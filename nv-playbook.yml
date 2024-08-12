@@ -1,0 +1,24 @@
+site:
+  title: NeuVector documentation
+  url: /
+  name: neuvector-ad
+  version: main
+  display_version: 'main'
+  start_page: ROOT::index.adoc
+  nav:
+  - modules/ROOT/nav.adoc
+
+content:
+  sources:
+    - url: https://github.com/rancher/neuvector-product-docs.git
+      branches: [main]
+
+ui:
+  bundle:
+    url: https://github.com/uyuni-project/uyuni-docs/blob/master/branding/default-ui/suma/ui-bundle.zip?raw=true
+    snapshot: true
+  supplemental_files: ./susecom-2023
+
+asciidoc:
+  extensions:
+    - asciidoctor-kroki

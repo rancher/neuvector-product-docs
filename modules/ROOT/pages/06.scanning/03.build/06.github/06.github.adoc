@@ -1,0 +1,10 @@
+= GitHub
+:slug: /scanning/build/github
+:taxonomy: {"category"=>"docs"}
+
+=== Scan for Vulnerabilities in a GitHub Action Pipeline
+
+The NeuVector scanner can be triggered from a GitHub Action pipeline by using the https://github.com/marketplace/actions/neuvector-vulnerability-scan-action[NeuVector Vulnerability Scan Action]
+published in the GitHub Action Marketplace.
+
+image::github_action.png[GithubAction]

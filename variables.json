@@ -1,0 +1,6 @@
+{
+    "CVE-critical": "🔴 Critical",
+    "CVE-high": "🟠 High",
+    "CVE-medium": "🟡 Medium",
+    "CVE-low": "🟢 Low"
+}

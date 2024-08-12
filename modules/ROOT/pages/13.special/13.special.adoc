@@ -1,0 +1,6 @@
+= Deployment Examples for Special Deployments Using the Allinone Container
+:sidebar_label: 13. Special Use Cases With Allinone
+:slug: /special
+:taxonomy: {"category"=>"docs"}
+
+How to deploy NeuVector using Kubernetes, OpenShift, Docker EE/UCP, Rancher, public cloud Kubernetes services and more...

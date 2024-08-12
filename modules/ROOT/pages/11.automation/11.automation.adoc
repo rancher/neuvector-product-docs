@@ -1,0 +1,6 @@
+= Automating NeuVector
+:sidebar_label: 11. Workflow & Automation
+:slug: /automation
+:taxonomy: {"category"=>"docs"}
+
+NeuVector can be integrated into the CI/CD workflow to provide automated scanning and deployment. We provide examples of using the REST API to automate NeuVector deployment.

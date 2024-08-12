@@ -1,0 +1,7 @@
+name: neuvector-ad
+title: NeuVector documentation
+version: main
+display_version: 'main'
+start_page: ROOT:index.adoc
+nav:
+- modules/ROOT/nav.adoc

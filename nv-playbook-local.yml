@@ -1,0 +1,19 @@
+site:
+  title: Longhorn documentation
+  url: /
+  start_page: neuvector-product-docs::index.adoc
+
+content:
+  sources:
+    - url: ./
+      branches: [main]
+
+ui:
+  bundle:
+    url: https://github.com/uyuni-project/uyuni-docs/blob/master/branding/default-ui/suma/ui-bundle.zip?raw=true
+    snapshot: true
+  supplemental_files: ./susecom-2023
+
+asciidoc:
+  extensions:
+    - asciidoctor-kroki

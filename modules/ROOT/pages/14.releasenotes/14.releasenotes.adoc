@@ -1,0 +1,6 @@
+= Release Notes
+:sidebar_label: 14. Release Notes
+:slug: /releasenotes
+:taxonomy: {"category"=>"docs"}
+
+Here you will find a log of major changes in releases.

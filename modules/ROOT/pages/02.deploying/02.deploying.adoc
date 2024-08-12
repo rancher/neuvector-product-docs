@@ -1,0 +1,6 @@
+= Deployments of the NeuVector Containers, Services, and Required Configurations
+:sidebar_label: 2. Deploying NeuVector 5.x
+:slug: /deploying
+:taxonomy: {"category"=>"docs"}
+
+Topics for planning and deploying for testing and to production on various platforms using Kubernetes, Rancher, OpenShift, & Docker compose.
