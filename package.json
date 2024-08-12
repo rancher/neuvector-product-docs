@@ -1,6 +1,7 @@
 {
   "devDependencies": {
-    "antora": "3.1.9"
+    "antora": "3.1.9",
+    "http-server": "^14.1.1"
   },
   "dependencies": {
     "asciidoctor-kroki": "^0.18.1"
