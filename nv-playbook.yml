@@ -4,7 +4,7 @@ site:
   name: neuvector-ad
   version: main
   display_version: 'main'
-  start_page: ROOT::index.adoc
+  start_page: ROOT::01.basics/01.overview/01.overview.adoc
   nav:
   - modules/ROOT/nav.adoc
 

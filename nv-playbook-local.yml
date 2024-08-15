@@ -1,7 +1,7 @@
 site:
-  title: Longhorn documentation
+  title: NeuVector documentation
   url: /
-  start_page: neuvector-product-docs::index.adoc
+  start_page: neuvector-product-docs::01.basics/01.overview/01.overview.adoc
 
 content:
   sources:
