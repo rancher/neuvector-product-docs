@@ -38,10 +38,6 @@ i.fa[title='Warning:'] {
   border-bottom-width: 2px;
 }
 
-.edit-this-page {
-  visibility: hidden;
-}
-
 /* Navbar colors */
 .navbar-brand .navbar-item:first-child .navbar-brand .navbar-item:first-child a {
   background-color: #0b322c;
@@ -51,10 +47,6 @@ i.fa[title='Warning:'] {
 .navbar .button {
   border: none;
   background-color: #e9644e;
-}
-
-.nav-panel-explore .context {
-  display: none;
 }
 
 @media screen and (min-width: 1024px) {
@@ -72,7 +64,7 @@ i.fa[title='Warning:'] {
 }
 
 .nav-container {
-  width: max-content;
+  width: calc(270 / 18 * 1rem);
 }
 
 @media screen and (min-width: 1024px) {
@@ -161,6 +153,10 @@ a.navbar-logo {
 
 .panels {
   background-color: #EFEFEF;
+}
+
+.nav-panel-explore .components .component .title a:hover {
+  color: #efefef;
 }
 
 /* Left Nav Link styles  */
