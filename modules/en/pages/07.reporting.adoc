@@ -1,0 +1,5 @@
+= Reporting
+:page-opendocs-origin: /07.reporting/07.reporting.md
+:page-opendocs-slug:  /reporting
+
+Reporting and Notifications

@@ -1,6 +1,0 @@
-= Configuring NeuVector and Accessing the Console
-:sidebar_label: 3. Initial Configuration & Console Login
-:slug: /configuration
-:taxonomy: {"category"=>"docs"}
-
-How to perform initial configurations and access the console.

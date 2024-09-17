@@ -1,6 +1,0 @@
-= Reporting
-:sidebar_label: 7. Reporting
-:slug: /reporting
-:taxonomy: {"category"=>"docs"}
-
-Reporting and Notifications

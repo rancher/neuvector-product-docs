@@ -1,6 +1,0 @@
-= Navigating NeuVector
-:sidebar_label: 4. Navigating NeuVector
-:slug: /navigation
-:taxonomy: {"category"=>"docs"}
-
-Console Menu and Navigation

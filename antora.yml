@@ -2,6 +2,6 @@ name: neuvector-product-docs
 title: NeuVector documentation
 version: main
 display_version: 'main'
-start_page: ROOT:01.basics/01.overview/01.overview.adoc
+start_page: en:overview.adoc
 nav:
-- modules/ROOT/nav.adoc
+- modules/en/nav.adoc

@@ -1,0 +1,155 @@
+= SAML (ADFS)
+:page-opendocs-origin: /08.integration/06.adfs/06.adfs.md
+:page-opendocs-slug:  /integration/adfs
+
+== Setting Up ADFS and NeuVector Integration
+
+This section describes the setup steps in ADFS first, then in the NeuVector console.
+
+=== ADFS Setup
+
+. From AD FS Management, right click on "`Relying Party Trusts`" and select "`Add Relying Party Trust...`".
++
+image:adfs1.png[adfsSetup]
+
+. Select "`Start`" button from Welcome step.
++
+image:adfs2.png[adfsSetup]
+
+. Select "`Enter data about the relying party manually`" and select "`Next`".
++
+image:adfs3.png[adfsSetup]
+
+. Enter a unique name for Display name field and select "`Next`".
++
+image:adfs4.png[adfsSetup]
+
+. Select "`Next`" to skip token encryption.
++
+image:adfs5.png[adfsSetup]
+
+. Check "`Enable support for the SAML 2.0 WebSSO protocol`" and enter  the SAML Redirect URI from NeuVector Settings>SAML Setting page into the "`Relying party SAML 2.0 SSO service URL`" field.  Select "`Next`" to continue.
++
+image:adfs6.png[adfsSetup]
+
+. Enter the same SAML Redirect URI into the "`Relying party trust identifier`" field and click "`Add`"; then select "`Next`" to continue.
++
+image:adfs7.png[adfsSetup]
+
+. Customize Access Control; then select "`Next`" to continue.
++
+image:adfs8.png[adfsSetup]
+
+. Select "`Next`" to continue.
++
+image:adfs9.png[adfsSetup]
+
+. Select "`Close`" to finish.
+. Select Edit Claim Issuance Policy...
++
+image:adfs10-11.png[adfsSetup]
+
+. Select "`Add Rule...`" and choose "`Send LDAP Attributes as Claims`"; then select "`Next`".  Name the rule and choose Active Directory as the Attribute store. Only Username outgoing claim is required for authentication if default role is set; else groups is needed for role mapping.  Email is optional.
++
+--
+* SAM-Account-Name -> Username
+* E-Mail-Address -> Email
+* Token-Groups -- Unqalified Names -> groups
+
+image:adfs11-12.png[adfsSetup]
+--
+. Select "`Add Rule...`" and choose "`Transform an Incoming Claim`"; then select "`Next`".  Name the rule and set the field as captured in the screenshot below.  The Outgoing name ID format needs to be Transient Identifier.
++
+image:adfs12-13.png[adfsSetup]
+
+=== NeuVector Setup
+
+. Identify Provider Single Sign-On URL
+* View Endpoints from AD FS Management > Service and use "`SAML 2.0/WS-Federation`" endpoint URL.
+* Example: https://<adfs-fqdn>/adfs/ls
+
+. Identity Provider Issuer
+* Right click on AD FS from AD FS Management console and select "`Edit Federation Service Properties...`"; use the "`Federation Service identifier`".
+* Example: http://<adfs-fqdn>/adfs/services/trust
+
+. X.509 Certificate
+* From AD FS Management, select Service > Certificate, right click on Token-signing certificate and choose "`View Certificate...`"
+* Select the Details tab and click "`Copy to File`"
+* Save it as a Base-64 encoded x.509 (.CER) file
+* Copy and paste the contents of the file into the X.509 Certificate field
+
+. Group claim
+* Enter the Outgoing claim name for the groups
+* Example: groups
+
+. Default role
+* Recommended to be "`None`" unless you want to allow any authenticated user a default role.
+
+. Role map
+* Set the group names of the users for the appropriate role.  (See screenshot example below.)
++
+image:nv_adfs1.png[NVadfsSetup]
+
+=== Mapping Groups to Roles and Namespaces
+
+Please see the xref:users.adoc#_mapping_groups_to_roles_and_namespaces[Users and Roles] section for how to map groups to preset and custom roles as well as namespaces in NeuVector.
+
+== Troubleshooting
+
+. ADFS SamlResponseSignature needs to be either MessageOnly or MessageAndAssertion.  Use Get-AdfsRelyingPartyTrust command to verify or update it.
++
+image:nv_adfs2.png[adfsTroubleshooting]
+
+. Time synchronization between Kubernetes Nodes x ADFS Server
+
+For a successful authentication, the time between the Kubernetess nodes and the ADFS server needs to be the same to avoid time sync or clock drift issues.
+
+It's recommended to use an https://en.wikipedia.org/wiki/Network_Time_Protocol[NTP server], with equal time settings across all servers.
+
+Please check and confirm that both ADFS and NeuVector hosts are synchronized and the potential delays do not exceed more than 10 seconds. You can use Linux and Windows commands to check dates, times and NTP server activity.
+
+[TIP]
+====
+You can reload the auth times by disabling and enabling again the config in the NeuVector UI as follows:
+
+* Log in to NeuVector with Admin User
+* Go to Settings
+* Click on the button to disable and enable the SAML setting
+** *Make sure to keep the configuration settings!*
+
+Once the setting has been re-enabled, you can try to log in with an ADFS user. If it works, this confirms the issue was due to a time synchronization error between Kubernetes nodes and the ADFS Server.
+====
+
+. SAML characters must be case sensitive in NeuVector UI
++
+Attribute names are case sensitive. Make sure any SAML attribute name configured here is an exact match to the application configuration. SAML must point to the correct URL to authenticate.
++
+All the fields in `+NeuVector UI -> Settings -> SAML Settings+` are case-sensitive.
++
+The NeuVector controller logs contain the relevant information about authentication with the ADFS server and errors that will help identify the root cause. We recommended recreate the failed login condition and check the logs.
+
+. Make sure to enter the correct groups, certificates and protocols
++
+The SAML settings need to match the following configuration:
++
+|===
+| Setting | Value
+
+| Identify Provider Single Sign-On URL
+| Requires HTTPS protocol
+
+| Identity Provider Issuer
+| Requires HTTP protocol
+
+| ADFS SamlResponseSignature
+| Needs to be either MessageOnly or MessageAndAssertion
+|===
+
+[CAUTION]
+====
+These settings need to be validated on your ADFS server and in the NeuVector UI.
+====
+
+The selected certificate needs to be valid and correctly generated, including its `CA Root` and `Intermediate Certificates`. You can generate them using your trusted certificate authority, Windows or an automation tool such as https://letsencrypt.org/[LetsEncrypt].
+
+If any of these parameters are incorrect, you will receive an `Authentication Failed` error when you try to log in to NeuVector with an ADFS user using SAML authentication.

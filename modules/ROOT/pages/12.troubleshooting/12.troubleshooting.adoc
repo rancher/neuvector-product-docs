@@ -1,6 +1,0 @@
-= Troubleshooting NeuVector Deployments
-:sidebar_label: 12. Troubleshooting
-:slug: /troubleshooting
-:taxonomy: {"category"=>"docs"}
-
-How to troubleshoot NeuVector Deployments and collect logs for support.

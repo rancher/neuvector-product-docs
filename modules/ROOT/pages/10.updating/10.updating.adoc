@@ -1,6 +1,0 @@
-= Update the NeuVector Containers
-:sidebar_label: 10. Updating NeuVector
-:slug: /updating
-:taxonomy: {"category"=>"docs"}
-
-How to update the NeuVector components
