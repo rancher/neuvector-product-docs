@@ -3,5 +3,11 @@ title: NeuVector documentation
 version: main
 display_version: 'main'
 start_page: en:overview.adoc
+asciidoc:
+  attributes:
+    CVE-critical: 🔴 Critical
+    CVE-high: 🟠 High
+    CVE-medium: 🟡 Medium
+    CVE-low: 🟢 Low
 nav:
 - modules/en/nav.adoc

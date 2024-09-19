@@ -1,8 +1,6 @@
 = 5.x Release Notes
 :page-opendocs-origin: /14.releasenotes/01.5x/01.5x.md
 :page-opendocs-slug:  /releasenotes/5x
-include::partial$global-variables.adoc[]
-
 
 == Release Notes for 5.x
 
