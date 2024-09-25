@@ -1,5 +1,5 @@
-* xref:overview.adoc[NeuVector documentation]
-* Understanding NeuVector
+* xref:overview.adoc[SUSE® Security overview]
+* Understanding SUSE® Security
 ** xref:requirements.adoc[System requirements]
 ** xref:installation.adoc[Deployment preparation]
 ** xref:policy-overview.adoc[Security policy overview]
@@ -7,7 +7,7 @@
 ** xref:ci-workflow.adoc[CI/CD Workflow]
 ** xref:public-cloud.adoc[Public cloud]
 * Operational tasks
-** Deploying NeuVector
+** Deploying SUSE® Security
 *** xref:configmap.adoc[Deploy using ConfigMap]
 *** xref:operators.adoc[Deploy using Operators]
 *** xref:kubernetes.adoc[Kubernetes]
@@ -15,17 +15,17 @@
 *** xref:rancher.adoc[Rancher deployment]
 *** xref:airgap.adoc[Air-gapped deployment]
 *** xref:docker.adoc[Docker]
-*** xref:updating.adoc[Updating NeuVector]
-*** xref:testing.adoc[Evaluating and testing NeuVector]
+*** xref:updating.adoc[Updating SUSE® Security]
+*** xref:testing.adoc[Evaluating and testing SUSE® Security]
 *** xref:troubleshooting.adoc[Troubleshooting deployments]
 ** xref:users.adoc[Users and roles]
-** xref:restore.adoc[Restoring NeuVector configuration]
-** xref:remove.adoc[Removing or resetting NeuVector]
+** xref:restore.adoc[Restoring SUSE® Security configuration]
+** xref:remove.adoc[Removing or resetting SUSE® Security]
 ** xref:internal.adoc[Replacing internal certificates]
 ** xref:replacecert.adoc[Replacing self-signed certificates]
 ** xref:rest-api.adoc[Connect to manager, REST API server]
 ** xref:automation.adoc[Automation with REST API]
-* NeuVector interface
+* SUSE® Security interface
 ** xref:navigation.adoc[Navigating the console]
 ** xref:multicluster.adoc[Enterprise multi-cluster management]
 ** xref:modes.adoc[Modes: discover, monitor, protect]

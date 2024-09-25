@@ -143,7 +143,8 @@ To receive email notifications of new releases, please subscribe to this SUSE ma
 
 * **NVSHAS-9443**: Upgrade/Install through ArgoCD fails as it cannot create leases.coordination.k8s.io object.
 * **Workaround**: Create the given lease objects before upgrading to 5.4.0 using ARGO CD. Change the namespace if it is different than neuvector.
-
++
+--
 [,bash]
 ----
 cat <<EOF | kubectl apply -f -
@@ -164,6 +165,7 @@ spec:
   leaseTransitions: 0
 EOF
 ----
+--
 
 === 5.3.4 July 2024
 
