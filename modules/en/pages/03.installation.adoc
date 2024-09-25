@@ -1,0 +1,6 @@
+= Installation / Deployment
+:page-opendocs-origin: /01.basics/03.installation/03.installation.md
+:page-opendocs-slug:  /basics/installation
+:taxonomy: {"category"=>"docs"}
+
+Deploy the NeuVector containers using Kubernetes, OpenShift, Rancher, AWS EKS, Azure AKS, Google GKE, IBM IKS, docker run, or docker-compose.
