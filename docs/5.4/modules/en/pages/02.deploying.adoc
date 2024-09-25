@@ -1,0 +1,5 @@
+= Deployments of the NeuVector Containers, Services, and Required Configurations
+:page-opendocs-origin: /02.deploying/02.deploying.md
+:page-opendocs-slug:  /deploying
+
+Topics for planning and deploying for testing and to production on various platforms using Kubernetes, Rancher, OpenShift, & Docker compose.

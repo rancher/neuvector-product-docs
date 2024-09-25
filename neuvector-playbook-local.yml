@@ -6,7 +6,8 @@ site:
 content:
   sources:
     - url: ./
-      branches: [main]
+      branches: [version-5.4]
+      start_path: docs/*
 
 ui:
   bundle:
