@@ -1,0 +1,5 @@
+= Vulnerability Scanning, Compliance Testing, and Admission Controls
+:page-opendocs-origin: /06.scanning/06.scanning.md
+:page-opendocs-slug:  /scanning
+
+Full Lifecycle Image and Container Scanning, CIS Benchmarks for Security, and Compliance
