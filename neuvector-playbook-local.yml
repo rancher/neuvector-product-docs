@@ -6,7 +6,7 @@ site:
 content:
   sources:
     - url: ./
-      branches: [version-5.4]
+      branches: [main]
       start_paths: [docs/*]
 
 ui:
