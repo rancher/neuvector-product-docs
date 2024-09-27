@@ -1,7 +1,7 @@
 site:
   title: NeuVector documentation
   url: /
-  start_page: 5.4@neuvector-product-docs:en:overview.adoc
+  start_page: 5.4@security:en:overview.adoc
 
 content:
   sources:

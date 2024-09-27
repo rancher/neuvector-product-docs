@@ -1,5 +1,5 @@
-name: neuvector-product-docs
-title: SUSE® Security documentation
+name: security
+title: SUSE® Security
 version: 5.4
 display_version: '5.4'
 start_page: en:overview.adoc
@@ -9,5 +9,6 @@ asciidoc:
     CVE-high: 🟠 High
     CVE-medium: 🟡 Medium
     CVE-low: 🟢 Low
+    product-name: SUSE® Security
 nav:
 - modules/en/nav.adoc
