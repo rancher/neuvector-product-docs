@@ -4,7 +4,7 @@
 
 == Reporting
 
-Reports can be viewed and downloaded from several menus in the NeuVector console. The Dashboard displays a security summary which can be downloaded as a pdf. The pdf download can be filtered for a namespace if desired.
+Reports can be viewed and downloaded from several menus in the {product-name} console. The Dashboard displays a security summary which can be downloaded as a pdf. The pdf download can be filtered for a namespace if desired.
 
 image:3_0_Dashboard.png[Dashboard]
 
@@ -20,7 +20,7 @@ image:gdpr_report.png[Reports]
 
 === Event Reporting
 
-All events such as security, admin, admission, scanning, and risk are logged by NeuVector and can be also viewed in the Console in the Notifications menu. See below for details.
+All events such as security, admin, admission, scanning, and risk are logged by {product-name} and can be also viewed in the Console in the Notifications menu. See below for details.
 
 ==== Event Limits
 
@@ -36,9 +36,9 @@ This is why once the limit is reached, only the most recent 4K events of that ty
 
 == SIEM and SYSLOG
 
-You can configure the SYSLOG server and webhook notifications in the NeuVector console in the Settings -> Configuration menu. Choose the logging level, TCP or UDP, and format if json is desired. CVE data can be sent individually for each CVE and/or include layered scan results. You can also choose to send events to the controller's pod log instead of or in addition to syslog. Note that events are only sent to the lead controller's pod log.
+You can configure the SYSLOG server and webhook notifications in the {product-name} console in the Settings -> Configuration menu. Choose the logging level, TCP or UDP, and format if json is desired. CVE data can be sent individually for each CVE and/or include layered scan results. You can also choose to send events to the controller's pod log instead of or in addition to syslog. Note that events are only sent to the lead controller's pod log.
 
-You can then use your favorite reporting tools to monitor NeuVector events.
+You can then use your favorite reporting tools to monitor {product-name} events.
 
 In addition, you can configure your syslog server through the CLI as follows:
 
@@ -87,7 +87,7 @@ You can integrate with Splunk using SYSLOG to capture container security events 
 
 == Notifications and Logs
 
-In the NeuVector Console in the Notifications menu you can find notifications for Security Events, Risk (Scanning & Compliance) Events, and general system events.
+In the {product-name} Console in the Notifications menu you can find notifications for Security Events, Risk (Scanning & Compliance) Events, and general system events.
 
 Notifications can be downloaded as CSV or PDF from the Notifications menus. In addition, packet captures can be downloaded for network attacks, and vulnerability results can be downloaded from the Notifications -> Risk reports menu for each scan result.
 
@@ -103,7 +103,7 @@ In this view, you can review network, process, and file events and easily add a 
 
 image:security_events_addrule.png[AddRule]
 
-NeuVector also continuously monitors all containers for know attacks such as DNS, DDoS, HTTP-smuggling, tunneling etc. When an attack is detected it is logged here and blocked (if container/service is set to protect), and the packet is automatically captured. You can view the packet details, for example:
+{product-name} also continuously monitors all containers for know attacks such as DNS, DDoS, HTTP-smuggling, tunneling etc. When an attack is detected it is logged here and blocked (if container/service is set to protect), and the packet is automatically captured. You can view the packet details, for example:
 
 image:ping_capture.png[Capture]
 
@@ -132,6 +132,6 @@ This section contains events for vulnerability scans (image, registry, run-time,
 
 == Other Integrations
 
-NeuVector has published a Prometheus exporter with Grafana dashboard on the NeuVector github account https://github.com/neuvector/prometheus-exporter which can be customized for each installation.  In addition, sample integrations with Fluentd are also available upon request.
+{product-name} has published a Prometheus exporter with Grafana dashboard on the {product-name} github account https://github.com/neuvector/prometheus-exporter which can be customized for each installation.  In addition, sample integrations with Fluentd are also available upon request.
 
 Webhook alerts can be sent by configuring the web hook endpoint in Settings -> Configuration. Then create the appropriate response rule(s) in the Policy -> Response rules menu to select the type of event and the webhook as the action.

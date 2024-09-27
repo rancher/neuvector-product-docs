@@ -4,16 +4,16 @@
 
 == Internal Communication and Certificates
 
-NeuVector includes default self-signed certificates for encryption for the Manager (console/UI access), Controller (REST API, internal), Enforcer (internal), and Scanner (internal) communications.
+{product-name} includes default self-signed certificates for encryption for the Manager (console/UI access), Controller (REST API, internal), Enforcer (internal), and Scanner (internal) communications.
 
-These certificates can be replaced by your own to further harden communication. For replacing certificates used by external access to NeuVector (i.e, browser to the Manager, or REST API to the Controller), please see xref:replacecert.adoc[this section]. See below for replacing the certificates used in internal communication between NeuVector containers.
+These certificates can be replaced by your own to further harden communication. For replacing certificates used by external access to {product-name} (i.e, browser to the Manager, or REST API to the Controller), please see xref:replacecert.adoc[this section]. See below for replacing the certificates used in internal communication between {product-name} containers.
 
 [WARNING]
 ====
-Replacing certificates is recommended to be performed only during initial deployment of NeuVector. Replacing on a running cluster (even with rolling upgrade) may result in an unstable state where NeuVector pods are unable to communicate with each other due to a mismatch in certificates, and DATA LOSS may occur.
+Replacing certificates is recommended to be performed only during initial deployment of {product-name}. Replacing on a running cluster (even with rolling upgrade) may result in an unstable state where {product-name} pods are unable to communicate with each other due to a mismatch in certificates, and DATA LOSS may occur.
 ====
 
-=== Replacing Certificates Used in Internal Communications of NeuVector
+=== Replacing Certificates Used in Internal Communications of {product-name}
 
 Replace the internal encryption files `ca.crt`, `tls.key`, `tls.crt` as follows:
 
@@ -29,7 +29,7 @@ prompt = no
 C = US
 ST = California
 L = San Jose
-O = NeuVector Inc.
+O = {product-name} Inc.
 OU = Neuvector
 CN = Neuvector
 [v3_req]
@@ -98,7 +98,7 @@ kubectl create secret generic internal-cert -n neuvector --from-file=tls.key --f
 ----
 --
 
-Then proceed to deploy NeuVector as before. You can also shell into the controller/enforcer/scanner pods to confirm that the ca.crt, tls.key, tls.crt files are the customized ones and that the NeuVector communications are working using the new certificates.
+Then proceed to deploy {product-name} as before. You can also shell into the controller/enforcer/scanner pods to confirm that the ca.crt, tls.key, tls.crt files are the customized ones and that the {product-name} communications are working using the new certificates.
 
 .Example patch commands for controller (change namespace to cattle-neuvector-system if needed, and modify for use on enforcer, scanner)
 [,bash]
@@ -114,7 +114,7 @@ kubectl patch deployment -n $\{NAMESPACE} neuvector-controller-pod --type='json'
 Update current certificate with SANs::
 +
 ======
-If your certificate files were created before NeuVector version 5.3, you need to upate the certificate with at least one Subject Alternative Name, or SAN for short. If you still have the files `ca.key` and `ca.crt` accessible, run the commands as follows:
+If your certificate files were created before {product-name} version 5.3, you need to upate the certificate with at least one Subject Alternative Name, or SAN for short. If you still have the files `ca.key` and `ca.crt` accessible, run the commands as follows:
 
 [,bash]
 ----
@@ -141,7 +141,7 @@ kubectl rollout restart ds neuvector-enforcer-pod
 Regenarate certificate files and add SANs::
 +
 ======
-If your certificate files were created before NeuVector version 5.3, you need to upate the certificate with at least one Subject Alternative Name, or SAN for short. If you don´t have the files `ca.key` and `ca.crt` anymore, follow the steps below: 
+If your certificate files were created before {product-name} version 5.3, you need to upate the certificate with at least one Subject Alternative Name, or SAN for short. If you don´t have the files `ca.key` and `ca.crt` anymore, follow the steps below: 
 
 * Backup your original certificate 
 +

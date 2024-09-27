@@ -4,11 +4,11 @@
 
 == Kubernetes ConfigMap
 
-NeuVector supports automated configuration using the Kubernetes ConfigMap feature. This enables deployment of NeuVector containers with the appropriate configurations, integrations, and other settings in an automated way.
+{product-name} supports automated configuration using the Kubernetes ConfigMap feature. This enables deployment of {product-name} containers with the appropriate configurations, integrations, and other settings in an automated way.
 
 The 'always_reload: true' setting can be added in any ConfigMap yaml to force reload of that yaml every time the controller starts (version 4.3.2+). Otherwise, the ConfigMap will only be loaded at initial startup or after complete cluster restart (see persistent storage section below).
 
-=== Complete Sample NeuVector ConfigMap (initcfg.yaml)
+=== Complete Sample {product-name} ConfigMap (initcfg.yaml)
 
 The latest ConfigMap can be found https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.3.0/initcfg.yaml[here].
 
@@ -450,6 +450,6 @@ Note that the secret is referred to in the standard Kubernetes and OpenShift Con
 
 == ConfigMaps and Persistent Storage
 
-Both the ConfigMaps and the xref:production.adoc#_backups_and_persistent_data[persistent storage] backup are only read when a new NeuVector cluster is deployed, or the cluster fails and is restarted. They are not used during rolling upgrades.
+Both the ConfigMaps and the xref:production.adoc#_backups_and_persistent_data[persistent storage] backup are only read when a new {product-name} cluster is deployed, or the cluster fails and is restarted. They are not used during rolling upgrades.
 
 The persistent storage configuration backup is read first, then the ConfigMaps are applied, so ConfigMap settings take precedence. All ConfigMap settings (e.g. updates) will also be saved into persistent storage.

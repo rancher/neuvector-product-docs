@@ -4,7 +4,7 @@
 
 == Data Loss Prevention (DLP) and Web Application Firewall (WAF)
 
-DLP and WAF uses the Deep Packet Inspection (DPI) of NeuVector to inspect the network payloads of connections for sensitive data violations. NeuVector uses a regular expression (regex) based engine to perform packet filtering functions. Extreme care should be taken when applying sensors to container traffic, as the filtering function incurs additional system overhead and can impact performance of the host.
+DLP and WAF uses the Deep Packet Inspection (DPI) of {product-name} to inspect the network payloads of connections for sensitive data violations. {product-name} uses a regular expression (regex) based engine to perform packet filtering functions. Extreme care should be taken when applying sensors to container traffic, as the filtering function incurs additional system overhead and can impact performance of the host.
 
 DLP and WAF filtering are applied differently depending on the group(s) to which they are applied. In general, WAF filtering is applied to inbound and outbound connections except for internal traffic where only inbound filtering is applied. DLP filtering applies to inbound and outbound connections from a 'security domain', but not any internal connections within a security domain. See the detailed descriptions below.
 

@@ -1,5 +1,5 @@
-= Update the NeuVector Containers
+= Update the {product-name} Containers
 :page-opendocs-origin: /10.updating/10.updating.md
 :page-opendocs-slug:  /updating
 
-How to update the NeuVector components
+How to update the {product-name} components

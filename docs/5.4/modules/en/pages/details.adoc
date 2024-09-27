@@ -153,7 +153,7 @@ ____
 * NV_SYSTEM_GROUPS
 +
 ____
-(Optional) Specify what groups or namespaces that NeuVector considers to be 'system containers', separated by semi-colons. For example, for Rancher-based apps and the default namespace, NV_SYSTEM_GROUPS=__cattle-system;__default. These values are translated in regex. System containers (which also include NeuVector and Kubernetes system containers) operate only in Monitor mode (alert only) even if the group is set to Protect mode.
+(Optional) Specify what groups or namespaces that {product-name} considers to be 'system containers', separated by semi-colons. For example, for Rancher-based apps and the default namespace, NV_SYSTEM_GROUPS=__cattle-system;__default. These values are translated in regex. System containers (which also include {product-name} and Kubernetes system containers) operate only in Monitor mode (alert only) even if the group is set to Protect mode.
 ____
 
 == Open Ports
@@ -163,4 +163,4 @@ ____
 * MANAGER_SERVER_PORT - on manager or all-in-one. Default 8443.
 * CTRL_SERVER_PORT - on controller. Default 10443.
 
-Please see the section xref:installation.adoc[Deployment Preparation] for a full description of the port communication requirements for the NeuVector containers.
+Please see the section xref:installation.adoc[Deployment Preparation] for a full description of the port communication requirements for the {product-name} containers.

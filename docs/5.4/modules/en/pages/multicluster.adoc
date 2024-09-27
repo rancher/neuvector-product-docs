@@ -4,13 +4,13 @@
 
 == Enterprise Console
 
-The NeuVector console can be used to manage large enterprise multi-cluster and multi-cloud deployments. One cluster should be selected as the Primary cluster, and other Remote clusters will then be able to join the Primary. Once connected, the Primary cluster can push Federated rules down to each remote cluster, which display as Federated rules in the consoles of each remote cluster. Scanned Federated registries will also sync the scan results with remote clusters. Only local users & Rancher users who have admin permission can promote a cluster to become the primary cluster.
+The {product-name} console can be used to manage large enterprise multi-cluster and multi-cloud deployments. One cluster should be selected as the Primary cluster, and other Remote clusters will then be able to join the Primary. Once connected, the Primary cluster can push Federated rules down to each remote cluster, which display as Federated rules in the consoles of each remote cluster. Scanned Federated registries will also sync the scan results with remote clusters. Only local users & Rancher users who have admin permission can promote a cluster to become the primary cluster.
 
 In addition to Federated policy, multi-cluster management supports monitoring of each remote cluster in a summary page, as shown below.
 
 image:multicluster_summary.png[Summary]
 
-There MUST be network connectivity between the controllers in each cluster on the required ports. The controller is exposed external to its cluster by either a primary or remote service, as can be seen in the sample NeuVector deployment yaml file.
+There MUST be network connectivity between the controllers in each cluster on the required ports. The controller is exposed external to its cluster by either a primary or remote service, as can be seen in the sample {product-name} deployment yaml file.
 
 == Configuring the Primary and Remote Clusters
 

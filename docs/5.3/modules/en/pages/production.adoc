@@ -1,18 +1,18 @@
-= Deploying NeuVector
+= Deploying {product-name}
 :page-opendocs-origin: /02.deploying/01.production/01.production.md
 :page-opendocs-slug: /deploying/production
 
 == Planning Deployments
 
-The NeuVector containers in a default deployment include the controller, manager, enforcer, scanner, and updater. Placement of where these containers (on which nodes) are deployed must be considered, and appropriate labels, taints or tolerations created to control them.
+The {product-name} containers in a default deployment include the controller, manager, enforcer, scanner, and updater. Placement of where these containers (on which nodes) are deployed must be considered, and appropriate labels, taints or tolerations created to control them.
 
-The enforcer should be deployed on every host/node where application containers to be monitored and protected by NeuVector will be running.
+The enforcer should be deployed on every host/node where application containers to be monitored and protected by {product-name} will be running.
 
-The controller manages the cluster of enforcers, and can be deployed on the same node as an enforcer or on a separate management node. The manager should be deployed on the node where the controller is running, and will provide console access to the controller. Other required NeuVector containers such as the manager, scanner, and updater are described in more detail in the Best Practices guide referenced below.
+The controller manages the cluster of enforcers, and can be deployed on the same node as an enforcer or on a separate management node. The manager should be deployed on the node where the controller is running, and will provide console access to the controller. Other required {product-name} containers such as the manager, scanner, and updater are described in more detail in the Best Practices guide referenced below.
 
-If you haven't done so, pull the images from the NeuVector Docker Hub.
+If you haven't done so, pull the images from the {product-name} Docker Hub.
 
-The images are on the NeuVector Docker Hub registry. Use the appropriate version tag for the manager, controller, enforcer, and leave the version as 'latest' for scanner and updater. For example:
+The images are on the {product-name} Docker Hub registry. Use the appropriate version tag for the manager, controller, enforcer, and leave the version as 'latest' for scanner and updater. For example:
 
 * neuvector/manager:5.3.2
 * neuvector/controller:5.3.2
@@ -22,13 +22,13 @@ The images are on the NeuVector Docker Hub registry. Use the appropriate version
 
 Please be sure to update the image references in appropriate yaml files.
 
-If deploying with the current NeuVector Helm chart (v1.8.9+), the following changes should be made to values.yml:
+If deploying with the current {product-name} Helm chart (v1.8.9+), the following changes should be made to values.yml:
 
 * Update the registry to docker.io
 * Update image names/tags to the current version on Docker Hub, as shown above
 * Leave the imagePullSecrets empty
 
-=== Best Practices, Tips, Q&A for Deploying and Managing NeuVector
+=== Best Practices, Tips, Q&A for Deploying and Managing {product-name}
 
 Download and review this xref:attachment$NV_Onboarding_5.0.pdf[Deployment Best Practices document] for tips such as performance and sizing, best practices, and frequently asked questions about deployments.
 
@@ -36,7 +36,7 @@ Download and review this xref:attachment$NV_Onboarding_5.0.pdf[Deployment Best P
 
 Automated deployment using Helm can be found at https://github.com/neuvector/neuvector-helm.
 
-Deployment using an Operator, including RedHat Certified Operator and Kubernetes community operator is supported, with a general description xref:operators.adoc[here]. The NeuVector RedHat operator is at https://access.redhat.com/containers/#/registry.connect.redhat.com/neuvector/neuvector-operator, and the community operator at https://operatorhub.io/operator/neuvector-operator.
+Deployment using an Operator, including RedHat Certified Operator and Kubernetes community operator is supported, with a general description xref:operators.adoc[here]. The {product-name} RedHat operator is at https://access.redhat.com/containers/#/registry.connect.redhat.com/neuvector/neuvector-operator, and the community operator at https://operatorhub.io/operator/neuvector-operator.
 
 == Deployment Using ConfigMap
 
@@ -62,18 +62,18 @@ If you run multiple controllers in an HA configuration, as long as one controlle
 
 If you wish to save logs such as violations, threats, vulnerabilities and events please enable the SYSLOG server in Settings.
 
-NeuVector supports persistent data for the NeuVector policy and configuration. This configures a real-time backup to mount a volume at /var/neuvector/ from the controller pod. The primary use case is when the persistent volume is mounted, the configuration and policy are stored during run-time to the persistent volume. In the case of total failure of the cluster, the configuration is automatically restored when the new cluster is created. Configuration and policy can also be manually restored or removed from the /var/neuvector/ volume.
+{product-name} supports persistent data for the {product-name} policy and configuration. This configures a real-time backup to mount a volume at /var/neuvector/ from the controller pod. The primary use case is when the persistent volume is mounted, the configuration and policy are stored during run-time to the persistent volume. In the case of total failure of the cluster, the configuration is automatically restored when the new cluster is created. Configuration and policy can also be manually restored or removed from the /var/neuvector/ volume.
 
 [IMPORTANT]
 ====
-If a persistent volume is not mounted, NeuVector does NOT store the configuration or policy as persistent data. Be sure to backup the Controller configuration and policy before stopping the allinone or controller container. This can be done in `Settings -> Configuration`. Alternatively, the controller can be deployed in an HA configuration with 3 or 5 controllers running, in which case the policy will persist with other controllers while one is being updated.
+If a persistent volume is not mounted, {product-name} does NOT store the configuration or policy as persistent data. Be sure to backup the Controller configuration and policy before stopping the allinone or controller container. This can be done in `Settings -> Configuration`. Alternatively, the controller can be deployed in an HA configuration with 3 or 5 controllers running, in which case the policy will persist with other controllers while one is being updated.
 ====
 
 === Persistent Volume Example
 
-The PersistentVolume defined in the cluster is required for persistent volume support. The requirement for NeuVector is that the accessModes needs to be ReadWriteMany(RWX). Not all storage types support the RWX access mode. For example, on GKE you may need to create a RWX persistent volume using NFS storage.
+The PersistentVolume defined in the cluster is required for persistent volume support. The requirement for {product-name} is that the accessModes needs to be ReadWriteMany(RWX). Not all storage types support the RWX access mode. For example, on GKE you may need to create a RWX persistent volume using NFS storage.
 
-Once the PersistentVolume is created, there needs to be created a PersistentVolumeClaim as below for Controller. Currently the persistent volume is used only for the NeuVector configuration backup files in the controller (Policies, Rules, user data, integrations etc) and registry scan results.
+Once the PersistentVolume is created, there needs to be created a PersistentVolumeClaim as below for Controller. Currently the persistent volume is used only for the {product-name} configuration backup files in the controller (Policies, Rules, user data, integrations etc) and registry scan results.
 
 [,yaml]
 ----
@@ -114,7 +114,7 @@ spec:
   storageClassName: ibmc-file-retain-custom
 ----
 
-After the Persistent Volume Claim is created, modify the NeuVector sample yaml file as shown below (old section commented out):
+After the Persistent Volume Claim is created, modify the {product-name} sample yaml file as shown below (old section commented out):
 
 [,yaml]
 ----
@@ -139,7 +139,7 @@ Also add the following environment variable in the Controller or Allinone sample
 
 === ConfigMaps and Persistent Storage
 
-Both the ConfigMaps and the persistent storage backup are only read when a new NeuVector cluster is deployed, or the cluster fails and is restarted. They are not used during rolling upgrades.
+Both the ConfigMaps and the persistent storage backup are only read when a new {product-name} cluster is deployed, or the cluster fails and is restarted. They are not used during rolling upgrades.
 
 The persistent storage configuration backup is read first, then the ConfigMaps are applied, so ConfigMap settings take precedence. All ConfigMap settings (e.g. updates) will also be saved into persistent storage.
 
@@ -183,7 +183,7 @@ By default the console is exposed as a service on port 8443, or nodePort with a 
 
 == Handing Host Updates or Auto-Scaling Nodes with a Pod Disruption Budget
 
-Maintenance or scaling activities can affect the controllers on nodes. Public cloud providers support the ability to auto-scale nodes, which can dynamically evict pods including the NeuVector controllers. To prevent disruptions to the controllers, a NeuVector pod disruption budget can be created.
+Maintenance or scaling activities can affect the controllers on nodes. Public cloud providers support the ability to auto-scale nodes, which can dynamically evict pods including the {product-name} controllers. To prevent disruptions to the controllers, a {product-name} pod disruption budget can be created.
 
 For example, create the file below nv_pdb.yaml to ensure that there are at least 2 controllers running at any time.
 
@@ -218,9 +218,9 @@ See the section on xref:docker.adoc[Docker deployment] for sample compose files.
 
 == Multi-site, Multi-Cluster Architecture
 
-For enterprises with multiple locations and where a separate NeuVector cluster can be deployed for each location, the following is a proposed reference architecture. Each cluster has its own set of controllers and is separately managed.
+For enterprises with multiple locations and where a separate {product-name} cluster can be deployed for each location, the following is a proposed reference architecture. Each cluster has its own set of controllers and is separately managed.
 
 image:multisite.png[Multi-Site]
 
 See a more detailed description in this file >
-xref:attachment$multisite.pdf[NeuVector Multi-Site Architecture]
+xref:attachment$multisite.pdf[{product-name} Multi-Site Architecture]

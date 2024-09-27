@@ -1,12 +1,12 @@
-= Evaluating and Testing NeuVector
+= Evaluating and Testing {product-name}
 :page-opendocs-origin: /09.testing/01.testing/01.testing.md
 :page-opendocs-slug:  /testing/testing
 
 == Sample Applications
 
-After you've deployed the NeuVector components you can evaluate it using the sample test applications we provide. These are located in the `'nvbeta`' repository on docker hub.
+After you've deployed the {product-name} components you can evaluate it using the sample test applications we provide. These are located in the `'nvbeta`' repository on docker hub.
 
-A typical Kubernetes-based test environment would have a master node and two to three worker nodes. You can control if application pods and NeuVector containers are deployed on a master node (off by default).
+A typical Kubernetes-based test environment would have a master node and two to three worker nodes. You can control if application pods and {product-name} containers are deployed on a master node (off by default).
 
 == Kubernetes Test Plan
 
@@ -154,7 +154,7 @@ kubectl get svc -n demo
 
 Then connect to the public IP address/port for one of the kubernetes nodes, e.g. '`http://(public_IP):(NodePort)`'
 
-After deploying NeuVector, you can run test traffic through the demo applications to generate the whitelist rules, and then move all services to Monitor or Protect mode to see violations and attacks.
+After deploying {product-name}, you can run test traffic through the demo applications to generate the whitelist rules, and then move all services to Monitor or Protect mode to see violations and attacks.
 
 === Generating Network Violations on Kubernetes
 
@@ -195,7 +195,7 @@ Use the internal IP of another node pod:
 ping 172.30.2.21 -s 40000
 ----
 
-For all of the above, you can view the security events in the NeuVector console Network Activity map, as well as the Notifications tab.
+For all of the above, you can view the security events in the {product-name} console Network Activity map, as well as the Notifications tab.
 
 === Process and File Protection Tests
 
@@ -209,17 +209,17 @@ More advanced admission control testing can be done using different criteria in 
 
 ==== Deploy Another App
 
-The Kubernetes Guestbook demo application can also be deployed on Kubernetes. It is recommended to deploy it into its own namespace so you can see namespace based filtering in the NeuVector console.
+The Kubernetes Guestbook demo application can also be deployed on Kubernetes. It is recommended to deploy it into its own namespace so you can see namespace based filtering in the {product-name} console.
 
 == Docker-native Test Plan
 
-After deploying the NeuVector components and the sample application(s) you'll be able to Discover, Monitor and Protect running containers. The test plan below provides suggestions for generating run-time violations of allowed application behavior and scanning containers for vulnerabilities.
+After deploying the {product-name} components and the sample application(s) you'll be able to Discover, Monitor and Protect running containers. The test plan below provides suggestions for generating run-time violations of allowed application behavior and scanning containers for vulnerabilities.
 
-xref:attachment$testplan.pdf[NeuVector Test Plan]
+xref:attachment$testplan.pdf[{product-name} Test Plan]
 
 If the link above does not work, you can http://neuvector.com/sample-applications-test-plan/[download] it from our website using password nv1851blvd.
 
-NeuVector can also detect threats to your containers such as DDOS attacks. If you run a tool to generate such attacks on your containers, these results will show in Network Activity and in the Dashboard.
+{product-name} can also detect threats to your containers such as DDOS attacks. If you run a tool to generate such attacks on your containers, these results will show in Network Activity and in the Dashboard.
 
 For example, a simple ping command with high payload will show the Ping.Death attack in the console. To try this, do the following to the IP address of one of the containers (internal IP of the container).
 

@@ -2,9 +2,9 @@
 :page-opendocs-origin: /06.scanning/02.registry/02.registry.md
 :page-opendocs-slug:  /scanning/registry
 
-Registry scanning requires that the NeuVector Allinone or Controller container be deployed on a host/node. Please see the xref:installation.adoc[Installation/Deployment] section for how to deploy the NeuVector containers. Configure registry scanning from the NeuVector console after logging in to the manager.
+Registry scanning requires that the {product-name} Allinone or Controller container be deployed on a host/node. Please see the xref:installation.adoc[Installation/Deployment] section for how to deploy the {product-name} containers. Configure registry scanning from the {product-name} console after logging in to the manager.
 
-In addition, make sure there is a NeuVector scanner container deployed and configured to connect to the Allinone or Controller. In 4.0 and later, the neuvector/scanner container must be deployed separate from the allinone or controller.
+In addition, make sure there is a {product-name} scanner container deployed and configured to connect to the Allinone or Controller. In 4.0 and later, the neuvector/scanner container must be deployed separate from the allinone or controller.
 
 [NOTE]
 ====
@@ -17,7 +17,7 @@ For multi-cluster (federated) environments, the primary (master) cluster can sca
 
 == Configure Registry Scanning
 
-To configure registries and repositories to be scanning, go to the Assets -> Registries menu in the NeuVector console. Add or edit registries to be scanned. Use the Filter to define repositories or subsets of images to be scanned. If your registry requires access through a proxy, this can be configured in Settings -> Configuration.
+To configure registries and repositories to be scanning, go to the Assets -> Registries menu in the {product-name} console. Add or edit registries to be scanned. Use the Filter to define repositories or subsets of images to be scanned. If your registry requires access through a proxy, this can be configured in Settings -> Configuration.
 
 image:registry-scan.png[Registry]
 
@@ -62,7 +62,7 @@ image:1-filter-examples.png[filters]
 ** Enable periodic scan to scan periodically
 ** Scan interval can set to be between 5 minutes to every 7 days.
 ** Because many Admission Control checks rely on image scan result, enabling periodical scan helps make sure Admission Control has the up-to-date information of the images.
-** Note that NeuVector will scan images in a regsistry that are new/changed from the previous scan.
+** Note that {product-name} will scan images in a regsistry that are new/changed from the previous scan.
 * Rescan after CVE DB update
 ** Enable this option to rescan all images after the vulnerability database is updated.
 
@@ -352,7 +352,7 @@ image:18-gcpiam.png[gcpiam]
 
 ==== Copy json file to client machine
 
-==== Add Google Container Registry from the NeuVector GUI
+==== Add Google Container Registry from the {product-name} GUI
 
 * Choose Google registry as type
 * Give unique name to the registry
@@ -385,7 +385,7 @@ Showing azure portal username and password for container registry access
 
 image:20-azure.png[azure]
 
-==== Add Azure Container Registry from the NeuVector GUI
+==== Add Azure Container Registry from the {product-name} GUI
 
 * Choose Azure registry as type
 * Give unique name to the registry
@@ -489,7 +489,7 @@ The following is a sample screen-capture of the page that reveals both the Exter
 
 image:gitlabexternalurl.png[gitlab]
 
-==== Add Gitlab Registry from the NeuVector Console
+==== Add Gitlab Registry from the {product-name} Console
 
 * Choose Gitlab as the registry type
 * Give unique name to the registry
@@ -501,7 +501,7 @@ image:gitlabregistryscan.png[gitlab]
 
 [NOTE]
 ====
-The Registry URL is used for pulling images into the NeuVector scanner-platform from GitLab to do registry scanning.  While the External URL is used for retrieving a list of images, registries, and metadata used by the registry scanning feature.
+The Registry URL is used for pulling images into the {product-name} scanner-platform from GitLab to do registry scanning.  While the External URL is used for retrieving a list of images, registries, and metadata used by the registry scanning feature.
 ====
 
 === IBM Cloud Container Registry

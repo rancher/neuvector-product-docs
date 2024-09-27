@@ -4,15 +4,15 @@
 
 == Google GCR - Authentication/Scanning with GCP Service Accounts
 
-It is a best practice to not depend on user attributed accounts for integrations.  GCP supports using a service account to access GCR.  Here are the steps to enable a service account for GCR and use it to trigger repository scans from NeuVector.
+It is a best practice to not depend on user attributed accounts for integrations.  GCP supports using a service account to access GCR.  Here are the steps to enable a service account for GCR and use it to trigger repository scans from {product-name}.
 
-Start in NeuVector, where one first sets up a new registry:
+Start in {product-name}, where one first sets up a new registry:
 
 image:gcr1.png[GCR]
 
 By selecting Google Container Registry as the repo type, this panel is customized to accept the input required to use your GCR.
 
-. Name - Here's where you give this particular repo entry a name of your choosing. It's merely to identify it in the NeuVector interface later on.
+. Name - Here's where you give this particular repo entry a name of your choosing. It's merely to identify it in the {product-name} interface later on.
 . Registry - This is the first place where you'll want to be sure the correct data is collected from your GCR instance. While the example of https://gcr.io is the most common, we will want to be sure it accurately reflects how your GCR was set up in GCP. It might be https://us.gcr.io for example. We'll go check it in the next section.
 . JSON Key - As is pretty self-evident, this will be a JSON-formatted key. And, as you're probably seeing a pattern set up for, we'll be finding that via GCP.
 . Filter - Be mindful that you will likely need to replace any filters here with the actual name of the repo. Again, that's in the GCR interface.
@@ -22,7 +22,7 @@ image:gcr2.png[GCR]
 Now let's head on over to that GCR screen in GCP. Much of what we need is right here on this page.
 
 [upperalpha]
-. See the "`gcr.io`" under Hostname? That's what belongs in item #2, Registry in the NeuVector interface. (Don't forget the https:// part)
+. See the "`gcr.io`" under Hostname? That's what belongs in item #2, Registry in the {product-name} interface. (Don't forget the https:// part)
 . The ID of the repo is actually under the top level project. This is what you will be using in #3, Filter. See example of env-demo below.
 
 image:gcr3.png[GCR]
@@ -47,9 +47,9 @@ Click "`ADD KEY`" --> "`Create New Key`"
 
 image:gcr7.png[GCR]
 
-As you have already concluded, JSON is the go-to here. Selecting "`CREATE`" will result in a file that you can download in your browser. The contents of this file should be pasted into the 3, JSON Key field in NeuVector; see figure 1.
+As you have already concluded, JSON is the go-to here. Selecting "`CREATE`" will result in a file that you can download in your browser. The contents of this file should be pasted into the 3, JSON Key field in {product-name}; see figure 1.
 
-Before you get too excited there's one more thing to ensure. In order for the scanner in NeuVector to use the API to scan and protect your images, said API must be enabled in your GCP account. You can either enable it via the command line via
+Before you get too excited there's one more thing to ensure. In order for the scanner in {product-name} to use the API to scan and protect your images, said API must be enabled in your GCP account. You can either enable it via the command line via
 
 [,shell]
 ----
@@ -66,7 +66,7 @@ image:gcr9.png[GCR]
 
 === Obtain the Access Token Using the REST API
 
-The NeuVector REST API may be used to authenticate using the service account. The below example uses gcloud to obtain the access token.  The username is "`oauth2accesstoken`".
+The {product-name} REST API may be used to authenticate using the service account. The below example uses gcloud to obtain the access token.  The username is "`oauth2accesstoken`".
 
 [,shell]
 ----
@@ -74,7 +74,7 @@ gcloud auth print-access-token
 ya29.a0AfH6SMAvyZ2zkD3MZD_K8Lqr7qkIsRkGNqhAGthJ_A7lp8OGRe7xh5KmuQY-VJfqu83C9e1gi7A_m1InNm8QIoTGf9WHXnOeAr1gT_O6b6K667NUz1_YDunjdW09jt0XvcBGQaxjJ3c4aHlxdehBFiE_9PMk13JDt_T6f0_6vzS7
 ----
 
-=== Use the Token with NeuVector Repository Scanning
+=== Use the Token with {product-name} Repository Scanning
 
 The below example script incorporates the access token to trigger GCR repository scan.
 

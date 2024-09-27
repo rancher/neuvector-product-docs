@@ -2,13 +2,13 @@
 :page-opendocs-origin: /13.special/01.general/01.general.md
 :page-opendocs-slug:  /special/general
 
-== Testing NeuVector Using the Allinone Container
+== Testing {product-name} Using the Allinone Container
 
-The examples in this section deploy the Allinone and Enforcer containers. This is useful for trying out NeuVector, especially on non-Kubernetes (e.g. docker native) environments. For Kubernetes based deployments using the latest NeuVector Helm chart is recommended. Please see the section Deploying NeuVector.
+The examples in this section deploy the Allinone and Enforcer containers. This is useful for trying out {product-name}, especially on non-Kubernetes (e.g. docker native) environments. For Kubernetes based deployments using the latest {product-name} Helm chart is recommended. Please see the section Deploying {product-name}.
 
 == General Guidelines for Deployment
 
-Prepare your host environment for proper installation. Make sure the NeuVector containers can communicate with each other between hosts. Then review and edit the sample files for you environment.
+Prepare your host environment for proper installation. Make sure the {product-name} containers can communicate with each other between hosts. Then review and edit the sample files for you environment.
 
 Generally, it is important to do the following:
 

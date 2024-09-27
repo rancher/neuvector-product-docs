@@ -1,23 +1,23 @@
-= Removing or Resetting NeuVector
+= Removing or Resetting {product-name}
 :page-opendocs-origin: /02.deploying/10.remove/10.remove.md
 :page-opendocs-slug: /deploying/remove
 
-== Removing NeuVector Deployment / Containers
+== Removing {product-name} Deployment / Containers
 
-To remove the NeuVector deployment on Kubernetes, use the same yaml file for deployment in the delete command.
+To remove the {product-name} deployment on Kubernetes, use the same yaml file for deployment in the delete command.
 
 [,shell]
 ----
 kubectl delete -f neuvector.yaml
 ----
 
-This will remove the services and container deployments of NeuVector. You may also want to delete the neuvector namespace, persistent volume and cluster roles and clusterrolebindings created in the deployment steps.
+This will remove the services and container deployments of {product-name}. You may also want to delete the neuvector namespace, persistent volume and cluster roles and clusterrolebindings created in the deployment steps.
 
-If you deployed NeuVector using a Helm chart or operator you should delete NeuVector using Helm or the appropriate operator command.
+If you deployed {product-name} using a Helm chart or operator you should delete {product-name} using Helm or the appropriate operator command.
 
-== Resetting NeuVector to an Initial State
+== Resetting {product-name} to an Initial State
 
-In addition to deleting as discussed above and redeploying NeuVector, the following steps can be taken in Kubernetes to reset NeuVector, which will remove learned rules, groups, and other configuration but leave the NeuVector deployment intact.
+In addition to deleting as discussed above and redeploying {product-name}, the following steps can be taken in Kubernetes to reset {product-name}, which will remove learned rules, groups, and other configuration but leave the {product-name} deployment intact.
 
 . Scale the controller deployment to 0.
 . (Optional) if a Persistent Volume is used, delete the persistent volume backup and registry folders created.
@@ -25,7 +25,7 @@ In addition to deleting as discussed above and redeploying NeuVector, the follow
 
 == Resetting the Admin Password
 
-The admin password is the key to administering the NeuVector deployment and view the cluster network activities.  It is important to change the password upon install and keep it safely guarded.  Sometimes, the password is guarded too well and become loss or the administrator leaves the company.  If you have kubectl access to the cluster, you can reset the admin password to the default using the following steps.
+The admin password is the key to administering the {product-name} deployment and view the cluster network activities.  It is important to change the password upon install and keep it safely guarded.  Sometimes, the password is guarded too well and become loss or the administrator leaves the company.  If you have kubectl access to the cluster, you can reset the admin password to the default using the following steps.
 
 Exec into one of the controllers.
 

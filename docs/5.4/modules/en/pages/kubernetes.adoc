@@ -4,21 +4,21 @@
 
 == Deploy Using Kubernetes
 
-You can use Kubernetes to deploy separate manager, controller and enforcer containers and make sure that all new nodes have an enforcer deployed. NeuVector requires and supports Kubernetes network plugins such as flannel, weave, or calico.
+You can use Kubernetes to deploy separate manager, controller and enforcer containers and make sure that all new nodes have an enforcer deployed. {product-name} requires and supports Kubernetes network plugins such as flannel, weave, or calico.
 
 The sample file will deploy one manager and 3 controllers. It will deploy an enforcer on every node as a daemonset. By default, the sample below will deploy to the Master node as well.
 
-See the bottom section for specifying dedicated manager or controller nodes using node labels. Note: It is not recommended to deploy (scale) more than one manager behind a load balancer due to potential session state issues. If you plan to use a PersistentVolume claim to store the backup of NeuVector config files, please see the general Backup/Persistent Data section in the xref:production.adoc#_backups_and_persistent_data[Deploying NeuVector] overview.
+See the bottom section for specifying dedicated manager or controller nodes using node labels. Note: It is not recommended to deploy (scale) more than one manager behind a load balancer due to potential session state issues. If you plan to use a PersistentVolume claim to store the backup of {product-name} config files, please see the general Backup/Persistent Data section in the xref:production.adoc#_backups_and_persistent_data[Deploying {product-name}] overview.
 
 If your deployment supports an integrated load balancer, change type NodePort to LoadBalancer for the console in the yaml file below.
 
-NeuVector supports Helm-based deployment with a Helm chart at https://github.com/neuvector/neuvector-helm.
+{product-name} supports Helm-based deployment with a Helm chart at https://github.com/neuvector/neuvector-helm.
 
 There is a separate section for OpenShift instructions, and Docker EE on Kubernetes has some special steps described in the Docker section.
 
-=== NeuVector Images on Docker Hub
+=== {product-name} Images on Docker Hub
 
-The images are on the NeuVector Docker Hub registry. Use the appropriate version tag for the manager, controller, enforcer, and leave the version as 'latest' for scanner and updater. For example:
+The images are on the {product-name} Docker Hub registry. Use the appropriate version tag for the manager, controller, enforcer, and leave the version as 'latest' for scanner and updater. For example:
 
 * neuvector/manager:5.3.2
 * neuvector/controller:5.3.2
@@ -28,7 +28,7 @@ The images are on the NeuVector Docker Hub registry. Use the appropriate version
 
 Please be sure to update the image references in appropriate yaml files.
 
-If deploying with the current NeuVector Helm chart (v1.8.9+), the following changes should be made to values.yml:
+If deploying with the current {product-name} Helm chart (v1.8.9+), the following changes should be made to values.yml:
 
 * Update the registry to docker.io
 * Update image names/tags to the current version on Docker hub, as shown above
@@ -36,13 +36,13 @@ If deploying with the current NeuVector Helm chart (v1.8.9+), the following chan
 
 [NOTE]
 ====
-If deploying from the Rancher Manager 2.6.5+ NeuVector chart, images are pulled automatically from the Rancher Registry mirrored image repo, and deploys into the cattle-neuvector-system namespace.
+If deploying from the Rancher Manager 2.6.5+ {product-name} chart, images are pulled automatically from the Rancher Registry mirrored image repo, and deploys into the cattle-neuvector-system namespace.
 ====
 
 
-== Deploy NeuVector
+== Deploy {product-name}
 
-. Create the NeuVector namespace and the required service accounts: 
+. Create the {product-name} namespace and the required service accounts: 
 +
 --
 [,shell]
@@ -56,7 +56,7 @@ kubectl create sa scanner -n neuvector
 kubectl create sa registry-adapter -n neuvector
 ----
 --
-. (*Optional*) Create the NeuVector Pod Security Admission (PSA) or Pod Security Policy (PSP). If you have enabled Pod Security Admission (aka Pod Security Standards) in Kubernetes 1.25+, or Pod Security Policies (prior to 1.25) in your Kubernetes cluster, add the following for NeuVector (for example, nv_psp.yaml). Note1: PSP is deprecated in Kubernetes 1.21 and will be totally removed in 1.25. Note2: The Manager and Scanner pods run without a uid. If your PSP has a rule `Run As User: Rule: MustRunAsNonRoot` then add the following into the sample yaml below (with appropriate value for ###):
+. (*Optional*) Create the {product-name} Pod Security Admission (PSA) or Pod Security Policy (PSP). If you have enabled Pod Security Admission (aka Pod Security Standards) in Kubernetes 1.25+, or Pod Security Policies (prior to 1.25) in your Kubernetes cluster, add the following for {product-name} (for example, nv_psp.yaml). Note1: PSP is deprecated in Kubernetes 1.21 and will be totally removed in 1.25. Note2: The Manager and Scanner pods run without a uid. If your PSP has a rule `Run As User: Rule: MustRunAsNonRoot` then add the following into the sample yaml below (with appropriate value for ###):
 +
 --
 [,yaml]
@@ -65,13 +65,13 @@ securityContext:
     runAsUser: ###
 ----
 
-For PSA in Kubernetes 1.25+, label the NeuVector namespace with privileged profile for deploying on a PSA enabled cluster. 
+For PSA in Kubernetes 1.25+, label the {product-name} namespace with privileged profile for deploying on a PSA enabled cluster. 
 [,shell]
 ----
 kubectl label namespace neuvector "pod-security.kubernetes.io/enforce=privileged" 
 ----
 --
-. Create the custom resources (CRD) for NeuVector security rules. For Kubernetes 1.19+: 
+. Create the custom resources (CRD) for {product-name} security rules. For Kubernetes 1.19+: 
 +
 --
 [,shell]
@@ -84,7 +84,7 @@ kubectl apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kube
 kubectl apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.3.0/admission-crd-k8s-1.19.yaml 
 ----
 --
-. Add read permission to access the kubernetes API. :::important The standard NeuVector 5.2+ deployment uses least-privileged service accounts instead of the default. See below if upgrading from a version prior to 5.3. ::: :::warning attention If you are upgrading to 5.3.0+, run the following commands based on your current version:
+. Add read permission to access the kubernetes API. :::important The standard {product-name} 5.2+ deployment uses least-privileged service accounts instead of the default. See below if upgrading from a version prior to 5.3. ::: :::warning attention If you are upgrading to 5.3.0+, run the following commands based on your current version:
 +
 --
 [tabs]
@@ -179,7 +179,7 @@ NAME                        ROLE                             AGE   USERS   GROUP
 neuvector-binding-scanner   Role/neuvector-binding-scanner   70d                    neuvector/updater, neuvector/controller
 ----
 --
-. (*Optional*) Create the Federation Master and/or Remote Multi-Cluster Management Services. If you plan to use the multi-cluster management functions in NeuVector, one cluster must have the Federation Master service deployed, and each remote cluster must have the Federation Worker service. For flexibility, you may choose to deploy both Master and Worker services on each cluster so any cluster can be a master or remote. Federated Cluster Management 
+. (*Optional*) Create the Federation Master and/or Remote Multi-Cluster Management Services. If you plan to use the multi-cluster management functions in {product-name}, one cluster must have the Federation Master service deployed, and each remote cluster must have the Federation Worker service. For flexibility, you may choose to deploy both Master and Worker services on each cluster so any cluster can be a master or remote. Federated Cluster Management 
 +
 --
 [,yaml]
@@ -222,7 +222,7 @@ Then create the appropriate service(s):
 kubectl create -f nv_master_worker.yaml 
 ----
 --
-. Create the primary NeuVector services and pods using the preset version commands or modify the sample yaml below. The preset version invoke a LoadBalancer for the NeuVector Console. If using the sample yaml file below replace the image names and <version> tags for the manager, controller and enforcer image references in the yaml file. Also make any other modifications required for your deployment environment (such as LoadBalancer/NodePort/Ingress for manager access etc). 
+. Create the primary {product-name} services and pods using the preset version commands or modify the sample yaml below. The preset version invoke a LoadBalancer for the {product-name} Console. If using the sample yaml file below replace the image names and <version> tags for the manager, controller and enforcer image references in the yaml file. Also make any other modifications required for your deployment environment (such as LoadBalancer/NodePort/Ingress for manager access etc). 
 +
 --
 [,shell]
@@ -237,12 +237,12 @@ Or, if modifying any of the above yaml or samples from below:
 kubectl create -f neuvector.yaml 
 ----
 
-That's it! You should be able to connect to the NeuVector console and login with admin:admin, e.g. https://<public-ip>:8443
+That's it! You should be able to connect to the {product-name} console and login with admin:admin, e.g. https://<public-ip>:8443
 --
 
 [NOTE]
 ====
-The nodeport service specified in the neuvector.yaml file will open a random port on all kubernetes nodes for the NeuVector management web console port. Alternatively, you can use a LoadBalancer or Ingress, using a public IP and default port 8443. For nodeport, be sure to open access through firewalls for that port, if needed. If you want to see which port is open on the host nodes, please do the following commands:
+The nodeport service specified in the neuvector.yaml file will open a random port on all kubernetes nodes for the {product-name} management web console port. Alternatively, you can use a LoadBalancer or Ingress, using a public IP and default port 8443. For nodeport, be sure to open access through firewalls for that port, if needed. If you want to see which port is open on the host nodes, please do the following commands:
 
 [,shell]
 ----
@@ -352,9 +352,9 @@ To prevent the enforcer from being deployed on a controller node, if it is a ded
 
 == Rolling Updates
 
-Orchestration tools such as Kubernetes, RedHat OpenShift, and Rancher support rolling updates with configurable policies. You can use this feature to update the NeuVector containers. The most important will be to ensure that there is at least one Controller (or Allinone) running so that policies, logs, and connection data is not lost. Make sure that there is a minimum of 120 seconds between container updates so that a new leader can be elected and the data synchronized between controllers.
+Orchestration tools such as Kubernetes, RedHat OpenShift, and Rancher support rolling updates with configurable policies. You can use this feature to update the {product-name} containers. The most important will be to ensure that there is at least one Controller (or Allinone) running so that policies, logs, and connection data is not lost. Make sure that there is a minimum of 120 seconds between container updates so that a new leader can be elected and the data synchronized between controllers.
 
-The provided sample deployment yamls already configure the rolling update policy. If you are updating via the NeuVector Helm chart, please pull the latest chart to properly configure new features such as admission control, and delete the old cluster role and cluster role binding for NeuVector. If you are updating via Kubernetes you can manually update to a new version with the sample commands below.
+The provided sample deployment yamls already configure the rolling update policy. If you are updating via the {product-name} Helm chart, please pull the latest chart to properly configure new features such as admission control, and delete the old cluster role and cluster role binding for {product-name}. If you are updating via Kubernetes you can manually update to a new version with the sample commands below.
 
 === Sample Kubernetes Rolling Update
 
@@ -367,7 +367,7 @@ If your Deployment or Daemonset is already running, you can change the yaml file
 kubectl apply -f <yaml file>
 ----
 
-To update to a new version of NeuVector from the command line.
+To update to a new version of {product-name} from the command line.
 
 For controller as Deployment (also do for manager)
 
@@ -424,7 +424,7 @@ Please see the Automation section for more info on the REST API.
 
 == Kubernetes Deployment in Non-Privileged Mode
 
-The following instructions can be used to deploy NeuVector without using privileged mode containers. The controller is already in non-privileged mode and enforcer deployment should be changed, which is shown in the excerpted snippets below.
+The following instructions can be used to deploy {product-name} without using privileged mode containers. The controller is already in non-privileged mode and enforcer deployment should be changed, which is shown in the excerpted snippets below.
 
 Enforcer:
 

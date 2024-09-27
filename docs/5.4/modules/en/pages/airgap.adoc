@@ -1,10 +1,10 @@
-= Air Gapping NeuVector
+= Air Gapping {product-name}
 :page-opendocs-origin: /02.deploying/09.airgap/09.airgap.md
 :page-opendocs-slug: /deploying/airgap
 
 == Tools Needed
 
-We need to install three tools for downloading all the bits for Neuvector.
+We need to install three tools for downloading all the bits for {product-name}.
 
 * https://helm.sh/[Helm] - Application Lifecycle Manager
 * https://github.com/containers/skopeo[Skopeo] - Image/Registry Tool

@@ -2,18 +2,18 @@
 :page-opendocs-origin: /02.deploying/03.rancher/03.rancher.md
 :page-opendocs-slug: /deploying/rancher
 
-== Deploy and Manage NeuVector through Rancher Extensions or Apps & Marketplace
+== Deploy and Manage {product-name} through Rancher Extensions or Apps & Marketplace
 
-NeuVector is able to be deployed easily either through Rancher Extensions for Prime customers, or Rancher Apps and Marketplace. The default (Helm-based) NeuVector deployment will deploy NeuVector containers into the cattle-neuvector-system namespace.
+{product-name} is able to be deployed easily either through Rancher Extensions for Prime customers, or Rancher Apps and Marketplace. The default (Helm-based) {product-name} deployment will deploy {product-name} containers into the cattle-neuvector-system namespace.
 
 [NOTE]
 ====
-Only NeuVector deployments through Rancher Extensions (NeuVector) of Rancher version 2.7.0+, or Apps & Marketplace of Rancher version 2.6.5+ can be managed directly (single sign on to NeuVector console) through Rancher. If adding clusters to Rancher with NeuVector already deployed, or where NeuVector has been deployed directly onto the cluster, these clusters will not be enabled for SSO integration.
+Only {product-name} deployments through Rancher Extensions ({product-name}) of Rancher version 2.7.0+, or Apps & Marketplace of Rancher version 2.6.5+ can be managed directly (single sign on to {product-name} console) through Rancher. If adding clusters to Rancher with {product-name} already deployed, or where {product-name} has been deployed directly onto the cluster, these clusters will not be enabled for SSO integration.
 ====
 
-=== NeuVector UI Extension for Rancher
+=== {product-name} UI Extension for Rancher
 
-Rancher Prime customers are able to easily deploy NeuVector and the NeuVector UI Extension for Rancher. This will enable Prime users to monitor and manage certain NeuVector functions and events directly through the Rancher UI. For community users, please see the Deploy NeuVector section below to deploy from Rancher Apps and Marketplace.
+Rancher Prime customers are able to easily deploy {product-name} and the {product-name} UI Extension for Rancher. This will enable Prime users to monitor and manage certain {product-name} functions and events directly through the Rancher UI. For community users, please see the Deploy {product-name} section below to deploy from Rancher Apps and Marketplace.
 
 . The first step is to enable the Rancher Extensions capability globally if it is not already enabled.
 +
@@ -22,7 +22,7 @@ image:ui0_extensions.png[extensions]
 
 image:ui1_enable.png[enable]
 --
-. Install the NeuVector-UI-Ext from the Available list
+. Install the {product-name}-UI-Ext from the Available list
 +
 --
 image:ui2_installext.png[install]
@@ -32,17 +32,17 @@ image:ui2_installext.png[install]
 --
 image:ui3reload.png[reload]
 --
-. On your selected cluster, install the NeuVector application from the NeuVector tab if the NeuVector app is not already installed. This should take you to the App installation steps. For more details on this installation process, see the Deploy NeuVector section below.
+. On your selected cluster, install the {product-name} application from the {product-name} tab if the {product-name} app is not already installed. This should take you to the App installation steps. For more details on this installation process, see the Deploy {product-name} section below.
 +
 --
 image:ui5installnv.png[install_nv]
 --
-. The NeuVector dashboard should now be shown from the NeuVector menu for that cluster. From this dashboard, a summary of the security health of the cluster can be monitored. There are interactive elements in the dashboard, such as invoking a wizard to Improve Your (Security Risk) Score, including being able to turn on automated scanning for vulnerabilities if it is not enabled.
+. The {product-name} dashboard should now be shown from the {product-name} menu for that cluster. From this dashboard, a summary of the security health of the cluster can be monitored. There are interactive elements in the dashboard, such as invoking a wizard to Improve Your (Security Risk) Score, including being able to turn on automated scanning for vulnerabilities if it is not enabled.
 +
 --
 image:ui6dashboard.png[dashboard]
 
-In addition, the links in the upper right of the dashboard provide convenient single sign on (SSO) links to the full NeuVector console for more detailed analysis and configuration.
+In addition, the links in the upper right of the dashboard provide convenient single sign on (SSO) links to the full {product-name} console for more detailed analysis and configuration.
 --
 . To uninstall the extension, go back to the Extensions page
 +
@@ -51,20 +51,20 @@ image:ui7uninstall.png[ininstall]
 
 [NOTE]
 ====
-Uninstalling the NeuVector UI extension will NOT uninstall the NeuVector app from each cluster. The NeuVector menu will revert to providing an SSO link into the NeuVector console.
+Uninstalling the {product-name} UI extension will NOT uninstall the {product-name} app from each cluster. The {product-name} menu will revert to providing an SSO link into the {product-name} console.
 ====
 --
 
-=== Deploy NeuVector
+=== Deploy {product-name}
 
-First, find the NeuVector chart in Rancher charts, select it and review the instructions and various configuration values. (Optional) Create a project to deploy into if desired, e.g. NeuVector. Note: If you see more than one NeuVector chart, don't select the one that is for upgrading legacy NeuVector 4.x Helm chart deployments.
+First, find the {product-name} chart in Rancher charts, select it and review the instructions and various configuration values. (Optional) Create a project to deploy into if desired, e.g. {product-name}. Note: If you see more than one {product-name} chart, don't select the one that is for upgrading legacy {product-name} 4.x Helm chart deployments.
 
 image:rancher_chart.png[rancher_chart]
 
-Deploy the NeuVector chart, first configuring appropriate values for a Rancher deployment, such as:
+Deploy the {product-name} chart, first configuring appropriate values for a Rancher deployment, such as:
 
 * Container run-time, e.g. docker for RKE and containerd for RKE2, or select the K3s value if using K3s.
-* Manager service type: change to LoadBalancer if available on public cloud deployments. If access is only desired through Rancher, any allowed value will work here. See the Important note below about changing the default admin password in NeuVector.
+* Manager service type: change to LoadBalancer if available on public cloud deployments. If access is only desired through Rancher, any allowed value will work here. See the Important note below about changing the default admin password in {product-name}.
 * Indicate if this cluster will be either a multi-cluster federated Primary, or remote (or select both if either option is desired).
 * Persistent volume for configuration backups
 
@@ -72,32 +72,32 @@ image:rancher_chart_values.png[nv_values]
 
 Click 'Install' after you have reviewed and updated any chart values.
 
-After successful NeuVector deployment, you will see a summary of the deployments, daemon sets, and cron job for NeuVector. You will also be able to see the services deployed in the Services Discovery menu on the left.
+After successful {product-name} deployment, you will see a summary of the deployments, daemon sets, and cron job for {product-name}. You will also be able to see the services deployed in the Services Discovery menu on the left.
 
 image:nv_deployed.png[deployed]
 
-=== Manage NeuVector
+=== Manage {product-name}
 
-You will now see a NeuVector menu item in the left, and selecting that will show a NeuVector tile/button, which when clicked will take you to the NeuVector console, in a new tab.
+You will now see a {product-name} menu item in the left, and selecting that will show a {product-name} tile/button, which when clicked will take you to the {product-name} console, in a new tab.
 
 image:nv_access.png[nv_console]
 
-When this Single Sign On (SSO) access method is used for the first time, a corresponding user in the NeuVector cluster is created for the Rancher user login. The same user name of the Rancher logged in user will be created in NeuVector, with a role of either admin or fedAdmin, and Identity provider as Rancher.
+When this Single Sign On (SSO) access method is used for the first time, a corresponding user in the {product-name} cluster is created for the Rancher user login. The same user name of the Rancher logged in user will be created in {product-name}, with a role of either admin or fedAdmin, and Identity provider as Rancher.
 
 image:nv_admin.png[users]
 
-Note in the above screen shot, two Rancher users admin and gkosaka have been automatically created for SSO. If another user is create manually in NeuVector, the Identity provider would be listed as NeuVector, as shown below. This local user can login directly to the NeuVector console without going through Rancher.
+Note in the above screen shot, two Rancher users admin and gkosaka have been automatically created for SSO. If another user is create manually in {product-name}, the Identity provider would be listed as {product-name}, as shown below. This local user can login directly to the {product-name} console without going through Rancher.
 
 image:local_admin.png[local]
 
 [IMPORTANT]
 ====
-It is recommended to login directly to the NeuVector console as admin/admin to manually change the admin password to a strong password. This will only change the NeuVector identity provider admin user password (you may see another admin user whose identify provider is Rancher). Alternatively, include a xref:configmap.adoc#_protect_sensitive_data_using_a_secret[ConfigMap as a secret] in the initial deployment from Rancher (see chart values for ConfigMap settings) to set the default admin password to a strong password.
+It is recommended to login directly to the {product-name} console as admin/admin to manually change the admin password to a strong password. This will only change the {product-name} identity provider admin user password (you may see another admin user whose identify provider is Rancher). Alternatively, include a xref:configmap.adoc#_protect_sensitive_data_using_a_secret[ConfigMap as a secret] in the initial deployment from Rancher (see chart values for ConfigMap settings) to set the default admin password to a strong password.
 ====
 
-=== Disabling NeuVector/Rancher SSO
+=== Disabling {product-name}/Rancher SSO
 
-To disable the ability to login to NeuVector from Rancher Manager, go to Settings -> Configuration.
+To disable the ability to login to {product-name} from Rancher Manager, go to Settings -> Configuration.
 
 image:rancher_sso.png[rancher_sso]
 

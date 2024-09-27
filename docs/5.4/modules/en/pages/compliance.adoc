@@ -4,9 +4,9 @@
 
 == Managing Compliance and CIS Benchmarks
 
-Compliance auditing with NeuVector includes CIS Benchmarks, custom checks, secrets auditing, and industry standard templates for PCI, GDPR and other regulations.
+Compliance auditing with {product-name} includes CIS Benchmarks, custom checks, secrets auditing, and industry standard templates for PCI, GDPR and other regulations.
 
-CIS Benchmarks automatically run by NeuVector include:
+CIS Benchmarks automatically run by {product-name} include:
 
 * Kubernetes
 * Docker
@@ -59,7 +59,7 @@ After the templates and assets are customized (if desired) in the Security Risks
 
 === Secrets Auditing
 
-NeuVector checks for over 40 common types of secrets as part of the image compliance scans and run-time scans. In addition, xref:customcompliance.adoc[custom compliance scripts] can be configured for containers or hosts, and the xref:dlp.adoc[DLP packet inspection] feature can be used to check for secrets in network payloads.
+{product-name} checks for over 40 common types of secrets as part of the image compliance scans and run-time scans. In addition, xref:customcompliance.adoc[custom compliance scripts] can be configured for containers or hosts, and the xref:dlp.adoc[DLP packet inspection] feature can be used to check for secrets in network payloads.
 
 The results for secrets auditing can be found in the Compliance section of image scans (Assets -> Registries), containers (Assets -> Containers), nodes (Assets -> Nodes), and the compliance management menu (Security Risks -> Compliance).
 

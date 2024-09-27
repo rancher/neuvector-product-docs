@@ -9,7 +9,7 @@
 These docs describe the 5.x (Open Source) version. The 5.x images are accessible from Docker Hub with the appropriate tag, e.g. neuvector/controller:(version). For 4.x versions see the https://docs.neuvector.com[4.x Docs].
 ====
 
-NeuVector provides a powerful end-to-end container security platform. This includes end-to-end vulnerability scanning and complete run-time protection for containers, pods and hosts, including:
+{product-name} provides a powerful end-to-end container security platform. This includes end-to-end vulnerability scanning and complete run-time protection for containers, pods and hosts, including:
 
 . CI/CD Vulnerability Management & Admission Control. Scan images with a Jenkins plug-in, scan registries, and enforce admission control rules for deployments into production.
 . Violation Protection. Discovers behavior and creates a whitelist based policy to detect violations of normal behavior.
@@ -20,19 +20,19 @@ NeuVector provides a powerful end-to-end container security platform. This inclu
 . Endpoint/Host Security. Detects privilege escalations, monitors processes and file activity on hosts and within containers, and monitors container file systems for suspicious activity.
 . Multi-cluster Management. Monitor and manage multiple Kubernetes clusters from a single console.
 
-Other features of NeuVector include the ability to quarantine containers and to export logs through SYSLOG and webhooks, initiate packet capture for investigation, and integration with OpenShift RBACs, LDAP, Microsoft AD, and SSO with SAML. Note: Quarantine means that all network traffic is blocked.  The container will remain and continue to run - just without any network connections.  Kubernetes will not start up a container to replace a quarantined container, as the api-server is still able to reach the container.
+Other features of {product-name} include the ability to quarantine containers and to export logs through SYSLOG and webhooks, initiate packet capture for investigation, and integration with OpenShift RBACs, LDAP, Microsoft AD, and SSO with SAML. Note: Quarantine means that all network traffic is blocked.  The container will remain and continue to run - just without any network connections.  Kubernetes will not start up a container to replace a quarantined container, as the api-server is still able to reach the container.
 
 == Security Containers
 
-The NeuVector run-time container security solution contains four types of security containers: *Controllers*, *Enforcers*, *Managers*, and *Scanners*. A special container called the *Allinone* is also provided to combine the Controller, Enforcer, and Manager functions all in one container, primarily for docker native deployments.
+The {product-name} run-time container security solution contains four types of security containers: *Controllers*, *Enforcers*, *Managers*, and *Scanners*. A special container called the *Allinone* is also provided to combine the Controller, Enforcer, and Manager functions all in one container, primarily for docker native deployments.
 
-NeuVector can be deployed on virtual machines or on bare metal systems with a single os.
+{product-name} can be deployed on virtual machines or on bare metal systems with a single os.
 
 image:1Overview.png[Deployment]
 
 === Controller
 
-The Controller manages the NeuVector Enforcer container cluster. It also provides REST APIs for the management console. Although typical test deployments have one Controller, multiple Controllers in a high-availability configuration is recommended. 3 controllers is the default in the Kubernetes Production deployment sample yaml.
+The Controller manages the {product-name} Enforcer container cluster. It also provides REST APIs for the management console. Although typical test deployments have one Controller, multiple Controllers in a high-availability configuration is recommended. 3 controllers is the default in the Kubernetes Production deployment sample yaml.
 
 === Enforcer
 
@@ -46,7 +46,7 @@ For Docker native (non Kubernetes) deployments the Enforcer container and the Co
 
 === Manager
 
-The Manager is a stateless container that provides a web-UI (HTTPS only) console for users to manage the NeuVector security solution. More than one Manager container can be deployed as necessary.
+The Manager is a stateless container that provides a web-UI (HTTPS only) console for users to manage the {product-name} security solution. More than one Manager container can be deployed as necessary.
 
 === All-in-One
 
@@ -54,15 +54,15 @@ The All-in-One container includes a Controller, an Enforcer and a Manager in one
 
 === Scanner
 
-The Scanner is a container which performs the vulnerability and compliance scanning for images, containers and nodes. It is typically deployed as a replicaset and can be scaled up to as many parallel scanners as desired in order to increase the scanning performance. The Controller assigns scanning jobs to each available scanner in a round-robin fashion until all scans are completed. The scanner also contains the latest CVE database and is updated regularly by NeuVector.
+The Scanner is a container which performs the vulnerability and compliance scanning for images, containers and nodes. It is typically deployed as a replicaset and can be scaled up to as many parallel scanners as desired in order to increase the scanning performance. The Controller assigns scanning jobs to each available scanner in a round-robin fashion until all scans are completed. The scanner also contains the latest CVE database and is updated regularly by {product-name}.
 
 === Updater
 
-The Updater is a container which when run, updates the CVE database for NeuVector. NeuVector regularly publishes new scanner images to include the latest CVE for vulnerability scans. The updater re-deploys all scanner pods by taking the deployment to zero and scaling it back up, forcing a pull of an updated scanner image.
+The Updater is a container which when run, updates the CVE database for {product-name}. {product-name} regularly publishes new scanner images to include the latest CVE for vulnerability scans. The updater re-deploys all scanner pods by taking the deployment to zero and scaling it back up, forcing a pull of an updated scanner image.
 
 == Architecture
 
-Here is a general architecture overview of NeuVector. Not shown is the separate scanner container, which can also be run as a stand-alone pipeline scanner.
+Here is a general architecture overview of {product-name}. Not shown is the separate scanner container, which can also be run as a stand-alone pipeline scanner.
 
 image:architecture.png[Architecture]
 
@@ -72,7 +72,7 @@ For common deployment patterns and best practices see the xref:production.adoc#_
 
 === All-in-One and Enforcers
 
-This deployment is ideal for single-node or small-scale environments, for example for evaluation, testing, and small deployments. An All-in-One container is deployed on one node, which can also be a node with running application containers. An Enforcer can be deployed on all other nodes, with one Enforcer required on each node you wish to protect with NeuVector. This is also useful for native Docker deployments where a controller and enforcer cannot run on the same host.
+This deployment is ideal for single-node or small-scale environments, for example for evaluation, testing, and small deployments. An All-in-One container is deployed on one node, which can also be a node with running application containers. An Enforcer can be deployed on all other nodes, with one Enforcer required on each node you wish to protect with {product-name}. This is also useful for native Docker deployments where a controller and enforcer cannot run on the same host.
 
 === Controller, Manager and Enforcer Containers
 
@@ -80,7 +80,7 @@ This is a more generic deployment use case which consists one or more Controller
 
 === All-in-One Only
 
-You can deploy just the allinone container for registry scanning, using the Jenkins plug-in, or simple one node testing of NeuVector.
+You can deploy just the allinone container for registry scanning, using the Jenkins plug-in, or simple one node testing of {product-name}.
 
 === Controller Only
 

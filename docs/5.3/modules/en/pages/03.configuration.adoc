@@ -1,4 +1,4 @@
-= Configuring NeuVector and Accessing the Console
+= Configuring {product-name} and Accessing the Console
 :page-opendocs-origin: /03.configuration/03.configuration.md
 :page-opendocs-slug: /configuration
 

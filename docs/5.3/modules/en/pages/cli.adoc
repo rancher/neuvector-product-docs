@@ -2,9 +2,9 @@
 :page-opendocs-origin: /12.troubleshooting/02.cli/02.cli.md
 :page-opendocs-slug:  /tronubleshooting/cli
 
-== Using the NeuVector Command Line
+== Using the {product-name} Command Line
 
-The NeuVector solution supports a limited set of functions using the CLI. The CLI is supported through the Manager, which in turn uses a RestAPI to issue commands to the Controller. The Controller then manages the Enforcer(s) appropriately. A complete set of operations is supported through the REST API, which can be exposed directly from the Controller. You can access the NeuVector CLI by typing the cli command for the Manager or Allinone, for example:
+The {product-name} solution supports a limited set of functions using the CLI. The CLI is supported through the Manager, which in turn uses a RestAPI to issue commands to the Controller. The Controller then manages the Enforcer(s) appropriately. A complete set of operations is supported through the REST API, which can be exposed directly from the Controller. You can access the {product-name} CLI by typing the cli command for the Manager or Allinone, for example:
 
 [,shell]
 ----

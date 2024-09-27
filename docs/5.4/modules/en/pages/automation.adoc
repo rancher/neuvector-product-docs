@@ -2,9 +2,9 @@
 :page-opendocs-origin: /11.automation/02.automation/02.automation.md
 :page-opendocs-slug:  /automation/automation
 
-== NeuVector Automation
+== {product-name} Automation
 
-There are many automation features in NeuVector to support the entire CI/CD workflow, including:
+There are many automation features in {product-name} to support the entire CI/CD workflow, including:
 
 * Jenkins plug-in to automated scanning during build
 * Registry scanning to automate repository monitoring
@@ -12,20 +12,20 @@ There are many automation features in NeuVector to support the entire CI/CD work
 * CIS benchmarks automatically run on hosts
 * Helm chart on github for automated deployment on Kubernetes
 * Response rules to automate responses to security events
-* REST API for building automation of any NeuVector function
+* REST API for building automation of any {product-name} function
 
 === REST API
 
-The NeuVector solution can be managed using the REST API. Below are common examples of automation using the REST API. The REST API yaml doc is best viewed in the Swagger 2.0 viewer. The REST API documentation is below in a yaml file which is best viewed in a reader such as swagger.io.
+The {product-name} solution can be managed using the REST API. Below are common examples of automation using the REST API. The REST API yaml doc is best viewed in the Swagger 2.0 viewer. The REST API documentation is below in a yaml file which is best viewed in a reader such as swagger.io.
 
-Latest update can be found https://raw.githubusercontent.com/neuvector/neuvector/main/controller/api/apis.yaml[here]. Also in the NeuVector GitHub source code https://github.com/neuvector/neuvector/blob/main/controller/api/apis.yaml[repo].  The apis.yaml from the main truck can include unreleased features.  It is recommended to download the appropriate released version source code and extract the apis.yaml from the controller/api folder.
+Latest update can be found https://raw.githubusercontent.com/neuvector/neuvector/main/controller/api/apis.yaml[here]. Also in the {product-name} GitHub source code https://github.com/neuvector/neuvector/blob/main/controller/api/apis.yaml[repo].  The apis.yaml from the main truck can include unreleased features.  It is recommended to download the appropriate released version source code and extract the apis.yaml from the controller/api folder.
 
 [IMPORTANT]
 ====
 If you are making REST API calls with username/password, please be sure make a DELETE call against /v1/auth when done. There is a maximum of 32 concurrent sessions for each user. If this is exceeded, an authentication failure will occur.
 ====
 
-NeuVector also support Response Rules to automate common responses to security events or vulnerabilities detected. Please see the section Security Policy -> Response Rules for more details.
+{product-name} also support Response Rules to automate common responses to security events or vulnerabilities detected. Please see the section Security Policy -> Response Rules for more details.
 
 === Expose REST API in Kubernetes
 
@@ -72,7 +72,7 @@ image:5_2_api_key_header.png[token]
 
 === Trigger Vulnerability Scanning from a script
 
-NeuVector can be triggered automatically to scan an image for vulnerabilities. This can be done by configuring a registry/repository to be monitored, using the NeuVector Jenkins plug-in, or using the REST API. Please see the section on Scanning & Compliance for more detail.
+{product-name} can be triggered automatically to scan an image for vulnerabilities. This can be done by configuring a registry/repository to be monitored, using the {product-name} Jenkins plug-in, or using the REST API. Please see the section on Scanning & Compliance for more detail.
 
 The sample script below shows how to remotely pull the container, run it, and scan it. It can be triggered from a Jenkins task (remote shell) or any CI/CD tool. A JSON parser tool (jq) is also used.
 
@@ -212,7 +212,7 @@ Sample output:
 
 === Create Policy Rules Automatically
 
-To create a new rule in the NeuVector policy controller, the groups for the FROM and TO fields must exist first. The following sample creates a new Group based on the container label nv-service-type=data, and another Group for label nv-service-type=website. A rule is then created to allow traffic from the wordpress container to the mysql container using only the mysql protocol.
+To create a new rule in the {product-name} policy controller, the groups for the FROM and TO fields must exist first. The following sample creates a new Group based on the container label nv-service-type=data, and another Group for label nv-service-type=website. A rule is then created to allow traffic from the wordpress container to the mysql container using only the mysql protocol.
 
 Be sure to update the username and password for access to the controller.
 
@@ -227,11 +227,11 @@ curl -k -X "PATCH" -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN
 curl -k -X "DELETE" -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" "https://`docker inspect neuvector.allinone | jq -r '.[0].NetworkSettings.IPAddress'`:10443/v1/auth"
 ----
 
-If the Groups already exist in NeuVector then the new rule can be created, skipping the Group creation steps. This example also removes the authentication token at the end. Note that a Rule ID number can be specified and NeuVector executes rules in numerical order lowest to highest.
+If the Groups already exist in {product-name} then the new rule can be created, skipping the Group creation steps. This example also removes the authentication token at the end. Note that a Rule ID number can be specified and {product-name} executes rules in numerical order lowest to highest.
 
 === Export/Import Configuration File
 
-Here are samples to backup the NeuVector configuration file automatically. You can select whether to export all configuration settings (policy, users, Settings etc), or only the policy.
+Here are samples to backup the {product-name} configuration file automatically. You can select whether to export all configuration settings (policy, users, Settings etc), or only the policy.
 
 [IMPORTANT]
 ====
@@ -429,7 +429,7 @@ show_menu() {
 }
 
 get_token() {
-read -p "Enter NeuVector Username: " USER
+read -p "Enter {product-name} Username: " USER
 if [ -z $USER ]; then
     echo "Blank username, exiting..."
     exit 1
@@ -538,7 +538,7 @@ The API call to quarantine is via PATCH to /v1/workload/:id with the following b
 }'
 ----
 
-=== Enable Debugging Mode for NeuVector Support
+=== Enable Debugging Mode for {product-name} Support
 
 Set access token with your IP, user, password:
 

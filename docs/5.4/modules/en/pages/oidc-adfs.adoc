@@ -12,7 +12,7 @@ Enter a name, select "Server application accessing a web API" and then click Nex
 
 image:adfs2.png[adfs]
 
-Enter Redirect URI from NeuVector Settings > OpenID Connect Setting page and then click Next
+Enter Redirect URI from {product-name} Settings > OpenID Connect Setting page and then click Next
 
 image:adfs3.png[adfs]
 
@@ -56,7 +56,7 @@ image:adfs13.png[adfs]
 
 image:adfs14.png[adfs]
 
-=== NeuVector Setup
+=== {product-name} Setup
 
 * Identity Provider Issuer: "https://<adfs-fqdn>/adfs"
 * Client ID: It is a "Client Identifier" showing in "Server application" dialog in "Add Application Group Wizard"

@@ -4,7 +4,7 @@
 
 == Detecting Network Threats
 
-NeuVector deep packet inspection can be used to inspect the network packets and payload for attacks such as those in the OWASP Top 10 and those commonly used in Web Application Firewalls (WAFs).
+{product-name} deep packet inspection can be used to inspect the network packets and payload for attacks such as those in the OWASP Top 10 and those commonly used in Web Application Firewalls (WAFs).
 
 === OWASP Signatures
 
@@ -28,4 +28,4 @@ image:owasp_top10_dlp.png[owasp]
 
 === Built-In Threat Detection
 
-NeuVector also has built-in detection of other network threats such as SQL Injection attacks, DDoS (e.g. Ping Death), and tunneling attacks. For SQL injection attacks, NeuVector inspects the network connection (SQL protocol) between the front end and the sql database pod, reducing false positives and increasing accuracy.
+{product-name} also has built-in detection of other network threats such as SQL Injection attacks, DDoS (e.g. Ping Death), and tunneling attacks. For SQL injection attacks, {product-name} inspects the network connection (SQL protocol) between the front end and the sql database pod, reducing false positives and increasing accuracy.
