@@ -6,11 +6,11 @@
 
 This menu is the key area to view and manage security rules and customize Groups for use in rules. It is also used to switch modes of Groups between Discover, Monitor, and Protect. Container Groups can have Process/File rules in a different mode than Network rules, as described xref:modes.adoc#_network_service_policy_mode[here]. Please see the following individual sections for explanations of Custom Compliance Checks, Network Rules, Process and File Access Rules and DLP/WAF detection. Note: Network rules can be viewed in the Groups menu for any group, but must be edited separately in the xref:networkrules.adoc[Network Rules] menu.
 
-NeuVector automatically creates Groups from your running applications. These groups start with the prefix 'nv.' You can also manually add them using a CRD or the REST API and can be created in any mode, Discover, Monitor, or Protect. Network and Response Rules require these Group definitions. For automatically created Groups ('learned' groups starting with 'nv'), NeuVector will learn the network and process rules and add them while in Discover mode. Custom Groups will not auto-learn and populate rules. Note: 'nv.' groups start with xref:processrules.adoc#_zero_drift_process_protection[zero drift] enabled by default for process/file protections.
+{product-name} automatically creates Groups from your running applications. These groups start with the prefix 'nv.' You can also manually add them using a CRD or the REST API and can be created in any mode, Discover, Monitor, or Protect. Network and Response Rules require these Group definitions. For automatically created Groups ('learned' groups starting with 'nv'), {product-name} will learn the network and process rules and add them while in Discover mode. Custom Groups will not auto-learn and populate rules. Note: 'nv.' groups start with xref:processrules.adoc#_zero_drift_process_protection[zero drift] enabled by default for process/file protections.
 
 image:5_groups.png[groups]
 
-It is convenient to see groups of containers and apply rules to each group. NeuVector creates a list of groups based on the container images. For example, all containers started from one Wordpress image will be in the same group. Rules are automatically created and applied to the group of containers.
+It is convenient to see groups of containers and apply rules to each group. {product-name} creates a list of groups based on the container images. For example, all containers started from one Wordpress image will be in the same group. Rules are automatically created and applied to the group of containers.
 
 The Groups screen also displays a 'Scorable' icon in the upper right, and a learned group can be selected and the Scorable checkbox enabled or disabled. This controls which containers are used to calculate the Security Risk Score in the Dashboard. See xref:improve-score.adoc#_improving_the_security_risk_score[Improve Security Risk Score] for more details.
 
@@ -18,13 +18,13 @@ The Groups screen is also where the CRD yaml file for 'security policy as code' 
 
 === Auto Deletion of Unused Groups
 
-Learned groups (not reserved or custom groups) can be automatically deleted by NeuVector if there are no members (containers) in the group. The time period for this is configurable in Settings -> Configuration.
+Learned groups (not reserved or custom groups) can be automatically deleted by {product-name} if there are no members (containers) in the group. The time period for this is configurable in Settings -> Configuration.
 
 === Host Protection - the 'Nodes' Group
 
-NeuVector automatically creates a group called 'nodes' which represents each node (host) in the cluster. NeuVector provides automated basic monitoring of hosts for suspicious processes (such as port scans, reverse shells etc.) and privilege escalations. In addition, NeuVector will learn the process behavior of each node while it is in Discover mode to whitelist those processes, similar to how it is done with container processes.  The 'local' (learned) process rule list is a combination of all processes from all nodes in the cluster while in Discover mode.
+{product-name} automatically creates a group called 'nodes' which represents each node (host) in the cluster. {product-name} provides automated basic monitoring of hosts for suspicious processes (such as port scans, reverse shells etc.) and privilege escalations. In addition, {product-name} will learn the process behavior of each node while it is in Discover mode to whitelist those processes, similar to how it is done with container processes.  The 'local' (learned) process rule list is a combination of all processes from all nodes in the cluster while in Discover mode.
 
-The nodes can then be put into the Monitor or Protect mode, where NeuVector will alert is any process starts while in Monitor mode, and block that process in Protect mode.
+The nodes can then be put into the Monitor or Protect mode, where {product-name} will alert is any process starts while in Monitor mode, and block that process in Protect mode.
 
 image:host_protection.png[nodeGroup]
 
@@ -90,7 +90,7 @@ Wildcards '_' can be used in criteria, for example 'address=_.google.com'. For m
 Special characters used after an equals '=' in criteria may not match properly. For example the dot '.' In 'policy=public._' will not match properly, and regex match should be used instead, like 'policy~public._'
 ====
 
-After saving a new group, NeuVector will display the members in that group. Rules can then be created using these groups.
+After saving a new group, {product-name} will display the members in that group. Rules can then be created using these groups.
 
 ==== Virtual Host ('vh') Based Network Policy
 

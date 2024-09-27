@@ -2,17 +2,17 @@
 :page-opendocs-origin: /02.deploying/04.openshift/04.openshift.md
 :page-opendocs-slug: /deploying/openshift
 
-== Deploy Separate NeuVector Components with RedHat OpenShift
+== Deploy Separate {product-name} Components with RedHat OpenShift
 
-NeuVector is compatible with standard ovs SDN plug-ins as well as others such as flannel, weave, or calico. The samples below assume a standard ovs plug-in is used. This also assumes a local docker registry will be used (see instructions at end for creating the secret for dynamically pulling from neuvector or Docker Hub).
+{product-name} is compatible with standard ovs SDN plug-ins as well as others such as flannel, weave, or calico. The samples below assume a standard ovs plug-in is used. This also assumes a local docker registry will be used (see instructions at end for creating the secret for dynamically pulling from neuvector or Docker Hub).
 
-NeuVector supports Helm-based deployment with a https://github.com/neuvector/neuvector-helm[Helm chart] at https://github.com/neuvector/neuvector-helm. The NeuVector Operator can also be used to deploy and is based on the Helm chart. To deploy the latest NeuVector container versions using an Operator, please use either the Red Hat Certified Operator from Operator Hub or the community operator, as detailed in the xref:operators.adoc[Operator section].
+{product-name} supports Helm-based deployment with a https://github.com/neuvector/neuvector-helm[Helm chart] at https://github.com/neuvector/neuvector-helm. The {product-name} Operator can also be used to deploy and is based on the Helm chart. To deploy the latest {product-name} container versions using an Operator, please use either the Red Hat Certified Operator from Operator Hub or the community operator, as detailed in the xref:operators.adoc[Operator section].
 
-To deploy manually, first pull the appropriate NeuVector containers from the NeuVector registry into your local registry. Note: the scanner image should be pulled regularly for CVE database updates from NeuVector.
+To deploy manually, first pull the appropriate {product-name} containers from the {product-name} registry into your local registry. Note: the scanner image should be pulled regularly for CVE database updates from {product-name}.
 
-=== NeuVector Images on Docker Hub
+=== {product-name} Images on Docker Hub
 
-The images are on the NeuVector Docker Hub registry. Use the appropriate version tag for the manager, controller, enforcer, and leave the version as 'latest' for scanner and updater. For example:
+The images are on the {product-name} Docker Hub registry. Use the appropriate version tag for the manager, controller, enforcer, and leave the version as 'latest' for scanner and updater. For example:
 neuvector/manager:5.3.2
 neuvector/controller:5.3.2
 neuvector/enforcer:5.3.2
@@ -21,7 +21,7 @@ neuvector/updater:latest
 
 Please be sure to update the image references in appropriate yaml files.
 
-If deploying with the current NeuVector Helm chart (v1.8.9+), the following changes should be made to values.yml:
+If deploying with the current {product-name} Helm chart (v1.8.9+), the following changes should be made to values.yml:
 
 * Update the registry to docker.io
 * Update image names/tags to the current version on Docker hub, as shown above
@@ -40,9 +40,9 @@ docker pull docker.io/neuvector/updater
 docker logout docker.io
 ----
 
-The sample file below will deploy one manager, 3 controllers, and 2 scanner pods. It will deploy an enforcer on every node as a daemonset, including on the master node (if schedulable). See the bottom section for specifying dedicated manager or controller nodes using node labels. Note: It is not recommended to deploy (scale) more than one manager behind a load balancer due to potential session state issues. If you plan to use a PersistentVolume claim to store the backup of NeuVector config files, please see the general Backup/Persistent Data section in the xref:production.adoc#_backups_and_persistent_data[Production Deployment] overview.
+The sample file below will deploy one manager, 3 controllers, and 2 scanner pods. It will deploy an enforcer on every node as a daemonset, including on the master node (if schedulable). See the bottom section for specifying dedicated manager or controller nodes using node labels. Note: It is not recommended to deploy (scale) more than one manager behind a load balancer due to potential session state issues. If you plan to use a PersistentVolume claim to store the backup of {product-name} config files, please see the general Backup/Persistent Data section in the xref:production.adoc#_backups_and_persistent_data[Production Deployment] overview.
 
-Next, set the route and allow privileged NeuVector containers using the instructions below. By default, OpenShift does not allow privileged containers. Also, by default OpenShift does not schedule pods on the Master node. See the instructions at the end to enable/disable this.
+Next, set the route and allow privileged {product-name} containers using the instructions below. By default, OpenShift does not allow privileged containers. Also, by default OpenShift does not schedule pods on the Master node. See the instructions at the end to enable/disable this.
 
 [NOTE]
 ====
@@ -62,7 +62,7 @@ oc login -u <user_name>
 --
 [NOTE]
 ====
-If the --node-selector argument is used when creating a project this will restrict pod placement such as for the NeuVector enforcer to specific nodes.
+If the --node-selector argument is used when creating a project this will restrict pod placement such as for the {product-name} enforcer to specific nodes.
 ====
 
 [,shell]
@@ -70,7 +70,7 @@ If the --node-selector argument is used when creating a project this will restri
 oc new-project neuvector
 ----
 --
-. Push NeuVector images to OpenShift docker registry.
+. Push {product-name} images to OpenShift docker registry.
 +
 --
 [NOTE]
@@ -197,7 +197,7 @@ NAME                              ROLE                                          
 system:openshift:scc:privileged   ClusterRole/system:openshift:scc:privileged   9m22s                    neuvector/enforcer
 ----
 
-Run this command to check NeuVector service for Controller:
+Run this command to check {product-name} service for Controller:
 
 [,shell]
 ----
@@ -212,7 +212,7 @@ NAME                                            ROLE                            
 System:openshift:scc:neuvector-scc-controller   ClusterRole/system:openshift:scc:neuvector-scc-controller   9m22s                    neuvector/controller
 ----
 --
-. Create the custom resources (CRD) for NeuVector security rules. For OpenShift 4.6+ (Kubernetes 1.19+):
+. Create the custom resources (CRD) for {product-name} security rules. For OpenShift 4.6+ (Kubernetes 1.19+):
 +
 --
 [,shell]
@@ -225,7 +225,7 @@ oc apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernete
 oc apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.3.0/admission-crd-k8s-1.19.yaml
 ----
 --
-. Add read permission to access the kubernetes API and OpenShift RBACs. IMPORTANT: The standard NeuVector 5.2+ deployment uses least-privileged service accounts instead of the default. See below if upgrading to 5.2+ from a version prior to 5.2.
+. Add read permission to access the kubernetes API and OpenShift RBACs. IMPORTANT: The standard {product-name} 5.2+ deployment uses least-privileged service accounts instead of the default. See below if upgrading to 5.2+ from a version prior to 5.2.
 +
 --
 [CAUTION]
@@ -325,7 +325,7 @@ NAME                        ROLE                             AGE   USERS   GROUP
 neuvector-binding-scanner   Role/neuvector-binding-scanner   70d                    neuvector/updater, neuvector/controller
 ----
 --
-. (*Optional*) Create the Federation Master and/or Remote Multi-Cluster Management Services. If you plan to use the multi-cluster management functions in NeuVector, one cluster must have the Federation Master service deployed, and each remote cluster must have the Federation Worker service. For flexibility, you may choose to deploy both Master and Worker services on each cluster so any cluster can be a master or remote.
+. (*Optional*) Create the Federation Master and/or Remote Multi-Cluster Management Services. If you plan to use the multi-cluster management functions in {product-name}, one cluster must have the Federation Master service deployed, and each remote cluster must have the Federation Worker service. For flexibility, you may choose to deploy both Master and Worker services on each cluster so any cluster can be a master or remote.
 +
 --
 Federated Management Services
@@ -379,7 +379,7 @@ oc create -f <compose file>
 ----
 --
 
-That's it! You should be able to connect to the NeuVector console and login with admin:admin, e.g. https://<public-ip>:8443
+That's it! You should be able to connect to the {product-name} console and login with admin:admin, e.g. https://<public-ip>:8443
 
 To see how to access the console for the neuvector-webui service:
 
@@ -482,15 +482,15 @@ app: neuvector-enforcer-pod
 
 == Updating the CVE Database on OpenShift Deployments
 
-The latest scanner image always contains the most recent CVE database update from NeuVector. For this reason, a version tag is not recommended when pulling the image. However, updating the CVE database requires regular pulling of the latest scanner image so the updater cron job can redeploy the scanner(s).  The samples above assume NeuVector images are pulled, tagged and pushed to a local OpenShift registry. Deployment is then from this registry instead of directly from neuvector (or the legacy NeuVector registry on docker hub).
+The latest scanner image always contains the most recent CVE database update from {product-name}. For this reason, a version tag is not recommended when pulling the image. However, updating the CVE database requires regular pulling of the latest scanner image so the updater cron job can redeploy the scanner(s).  The samples above assume {product-name} images are pulled, tagged and pushed to a local OpenShift registry. Deployment is then from this registry instead of directly from neuvector (or the legacy {product-name} registry on docker hub).
 
-To regularly update the CVE database, we recommend a script/cron job be created to pull the latest NeuVector scanner image and perform the tagging and pushing steps to the local registry. This will ensure the CVE database is being updated regularly and images and containers are being scanned for new vulnerabilities.
+To regularly update the CVE database, we recommend a script/cron job be created to pull the latest {product-name} scanner image and perform the tagging and pushing steps to the local registry. This will ensure the CVE database is being updated regularly and images and containers are being scanned for new vulnerabilities.
 
 == Rolling Updates
 
-Orchestration tools such as Kubernetes, RedHat OpenShift, and Rancher support rolling updates with configurable policies. You can use this feature to update the NeuVector containers. The most important will be to ensure that there is at least one Allinone/Controller running so that policies, logs, and connection data is not lost. Make sure that there is a minimum of 30 seconds between container updates so that a new leader can be elected and the data synchronized between controllers.
+Orchestration tools such as Kubernetes, RedHat OpenShift, and Rancher support rolling updates with configurable policies. You can use this feature to update the {product-name} containers. The most important will be to ensure that there is at least one Allinone/Controller running so that policies, logs, and connection data is not lost. Make sure that there is a minimum of 30 seconds between container updates so that a new leader can be elected and the data synchronized between controllers.
 
-Before starting the rolling updates, please pull and tag the NeuVector containers the same way as in the beginning of this page. You can pull the latest without a version number, but to trigger the rolling update you'll need to tag the image with a version.
+Before starting the rolling updates, please pull and tag the {product-name} containers the same way as in the beginning of this page. You can pull the latest without a version number, but to trigger the rolling update you'll need to tag the image with a version.
 
 For example, for the controller (latest):
 
@@ -508,9 +508,9 @@ docker tag neuvector/controller docker-registry.default.svc:5000/neuvector/contr
 docker push docker-registry.default.svc:5000/neuvector/controller:2.0.1
 ----
 
-You can now update your yaml file with these new versions and '`apply`', or use the '`oc set image ...`' command to trigger the rolling update. Please see the Kubernetes rolling update samples in this Production section to how to launch and monitor rolling updates of the NeuVector containers.
+You can now update your yaml file with these new versions and '`apply`', or use the '`oc set image ...`' command to trigger the rolling update. Please see the Kubernetes rolling update samples in this Production section to how to launch and monitor rolling updates of the {product-name} containers.
 
-The provided sample deployment yamls already configure the rolling update policy. If you are updating via the NeuVector Helm chart, please pull the latest chart to properly configure new features such as admission control, and delete the old cluster role and cluster role binding for NeuVector.
+The provided sample deployment yamls already configure the rolling update policy. If you are updating via the {product-name} Helm chart, please pull the latest chart to properly configure new features such as admission control, and delete the old cluster role and cluster role binding for {product-name}.
 
 == Enabling the REST API
 
@@ -549,7 +549,7 @@ oc adm manage-node nodename --schedulable=false
 
 == OpenShift Deployment in Non-Privileged Mode
 
-The following instructions can be used to deploy NeuVector without using privileged mode containers. The controller is already in non-privileged mode and the enforcer deployment should be changed, which is shown in the excerpted snippets below.
+The following instructions can be used to deploy {product-name} without using privileged mode containers. The controller is already in non-privileged mode and the enforcer deployment should be changed, which is shown in the excerpted snippets below.
 
 Enforcer:
 

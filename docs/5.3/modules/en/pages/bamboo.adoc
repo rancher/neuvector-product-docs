@@ -4,15 +4,15 @@
 
 == Scan for Vulnerabilities during Bamboo Build Pipeline
 
-The Bamboo plug-in for NeuVector can be used to scan for vulnerabilities in the Bamboo pipeline. The plug-in can be downloaded from the Admin -> Add-ons menu in Bamboo. Use Find New Apps to search for NeuVector. The plug-in is also described in the https://marketplace.atlassian.com/apps/1221199/neuvector[Atlassian Marketplace].
+The Bamboo plug-in for {product-name} can be used to scan for vulnerabilities in the Bamboo pipeline. The plug-in can be downloaded from the Admin -> Add-ons menu in Bamboo. Use Find New Apps to search for {product-name}. The plug-in is also described in the https://marketplace.atlassian.com/apps/1221199/neuvector[Atlassian Marketplace].
 
-Deploy the NeuVector Allinone or Controller container if you haven't already done so on a host reachable by Bamboo. Make a note of the IP address of the host where the Allinone or Controller is running.
+Deploy the {product-name} Allinone or Controller container if you haven't already done so on a host reachable by Bamboo. Make a note of the IP address of the host where the Allinone or Controller is running.
 
-In addition, make sure there is a NeuVector scanner container deployed and configured to connect to the Allinone or Controller. In 4.0 and later, the neuvector/scanner container must be deployed separate from the allinone or controller.
+In addition, make sure there is a {product-name} scanner container deployed and configured to connect to the Allinone or Controller. In 4.0 and later, the neuvector/scanner container must be deployed separate from the allinone or controller.
 
 === Configure Global Settings
 
-Configure settings for the NeuVector Controller/Allinone including the NeuVector authentication as well as the registry authentication.
+Configure settings for the {product-name} Controller/Allinone including the {product-name} authentication as well as the registry authentication.
 
 image:bamboo_nv_global_config.png[global-image]
 

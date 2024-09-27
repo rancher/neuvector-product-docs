@@ -48,10 +48,10 @@ Example - largest image size = 1.3GB, the scanner container memory should be 1.8
 * Officially supported linux distributions, SUSE Linux, Ubuntu, CentOS/Red Hat (RHEL), Debian, CoreOS, AWS Bottlerocket and Photon.
 * AMD64 and Arm architectures
 * CoreOS is supported (November 2023) for CVE scanning through RHEL mapping table provided by RedHat. Once an official feed is published by RedHat for CoreOS it will be supported.
-* Officially supported Kubernetes and Docker compliant container management systems. The following platforms are tested with every release of NeuVector: Kubernetes 1.19-1.30, SUSE Rancher (RKE, RKE2, K3s etc), RedHat OpenShift 4.6-4.14 (3.x to 4.12 supported prior to NeuVector 5.2.x), Google GKE, Amazon EKS, Microsoft Azure AKS, IBM IKS, native docker, docker swarm. The following Kubernetes and docker compliant platforms are supported and have been verified to work with NeuVector: VMware Photon and Tanzu, SUSE CaaS, Oracle OKE, Mirantis Kubernetes Engine, Nutanix Kubernetes Engine, docker UCP/DataCenter, docker Cloud.
+* Officially supported Kubernetes and Docker compliant container management systems. The following platforms are tested with every release of {product-name}: Kubernetes 1.19-1.30, SUSE Rancher (RKE, RKE2, K3s etc), RedHat OpenShift 4.6-4.14 (3.x to 4.12 supported prior to {product-name} 5.2.x), Google GKE, Amazon EKS, Microsoft Azure AKS, IBM IKS, native docker, docker swarm. The following Kubernetes and docker compliant platforms are supported and have been verified to work with {product-name}: VMware Photon and Tanzu, SUSE CaaS, Oracle OKE, Mirantis Kubernetes Engine, Nutanix Kubernetes Engine, docker UCP/DataCenter, docker Cloud.
 * Docker run-time version: 1.9.0 and up; Docker API version: 1.21, CE and EE.
 * Containerd and CRI-O run-times (requires changes to volume paths in sample yamls). See changes required for Containerd in the Kubernetes deployment section and CRI-O in the OpenShift deployment section.
-* NeuVector is compatible with most commercially supported CNI's. Officially tested and supported are openshift ovs (subnet/multitenant), calico, flannel, cilium, antrea and public clouds (gke, aks, iks, eks). Note: The multus cni is not currently supported but is on the 2024 roadmap.
+* {product-name} is compatible with most commercially supported CNI's. Officially tested and supported are openshift ovs (subnet/multitenant), calico, flannel, cilium, antrea and public clouds (gke, aks, iks, eks). Note: The multus cni is not currently supported but is on the 2024 roadmap.
 * Console: Chrome or Firefox browser recommended. IE 11 not supported due to performance issues.
 * Minikube is supported for simple initial evaluation but not for full proof of concept. See below for changes required for the Allinone yaml to run on Minikube.
 
@@ -61,11 +61,11 @@ AWS Bottlerocket Note: Must change path of the containerd socket specific to Bot
 
 * GKE Autopilot.
 * The multus cni is not currently supported but is on the 2024 roadmap.
-* AWS ECS is no longer supported. (NOTE: No functionality has been actively removed for operating NeuVector on ECS deployments. However, testing on ECS is no longer being perfromed by SUSE. While protecting ECS workloads with Neuvector likely will operate as expected, issues will not be investigated.)
+* AWS ECS is no longer supported. (NOTE: No functionality has been actively removed for operating {product-name} on ECS deployments. However, testing on ECS is no longer being perfromed by SUSE. While protecting ECS workloads with {product-name} likely will operate as expected, issues will not be investigated.)
 * Docker on Mac
 * Docker on Windows
 * Rkt (container linux) from CoreOS
-* AppArmor on K3S / SLES environments. Certain configurations may conflict with NeuVector and cause scanner errors; AppArmor should be disabled when deploying NeuVector.
+* AppArmor on K3S / SLES environments. Certain configurations may conflict with {product-name} and cause scanner errors; AppArmor should be disabled when deploying {product-name}.
 * IPv6 is not supported
 * VMWare Integrated Containers (VIC) except in nested mode
 * CloudFoundry
@@ -85,7 +85,7 @@ PKS is field tested and requires enabling privileged containers to the plan/tile
 
 [NOTE]
 ====
-NeuVector supports running on linux-based VMs on Mac/Windows using Vagrant, VirtualBox, VMware or other virtualized environments.
+{product-name} supports running on linux-based VMs on Mac/Windows using Vagrant, VirtualBox, VMware or other virtualized environments.
 ====
 
 
@@ -121,7 +121,7 @@ spec:
 
 == Performance and Scaling
 
-As always, performance planning for NeuVector containers will depend on several factors, including:
+As always, performance planning for {product-name} containers will depend on several factors, including:
 
 * (Controller & Scanner) Number and size of images in registry to be scanned (by Scanner) initially
 * (Enforcer) Services mode (Discover, Monitor, Protect), where Protect mode runs as an inline firewall
@@ -129,7 +129,7 @@ As always, performance planning for NeuVector containers will depend on several 
 
 In Monitor mode (network filtering similar to a mirror/tap), there is no performance impact and the Enforcer handles traffic at line speed, generating alerts as needed. In Protect mode (inline firewall), the Enforcer requires CPU and memory to filter connections with deep packet inspection and hold them to determine whether they should be blocked/dropped. Generally, with 1GB of memory and a shared CPU, the Enforcer should be able to handle most environments while in Protect mode.
 
-For throughput or latency sensitive environments, additional memory and/or a dedicated CPU core can be allocated to the NeuVector Enforcer container.
+For throughput or latency sensitive environments, additional memory and/or a dedicated CPU core can be allocated to the {product-name} Enforcer container.
 
 For performance tuning of the Controller and Scanner for registry scanning, see System Requirements above.
 
@@ -145,7 +145,7 @@ This throughput would be projected to scale up as dedicated a CPU is assigned to
 
 === Latency
 
-Latency is another performance metric which depends on the type of network connections. Similar to throughput, latency is not affected in Monitor mode, only for services in Protect (inline firewall) mode. Small packets or simple/fast services will generate a higher latency by NeuVector as a percentage, while larger packets or services requiring complex processing will show a lower percentage of added latency by the NeuVector enforcer.
+Latency is another performance metric which depends on the type of network connections. Similar to throughput, latency is not affected in Monitor mode, only for services in Protect (inline firewall) mode. Small packets or simple/fast services will generate a higher latency by {product-name} as a percentage, while larger packets or services requiring complex processing will show a lower percentage of added latency by the {product-name} enforcer.
 
 The table below shows the average latency of 2-10% benchmarked using the Redis benchmark tool. The Redis Benchmark uses fairly small packets, so the the latency with larger packets would expected to be lower.
 

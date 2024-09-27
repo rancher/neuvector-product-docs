@@ -1,5 +1,5 @@
-= Automating NeuVector
+= Automating {product-name}
 :page-opendocs-origin: /11.automation/11.automation.md
 :page-opendocs-slug:  /automation
 
-NeuVector can be integrated into the CI/CD workflow to provide automated scanning and deployment. We provide examples of using the REST API to automate NeuVector deployment.
+{product-name} can be integrated into the CI/CD workflow to provide automated scanning and deployment. We provide examples of using the REST API to automate {product-name} deployment.

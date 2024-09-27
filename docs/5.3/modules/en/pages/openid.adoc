@@ -4,15 +4,15 @@
 
 == Integrating with OpenID Connect (OIDC) for Azure and Okta
 
-To enable OpenID Connect authentication, the *Issuer*, *Client ID* and *Client secret* settings are required. With the issuer URL, NeuVector will call the discovery API to retrieve the Authenorization, Token and User info endpoints.
+To enable OpenID Connect authentication, the *Issuer*, *Client ID* and *Client secret* settings are required. With the issuer URL, {product-name} will call the discovery API to retrieve the Authenorization, Token and User info endpoints.
 
-Locate the OpenID Connect Redirect URI on the top of the NeuVector OpenID Connect Setting page. You will need copy this URI to the *Login redirect URIs* for Okta and *Reply URLs* for Microsoft Azure.
+Locate the OpenID Connect Redirect URI on the top of the {product-name} OpenID Connect Setting page. You will need copy this URI to the *Login redirect URIs* for Okta and *Reply URLs* for Microsoft Azure.
 
 image:openid1.png[OpenID1]
 
 === Microsoft Azure Configuration
 
-In Azure Active Directory > App registrations > Application name > Settings Page, locate Application ID string. This is used to set the Client ID in NeuVector. The Client secret can be located in Azure's Keys setting.
+In Azure Active Directory > App registrations > Application name > Settings Page, locate Application ID string. This is used to set the Client ID in {product-name}. The Client secret can be located in Azure's Keys setting.
 
 image:openid3.png[OpenID3]
 
@@ -22,9 +22,9 @@ image:openid4.png[OpenID4]
 
 If the users are assigned to the groups in the active directory, their group membership can be added to the claim. Find the application in *Azure Active Directory -> App registrations* and edit the manifest. Modify value of "groupMembershipClaims" to "Application Group".  There is a maximum number of groups that will get emitted into a token.  If the user belongs to a large number of groups ( > 200) and the value "All" is used, the token will not include the groups and authorization will failed.  Using the value "Application Group" instead of "All" will reduce the number of applicable groups returned in the token.
 
-By default, NeuVector looks for "groups" in the claim to identify the user's group membership. If other claim name is used, you can customize the claim name in NeuVector's OpenID Connect Setting page.
+By default, {product-name} looks for "groups" in the claim to identify the user's group membership. If other claim name is used, you can customize the claim name in {product-name}'s OpenID Connect Setting page.
 
-The group claim returned by Azure are identified by the "Object ID" instead of the name. The group's object ID can be located in menu:Azure Active Directory[Groups > Group name Page]. You should use this value to configure group-based role mapping in NeuVector -> Settings.
+The group claim returned by Azure are identified by the "Object ID" instead of the name. The group's object ID can be located in menu:Azure Active Directory[Groups > Group name Page]. You should use this value to configure group-based role mapping in {product-name} -> Settings.
 
 image:openid5.png[OpenID5]
 
@@ -71,7 +71,7 @@ Grant Type (check):
 
 For Sign-in redirect URIs section:
 
-Go to your NeuVector console and navigate to "`Settings`" -> "`OpenId Connect Settings`".  At the top of the page, next to "`OpenID Connect Redirect URI`" label click "`Copy to Clipboard`".
+Go to your {product-name} console and navigate to "`Settings`" -> "`OpenId Connect Settings`".  At the top of the page, next to "`OpenID Connect Redirect URI`" label click "`Copy to Clipboard`".
 
 image:okta4.png[copy]
 
@@ -90,7 +90,7 @@ Then click the save button at the bottom of the page.
 
 Once your general setting are saved, you will be taken to your new application integration setup and a client Id will be generated automatically.
 
-In "`Client Credentials`" section, click edit and modify the "`Client Authentication`" section from "`Use PKCE (for public clients)`" to "`Use Client Authentication`", and hit save. This will generate a new secret automatically which we will need in upcoming NeuVector setup steps:
+In "`Client Credentials`" section, click edit and modify the "`Client Authentication`" section from "`Use PKCE (for public clients)`" to "`Use Client Authentication`", and hit save. This will generate a new secret automatically which we will need in upcoming {product-name} setup steps:
 
 image:okta7.png[clientauth]
 
@@ -100,7 +100,7 @@ Change the Issuer from 	"`Dynamic (based on request domain)`" to the fixed "`Okt
 image:okta8.png[token]
 
 The Okta console can operate in two modes, Classic Mode and Developer Mode.
-In classic mode, the issuer URL is located at Okta Application page's Sign On Tab. To have the user's group membership returned in the claim, you need to add "groups" scope in the NeuVector OpenID Connect configuration page:
+In classic mode, the issuer URL is located at Okta Application page's Sign On Tab. To have the user's group membership returned in the claim, you need to add "groups" scope in the {product-name} OpenID Connect configuration page:
 
 image:okta9.png[claims]
 
@@ -109,11 +109,11 @@ In the Developer Mode, Okta allows you to customize the claims. This is done in 
 image:okta10.png[api]
 
 Claims are name/value pairs that contain information about a user as well as meta-information about the OIDC service.
-In "`OpenID Connect ID Token`" section, you can create new claims for user's Groups and carry the claim in the ID Token (an ID Token is a JSON Web Token, a compact URL-Safe means of representing claims to be transferred between two parties, so identity information about the user is encoded right into the token and the token can be definitively verified to prove that is hasn't been tampered with). If a specific scope is configured, make sure to add the scope to NeuVector OpenID Connect setting page, so that the claim can be included after the user is authenticated:
+In "`OpenID Connect ID Token`" section, you can create new claims for user's Groups and carry the claim in the ID Token (an ID Token is a JSON Web Token, a compact URL-Safe means of representing claims to be transferred between two parties, so identity information about the user is encoded right into the token and the token can be definitively verified to prove that is hasn't been tampered with). If a specific scope is configured, make sure to add the scope to {product-name} OpenID Connect setting page, so that the claim can be included after the user is authenticated:
 
 image:okta11.png[scopes]
 
-By default, NeuVector looks for "groups" in the claim to identify the user's group membership. If other claim name is used, you can customize the claim name in NeuVector's OpenID Connect Setting page. To configure claims, edit the "`OpenID Connect ID Token`" section as shown in the next image:
+By default, {product-name} looks for "groups" in the claim to identify the user's group membership. If other claim name is used, you can customize the claim name in {product-name}'s OpenID Connect Setting page. To configure claims, edit the "`OpenID Connect ID Token`" section as shown in the next image:
 
 image:okta12.png[claims]
 
@@ -121,7 +121,7 @@ In your application integration page, navigate to "`Assignments`" tab and make s
 
 image:okta13.png[assignments]
 
-=== NeuVector OpenID Connect Configuration
+=== {product-name} OpenID Connect Configuration
 
 Configure the proper Issuer URL, Client ID and Client secret in the page.
 
@@ -132,8 +132,8 @@ After the user is authenticated, the proper role can be derived with group-based
 . If group-based role mapping is not configured or the matched groups cannot be located, the authenticated user will be assigned with the Default role. If the Default role is set to None, when group-based role mapping fails, the user is not able to login.
 . Specify a list of groups respectively in Admin and Reader role map. The user's group membership is returned by the claims in the ID Token after the user is authenticated. If the matched group is located, the corresponding role will be assigned to the user.
 
-The group can be mapped to the Admin role in NeuVector. Individual users can be 'promoted' to a Federated Admin role by logging in as a local cluster admin, selecting the user with Identify Provider 'OpenID', and editing their role in Settings -> Users/Roles.
+The group can be mapped to the Admin role in {product-name}. Individual users can be 'promoted' to a Federated Admin role by logging in as a local cluster admin, selecting the user with Identify Provider 'OpenID', and editing their role in Settings -> Users/Roles.
 
 === Mapping Groups to Roles and Namespaces
 
-Please see the xref:users.adoc#_mapping_groups_to_roles_and_namespaces[Users and Roles] section for how to map groups to preset and custom roles as well as namespaces in NeuVector.
+Please see the xref:users.adoc#_mapping_groups_to_roles_and_namespaces[Users and Roles] section for how to map groups to preset and custom roles as well as namespaces in {product-name}.

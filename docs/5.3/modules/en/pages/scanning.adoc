@@ -2,9 +2,9 @@
 :page-opendocs-origin: /06.scanning/01.scanning/01.scanning.md
 :page-opendocs-slug:  /scanning/scanning
 
-NeuVector enables full lifecycle scanning & compliance through vulnerability scanning and running of the CIS benchmarks for security, as well as custom compliance checks. The Security Risks menu enables customizable Vulnerability and Compliance management investigation, triage, and reporting. Easily research image vulnerabilities and find out which nodes or containers contain those vulnerabilities. Advanced filtering makes reviewing scan and compliance check results easy and provides customized reporting. It also provides standard and customizable compliance reports and templates for PCI, GDPR, and other regulations.
+{product-name} enables full lifecycle scanning & compliance through vulnerability scanning and running of the CIS benchmarks for security, as well as custom compliance checks. The Security Risks menu enables customizable Vulnerability and Compliance management investigation, triage, and reporting. Easily research image vulnerabilities and find out which nodes or containers contain those vulnerabilities. Advanced filtering makes reviewing scan and compliance check results easy and provides customized reporting. It also provides standard and customizable compliance reports and templates for PCI, GDPR, and other regulations.
 
-== Overview of NeuVector Scanning
+== Overview of {product-name} Scanning
 
 Scanning is performed at all phases of the pipeline from Build to Registry to Run-Time, on various assets, as shown below.
 
@@ -44,14 +44,14 @@ Scanning is performed at all phases of the pipeline from Build to Registry to Ru
 
 Images are scanned either in Registry scanning or through Build-phase plug-ins such as Jenkins, CircleCI, Gitlab etc.
 
-The CIS Benchmarks support by NeuVector include:
+The CIS Benchmarks support by {product-name} include:
 
 * Kubernetes
 * Docker
 * Red Hat OpenShift draft 'Inspired by CIS' benchmarks
 * Google GKE
 
-The open source implementation of these benchmarks can be found on the https://github.com/neuvector[NeuVector Github page].
+The open source implementation of these benchmarks can be found on the https://github.com/neuvector[{product-name} Github page].
 
 [NOTE]
 ====
@@ -61,11 +61,11 @@ Secrets can also be detected on Nodes and in Containers with xref:customcomplian
 
 === Kubernetes Resource Deployment File Scanning
 
-NeuVector is able to scan deployment yaml files for configuration assessments against Admission Control rules. This is useful to scan deployment yaml files early in the pipeline to determine if the deployment would violate any rules before attempting the deployment. Please see xref:assessment.adoc[Configuration Assessment] under Admission Controls for more details.
+{product-name} is able to scan deployment yaml files for configuration assessments against Admission Control rules. This is useful to scan deployment yaml files early in the pipeline to determine if the deployment would violate any rules before attempting the deployment. Please see xref:assessment.adoc[Configuration Assessment] under Admission Controls for more details.
 
 == Managing Vulnerabilities and Compliance
 
-NeuVector provides several ways to review vulnerability and compliance scan results and generate reports. These include:
+{product-name} provides several ways to review vulnerability and compliance scan results and generate reports. These include:
 
 * *Dashboard.* Review summary vulnerabilities and see how they impact the overall xref:improve-score.adoc[Security Risk Score].
 * *Security Risks Menu.* View the impact of vulnerabilities and compliance issues and generate reports with advanced filtering.
@@ -88,9 +88,9 @@ See the next section on xref:vulnerabilities.adoc[Vulnerability Management] for 
 The Assets menu reports vulnerabilities and compliance checks results organized by the asset.
 
 * Platforms. The orchestration platform such as Kubernetes, and vulnerability scans of the platform.
-* Nodes. Nodes/hosts protected by NeuVector Enforcers, and results of Compliance checks such as CIS benchmarks and custom checks, as well as host vulnerability scans.
+* Nodes. Nodes/hosts protected by {product-name} Enforcers, and results of Compliance checks such as CIS benchmarks and custom checks, as well as host vulnerability scans.
 * Containers. All containers in the cluster including system containers, and the results of Compliance checks such as CIS benchmarks and custom checks, as well as container run-time Vulnerability scans. Process activity and performance statistics can also be found here.
-* Registries. Registries/repositories scanned by NeuVector. Layered image scanning results are found here, and scan results can be used in Admission control rules (found in Policy -> Admission Controls).
+* Registries. Registries/repositories scanned by {product-name}. Layered image scanning results are found here, and scan results can be used in Admission control rules (found in Policy -> Admission Controls).
 
 [NOTE]
 ====
@@ -99,13 +99,13 @@ xref:customcompliance.adoc[Custom compliance checks] as mentioned above are defi
 
 === Automated Run-Time Scanning
 
-NeuVector can scan running containers, host nodes, and the orchestration platform for vulnerabilities. In the Assets menu for Nodes or Containers, enable Auto-Scan by clicking on the Vulnerabilities tab for a node or container, then Auto-Scan (appears in upper right) to scan all running containers, nodes, and platform including newly started ones once they start running. You can also select a container or node and scan it manually.
+{product-name} can scan running containers, host nodes, and the orchestration platform for vulnerabilities. In the Assets menu for Nodes or Containers, enable Auto-Scan by clicking on the Vulnerabilities tab for a node or container, then Auto-Scan (appears in upper right) to scan all running containers, nodes, and platform including newly started ones once they start running. You can also select a container or node and scan it manually.
 
 You can click on each vulnerability name/CVE that is discovered to retrieve a description of it, and click on the inspect arrow in the popup to see the detailed description of the vulnerability.
 
 image:Vuln1.png[Vulnerabilities]
 
-The auto-scan will also be triggered when ever there is an update to the NeuVector CVE database. Please see the section xref:updating.adoc[Updating the CVE Database] for details.
+The auto-scan will also be triggered when ever there is an update to the {product-name} CVE database. Please see the section xref:updating.adoc[Updating the CVE Database] for details.
 
 == Automated Actions, Mitigations, and Responses Based on Vulnerabilities
 

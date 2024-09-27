@@ -10,13 +10,13 @@ Please see the first section Basics -> Connect to Manager for configuration opti
 
 == Menus and Navigation
 
-Use the left side menu to navigate in your NeuVector console. Note that there are additional settings in upper right for User Profile and Multi-Cluster configuration.
+Use the left side menu to navigate in your {product-name} console. Note that there are additional settings in upper right for User Profile and Multi-Cluster configuration.
 
 image:4-3_Network_Activity.png[Navigation]
 
 == Dashboard
 
-The Dashboard shows a summary of risk scores, security events, and application protocols detected by NeuVector. It also shows details for some of these security events. PDF reports can be generated from the Dashboard which contain detailed charts and explanations.
+The Dashboard shows a summary of risk scores, security events, and application protocols detected by {product-name}. It also shows details for some of these security events. PDF reports can be generated from the Dashboard which contain detailed charts and explanations.
 
 At the top of the dashboard there is a summary of the security risks in the cluster. The wrench tool next to the overall risk score can be clicked to open a wizard which will guide you through recommended steps to reduce/improve the risk score. Mousing over each risk gauge will provide a description of it to the right and how to improve the risk score. Also see the separate documentation section Improving Security Risk Score.
 
@@ -87,19 +87,19 @@ See the explanation of the Legend icons at the bottom of this page.
 
 === Assets
 
-Assets displays information about Platforms, Nodes, Containers, Registries, Sigstore Verifiers (used in Admission Control rules), and System Components (NeuVector Controllers, Scanners, and Enforcers).
+Assets displays information about Platforms, Nodes, Containers, Registries, Sigstore Verifiers (used in Admission Control rules), and System Components ({product-name} Controllers, Scanners, and Enforcers).
 
-NeuVector includes an end-to-end vulnerability management platform which can be integrated into your automated CI/CD process. Scan registries, images, and running containers and host nodes for vulnerabilities. Results for individual registries, nodes, and containers can be found here, while combined results and advanced reporting can be found in the Security Risks menu.
+{product-name} includes an end-to-end vulnerability management platform which can be integrated into your automated CI/CD process. Scan registries, images, and running containers and host nodes for vulnerabilities. Results for individual registries, nodes, and containers can be found here, while combined results and advanced reporting can be found in the Security Risks menu.
 
-NeuVector also automatically runs the Docker Bench security report and Kubernetes CIS Benchmark (if applicable) on each host and running containers.
+{product-name} also automatically runs the Docker Bench security report and Kubernetes CIS Benchmark (if applicable) on each host and running containers.
 
-Note that the Status of all containers is shown in Assets -> Containers, which indicates the NeuVector protection mode (Discover, Monitor, Protect). If the container is shown in an 'Exit' state, it is still on the host but is stopped. Removing the container will remove it from an Exit state.
+Note that the Status of all containers is shown in Assets -> Containers, which indicates the {product-name} protection mode (Discover, Monitor, Protect). If the container is shown in an 'Exit' state, it is still on the host but is stopped. Removing the container will remove it from an Exit state.
 
-Please see the section Scanning & Compliance for additional details, including how to use the Jenkins plug-in NeuVector Vulnerability Scanner.
+Please see the section Scanning & Compliance for additional details, including how to use the Jenkins plug-in {product-name} Vulnerability Scanner.
 
 === Policy
 
-This displays and manages the run-time Security Policy which determines what container networking, process, and file system application behavior is ALLOWED and DENIED. Any conversations and activities  which are not explicitly allowed are logged as violations by NeuVector. This is also where Admission Control rules can be created.
+This displays and manages the run-time Security Policy which determines what container networking, process, and file system application behavior is ALLOWED and DENIED. Any conversations and activities  which are not explicitly allowed are logged as violations by {product-name}. This is also where Admission Control rules can be created.
 
 Please see the Security Policy section of these docs for a detailed explanation of the behavior of the rules and how to edit or create rules.
 
@@ -111,13 +111,13 @@ These menu's combine results from registry (image), node, and container vulnerab
 
 === Notifications
 
-This is where you can see the logs for Security Events, Risk Reports (e.g. Scanning) and general Events. NeuVector also supports SYSLOG for integration with tools such as SPLUNK as well as webhook notifications.
+This is where you can see the logs for Security Events, Risk Reports (e.g. Scanning) and general Events. {product-name} also supports SYSLOG for integration with tools such as SPLUNK as well as webhook notifications.
 
 *Security Events*
 
 Use the search or Advanced Filter to locate specific events. The timeline widget at the top can also be adjusted using the left and right circles to change the time window. You can also easily add rules (Security Policy) to allow or deny the detected event by selecting the Review Rule button and deploying a new rule.
 
-NeuVector continuously monitors all containers for know attacks such as DNS, DDoS, HTTP-smuggling, tunneling etc. When an attack is detected it is logged here and blocked (if container/service is set to protect), and the packet is automatically captured. You can view the packet details, for example:
+{product-name} continuously monitors all containers for know attacks such as DNS, DDoS, HTTP-smuggling, tunneling etc. When an attack is detected it is logged here and blocked (if container/service is set to protect), and the packet is automatically captured. You can view the packet details, for example:
 
 image:ping-capture.png[Capture]
 
@@ -143,17 +143,17 @@ Add other users here. Users can be assigned an Admin role, a Read-only role, or 
 
 Configure a unique cluster name, new services mode, and other settings here.
 
-If deploying on a Rancher or OpenShift cluster, authentication can be enabled such that Rancher users or OpenShift users can log into the NeuVector console with the associated RBACs. For Rancher users, a connecting button/link from the Rancher console allows Rancher admin's to open and access the NeuVector console directly.
+If deploying on a Rancher or OpenShift cluster, authentication can be enabled such that Rancher users or OpenShift users can log into the {product-name} console with the associated RBACs. For Rancher users, a connecting button/link from the Rancher console allows Rancher admin's to open and access the {product-name} console directly.
 
-The xref:modes.adoc#_new_service_mode[New Service Mode] sets which protection mode any new services (applications) previously unknown or undefined in NeuVector will by default be set to. For production environments, it is not recommended to set this to Discover.
+The xref:modes.adoc#_new_service_mode[New Service Mode] sets which protection mode any new services (applications) previously unknown or undefined in {product-name} will by default be set to. For production environments, it is not recommended to set this to Discover.
 
 The xref:modes.adoc#_network_service_policy_mode[Network Service Policy Mode], if enabled, applies the selected policy mode globally to the network rules for all groups, and each Group's individual policy mode will only apply to process and file rules.
 
 The xref:modes.adoc#_automated_promotion_of_group_modes[Automated Promotion of Group Modes] promotes a Group's protection Mode automatically (from Discover to Monitor to Protect) based on elapsed time and criteria.
 
-The Auto-Deletion of Unused Groups is useful for automated 'clean-up' of the discovered (and auto-created rules for) groups which are no longer in use, especially high-churn development environments. See Policy -> Groups for the list of groups in NeuVector. Removing unused Groups will clean up the Groups list and all associated rules for those groups.
+The Auto-Deletion of Unused Groups is useful for automated 'clean-up' of the discovered (and auto-created rules for) groups which are no longer in use, especially high-churn development environments. See Policy -> Groups for the list of groups in {product-name}. Removing unused Groups will clean up the Groups list and all associated rules for those groups.
 
-The X-FORWARDED-FOR enables/disables use of these headers in enforcing NeuVector network rules. This is useful to retain the original source IP of an ingress connection so it can be used for network rules enforcement. Enable means the source IP will be retained. See below for a detailed explanation.
+The X-FORWARDED-FOR enables/disables use of these headers in enforcing {product-name} network rules. This is useful to retain the original source IP of an ingress connection so it can be used for network rules enforcement. Enable means the source IP will be retained. See below for a detailed explanation.
 
 Multiple webhooks can be configured to be used in xref:responserules.adoc[Response Rules] for customized notifications. Webhook format choices include Slack, JSON, and key-value pairs.
 
@@ -165,11 +165,11 @@ An integration with xref:ibmsa.adoc[IBM Security Advisor] and xref:ibmqr.adoc[QR
 
 Import/Export the Security Policy file. You can configure SSO for SAML and LDAP/AD here as well. See the Enterprise Integration section for configuration details. *_Important!_* Be careful when importing the configuration file. Importing will overwrite the existing settings. If you import a '`policy only`' file, the Groups and Rules of the Policy will be overwritten. If you import a file with '`all`' settings, then the Policy, Users, and Configurations will be overwritten. Note that the original '`admin`' user's password of your current Controller will also be overwritten with the original admin's password in the imported file.
 
-The Usage Report and Collect Log exports may be requested by your NeuVector support team.
+The Usage Report and Collect Log exports may be requested by your {product-name} support team.
 
 ===== X-FORWARDED-FOR Behavior Details
 
-In a Kubernetes cluster, an application can be exposed to the outside of the cluster by a NodePort, LoadBalancer or Ingress services. These services typically replace the source IP while doing the Source NAT (SNAT) on the packets. As the original source IP is masqueraded, this prevents NeuVector from recognizing the connection is actually from the 'external'.
+In a Kubernetes cluster, an application can be exposed to the outside of the cluster by a NodePort, LoadBalancer or Ingress services. These services typically replace the source IP while doing the Source NAT (SNAT) on the packets. As the original source IP is masqueraded, this prevents {product-name} from recognizing the connection is actually from the 'external'.
 
 In order to preserve the original source IP address, the user needs to add the following line to the exposed services, in the 'spec' section of the external facing load balancer or ingress controller. (Ref: https://kubernetes.io/docs/tutorials/services/source-ip/)
 
@@ -180,17 +180,17 @@ In order to preserve the original source IP address, the user needs to add the f
 
 Many implementations of LoadBalancer services and Ingress controllers will add the X-FORWARDED-FOR line to the HTTP request header to communicate the real source IP to the backend applications. This product can recognize this set of HTTP headers, identify the original source IP and enforce the policy according to that.
 
-This improvement created some unexpected issues in some setup. If the above line has been added to the exposed services and NeuVector network policies have been created in a way that expect the network connections are coming from internal proxy/ingress services, because we now identify the connections are from "external" to the cluster, normal application traffic might trigger alerts or get blocked if the applications are put in "Protect" mode.
+This improvement created some unexpected issues in some setup. If the above line has been added to the exposed services and {product-name} network policies have been created in a way that expect the network connections are coming from internal proxy/ingress services, because we now identify the connections are from "external" to the cluster, normal application traffic might trigger alerts or get blocked if the applications are put in "Protect" mode.
 
-A switch is available to disable this feature. Disabling it tells NeuVector not to identify that the connection is from "external" using X-FORWARDED-FOR headers. By default this is enabled, and the X-FORWARDED-FOR header is used in policy enforcement. To disable it, go to Settings -> Configuration, and disable the "X-Forwarded-For based policy match" setting.
+A switch is available to disable this feature. Disabling it tells {product-name} not to identify that the connection is from "external" using X-FORWARDED-FOR headers. By default this is enabled, and the X-FORWARDED-FOR header is used in policy enforcement. To disable it, go to Settings -> Configuration, and disable the "X-Forwarded-For based policy match" setting.
 
 ==== Settings -> LDAP/AD, SAML, and OpenID Connect
 
-NeuVector supports integration with LDAP/AD, SAML, and OpenID Connect for SSO and user group mapping. See the xref:integration.adoc[Enterprise Integration] section for configuration details.
+{product-name} supports integration with LDAP/AD, SAML, and OpenID Connect for SSO and user group mapping. See the xref:integration.adoc[Enterprise Integration] section for configuration details.
 
 ==== Multiple Cluster Management
 
-You can manage xref:multicluster.adoc[multiple NeuVector clusters] (e.g. multiple Kubernetes clusters running NeuVector on different clouds or on premise) by selecting a Master cluster, and joining remote clusters to them. Each remote cluster can also be individually managed. Security rules can be propagated to multiple clusters through use of Federated Policy settings.
+You can manage xref:multicluster.adoc[multiple {product-name} clusters] (e.g. multiple Kubernetes clusters running {product-name} on different clouds or on premise) by selecting a Master cluster, and joining remote clusters to them. Each remote cluster can also be individually managed. Security rules can be propagated to multiple clusters through use of Federated Policy settings.
 
 ==== My Profile
 
@@ -206,7 +206,7 @@ Here is what the icons mean:
 
 ==== External network
 
-This is any network outside the NeuVector cluster. This could include internet public access or other internal networks.
+This is any network outside the {product-name} cluster. This could include internet public access or other internal networks.
 
 ==== Namespace
 
@@ -230,11 +230,11 @@ This represent a group of containers in a service. Use this to provide a more ab
 
 ==== Un-managed node
 
-This node has been detected but does not have a NeuVector enforcer on it.
+This node has been detected but does not have a {product-name} enforcer on it.
 
 ==== Un-managed container
 
-This container has been detected but is not on a node with a NeuVector enforcer on it. This could also represent some system services.
+This container has been detected but is not on a node with a {product-name} enforcer on it. This could also represent some system services.
 
 ==== Exited Container
 
@@ -258,7 +258,7 @@ A connection which has generated a violation alert is shown in lighter red.
 
 ==== Conversation being blocked
 
-If a connection is a violation, as shown in red, and has been blocked by NeuVector, the arrow will have an '`x`' in it.
+If a connection is a violation, as shown in red, and has been blocked by {product-name}, the arrow will have an '`x`' in it.
 
 ==== Quarantined container
 

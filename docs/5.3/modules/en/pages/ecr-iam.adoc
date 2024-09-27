@@ -4,7 +4,7 @@
 
 == AWS ECR - IAM Roles
 
-When the NeuVector containers are deployed in AWS, and an EC2 instance is assigned a role of "`EC2 Container Registry`" Read Access, the AWS ECR registry can be scanned without an Access Key and Secret Key.
+When the {product-name} containers are deployed in AWS, and an EC2 instance is assigned a role of "`EC2 Container Registry`" Read Access, the AWS ECR registry can be scanned without an Access Key and Secret Key.
 
 Here is how to create an AWS role and assign it to the node.
 

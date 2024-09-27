@@ -8,7 +8,7 @@ The Settings -> Users and Roles menu enables management of users as well as role
 
 === Users
 
-Users can be configured directly in NeuVector or integrated through directories/SSO. To create a new user in NeuVector go to Settings -> Users & Roles and add the user. Select the role of the user from the predefined roles, or see below to create a custom role.
+Users can be configured directly in {product-name} or integrated through directories/SSO. To create a new user in {product-name} go to Settings -> Users & Roles and add the user. Select the role of the user from the predefined roles, or see below to create a custom role.
 
 The default password requirement is minimum 8 characters length, 1 uppercase letter, 1 lowercase letter, 1 numeric character. These and other requirements can be changed by an admin in Settings -> Users under Authentication and Security Policies.
 
@@ -27,7 +27,7 @@ If a user has previously logged in through an enterprise integration, their Iden
 
 [NOTE]
 ====
-When a namespace restricted user configures a registry in Assets in NeuVector, only users with access to that namespace can see/scan that registry. Global users will be able to see/manage that registry, but not any users with restricted namespaces / role.
+When a namespace restricted user configures a registry in Assets in {product-name}, only users with access to that namespace can see/scan that registry. Global users will be able to see/manage that registry, but not any users with restricted namespaces / role.
 ====
 
 === Roles
@@ -53,7 +53,7 @@ image:roles_4.png[roles]
 
 === Mapping Groups to Roles and Namespaces
 
-Groups can be mapped to preset or custom roles in NeuVector. In addition, a role can be restricted to one or more namespaces.
+Groups can be mapped to preset or custom roles in {product-name}. In addition, a role can be restricted to one or more namespaces.
 
 In the LDAP/AD, SAML, or OIDC configuration in Settings, the last section of the configuration screen maps Groups to Roles and Namespaces. First select a default role, if any, for mapping.
 

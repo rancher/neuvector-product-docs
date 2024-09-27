@@ -2,25 +2,25 @@
 :page-opendocs-origin: /01.basics/03.installation/01.native/01.native.md
 :page-opendocs-slug: /basics/installation
 
-== Understanding How to Deploy NeuVector
+== Understanding How to Deploy {product-name}
 
-Deploy the NeuVector containers using Kubernetes, OpenShift, Rancher, Docker, or other platforms. Each type of NeuVector container has a unique purpose and may require special performance or node selection requirements for optimum operation.
+Deploy the {product-name} containers using Kubernetes, OpenShift, Rancher, Docker, or other platforms. Each type of {product-name} container has a unique purpose and may require special performance or node selection requirements for optimum operation.
 
-The NeuVector open source images are hosted on Docker Hub at `/neuvector/{image name}`.
+The {product-name} open source images are hosted on Docker Hub at `/neuvector/{image name}`.
 
 See the xref:production.adoc#_best_practices_tips_qa_for_deploying_and_managing_neuvector[Onboarding/Best Practices section] to download an on boarding guide.
 
 === Deploy using Kubernetes, OpenShift, Rancher, or other Kubernetes-based tools
 
-To deploy NeuVector using Kubernetes, OpenShift, Rancher or other orchestration tools, see the preparation steps and sample files in the section xref:production.adoc#_planning_deployments[Deploying NeuVector]. This deploys manager, controller, scanner, and enforcer containers. For simple testing using the NeuVector Allinone container, see the section Special Use Cases with Allinone.
+To deploy {product-name} using Kubernetes, OpenShift, Rancher or other orchestration tools, see the preparation steps and sample files in the section xref:production.adoc#_planning_deployments[Deploying {product-name}]. This deploys manager, controller, scanner, and enforcer containers. For simple testing using the {product-name} Allinone container, see the section Special Use Cases with Allinone.
 
-NeuVector supports Helm-based deployment with a Helm chart at https://github.com/neuvector/neuvector-helm.
+{product-name} supports Helm-based deployment with a Helm chart at https://github.com/neuvector/neuvector-helm.
 
 Automated deployments are supported using Helm, Red Hat/Community Operators, the rest API, or a Kubernetes ConfigMap. See the section xref:configmap.adoc#_kubernetes_configmap[Deploy Using ConfigMap] for more details on automating deployment.
 
 === Deploy using Docker Native
 
-Before you xref:docker.adoc[deploy NeuVector] with docker run or compose, you MUST set the CLUSTER_JOIN_ADDR to the appropriate IP address. Find the node IP address, node name (if using a name server, or node variable (if using orchestration tools) for the allinone (controller) to use for the "`node IP`" in the docker-compose files for both allinone and enforcer.  For example:
+Before you xref:docker.adoc[deploy {product-name}] with docker run or compose, you MUST set the CLUSTER_JOIN_ADDR to the appropriate IP address. Find the node IP address, node name (if using a name server, or node variable (if using orchestration tools) for the allinone (controller) to use for the "`node IP`" in the docker-compose files for both allinone and enforcer.  For example:
 
 [,yaml]
 ----
@@ -34,17 +34,17 @@ For Swarm-Based deployments, also add the following environment variable:
 - NV_PLATFORM_INFO=platform=Docker
 ----
 
-See the section Deploying NeuVector -> xref:docker.adoc[Docker Production Deployment] for instructions and examples.
+See the section Deploying {product-name} -> xref:docker.adoc[Docker Production Deployment] for instructions and examples.
 
 === Backing Up Configuration Files
 
-By default NeuVector stores various config files in  /var/neuvector/config/backup on the Controller or Allinone node.
+By default {product-name} stores various config files in  /var/neuvector/config/backup on the Controller or Allinone node.
 
 This volume can be mapped to xref:production.adoc#_backups_and_persistent_data[persistent storage] to maintain configuration. Files in the folder may need to be deleted in order to start fresh.
 
 === Volume Mapping
 
-Make sure volumes are mapped properly. NeuVector requires these to operate (/var/neuvector is only required on controller/allinone). For example:
+Make sure volumes are mapped properly. {product-name} requires these to operate (/var/neuvector is only required on controller/allinone). For example:
 
 [,yaml]
 ----
@@ -69,11 +69,11 @@ If deploying docker native (including SWARM) make sure there is not any host fir
 
 ==== Port Summary
 
-The following table lists communications from each NeuVector container. The Allinone container combines the Manager, Controller and Enforcer containers so requires the ports listed for those containers.
+The following table lists communications from each {product-name} container. The Allinone container combines the Manager, Controller and Enforcer containers so requires the ports listed for those containers.
 
 image:Communication_Matrix_From_To.png[Ports]
 
-The following table summarizes the listening ports for each NeuVector container.
+The following table summarizes the listening ports for each {product-name} container.
 
 image:Communication_Matrix_Listening_Ports.png[Listening]
 

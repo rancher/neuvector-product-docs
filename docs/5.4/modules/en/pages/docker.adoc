@@ -8,16 +8,16 @@ Follow the instructions in the xref:kubernetes.adoc[Kubernetes section].
 
 [NOTE]
 ====
-NeuVector does not support mixed Kubernetes / Swarm clusters.
+{product-name} does not support mixed Kubernetes / Swarm clusters.
 ====
 
-== Deploy NeuVector Containers Using Docker Native or UCP/Swarm
+== Deploy {product-name} Containers Using Docker Native or UCP/Swarm
 
-Note that native Docker deployment on Mirantis Kubernetes Engine using Swarm DOES NOT support deployment of services with containers in privileged mode, or with seccomp capabilities added. To deploy in this environment, you must use Docker Compose or Run to deploy the NeuVector containers. You can use the remote host deployment (docker-compose -H HOST) to make this task easier.
+Note that native Docker deployment on Mirantis Kubernetes Engine using Swarm DOES NOT support deployment of services with containers in privileged mode, or with seccomp capabilities added. To deploy in this environment, you must use Docker Compose or Run to deploy the {product-name} containers. You can use the remote host deployment (docker-compose -H HOST) to make this task easier.
 
 Here are the sample docker compose configuration files. Note that using docker native does not support deploying the enforcer on the same node as the controller, requiring the use of the Allinone container if controller and enforcer functions are desired on a node.
 
-NOTE: The environment variable NV_PLATFORM_INFO=platform=Docker is used to notify NeuVector that the platform is Docker/Swarm, even though there may be unused Kubernetes containers detected by NeuVector on a Docker EE deployment. Also to be able to see these in Network Activity -> View -> Show System, add the environment variable for the Enforcer NV_SYSTEM_GROUPS.
+NOTE: The environment variable NV_PLATFORM_INFO=platform=Docker is used to notify {product-name} that the platform is Docker/Swarm, even though there may be unused Kubernetes containers detected by {product-name} on a Docker EE deployment. Also to be able to see these in Network Activity -> View -> Show System, add the environment variable for the Enforcer NV_SYSTEM_GROUPS.
 
 === Deploy Allinone for High Availability
 
@@ -88,9 +88,9 @@ enforcer:
 
 The most important environment variable is *CLUSTER_JOIN_ADDR*. For enforcers, replace `<controller_node_ip>` with the controller's node IP address. Typically, *CLUSTER_JOIN_ADDR* in the controller/all-in-one's docker-compose file and enforcer's docker-compose file have the same value.
 
-=== Deploy the NeuVector Scanner Container
+=== Deploy the {product-name} Scanner Container
 
-From NeuVector 4.0+, a separate scanner container must be deployed to perform vulnerability scanning. Important: Always use the :latest tag when pulling and running the scanner image to ensure the latest CVE database is deployed.
+From {product-name} 4.0+, a separate scanner container must be deployed to perform vulnerability scanning. Important: Always use the :latest tag when pulling and running the scanner image to ensure the latest CVE database is deployed.
 
 Sample docker run to deploy the scanner on the same host as the controller
 
@@ -132,11 +132,11 @@ Where s1 is scanner 1 (use s2, s3 etc for each additional scanner).
 
 To deploy a stand alone scanner (no controller/allinone), please see the section xref:scanners.adoc[Parallel and Standalone Scanners].
 
-To update the Scanner in order to get the latest CVE database updates from NeuVector, create a cron job to stop and restart the scanner, pulling the latest. See xref:updating.adoc#_docker_native_updates[this section] for details.
+To update the Scanner in order to get the latest CVE database updates from {product-name}, create a cron job to stop and restart the scanner, pulling the latest. See xref:updating.adoc#_docker_native_updates[this section] for details.
 
 === Deployment Without Using Privileged Mode
 
-For some platform configurations it is possible to deploy the NeuVector containers without requiring them to run in privileged mode. The configuration must support the ability to add capabilities and set the apparmor profile. Note that Docker DataCenter/UCP and Swarm currently do not support this, but it is still possible to deploy NeuVector manually using Compose or Run.
+For some platform configurations it is possible to deploy the {product-name} containers without requiring them to run in privileged mode. The configuration must support the ability to add capabilities and set the apparmor profile. Note that Docker DataCenter/UCP and Swarm currently do not support this, but it is still possible to deploy {product-name} manually using Compose or Run.
 
 === Deploy allinone (NO privileged mode) with docker-compose
 
@@ -304,7 +304,7 @@ docker run -d --name enforcer \
 neuvector/enforcer:<version>
 ----
 
-== Deploy Separate NeuVector Components on Different Hosts
+== Deploy Separate {product-name} Components on Different Hosts
 
 If planning to dedicate a docker host to a Controller and/or Manager (no Enforcer) these containers can be deployed individually instead of the Allinone. Note that docker does not support deploying the enforcer on the same node as the controller as separate components, requiring the use of the Allinone container if controller and enforcer functions are desired on a node.
 
@@ -341,7 +341,7 @@ Docker run can also be used, for example
 docker run -itd --privileged --name neuvector.controller -e CLUSTER_JOIN_ADDR=controller_ip -p 18301:18301 -p 18301:18301/udp -p 18300:18300 -p 18400:18400 -p 10443:10443 -v /var/neuvector:/var/neuvector -v /var/run/docker.sock:/var/run/docker.sock:ro -v /proc:/host/proc:ro -v /sys/fs/cgroup/:/host/cgroup/:ro neuvector/controller:<version>
 ----
 
-Manager compose file (replace [controller IP] with IP of controller node to connect to). The Docker UCP HRM service uses the default port 8443 which conflicts with the NeuVector console port. If using the default HRM port, then change the NeuVector port mapping in the example below to another port, for example 9443:8443 for the manager container as shown below.
+Manager compose file (replace [controller IP] with IP of controller node to connect to). The Docker UCP HRM service uses the default port 8443 which conflicts with the {product-name} console port. If using the default HRM port, then change the {product-name} port mapping in the example below to another port, for example 9443:8443 for the manager container as shown below.
 
 [,yaml]
 ----
@@ -377,9 +377,9 @@ enforcer:
         - /sys/fs/cgroup/:/host/cgroup/:ro
 ----
 
-== Monitoring and Restarting NeuVector
+== Monitoring and Restarting {product-name}
 
-Since the NeuVector containers are not deployed as a UCP/Swarm service, they are not automatically started/restarted on nodes. You should set up alerting through your SIEM system for NeuVector SYSLOG events or through DataCenter to detect if a NeuVector container is not running.
+Since the {product-name} containers are not deployed as a UCP/Swarm service, they are not automatically started/restarted on nodes. You should set up alerting through your SIEM system for {product-name} SYSLOG events or through DataCenter to detect if a {product-name} container is not running.
 
 == Deploying Without Privileged Mode
 

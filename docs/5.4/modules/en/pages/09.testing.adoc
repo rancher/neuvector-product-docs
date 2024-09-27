@@ -2,4 +2,4 @@
 :page-opendocs-origin: /09.testing/09.testing.md
 :page-opendocs-slug:  /testing
 
-Evaluate and Test NeuVector Using Sample Applications
+Evaluate and Test {product-name} Using Sample Applications

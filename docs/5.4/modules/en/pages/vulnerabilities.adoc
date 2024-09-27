@@ -2,9 +2,9 @@
 :page-opendocs-origin: /06.scanning/01.scanning/01.vulnerabilities/01.vulnerabilities.md
 :page-opendocs-slug:  /scanning/scanning/vulnerabilities
 
-== Managing Vulnerabilities with NeuVector
+== Managing Vulnerabilities with {product-name}
 
-NeuVector enables automated vulnerability scanning and management throughout the pipeline. Best practices for managing vulnerabilities in NeuVector include:
+{product-name} enables automated vulnerability scanning and management throughout the pipeline. Best practices for managing vulnerabilities in {product-name} include:
 
 * Scan during the xref:build-image-scanning.adoc[build-phase], failing the build if there are critical vulnerabilities 'with fix available.' This forces developers to address fixable vulnerabilities before storing in registries.
 * Scan staging and production registries continuously to look for newly discovered vulnerabilities. Vulnerabilities with fixes available can be required to be fixed immediately, or a grace period allowed to provide time to remediate them.
@@ -13,7 +13,7 @@ NeuVector enables automated vulnerability scanning and management throughout the
 * Ensure running containers are in Monitor or Protect mode with appropriate whitelist rules to 'virtually patch' vulnerabilities to prevent any exploit in production.
 * Scan distroless and PhotonOS based images.
 
-The Dashboard in NeuVector presents a summary risk score which includes vulnerabilities, which can be used to reduce risk from vulnerabilities. See xref:improve-score.adoc[how to improve the risk score] for more details.
+The Dashboard in {product-name} presents a summary risk score which includes vulnerabilities, which can be used to reduce risk from vulnerabilities. See xref:improve-score.adoc[how to improve the risk score] for more details.
 
 The other main tool for reviewing, filtering, and reporting on vulnerabilities is in the Security Risks menu.
 
@@ -25,7 +25,7 @@ The Vulnerabilities menu provides a powerful explorer tool to:
 
 * Make it easy to filter for viewing or downloading of reports, by typing in a search string or using the advanced filter next to the box. The advanced filter allows users to filter vulnerabilities by fix available (or not available), urgency, workloads, service, container, nodes or namespace names.
 * Understand the Impact of vulnerabilities and compliance checks by clicking on the impact row and reviewing remediation and impacted images, nodes, or containers.
-* View the Protection Status (exploit risk) of any vulnerability or compliance issue to see if there are NeuVector Run-Time security protections (rules) enabled for impacted nodes or containers.
+* View the Protection Status (exploit risk) of any vulnerability or compliance issue to see if there are {product-name} Run-Time security protections (rules) enabled for impacted nodes or containers.
 * 'Accept' a vulnerability/CVE after it has been reviewed to hide it from views and suppress it from reports.
 
 image:vulnerabilities_4_4.png[SecurityRisks]
@@ -34,11 +34,11 @@ Use the filter box to enter a string match, or use the advanced filter next to i
 
 image:advanced_filter_4.png[AdvancedFilter]
 
-Selecting any CVE listed provides additional details about the CVE, remediation, and which images, nodes, or containers are Impacted. The Protection State icon (circle) shows various colors to indicate a rough percentage of the impacted items which are unprotected by NeuVector during run-time, protected by NeuVector rules (in a Monitor or Protect mode), or unaffected in run-time (e.g. an image scanned with this vulnerability has no running containers). The Protection State column color scheme is:
+Selecting any CVE listed provides additional details about the CVE, remediation, and which images, nodes, or containers are Impacted. The Protection State icon (circle) shows various colors to indicate a rough percentage of the impacted items which are unprotected by {product-name} during run-time, protected by {product-name} rules (in a Monitor or Protect mode), or unaffected in run-time (e.g. an image scanned with this vulnerability has no running containers). The Protection State column color scheme is:
 
 * Black = unaffected
-* Green = protected by NeuVector with Monitor or Protect mode
-* Red = unprotected by NeuVector, still in Discover mode
+* Green = protected by {product-name} with Monitor or Protect mode
+* Red = unprotected by {product-name}, still in Discover mode
 
 The Impact analysis window (showing affected images, nodes, containers) color scheme is:
 
@@ -47,7 +47,7 @@ The Impact analysis window (showing affected images, nodes, containers) color sc
 * Dark Green = running in Protect mode in production
 * Light Blue = running in Discover mode in production (unprotected)
 
-The Impact colors are meant to correspond to the run-time protection colors for Discover, Monitor and Protect modes in other places in the NeuVector console.
+The Impact colors are meant to correspond to the run-time protection colors for Discover, Monitor and Protect modes in other places in the {product-name} console.
 
 === Accepting Vulnerabilities
 

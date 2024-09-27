@@ -10,7 +10,7 @@
 
 === 4.4.4-s2 Security Patch March 2022
 
-* Update to remediate CVE-2022-0778, an OpenSSL vulnerability found in the Alpine base image used by NeuVector images. Short description: It is possible to trigger an infinite loop by crafting a certificate that has invalid elliptic curve parameters. Since certificate parsing happens before verification of the certificate signature, any process that parses an externally supplied certificate may be subject to a denial of service attack. More details can be found at the following links.
+* Update to remediate CVE-2022-0778, an OpenSSL vulnerability found in the Alpine base image used by {product-name} images. Short description: It is possible to trigger an infinite loop by crafting a certificate that has invalid elliptic curve parameters. Since certificate parsing happens before verification of the certificate signature, any process that parses an externally supplied certificate may be subject to a denial of service attack. More details can be found at the following links.
  ** https://security.alpinelinux.org/vuln/CVE-2022-0778
  ** https://www.suse.com/security/cve/CVE-2022-0778.html
  ** https://nvd.nist.gov/vuln/detail/CVE-2022-0778
@@ -105,7 +105,7 @@
 
 ==== Splunk App Published
 
-* New Splunk app for NeuVector is published at https://splunkbase.splunk.com/app/6205/
+* New Splunk app for {product-name} is published at https://splunkbase.splunk.com/app/6205/
 
 === 4.4.0 December 2021
 
@@ -134,13 +134,13 @@
 * Support multi-architecture image scan.
 * ConfigMap override option to reset config whenever controller starts. The 'always_reload: true' can be used in any configMap yaml to force reload of that yaml every time the controller starts.
 * Include pre-built PSP best practices admission control rules.
-* Test support for AppArmor profile for running NeuVector as non-privileged containers.
+* Test support for AppArmor profile for running {product-name} as non-privileged containers.
 * Allow users to click Group name in Security events list to go to the Policy -> Groups selection.
 
 ==== Bug Fixes
 
 * Add indicator for admission control criterion to determine if scan result is required.
-* Warning if all NeuVector components are not running the same version.
+* Warning if all {product-name} components are not running the same version.
 * Show Docker Swarm/Mirantis platform in Network Activity -> View -> Show System. This is enabled by adding the environment variable for the Enforcer NV_SYSTEM_GROUPS.
 
 ==== Other
@@ -207,7 +207,7 @@ For example,
 
 * Helm Chart  v1.8.0 is updated to default to registry.neuvector.com as the default registry. NOTE: Must specify the version tag manually.
 * Add configurable parameters such as Controller API annotations in Helm chart. Available from version 1.7.6+.
-* Community Operator 1.2.6, Certified Operator 1.2.7 updated to reflect Helm chart updates including adding OpenShift route when controller.apisvc.type is enabled. The certified Operator 1.2.7 deploys NeuVector version 4.2.2.
+* Community Operator 1.2.6, Certified Operator 1.2.7 updated to reflect Helm chart updates including adding OpenShift route when controller.apisvc.type is enabled. The certified Operator 1.2.7 deploys {product-name} version 4.2.2.
 * Add HTML output format for scan results in Jenkins pipeline scanning results.
 * Add namespace of impacted workload in Prometheus exporter alerts. Now supported in neuvector/prometheus-exporter:4.2.2 and later.
 
@@ -224,7 +224,7 @@ For example,
 
 * Fix the condition where Enforcer is delaying node reboot for up to 20 minutes on OpenShift update.
 * Correct Unmanaged node terminology to be 'nodes'.
-* CRD import produced unexpected results. A conversion tool is available from NeuVector to help convert from previous releases CRD format.
+* CRD import produced unexpected results. A conversion tool is available from {product-name} to help convert from previous releases CRD format.
 * In AKS webhook certificates created without SAN for k8s v1.19+.
 * Federated policy working inconsistently and not as expected. Improve unmanaged workload ip logic to reduce unnecessary violations.
 
@@ -273,7 +273,7 @@ Please see release notes section link:/releasenotes/other[Integrations & Other C
 
 ==== Enhancements
 
-* Enable toggling for XFF-forwarding to disable the NeuVector policy from using it, which is enabled by default. This is related to a function added in 4.1.1 to add support for x-forwarded-* headers. To disable, go to Settings -> Configuration. IMPORTANT: See the detailed description of the behavior of XFF-FORWARDED-FOR below.
+* Enable toggling for XFF-forwarding to disable the {product-name} policy from using it, which is enabled by default. This is related to a function added in 4.1.1 to add support for x-forwarded-* headers. To disable, go to Settings -> Configuration. IMPORTANT: See the detailed description of the behavior of XFF-FORWARDED-FOR below.
 
 ==== Bug Fixes
 
@@ -288,7 +288,7 @@ Please see release notes section link:/releasenotes/other[Integrations & Other C
 
 ==== XFF-FORWARDED-FOR Behavior Details
 
-In a Kubernetes cluster, an application can be exposed to the outside of the cluster by a NodePort, LoadBalancer or Ingress services. These services typically replace the source IP while doing the Source NAT (SNAT) on the packets. As the original source IP is masqueraded, this prevents NeuVector from recognizing the connection is actually from the 'external'.
+In a Kubernetes cluster, an application can be exposed to the outside of the cluster by a NodePort, LoadBalancer or Ingress services. These services typically replace the source IP while doing the Source NAT (SNAT) on the packets. As the original source IP is masqueraded, this prevents {product-name} from recognizing the connection is actually from the 'external'.
 
 In order to preserve the original source IP address, the user needs to add the following line to the exposed services, in the 'spec' section of the external facing load balancer or ingress controller. (Ref: https://kubernetes.io/docs/tutorials/services/source-ip/)
 
@@ -296,9 +296,9 @@ In order to preserve the original source IP address, the user needs to add the f
 
 Many implementations of LoadBalancer services and Ingress controllers will add the X-FORWARDED-FOR line to the HTTP request header to communicate the real source IP to the backend applications. In 4.1.0 release, we added a feature to recognize this set of HTTP headers, identify the original source IP and enforce the policy according to that.
 
-This improvement created some unexpected issues in some setup. If the above line has been added to the exposed services and NeuVector network policies have been created in a way that expect the network connections are coming from internal proxy/ingress services, because we now identify the connections are from "external" to the cluster, normal application traffic might trigger alerts or get blocked if the applications are put in "Protect" mode.
+This improvement created some unexpected issues in some setup. If the above line has been added to the exposed services and {product-name} network policies have been created in a way that expect the network connections are coming from internal proxy/ingress services, because we now identify the connections are from "external" to the cluster, normal application traffic might trigger alerts or get blocked if the applications are put in "Protect" mode.
 
-In 4.1.2, switch is added to disable this feature. Disabling it tells NeuVector not to identify that the connection is from "external" using X-FORWARDED-FOR headers. By default this is enabled, and the X-FORWARDED-FOR header is used in policy enforcement. To disable it, go to Settings -> Configuration, and disable the "X-Forwarded-For based policy match" setting.
+In 4.1.2, switch is added to disable this feature. Disabling it tells {product-name} not to identify that the connection is from "external" using X-FORWARDED-FOR headers. By default this is enabled, and the X-FORWARDED-FOR header is used in policy enforcement. To disable it, go to Settings -> Configuration, and disable the "X-Forwarded-For based policy match" setting.
 
 image:xff.png[xff_behavior]
 
@@ -369,9 +369,9 @@ To use an exported CRD with Kubernetes 1.19+, please remove the 'version: v1' fr
 
 ==== Helm Chart Changes
 
-* Allow user to customize PriorityClass of the manager/controller/enforcer/scanner deployment. We suggest to give NeuVector containers higher priority to make sure the security policies get enforced when the node resource is under pressure or during a cluster upgrade process.
-* Create a separate chart for CRD. This allows CRD policies to be created before NeuVector core services are deployed. If the new chart is used, the CRD resources in the core chart, kept for backward compatibility, should be disabled with crdwebhook.enabled=false
-* Allow user to specify the service account for NeuVector deployment. Previously, the 'default' service account of the namespace is used. In the case when NeuVector is deployed together with other applications in a namespace, it is not advisable to use the default service account for the namespace for some users.
+* Allow user to customize PriorityClass of the manager/controller/enforcer/scanner deployment. We suggest to give {product-name} containers higher priority to make sure the security policies get enforced when the node resource is under pressure or during a cluster upgrade process.
+* Create a separate chart for CRD. This allows CRD policies to be created before {product-name} core services are deployed. If the new chart is used, the CRD resources in the core chart, kept for backward compatibility, should be disabled with crdwebhook.enabled=false
+* Allow user to specify the service account for {product-name} deployment. Previously, the 'default' service account of the namespace is used. In the case when {product-name} is deployed together with other applications in a namespace, it is not advisable to use the default service account for the namespace for some users.
 
 === 4.0.2 December 2020
 
@@ -385,7 +385,7 @@ To use an exported CRD with Kubernetes 1.19+, please remove the 'version: v1' fr
 ==== Bug Fixes
 
 * Issue with jumbo frames (enabled on some public clouds). Symptom: the main prometheus application URI /graph becomes inaccessible when the prometheus group is placed into Protect mode.
-* Missing namespace option in vulnerabilities filter. Allow users to select/type the Namespace where NeuVector is installed as filter entry.
+* Missing namespace option in vulnerabilities filter. Allow users to select/type the Namespace where {product-name} is installed as filter entry.
 * False positive in OpenSSL version 1.1.1c-1 affected by CVE-2020-1967.
 * Unexpected implicit deny violations for user created address group using wildcard hostnames. Problems with using DNS Name (with wildcards) for Firewall Traffic.
 * Improve detection to remove SQL Injection false positive.
@@ -402,7 +402,7 @@ To use an exported CRD with Kubernetes 1.19+, please remove the 'version: v1' fr
 ====
 Changes to Helm Chart Structure
 
-The directory for the NeuVector chart has changed from ./neuvector-helm/ to ./neuvector-helm/charts/core/
+The directory for the {product-name} chart has changed from ./neuvector-helm/ to ./neuvector-helm/charts/core/
 
 If using Helm to upgrade, please update the location to the path above.
 ====
@@ -431,9 +431,9 @@ If using Helm to upgrade, please update the location to the path above.
 
 === 4.0.0.s1 October 2020
 
-==== Security Patch for NeuVector Containers
+==== Security Patch for {product-name} Containers
 
-* This security release is for the NeuVector Manager and Allinone containers to address High https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-14363[CVE-2020-14363] found in the base Alpine layer in package libx11.  As part of the update, Medium CVE-2020-8927 is also addressed. This issue, although unlikely to be able to be exploited, affects the Manager console for NeuVector and does not affect the operations of the Controller or Enforcer containers.
+* This security release is for the {product-name} Manager and Allinone containers to address High https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-14363[CVE-2020-14363] found in the base Alpine layer in package libx11.  As part of the update, Medium CVE-2020-8927 is also addressed. This issue, although unlikely to be able to be exploited, affects the Manager console for {product-name} and does not affect the operations of the Controller or Enforcer containers.
 
 === 4.0 September 2020
 
@@ -442,9 +442,9 @@ If using Helm to upgrade, please update the location to the path above.
 * Customizable compliance templates. Preset templates for PCI, GDPR, HIPAA, NIST. Each CIS benchmarks and custom check can be tagged with one or more compliance regulations. Reports can then be generated for each. Security Risks -> Compliance Profile.
 * Vulnerability Management Workflow Support. Track status of vulnerabilities and create policies based on vulnerability discovery dates and other criteria. Security Risks -> Vulnerabilities (Advanced Filter), and Admission Control rules.
 * Secrets auditing. 20+ secrets checks included, and automatically run on image scans and resource yamls. Results will show pass/warn in the compliance reports on image vulnerabilities in Assets -> Registries and Security Risks -> Compliance.
-* Granular RBAC for NeuVector Users. Create custom roles with granular read/write permissions for NeuVector functions. Assign users to roles. Settings -> Users/Roles.
+* Granular RBAC for {product-name} Users. Create custom roles with granular read/write permissions for {product-name} functions. Assign users to roles. Settings -> Users/Roles.
 * Scalable and Separated Scanner Pods. Scanner pods can be scaled up or down to scan thousands of images. The controller assigns scanning tasks to each available scanner pod. Important: the Controller no longer contains a scanner function, so a minimum of one scanner pod is required to be deployed. Also, the 4.x scanners are NOT backward compatible with 3.x controllers, 3.x deployments of external scanners should be updated to neuvector/scanner:3.
-* Serverless Scanning and Risk Assessment for AWS Lambda. Scan AWS Lambda functions for vulnerabilities with the Serverless IDE Plug-in or in AWS accounts. Supported languages include Java, Python, Ruby, node.js. Perform risk assessment by evaluating IAM role permissions for Lambda functions and alert if unnecessary permissions are enabled. Note: Serverless security requires a separate NeuVector license.
+* Serverless Scanning and Risk Assessment for AWS Lambda. Scan AWS Lambda functions for vulnerabilities with the Serverless IDE Plug-in or in AWS accounts. Supported languages include Java, Python, Ruby, node.js. Perform risk assessment by evaluating IAM role permissions for Lambda functions and alert if unnecessary permissions are enabled. Note: Serverless security requires a separate {product-name} license.
 * Perform compliance checks during image scanning. Also deployment yamls file. This includes setuid, setgid, CIS (running as root etc), 20+ secrets checks.
 * Enhance Security Risk Score in Dashboard with ability to enable/disable which Groups contribute to the Risk Score. Policy -> Groups -> Scorable check box. This includes ability to disable system containers from risk scoring.
 * Added support for a Namespace restricted user to have access to assigned registries.

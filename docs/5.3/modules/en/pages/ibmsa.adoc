@@ -4,22 +4,22 @@
 
 == Integrating with IBM Security Advisor
 
-NeuVector Integrates with IBM Security Advisor on IBM Cloud.
+{product-name} Integrates with IBM Security Advisor on IBM Cloud.
 
-To generate the registration URL required, please log into the NeuVector console as an administrator and go to Settings -> Configuration.
+To generate the registration URL required, please log into the {product-name} console as an administrator and go to Settings -> Configuration.
 
 . Enable "Integrate with IBM Security Advisor" -> Submit
 . Click "Get URL" -> Copy to clipboard
 
 image:ibmsa_config_new.png[ibmconfigure]
 
-Then return to the IBM Security Advisor console, and under "Enter the NeuVector setup URL", type in "https://{NeuVector controller hostname/ip}:\{port}" and paste what is copied in from the steps above. For the port, use the exposed NeuVector REST API port (default is 10443). For multi-cluster environments this is also the 'fed-worker' service which exposes this port.
+Then return to the IBM Security Advisor console, and under "Enter the {product-name} setup URL", type in "https://{{product-name} controller hostname/ip}:\{port}" and paste what is copied in from the steps above. For the port, use the exposed {product-name} REST API port (default is 10443). For multi-cluster environments this is also the 'fed-worker' service which exposes this port.
 
-IBM Security Advisor will communicate with your NeuVector cluster controller thru the provided hostname or IP. Note: This may need to be exposed as a service for access from outside the Kubernetes cluster, similar to how the REST API is exposed as a service.
+IBM Security Advisor will communicate with your {product-name} cluster controller thru the provided hostname or IP. Note: This may need to be exposed as a service for access from outside the Kubernetes cluster, similar to how the REST API is exposed as a service.
 
 === Verifying the Connection
 
-When the connection is successfully created between IBM Security Advisor & NeuVector, you will see the green "Connected at {date, time}" icon next to "Integrate with IBM Security Advisor" in the NeuVector Console.
+When the connection is successfully created between IBM Security Advisor & {product-name}, you will see the green "Connected at {date, time}" icon next to "Integrate with IBM Security Advisor" in the {product-name} Console.
 
 image:ibmsa_connected.png[connected]
 
@@ -35,4 +35,4 @@ image:ibm_sa_findings.png[findings]
 
 == Removing the Integration
 
-If you delete a NeuVector integration connection in your IBM Cloud account, remember to also disable the "IBM SA integration" for that NeuVector cluster in Settings -> Configuration.
+If you delete a {product-name} integration connection in your IBM Cloud account, remember to also disable the "IBM SA integration" for that {product-name} cluster in Settings -> Configuration.

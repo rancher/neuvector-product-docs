@@ -22,7 +22,7 @@ image:newrule1.png[NewResponseRules]
 All Response Rules are evaluated to determine if they match the condition/criteria. If there are multiple rule matches, each action(s) will be performed. This is different than the behavior of Network Rules, which are evaluated from top to bottom and only the first rule which matches will be executed.
 ====
 
-Additional events and actions will continue to be added by NeuVector in future releases.
+Additional events and actions will continue to be added by {product-name} in future releases.
 
 == Detailed Configuration for Response Rules
 
@@ -30,7 +30,7 @@ Response Rules enable automated responses such as quarantine, webhook, and suppr
 
 Actions from multiple rules will be applied if an event matches multiple rules. Each rule can have multiple actions and multiple match criteria. All actions defined will be applied to containers when events match the response rule criteria. In the case there is a match for Host (not container) events, currently the actions webhook and suppress log are supported.
 
-There are 6 default response rules included with NeuVector which are set to the status '`disabled,`' one for each category. Users can either modify a default rule to match their requirements or create new ones. Be sure to enable any rules which should be applied.
+There are 6 default response rules included with {product-name} which are set to the status '`disabled,`' one for each category. Users can either modify a default rule to match their requirements or create new ones. Be sure to enable any rules which should be applied.
 
 === Response Rule Parameters Matrix
 
@@ -211,7 +211,7 @@ Cloud.Scan.Fail   // for cloud scan fail
 Group.Auto.Remove
 Agent.Memory.Pressure
 Controller.Memory.Pressure
-Kubenetes.NeuVector.RBAC
+Kubenetes.{product-name}.RBAC
 Group.Auto.Promote
 User.Password.Alert
 ----

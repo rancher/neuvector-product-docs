@@ -1,5 +1,5 @@
-= Troubleshooting NeuVector Deployments
+= Troubleshooting {product-name} Deployments
 :page-opendocs-origin: /12.troubleshooting/12.troubleshooting.md
 :page-opendocs-slug:  /troubleshooting
 
-How to troubleshoot NeuVector Deployments and collect logs for support.
+How to troubleshoot {product-name} Deployments and collect logs for support.
