@@ -1,5 +1,5 @@
 site:
-  title: SUSE® Security documentation
+  title: SUSE® Security Documentation
   url: /
   start_page: 5.4@security:en:overview.adoc
 
@@ -16,6 +16,13 @@ ui:
   supplemental_files: ./product-docs-supplemental-files
 
 asciidoc:
+  attributes:
+    page-pagination: ''
   extensions:
-    - asciidoctor-kroki
     - '@asciidoctor/tabs'
+antora:
+  extensions:
+  - require: '@antora/lunr-extension'
+
+output:
+  dir: build/site

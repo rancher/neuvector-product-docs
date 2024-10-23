@@ -1,65 +1,65 @@
-* xref:overview.adoc[{product-name} overview]
+* xref:overview.adoc[{product-name} Overview]
 * Understanding {product-name}
-** xref:requirements.adoc[System requirements]
-** xref:installation.adoc[Deployment preparation]
-** xref:policy-overview.adoc[Security policy overview]
-** xref:integration.adoc[Enterprise integration]
+** xref:requirements.adoc[System Requirements]
+** xref:installation.adoc[Deployment Preparation]
+** xref:policy-overview.adoc[Security Policy Overview]
+** xref:integration.adoc[Enterprise Integration]
 ** xref:ci-workflow.adoc[CI/CD Workflow]
-** xref:public-cloud.adoc[Public cloud]
-* Operational tasks
+** xref:public-cloud.adoc[Public Cloud]
+* Operational Tasks
 ** Deploying {product-name}
-*** xref:configmap.adoc[Deploy using ConfigMap]
-*** xref:operators.adoc[Deploy using Operators]
+*** xref:configmap.adoc[Deploy Using ConfigMap]
+*** xref:operators.adoc[Deploy Using Operators]
 *** xref:kubernetes.adoc[Kubernetes]
 *** xref:openshift.adoc[OpenShift]
-*** xref:rancher.adoc[Rancher deployment]
-*** xref:airgap.adoc[Air-gapped deployment]
+*** xref:rancher.adoc[Rancher Deployment]
+*** xref:airgap.adoc[Air-Gapped Deployment]
 *** xref:docker.adoc[Docker]
 *** xref:updating.adoc[Updating {product-name}]
-*** xref:testing.adoc[Evaluating and testing {product-name}]
-*** xref:troubleshooting.adoc[Troubleshooting deployments]
-** xref:users.adoc[Users and roles]
-** xref:restore.adoc[Restoring {product-name} configuration]
-** xref:remove.adoc[Removing or resetting {product-name}]
-** xref:internal.adoc[Replacing internal certificates]
-** xref:replacecert.adoc[Replacing self-signed certificates]
-** xref:rest-api.adoc[Connect to manager, REST API server]
+*** xref:testing.adoc[Evaluating and Testing {product-name}]
+*** xref:troubleshooting.adoc[Troubleshooting Deployments]
+** xref:users.adoc[Users and Roles]
+** xref:restore.adoc[Restoring {product-name} Configuration]
+** xref:remove.adoc[Removing or Resetting {product-name}]
+** xref:internal.adoc[Replacing Internal Certificates]
+** xref:replacecert.adoc[Replacing Self-Signed Certificates]
+** xref:rest-api.adoc[Connect to Manager, REST API Server]
 ** xref:automation.adoc[Automation with REST API]
-* {product-name} interface
-** xref:navigation.adoc[Navigating the console]
-** xref:multicluster.adoc[Enterprise multi-cluster management]
-** xref:modes.adoc[Modes: discover, monitor, protect]
-** xref:reporting.adoc[Reporting & notifications]
+* {product-name} Interface
+** xref:navigation.adoc[Navigating the Console]
+** xref:multicluster.adoc[Enterprise Multi-Cluster Management]
+** xref:modes.adoc[Modes: Discover, Monitor, Protect]
+** xref:reporting.adoc[Reporting & Notifications]
 ** xref:customui.adoc[Customizing the UI]
-* Security management
+* Security Management
 ** Security Policy
-*** Admission controls
-**** xref:admission.adoc[Admission controls]
-**** xref:sigstore.adoc[Sigstore Cosign signature verifiers]
-**** xref:assessment.adoc[Configuration assessment for Kubernetes resources]
+*** Admission Controls
+**** xref:admission.adoc[Admission Controls]
+**** xref:sigstore.adoc[Sigstore Cosign Signature Verifiers]
+**** xref:assessment.adoc[Configuration Assessment for Kubernetes Resources]
 *** xref:groups.adoc[Groups]
-*** xref:networkrules.adoc[Network rules]
-*** xref:processrules.adoc[Process profile rules]
-*** xref:filerules.adoc[File access rules]
-*** xref:responserules.adoc[Response rules]
-*** xref:dlp.adoc[DLP & WAF sensors]
-*** xref:threats.adoc[Network threat signatures]
-*** xref:customcompliance.adoc[Custom compliance checks]
-*** xref:federated.adoc[Federated policy]
-*** Custom resource definitions
+*** xref:networkrules.adoc[Network Rules]
+*** xref:processrules.adoc[Process Profile Rules]
+*** xref:filerules.adoc[File Access Rules]
+*** xref:responserules.adoc[Response Rules]
+*** xref:dlp.adoc[DLP & WAF Sensors]
+*** xref:threats.adoc[Network Threat Signatures]
+*** xref:customcompliance.adoc[Custom Compliance Checks]
+*** xref:federated.adoc[Federated Policy]
+*** Custom Resource Definitions
 **** xref:usingcrd.adoc[Using CRD]
-**** xref:import.adoc[Importing CRD from console]
-** Security risks, scanning & compliance
-*** Scanning & compliance
+**** xref:import.adoc[Importing CRD from Console]
+** Security Risks, Scanning & Compliance
+*** Scanning & Compliance
 **** xref:scanning.adoc[Scanning]
-**** xref:vulnerabilities.adoc[Vulnerability management]
-**** xref:compliance.adoc[Compliance & CIS benchmarks]
-*** Registry scanning
-**** xref:registry-scanning-configuration.adoc[Registry scanning configuration]
-**** xref:harbor.adoc[Harbor pluggable scanner module]
-**** xref:ecr-iam.adoc[ECR scanning using IAM roles]
-**** xref:gcr-sa.adoc[GCR scanning using service accounts]
-*** Build phase image scanning
+**** xref:vulnerabilities.adoc[Vulnerability Management]
+**** xref:compliance.adoc[Compliance & CIS Benchmarks]
+*** Registry Scanning
+**** xref:registry-scanning-configuration.adoc[Registry Scanning Configuration]
+**** xref:harbor.adoc[Harbor Pluggable Scanner Module]
+**** xref:ecr-iam.adoc[ECR Scanning Using IAM Roles]
+**** xref:gcr-sa.adoc[GCR Scanning Using Service Accounts]
+*** Build Phase Image Scanning
 **** xref:build-image-scanning.adoc[Local]
 **** xref:jenkins.adoc[Jenkins]
 **** xref:bamboo.adoc[Bamboo]
@@ -68,10 +68,10 @@
 **** xref:gitlab.adoc[Gitlab]
 **** xref:github.adoc[GitHub]
 *** xref:improve-score.adoc[Improve Security Risk Score]
-*** xref:cve-sources.adoc[CVE database sources & version]
-*** xref:updating-cve-database.adoc[Updating the CVE database]
-*** xref:scanners.adoc[Parallel & standalone scanners]
-* Enterprise features
+*** xref:cve-sources.adoc[CVE Database Sources & Version]
+*** xref:updating-cve-database.adoc[Updating the CVE Database]
+*** xref:scanners.adoc[Parallel & Stand-Alone Scanners]
+* Enterprise Features
 ** Integration
 *** xref:ldap.adoc[LDAP]
 *** xref:msad.adoc[Microsoft AD]
@@ -84,9 +84,9 @@
 *** xref:ibmqr.adoc[IBM QRadar]
 *** xref:splunk.adoc[Splunk]
 * References
-** xref:details.adoc[Environment variables details]
-** xref:cli.adoc[Command line]
-* Release notes
-** xref:5x.adoc[5.x release notes]
-** xref:4x.adoc[4.x release notes]
-** xref:other.adoc[Integrations & other components]
+** xref:details.adoc[Environment Variables Details]
+** xref:cli.adoc[Command Line]
+* Release Notes
+** xref:5x.adoc[5.x Release Notes]
+** xref:4x.adoc[4.x Release Notes]
+** xref:other.adoc[Integrations & Other Components]
