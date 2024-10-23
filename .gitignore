@@ -1,5 +1,5 @@
-# Dependencies
-/node_modules
-
-# Local build
-/build
+tmp/
+node_modules/
+build/
+.vscode/
+.DS_Store
