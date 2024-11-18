@@ -81,7 +81,7 @@ image:operator_cert.png[]
 ** Open the Resources tab 
 ** Verify that resources are in status Created or Running
 
-After you have successfully deployed the {product-name} Platform to your cluster, login to the {product-name} console at https://neuvector-route-webui-neuvector.(OC_INGRESS). 
+After you have successfully deployed the {product-name} Platform to your cluster, login to the {product-name} console at `https://neuvector-route-webui-neuvector.(OC_INGRESS)`. 
 * Login with the initial username admin and password admin. 
 * Accept the {product-name} end user license agreement. 
 * Change the password of the admin user. Optionally, you can also create additional users in the Settings -> Users & Roles menu. Now you are ready to navigate the {product-name} console to start vulnerability scanning, observe running application pods, and apply security protections to containers.
@@ -195,7 +195,7 @@ spec:
 ** Select the neuvector-default instance 
 ** Open the Resources tab 
 ** Verify that resources are in status Created or Running
-. After you have successfully deployed the {product-name} Platform to your cluster, login to the {product-name} console at https://neuvector-route-webui-neuvector.(INGRESS_DOMAIN). 
+. After you have successfully deployed the {product-name} Platform to your cluster, login to the {product-name} console at `https://neuvector-route-webui-neuvector.(INGRESS_DOMAIN)`. 
 ** Login with the initial username admin and password admin. 
 ** Accept the {product-name} end user license agreement. 
 ** Change the password of the admin user. 

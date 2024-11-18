@@ -237,7 +237,7 @@ Or, if modifying any of the above yaml or samples from below:
 kubectl create -f neuvector.yaml 
 ----
 
-That's it! You should be able to connect to the {product-name} console and login with admin:admin, e.g. https://<public-ip>:8443
+That's it! You should be able to connect to the {product-name} console and login with admin:admin, e.g. `https://<public-ip>:8443`
 --
 
 [NOTE]
