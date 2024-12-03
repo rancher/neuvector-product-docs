@@ -78,15 +78,15 @@ kubectl create secret generic internal-cert -n neuvector --from-file=tls.key --f
       containers:
         - name: neuvector-controller/enforcer/scanner-pod
           volumeMounts:
-            - mountPath: /etc/neuvector/certs/internal/tls.key
+            - mountPath: /etc/neuvector/certs/internal/cert.key
               name: internal-cert
               readOnly: true
               subPath: tls.key
-            - mountPath: /etc/neuvector/certs/internal/tls.crt
+            - mountPath: /etc/neuvector/certs/internal/cert.pem
               name: internal-cert
               readOnly: true
               subPath: tls.crt
-            - mountPath: /etc/neuvector/certs/internal/ca.crt
+            - mountPath: /etc/neuvector/certs/internal/ca.cert
               name: internal-cert
               readOnly: true
               subPath: ca.crt
