@@ -105,6 +105,11 @@ ____
 ____
 (Optional) Manager by default uses and HTTPS/SSL connection. Set the value to "`off`" to use HTTP.
 ____
++
+[IMPORTANT]
+====
+This environment variable is only for the standalone NeuVector product. Please set the variable to "on" if using Rancher SSO or leave unset as NeuVector will use HTTPS by default.
+====
 
 === Enforcer
 

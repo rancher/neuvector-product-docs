@@ -95,6 +95,98 @@ image:local_admin.png[local]
 It is recommended to login directly to the {product-name} console as admin/admin to manually change the admin password to a strong password. This will only change the {product-name} identity provider admin user password (you may see another admin user whose identify provider is Rancher). Alternatively, include a xref:configmap.adoc#_protect_sensitive_data_using_a_secret[ConfigMap as a secret] in the initial deployment from Rancher (see chart values for ConfigMap settings) to set the default admin password to a strong password.
 ====
 
+=== NeuVector/Rancher SSO Permission Resources
+
+The Rancher v2.9.2 UI provides for selecting NeuVector permission resources when creating `Global/Cluster/Project/Namespaces` roles. When a Rancher user is assigned a role with a NeuVector permission resource, the user's NeuVector SSO session is assigned the respective NeuVector permission accordingly. This is to provide SSO users with custom roles other than the reserved `admin/reader/fedAdmin/fedReader` roles.
+
+Below are the mapped permission resources used with applicable `Global/Cluster/Project/Namespaces` roles.
+
+==== Mapped Permission Resources for `Global/Cluster` Role
+
+[NOTE]
+====
+Users will need to manually add * (Verbs) / services/proxy (Resource) to NeuVector-related `Global/Cluster` Roles.
+====
+
+API Groups:
+
+`permission.neuvector.com`
+
+Verbs:
+
+[,shell]
+----
+get    // for read-only(i.e. view)
+*      // for read/write(i.e. modify)
+----
+
+Resources:
+
+NeuVector, Cluster Scoped
+
+[,shell]
+----
+AdmissionControl
+Authentication
+CI Scan
+Cluster
+Federation
+Vulnerability
+----
+
+NeuVector, Namespaced
+
+[,shell]
+----
+AuditEvents
+Authorization
+Compliance
+Events
+Namespace
+RegistryScan
+RuntimePolicy
+RuntimeScan
+SecurityEvents
+SystemConfig
+----
+
+==== Mapped Permission Resources for `Project/Namespace` Role
+
+[NOTE]
+====
+Users will need to manually add * (Verbs) / services/proxy (Resource) to NeuVector-related `Project/Namespace` Roles.
+====
+
+API Groups:
+
+`permission.neuvector.com`
+
+Verbs:
+
+[,shell]
+----
+get    // for read-only(i.e. view)
+*      // for read/write(i.e. modify)
+----
+
+Resources:
+
+NeuVector, Namespaced
+
+[,shell]
+----
+AuditEvents
+Authorization
+Compliance
+Events
+Namespace
+RegistryScan
+RuntimePolicy
+RuntimeScan
+SecurityEvents
+SystemConfig
+----
+
 === Disabling {product-name}/Rancher SSO
 
 To disable the ability to login to {product-name} from Rancher Manager, go to Settings -> Configuration.
