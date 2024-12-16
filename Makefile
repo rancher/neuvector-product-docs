@@ -15,7 +15,7 @@ local:
 
 remote:
 	mkdir -p tmp
-	npm install && npm update
+	npm ci
 	npx antora --version
 	npx antora --stacktrace --log-format=pretty \
 		neuvector-playbook.yml \
@@ -25,7 +25,7 @@ clean:
 	rm -rf build
 
 environment:
-	npm install && npm update
+	npm ci
 
 preview:
 	npx http-server build/site -c-1
