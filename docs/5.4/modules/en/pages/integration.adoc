@@ -42,4 +42,4 @@ Notifications can be sent via webhooks to an endpoint. Enter the endpoint URL fo
 
 === Directory/SSO Integration
 
-See the next sections for LDAP, MSAD, SAML, OpenId and other integrations. See the xref:users.adoc#users[Basics -> Users & Roles] section for predefined and custom roles in {product-name} which can be mapped in the integration.
+See the next sections for LDAP, MSAD, SAML, OpenId and other integrations. See the xref:users.adoc#_users[Basics -> Users & Roles] section for predefined and custom roles in {product-name} which can be mapped in the integration.

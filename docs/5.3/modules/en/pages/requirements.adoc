@@ -133,7 +133,7 @@ For throughput or latency sensitive environments, additional memory and/or a ded
 
 For performance tuning of the Controller and Scanner for registry scanning, see System Requirements above.
 
-For additional advice on performance and sizing, see the xref:production.adoc#_best_practices_tips_qa_for_deploying_and_managing_neuvector[Onboarding/Best Practices section].
+For additional advice on performance and sizing, see the xref:production.adoc#_best_practices_tips_qa_for_deploying_and_managing_suse_security[Onboarding/Best Practices section].
 
 === Throughput
 

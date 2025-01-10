@@ -8,7 +8,7 @@ Deploy the {product-name} containers using Kubernetes, OpenShift, Rancher, Docke
 
 The {product-name} open source images are hosted on Docker Hub at `/neuvector/{image name}`.
 
-See the xref:production.adoc#_best_practices_tips_qa_for_deploying_and_managing_neuvector[Onboarding/Best Practices section] to download an on boarding guide.
+See the xref:production.adoc#_best_practices_tips_qa_for_deploying_and_managing_suse_security[Onboarding/Best Practices section] to download an on boarding guide.
 
 === Deploy using Kubernetes, OpenShift, Rancher, or other Kubernetes-based tools
 
