@@ -68,7 +68,7 @@ image:architecture.png[Architecture]
 
 == Deployment Examples
 
-For common deployment patterns and best practices see the xref:production.adoc#_best_practices_tips_qa_for_deploying_and_managing_neuvector[Onboarding/Best Practices section].
+For common deployment patterns and best practices see the xref:production.adoc#_best_practices_tips_qa_for_deploying_and_managing_suse_security[Onboarding/Best Practices section].
 
 === All-in-One and Enforcers
 

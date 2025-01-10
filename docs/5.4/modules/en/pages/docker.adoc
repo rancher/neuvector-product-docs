@@ -132,7 +132,7 @@ Where s1 is scanner 1 (use s2, s3 etc for each additional scanner).
 
 To deploy a stand alone scanner (no controller/allinone), please see the section xref:scanners.adoc[Parallel and Standalone Scanners].
 
-To update the Scanner in order to get the latest CVE database updates from {product-name}, create a cron job to stop and restart the scanner, pulling the latest. See xref:updating.adoc#_docker_native_updates[this section] for details.
+To update the Scanner in order to get the latest CVE database updates from {product-name}, create a cron job to stop and restart the scanner, pulling the latest. See xref:docker.adoc#_docker_native_updates[this section] for details.
 
 === Deployment Without Using Privileged Mode
 

@@ -45,7 +45,7 @@ For Kubernetes or OpenShift-based local scanning, remove the commented-out secti
       restartPolicy: Always
 ----
 
-For Docker-native local scanning, follow the instructions for Docker scanner deployments in the xref:docker.adoc#_deploy_the_neuvector_scanner_container[Docker Production deployments] section for the scanner.
+For Docker-native local scanning, follow the instructions for Docker scanner deployments in the xref:docker.adoc#_deploy_the_suse_security_scanner_container[Docker Production deployments] section for the scanner.
 
 === Local Build-Phase Scanning - Scanner Only (No Controller Required)
 
