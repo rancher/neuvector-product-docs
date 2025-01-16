@@ -33,7 +33,7 @@ image:secret_compliance_4.png[secrets]
 
 === Customizing Compliance Templates for PCI, GDPR, HIPAA, NIST, PCIv4, and DISA STIG
 
-The Compliance profile menu enables customization of the built-in templates for industry standards such as PCI and GDPR. These reports can be generated from the Security Risks -> Compliance menu by selecting one of the standards to filter, then exporting. The NIST profile is for https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-190.pdf[NIST SP 800-190].
+The Compliance profile menu enables customization of the built-in templates for industry standards such as PCI, GDPR, HIPAA, NIST, PCIv4, and DISA STIG. These reports can be generated from the Security Risks -> Compliance menu by selecting one of the standards to filter, then exporting. The NIST profile is for https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-190.pdf[NIST SP 800-190].
 
 To customize any compliance profile, select the industry standard (e.g. PCI), then enable or disable specific checks for that standard. Think of these as compliance 'tags' that are applied to each check in order to generate a compliance report for that industry standard.
 
