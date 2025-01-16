@@ -81,7 +81,7 @@ These menu's combine the results from registry (image), node, and container vuln
 
 image:vulnerabilities_4_4.png[SecurityRisks]
 
-See the next section on xref:vulnerabilities.adoc[Vulnerability Management] for how to manage vulnerabilities in this menu, and the xref:compliance.adoc[Compliance & CIS Benchmarks] section for reporting on CIS Benchmarks and industry compliance such as PCI, GDPR, HIPAA, and NIST.
+See the next section on xref:vulnerabilities.adoc[Vulnerability Management] for how to manage vulnerabilities in this menu, and the xref:compliance.adoc[Compliance & CIS Benchmarks] section for reporting on CIS Benchmarks and industry compliance such as PCI, GDPR, HIPAA, NIST, PCIv4, and DISA STIG.
 
 === Assets Menu
 

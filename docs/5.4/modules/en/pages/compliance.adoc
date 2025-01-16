@@ -1,6 +1,7 @@
 = Compliance & CIS Benchmarks
 :page-opendocs-origin: /06.scanning/01.scanning/02.compliance/02.compliance.md
 :page-opendocs-slug:  /scanning/scanning/compliance
+:toclevels: 4
 
 == Managing Compliance and CIS Benchmarks
 
@@ -31,7 +32,7 @@ The following screenshot shows an example of a secret found in an image scan.
 
 image:secret_compliance_4.png[secrets]
 
-==== Customizing Compliance Templates for PCI, GDPR, HIPAA, NIST and others
+=== Customizing Compliance Templates for PCI, GDPR, HIPAA, NIST, PCIv4, and DISA STIG
 
 The Compliance profile menu enables customization of the built-in templates for industry standards such as PCI and GDPR. These reports can be generated from the Security Risks -> Compliance menu by selecting one of the standards to filter, then exporting. The NIST profile is for https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-190.pdf[NIST SP 800-190].
 
@@ -56,6 +57,19 @@ Alternatively, instead of restricting by the above criteria, compliance template
 image:DocheckASSETSEnableNS.png[namespace]
 
 After the templates and assets are customized (if desired) in the Security Risks -> Compliance Profiles menu, reports can be generated in the Security Risks -> Compliance menu by opening the advanced filter and selecting the compliance template desired. For example, selecting GDPR will filter the display and reports for only the GDPR profile.
+
+=== Sample Helm Installation with Prime Compliance
+
+The following is a sample Helm installation command to install SUSE Security 5.4.0 with prime compliance. Users can modify the install version to 5.4.0 or later as prime compliance begins with 5.4.0. After installation prime users can check the available regulations from the SUSE Security web UI **Compliance > Regulations** tab view.
+
+[,shell]
+----
+helm install neuvector -n neuvector ./ --set controller.prime.enabled=true --set
+controller.prime.image.repository=nvlab/compliance_config,controller.prime.image.tag=1.
+0.0 --set
+tag=5.4.0-b2,controller.image.repository=nvpublic/co,enforcer.image.repository=nvpublic/
+en,manager.image.repository=nvpublic/ma
+----
 
 === Secrets Auditing
 
