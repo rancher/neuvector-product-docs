@@ -57,8 +57,7 @@ In the NeuVector 5.4.2 release, support is discontinued for deployments using th
 
 ===== Using YAML:
 
-- Provide an internal certificate using the existing methods:
-  https://open-docs.neuvector.com/deploying/production/internal
+- Provide an xref:internal.adoc#_replacing_certificates_used_in_internal_communications_of_suse_security[internal certificate using the existing methods].
 
 ==== Upgrading Previous Versions to 5.4.2:
 
