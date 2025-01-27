@@ -2,6 +2,12 @@
 :page-opendocs-origin: /02.deploying/01.production/04.internal/04.internal.md
 :page-opendocs-slug: /deploying/production/internal
 
+[IMPORTANT]
+====
+NeuVector versions 5.4.2 and later must have users generate/replace internal certificates before using NeuVector.
+After March 2025, NeuVector versions prior to 5.4.2 must have users generate/replace internal certificates before using NeuVector.
+====
+
 == Internal Communication and Certificates
 
 {product-name} includes default self-signed certificates for encryption for the Manager (console/UI access), Controller (REST API, internal), Enforcer (internal), and Scanner (internal) communications.

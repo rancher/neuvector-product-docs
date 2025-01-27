@@ -59,9 +59,11 @@ In the NeuVector 5.4.2 release, support is discontinued for deployments using th
 
 - Provide an xref:internal.adoc#_replacing_certificates_used_in_internal_communications_of_suse_security[internal certificate using the existing methods].
 
-==== Upgrading Previous Versions to 5.4.2:
+==== Upgrading from Previous Versions to 5.4.2:
 
 Please create and configure internal certificates from the scanner for the controller, enforcer, and registry-adapter to achieve a rolling update without losing data. It is still recommended to take a backup of your configuration before upgrading. 
+
+The following steps are only needed if your deployment uses a `.yaml` file. Upgrading using Helm does not need these additional steps due to the internal certificates getting created by default via the following flags: `internal.autoGenerateCert` and `internal.autoRotateCert`.
 
 [,shell]
 ----
@@ -86,8 +88,8 @@ kubectl create secret generic internal-cert -n neuvector  --from-file=tls.key --
 Sample 5.4.2 yaml with internal certificate configured:
 *https://github.com/neuvector/manifests/blob/main/kubernetes/5.4.0/neuvector-k8s.yaml* 
 
-PR for document update:
-*https://github.com/neuvector/docs/pull/141/files#diff-b2546ca00e2b37017e5ff28da2c113e82473be290ed444af0c80b7c43680254cR252*
+Additional information about xref:internal.adoc[internal certificates].
+
 
 In the case of a PVC configuration, users can configure an existing PVC in the new installation to restore a configuration.
 
