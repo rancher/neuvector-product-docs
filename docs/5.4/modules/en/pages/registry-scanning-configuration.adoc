@@ -389,7 +389,7 @@ image:20-azure.png[azure]
 
 * Choose Azure registry as type
 * Give unique name to the registry
-* Type registry URL. Sample https://neuvector.azure.io (obtain from azure portal)
+* Type registry URL. Sample `https://neuvector.azure.io` (obtain from azure portal)
 ** Container registry->user->Overview->Login Server
 * Add username and password
 ** Azure container registry -> user-> access keys->password

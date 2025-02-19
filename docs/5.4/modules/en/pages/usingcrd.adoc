@@ -322,7 +322,7 @@ spec:
 ----
 ====
 
-You can refer to the (https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.3.0/admission-crd-k8s-1.19.yaml)[complete schema for the CRD] for modifications to the manifest generated above to meet your requirements.
+You can refer to the https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.3.0/admission-crd-k8s-1.19.yaml[complete schema for the CRD] for modifications to the manifest generated above to meet your requirements.
 
 Once the modifications are done, you can apply the manifest to your Kubernetes cluster.
 

@@ -76,7 +76,7 @@
 
 * Add support for scanning embedded java jars and jars without Maven file, for example log4j-core-2.5.jar, when pom.xml doesn't exist.
 * Add CVE database source of https://github.com/advisories?query=maven[GitHub advisories for Maven], starting with scanner/CVE db version 2.531.
-* Rest API link:/automation/automation#rest-api[reference doc] is updated to 4.4.1 and 4.4.2.
+* Rest API xref:automation.adoc#_rest_api[reference doc] is updated to 4.4.1 and 4.4.2.
 
 ==== Bug Fixes
 
@@ -250,7 +250,7 @@ For example,
 * Report and display Image Modules detected during scan in scan results. This is shown in a tab in Image Scan results, and included in scan results from REST API.
 * Allow editing of filters in registry, group, and response rule configurations through console.
 * Update ConfigMap to add group_claim in oidcinitcfg.yaml and samlinitcfg.yaml, and Xff_Enabled in sysinitcfg.yaml
-* API's yaml is updated for 4.2 in link:/automation/automation#rest-api[Automation section].
+* API's yaml is updated for 4.2 in xref:automation.adoc#_rest_api[Automation section].
 
 ==== Bug Fixes
 
@@ -267,7 +267,7 @@ For example,
  ** Add error messages to the JAVA exceptions hudson.AbortException.
 * Update Helm chart to 1.7.1.
 
-Please see release notes section link:/releasenotes/other[Integrations & Other Components] for details.
+Please see release notes section xref:other.adoc[Integrations & Other Components] for details.
 
 === 4.1.2 February 2021
 
@@ -284,7 +284,7 @@ Please see release notes section link:/releasenotes/other[Integrations & Other C
 
 ==== Other
 
-* Jenkins plug-in updated to support stand alone scanner.  Please see release notes section link:/releasenotes/other[Integrations & Other Components] for details.
+* Jenkins plug-in updated to support stand alone scanner.  Please see release notes section xref:other.adoc[Integrations & Other Components] for details.
 
 ==== XFF-FORWARDED-FOR Behavior Details
 
@@ -332,7 +332,7 @@ image:xff.png[xff_behavior]
 * Block policy not working as expected. Add support for x-forwarded-* headers. IMPORTANT: See the detailed description of the behavior of XFF-FORWARDED-FOR above as part of the 4.1.2 release notes.
 * Helm Chart error when setting controller ingress to true.
 * Unable to create add and save network rule, due to gateway timeout.
-* Configmap examples are missing Group_Claim field. Added to link:/deploying/production/configmap[configmap documentation].
+* Configmap examples are missing Group_Claim field. Added to xref:configmap.adoc[configmap documentation].
 * Process profile violation when terminating Controller pod.
 
 ==== Scanner Details
@@ -489,6 +489,6 @@ Kubernetes (for OpenShift use the equivalent oc commands)
  ** kubectl create clusterrolebinding neuvector-binding-view --clusterrole=view --serviceaccount=neuvector:default
  ** kubectl create rolebinding neuvector-admin --clusterrole=admin --serviceaccount=neuvector:default -n neuvector
 * Set the version tags to 4.0.0 for the Controller, Manager, Enforcer yaml's and apply the update
-* Create the link:/scanning/scanners#manual-deployment-of-multiple-scanners-on-kubernetes[scanner pods]
-* Create or update the link:/scanning/scanners#manual-deployment-of-multiple-scanners-on-kubernetes[scanner cron job]
+* Create the xref:scanners.adoc#_manual_deployment_of_multiple_scanners_on_kubernetes[scanner pods]
+* Create or update the xref:scanners.adoc#_manual_deployment_of_multiple_scanners_on_kubernetes[scanner cron job]
 * Wait a few minutes for the rolling update of the controllers to complete, and check all settings after login...

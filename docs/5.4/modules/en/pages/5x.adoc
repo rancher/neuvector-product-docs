@@ -516,7 +516,7 @@ The 5.3.1 version has been removed from docker hub in order to prevent the upgra
 
 ==== {product-name} UI Extension v. 1.0 for Rancher March 2024
 
-* After installation of {product-name}, link:/deploying/rancher#neuvector-ui-extension-for-rancher[enabling/installing] the {product-name} UI Extension from Rancher will display a Dashboard for the cluster, including links to SSO to the full {product-name} cluster. NOTE: The extension may display as Third Party, which will be fixed in a future release. Also, after installation, Rancher 2.7.x users may see two {product-name} UI Ext icons in the list (bug). One icon will say Uninstall (meaning it is installed), and the other should say Install. This can be left as is, ie, don't Install again if the extension is already installed.
+* After installation of {product-name}, xref:rancher.adoc#_suse_security_ui_extension_for_rancher[enabling/installing] the {product-name} UI Extension from Rancher will display a Dashboard for the cluster, including links to SSO to the full {product-name} cluster. NOTE: The extension may display as Third Party, which will be fixed in a future release. Also, after installation, Rancher 2.7.x users may see two {product-name} UI Ext icons in the list (bug). One icon will say Uninstall (meaning it is installed), and the other should say Install. This can be left as is, ie, don't Install again if the extension is already installed.
 
 === 5.2.4-s2 February 2024
 
@@ -626,7 +626,7 @@ docker run --rm --privileged --pid=host neuvector/scanner -n
  ** Certificate for JWT-signing is created automatically by controller with validity of 90days and rotated automatically.
  ** Auto-generation of Manager, REST API, and registry adapter certificate requires using Helm-based install using {product-name} helm version 2.6.3 or later.
  ** Built-in certificate is still used for yaml based deployments if not replaced during deployment; however, it is recommended to replace these (see next line).
- ** Manual link:/configuration/console/replacecert[replacement of certificate] is still supported and recommended for previous releases or yaml based deployments. See the {product-name} GitHub security advisory https://github.com/neuvector/neuvector/security/advisories/GHSA-622h-h2p8-743x[here] for a description.
+ ** Manual xref:replacecert.adoc[replacement of certificate] is still supported and recommended for previous releases or yaml based deployments. See the {product-name} GitHub security advisory https://github.com/neuvector/neuvector/security/advisories/GHSA-622h-h2p8-743x[here] for a description.
  ** Use of user-supplied certificates is still supported as before for both Helm and yaml based deployments.
 * Add additional controls on custom compliance scripts. By default, custom script are now not allowed to be added, unless the environment variable CUSTOM_CHECK_CONTROL is added to Controller and Enforcer. Values are "disable" (default, not allowed), "strict" (admin role only), or "loose" (admin, compliance, and runtime-policy roles).
 * Prevent LDAP injection - username field is escaped.
@@ -686,7 +686,7 @@ docker run --rm --privileged --pid=host neuvector/scanner -n
 * Use less privileged services accounts as required for each {product-name} component. A variable "`leastPrivilege`" is introduced. The default is false. NOTE: Using the current helm chart with this variable on a release prior to 5.2.0 will not function properly.
 * Bind to non-default service account to meet CIS 1.5 5.1.5 recommendation.
 * Enable administrator to configure user default Session Time out in Settings -> Users, API Keys & Roles.
-* Customizable login banner and customizable UI header text for regulated and government deployments. Requirements for configuration can be found https://open-docs.neuvector.com/configuration/customui[here].
+* Customizable login banner and customizable UI header text for regulated and government deployments. Requirements for configuration can be found xref:customui.adoc[here].
 * SYSLOG support for TLS encrypted transport. Select TCP/TLS in Settings -> Configuration for SYSLOG.
 * Enable deployment of the {product-name} monitor helm chart from Rancher Manager.
 * Remove upper limit for top level domain in URL validator for registry scanning.
@@ -1048,7 +1048,7 @@ neuvector-scanner-pod-87474dcff-s8vgt       1/1     Running   0          114s   
 
 [NOTE]
 ====
-The instructions below apply to upgrades to 5.0.x and 5.1.x. For 5.2.x, service accounts and bindings have changed, and should be https://open-docs.neuvector.com/deploying/kubernetes#deploy-neuvector[reviewed] to plan upgrades.
+The instructions below apply to upgrades to 5.0.x and 5.1.x. For 5.2.x, service accounts and bindings have changed, and should be xref:kubernetes.adoc#_deploy_suse_security[reviewed] to plan upgrades.
 ====
 
 
