@@ -9,6 +9,46 @@
 To receive email notifications of new releases, please subscribe to this SUSE mailing list: https://lists.suse.com/mailman/listinfo/neuvector-updates
 ====
 
+=== 5.4.3 March 2025
+
+==== New Features:
+
+* **NVSHAS-9793**: Allow Fed Global roles in LDAP/userinitcfg when deploying NeuVector through the ConfigMap and Secret.
+* **NVSHAS-9764**: [RFE] Add support for Azure for "Remote Repository Configuration".
+* **NVSHAS-9759**: Add date details in the Ingress-Exposure Report.
+* **NVSHAS-9755**: Request to display environment variable names alongside values in alerts for secrets.
+* **NVSHAS-9748**: [Helm] NeuVector Helm update for supporting name referral for common groups in CRD (NVSHAS0-4717).
+* **NVSHAS-9426**: Add hostPath for Scanner to Helm chart.
+* **NVSHAS-9326**: NeuVector - Harbor Pluggable Scanner Module.
+* **NVSHAS-9835**: UI for disable auto-scan for node.
+* **NVSHAS-7997**: Scanner connector for ghcr.io.
+* **NVSHAS-7982**: Assign WAF sensors from Federation Master.
+
+==== Bug Fixes:
+
+* **NVSHAS-9849**: Enforcers not registering with controllers.
+* **NVSHAS-9847**: Wildcard filters not working for Docker registry.
+* **NVSHAS-9833**: Configuration restore fails in Rancher deployments.
+* **NVSHAS-9832**: Problem with creating network rules using the Workload group.
+* **NVSHAS-9821**: Process name is not matched from the command line for the Process Profit Rule Alert.
+* **NVSHAS-9817**: Creating NvClusterSecurityRule CRD shows successful creation, but it was not actually created due to duplicated process rule entries.
+* **NVSHAS-9812**: NeuVector prometheus-exporter wrong metrics.
+* **NVSHAS-9811**: [Manager] Unable to access GUI when using a custom certificate (CA) with root CA and intermediate CA on the secret.
+* **NVSHAS-9801**: FIPS mode + `manager.env.ssl=false` causes Manager to error out.
+* **NVSHAS-9792**: Federation policy syncing failing due to body size exceeding Consul max.
+* **NVSHAS-9784**: NeuVector returning 404 during Jfrog image repository scanning.
+* **NVSHAS-9783**: After adding the network policy to deny icmp packets the user does not see any alert in "Security Events".
+* **NVSHAS-9780**: NeuVector single sign on not working with Rancher NavLink.
+* **NVSHAS-9777**: Webhook JSON with duplicated "level" keys.
+* **NVSHAS-9770**: Auto-Switch after Zero-Drift mode switches incorrect policy.
+* **NVSHAS-9765**: File access doesn't get fully blocked in Protect mode.
+* **NVSHAS-9756**: Enforcer reached maximum CPU and has several Memory Pressure alerts.
+* **NVSHAS-9668**: Compliance test failing on RKE2.
+* **NVSHAS-9265**: Incomplete and incorrect vulnerability scan results on PRE PCI environment.
+* **NVSHAS-9227**: Registry scan gets stuck in the middle of scanning process and goes to "Idle" state.
+* **NVSHAS-9729**: Incorrect count of vulnerabilities are observed when multiple statefulset with the "same name" in namespaces are deployed in a project.
+* **NVSHAS-9810**: NeuVector controller not responding and UI not accessible.
+
 === 5.4.2 January 2025
 
 ==== New Features:
