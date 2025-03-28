@@ -25,9 +25,26 @@ CRD's bring many benefits, including:
 * Version and track the security policies the same as application deployment manifests.
 * Define the allowed behavior of any application including network, file and process behavior.
 
-=== Supported Resource Types
+== Supported Resource Types
 
-{product-name} supports the NvSecurityRule, NvClusterSecurityRule, and NvAdmissionControlSecurityRule custom resource definitions.
+{product-name} supports the following custom resource definitions:
+
++ NvAdmissionControlSecurityRule
++ NvClusterSecurityRule
++ NvGroupDefinition
++ NvSecurityRule
+
+=== NvGroupDefinition
+
+The NvGroupDefinition custom resource represents a group's definition (`criteria/comment`). The security-related settings still remain in the NvSecurityRule/NvClusterSecurityRule custom resources. All NvGroupDefinition custom resources are under the `neuvector` namespace.
+
+==== Schema Attribute: `name_referral`
+
+NeuVector v5.4.3 adds the attribute `name_referral` (boolean) as a setting in the group selector(`target.selector`, `ingress.items[].selector`, `egress.items[].selector`) in the NvSecurityRule/NvClusterSecurityRule CRD schema.
+
+If the `name_referral` attribute is set to `true`, the `criteria/comment` fields of the group selector in NvSecurityRule/NvClusterSecurityRule are ignored by NeuVector. This means that NeuVector will try to determine the group's `criteria/comment` by referral. This introduces "group referral" in NvSecurityRule/NvClusterSecurityRule CRDs to assist with modifications when editing groups. If unset then users will need to update groups in each defined place in the respective YAML files if modifications are needed.
+
+=== NvClusterSecurityRule and NvSecurityRule
 
 The difference between the NvSecurityRule and NvClusterSecurityRule is the boundary set by the definition of the scope. The NvSecurityRule resource is scoped at the namespace level, whereas the NvClusterSecurityRule is scoped at the cluster level. The resource types can be configured in a yaml file and can be created during deployment, as shown in the deployment instructions and examples for NeuVector.
 
