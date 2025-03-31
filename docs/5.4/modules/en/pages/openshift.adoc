@@ -13,11 +13,12 @@ To deploy manually, first pull the appropriate {product-name} containers from th
 === {product-name} Images on Docker Hub
 
 The images are on the {product-name} Docker Hub registry. Use the appropriate version tag for the manager, controller, enforcer, and leave the version as 'latest' for scanner and updater. For example:
-neuvector/manager:5.4.3
-neuvector/controller:5.4.3
-neuvector/enforcer:5.4.3
-neuvector/scanner:latest
-neuvector/updater:latest
+
+* neuvector/manager:5.4.3
+* neuvector/controller:5.4.3
+* neuvector/enforcer:5.4.3
+* neuvector/scanner:latest
+* neuvector/updater:latest
 
 Please be sure to update the image references in appropriate yaml files.
 

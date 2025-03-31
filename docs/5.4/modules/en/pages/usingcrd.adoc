@@ -29,10 +29,10 @@ CRD's bring many benefits, including:
 
 {product-name} supports the following custom resource definitions:
 
-+ NvAdmissionControlSecurityRule
-+ NvClusterSecurityRule
-+ NvGroupDefinition
-+ NvSecurityRule
+* NvAdmissionControlSecurityRule
+* NvClusterSecurityRule
+* NvGroupDefinition
+* NvSecurityRule
 
 === NvGroupDefinition
 
