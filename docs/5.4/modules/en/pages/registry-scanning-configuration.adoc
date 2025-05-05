@@ -27,6 +27,14 @@ After the scan is completed you will see the results below it. Click on the repo
 
 image:image_scan_4.png[Layered]
 
+NeuVector provides a **"View all scanned images"** option. Users don't have to look into a registry to see a specific image. Instead, users can click the last row to list all scanned images.
+
+image:view-all-scanned-images.png[Registry]
+
+Users can also land on the **Registries** page and open specific images from the hyperlink from the **Containers** page. If the image name is not clickable, it means that the image has not been scanned yet.
+
+image:link-to-image-scan-result.png[Container]
+
 The scan results include vulnerabilities by image layer, if this option was selected during registry/repository configuration, as well the compliance checks results. Click the compliance tab when viewing the scan results for the image to see compliance checks.
 
 Scanning will also discover and list all Modules (ie, an inventory) in the image, as shown below. It will also summarize the vulnerability risk by module and list all vulnerabilities for each module.
