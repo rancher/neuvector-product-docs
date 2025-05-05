@@ -543,3 +543,46 @@ Use the same instructions as the Native Docker registry, choosing **Harbor Regis
 image::https://github.com/user-attachments/assets/9d382fde-7be4-423d-8401-c1034a9e4c2f[Harbor]
 
 The filter field can not be left blank. Enter a repository filter, or add filter as * to scan all repositories.
+
+=== GitHub Container Registry
+
+Available in NeuVector v5.4.3 and later, image scanning is now supported from the https://ghcr.io[GitHub Container Registry (GHCR)], enabling users to include images stored in GitHub in their security and compliance workflows.
+
+==== Add the GitHub Container Registry
+
+To configure the GHCR in NeuVector, go to **Add Registry** and select **GitHub Container Registry** from the registry type dropdown.
+
+|===
+| Field | Description
+
+| **Name**
+| A name to identify this registry configuration.
+
+| **Registry**
+| The GHCR registry URL. Example: `https://ghcr.io/`.
+
+| **User Name**
+| Your GitHub username.
+
+| **Token**
+| A https://github.com/settings/tokens[GitHub Personal Access Token] with `read:packages` permission (and `repo` if accessing private images).
+
+| **Filter**
+| Specify the namespace to scan (e.g., `github_user/hello-world:*` or `repo/package_name:version`).
+|===
+
+==== Token Permissions
+
+To access GHCR, you must generate a GitHub token with the following scopes:
+
+* `read:packages` (required)
+* `repo` (if accessing private repositories)
+
+You can create a token https://github.com/settings/tokens[here].
+
+==== Troubleshooting
+
+If you encounter issues such as `403 Forbidden` or `invalid credentials`, please ensure:
+
+* Your token has the correct scopes.
+* The registry URL is correctly formatted (e.g., `\https://ghcr.io/`).
