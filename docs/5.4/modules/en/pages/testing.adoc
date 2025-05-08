@@ -152,7 +152,7 @@ To access the Nginx-webui service externally, find the random port assigned to i
 kubectl get svc -n demo
 ----
 
-Then connect to the public IP address/port for one of the kubernetes nodes, e.g. `http://(public_IP):(NodePort)`
+Then connect to the public IP address/port for one of the kubernetes nodes, e.g. `+http://(public_IP):(NodePort)+`
 
 After deploying {product-name}, you can run test traffic through the demo applications to generate the whitelist rules, and then move all services to Monitor or Protect mode to see violations and attacks.
 
