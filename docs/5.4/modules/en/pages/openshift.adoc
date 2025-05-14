@@ -393,7 +393,7 @@ oc create -f <compose file>
 ----
 --
 
-That's it! You should be able to connect to the {product-name} console and login with admin:admin, e.g. `https://<public-ip>:8443`
+That's it! You should be able to connect to the {product-name} console and login with admin:admin, e.g. `+https://<public-ip>:8443+`
 
 To see how to access the console for the neuvector-webui service:
 
