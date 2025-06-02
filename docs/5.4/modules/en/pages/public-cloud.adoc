@@ -128,7 +128,7 @@ The example uses 730 hours for the billing cycle. Actual billing would depend on
 Table 2. Usage calculations for different scenarios
 [cols="1,1,1,1,1,1", options="header"]
 |===
-| 
+| Type
 | Hours Active
 | Nodes
 | Usage Total
@@ -155,7 +155,7 @@ Table 2. Usage calculations for different scenarios
 | 6720
 | 20
 | 20 @Tier 2
-|===                 |
+|===                 
 
 [NOTE]
 .Definitions
