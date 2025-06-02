@@ -79,14 +79,36 @@ There is a 5-node minimum, if the average node count is less than 5 nodes, the c
 {product-name} Prime has different pricing tiers when purchasing via the cloud marketplace. This is based on the number of nodes on which {product-name} is deployed. Details of the tiers are below, please check the listing for further pricing information.
 
 Table 1. Pricing tiers
-| Tier | Nodes (from) | Nodes (to) |
-|:---:|:--------:|:-------:|
-| 1    | 5            | 15         |
-| 2    | 16           | 50         |
-| 3    | 51           | 100        |
-| 4    | 101          | 250        |
-| 5    | 251          | 1000       |
-| 6    | 1000         | 15         |
+[cols="1,1,1", options="header"]
+|===
+| Tier
+| Nodes (from)
+| Nodes (to)
+
+| 1
+| 5
+| 15
+
+| 2
+| 16
+| 50
+
+| 3
+| 51
+| 100
+
+| 4
+| 101
+| 250
+
+| 5
+| 251
+| 1000
+
+| 6
+| 1000
+| 15
+|===
 
 *_Is there a way to try {product-name} Prime before purchasing?_*
 
@@ -104,11 +126,36 @@ The example uses 730 hours for the billing cycle. Actual billing would depend on
 ====
 
 Table 2. Usage calculations for different scenarios
-|                   | Hours Active | Nodes                           | Usage Total | Average Node count | Node billed                    |
-|-------------|:--------:|:---------------------:|:--------:|:------------:|:--------------------:|
-| Static Usage      | 730          | 10                              | 7300        | 10                 | 10 @Tier 1                     |
-| Bursting Model    | 730          | 10 (562 Hours) & 20 (168 Hours) | 10660       | 15                 | 15 @Tier 1 (Rounded from 14.6) |
-| Transient Cluster | 336          | 20                              | 6720        | 20                 | 20 @Tier 2                     |
+[cols="1,1,1,1,1,1", options="header"]
+|===
+| 
+| Hours Active
+| Nodes
+| Usage Total
+| Average Node count
+| Node billed
+
+| Static Usage
+| 730
+| 10
+| 7300
+| 10
+| 10 @Tier 1
+
+| Bursting Model
+| 730
+| 10 (562 Hours) & 20 (168 Hours)
+| 10660
+| 15
+| 15 @Tier 1 (Rounded from 14.6)
+
+| Transient Cluster
+| 336
+| 20
+| 6720
+| 20
+| 20 @Tier 2
+|===                 |
 
 [NOTE]
 .Definitions

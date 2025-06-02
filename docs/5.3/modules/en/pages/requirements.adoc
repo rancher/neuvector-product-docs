@@ -4,6 +4,7 @@
 
 == System Requirements
 
+[cols="1,1,1,1,4", options="header"]
 |===
 | Component | # of Instances | Recommended vCPU | Minimum Memory | Notes
 
