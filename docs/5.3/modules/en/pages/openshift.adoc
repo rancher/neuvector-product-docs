@@ -225,7 +225,12 @@ oc apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernete
 oc apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.3.0/admission-crd-k8s-1.19.yaml
 ----
 --
-. Add read permission to access the kubernetes API and OpenShift RBACs. IMPORTANT: The standard {product-name} 5.2+ deployment uses least-privileged service accounts instead of the default. See below if upgrading to 5.2+ from a version prior to 5.2.
+. Add read permission to access the kubernetes API and OpenShift RBACs. 
+
+[IMPORTANT]
+====
+The standard {product-name} 5.2+ deployment uses least-privileged service accounts instead of the default. See below if upgrading to 5.2+ from a version prior to 5.2.
+====
 +
 --
 [CAUTION]
@@ -370,7 +375,13 @@ Then create the appropriate service(s):
 oc create -f nv_master_worker.yaml
 ----
 --
-. Create the neuvector services and pods based on the sample yamls below. Important! Replace the <version> tags for the manager, controller and enforcer image references in the yaml file. Also make any other modifications required for your deployment environment.
+. Create the neuvector services and pods based on the sample yamls below. 
+
+[Important] 
+====
+Replace the <version> tags for the manager, controller and enforcer image references in the yaml file. Also make any other modifications required for your deployment environment.
+====
+
 +
 --
 [,shell]
