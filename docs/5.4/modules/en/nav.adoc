@@ -5,11 +5,12 @@
 ** xref:policy-overview.adoc[Security Policy Overview]
 ** xref:integration.adoc[Enterprise Integration]
 ** xref:ci-workflow.adoc[CI/CD Workflow]
-** xref:public-cloud.adoc[Public Cloud]
 * Operational Tasks
 ** Deploying {product-name}
 *** xref:configmap.adoc[Deploy Using ConfigMap]
 *** xref:operators.adoc[Deploy Using Operators]
+*** xref:publick8s.adoc[Deploying SUSE Security on Public Cloud]
+**** xref:awsmarketplace.adoc[AWS Marketplace Listing]
 *** xref:kubernetes.adoc[Kubernetes]
 *** xref:openshift.adoc[OpenShift]
 *** xref:rancher.adoc[Rancher Deployment]
