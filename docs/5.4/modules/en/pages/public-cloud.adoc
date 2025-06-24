@@ -1,0 +1,316 @@
+= Public Cloud Marketplaces
+:page-opendocs-origin: /13.special/03.public-cloud/03.public-cloud.md
+:page-opendocs-slug:  /special/public-cloud
+
+_{product-name} Prime by SUSE_ is now available in the https://aws.amazon.com/marketplace/pp/prodview-u2ciiono2w3h2[AWS] and https://azuremarketplace.microsoft.com/en-us/marketplace/apps/neuvector.neuvector-app?tab=Overview[Azure Cloud] Marketplace.
+
+This brings the value of running {product-name}, the cloud-native, zero-trust container security platform, to cloud customers with the added benefit of a pay monthly pricing model available through the cloud marketplaces.
+
+This document covers some of the frequently asked questions about the listing in the following 5 categories:
+
+* <<_the_listing,The Listing>>
+* <<_billing,Billing>>
+* <<_technical_billing,Technical Billing>>
+* <<_technical_product,Technical Product>>
+* <<_miscellaneous,Miscellaneous>>
+* <<_appendix,Appendix>>
+
+== The Listing
+
+*_What is the SUSE {product-name} Prime listing on the Cloud Marketplace?_*
+
+By selecting the {product-name} listing from the public cloud marketplace, customers can deploy {product-name} to their Kubernetes environment with the advantage of having monthly billing via that cloud provider.
+
+*_Where do I find {product-name} Prime in the Cloud Marketplace?_*
+
+The listings can be found in the AWS and Azure Marketplace, there are two listings:
+
+* For AWS Marketplace:
+ ** https://aws.amazon.com/marketplace/pp/prodview-u2ciiono2w3h2?sr=0-3&ref_=beagle&applicationId=AWSMPContessa[{product-name} Prime with 24x7 Support (non-EU and non-UK only)]
+ ** https://aws.amazon.com/marketplace/pp/prodview-xkfyjdvvkuohs[{product-name} Prime with 24x7 Support (EU and UK only)]
+* For Azure Marketplace:
+ ** https://azuremarketplace.microsoft.com/en-us/marketplace/apps/suse.neuvector-prime-llc?tab=Overview[{product-name} Prime with 24x7 Support (non-EU and non-UK only)]
+ ** https://azuremarketplace.microsoft.com/en-us/marketplace/apps/suseirelandltd1692213356027.neuvector-prime-ltd?tab=Overview[{product-name} Prime with 24x7 Support (EU and UK only)]
+
+*_Why are there 2 listings, which one should I use?_*
+
+We have 2 listings for {product-name} Prime, in AWS "EU and UK only" and "non-EU and non-UK only" and in Azure "24x7 Support" and "24x7 Support (EMEA Orders Only)", you should pick the listing that reflects where your *cloud account gets billed*.
+
+*_Are these listings available in all countries?_*
+
+The {product-name} Prime listing on the public cloud is not available to purchase in all countries. Your billing country is based on the cloud Account ID used to do the deployment. Please read the addendum at the end of this FAQ for a list of countries that can and cannot transact {product-name} Prime,via the marketplace.
+
+*_My cloud account is in the USA, but I want to deploy {product-name} in another region, a region that is in a country where I currently cannot transact {product-name}, is this possible?_*
+
+Yes. As long as your cloud account is billed to one of the allowed countries, it is possible to deploy {product-name} in any region.
+
+*_Is this listing available in China?_*
+
+Whilst it is not possible to transact/bill {product-name} Prime in China, it is possible to deploy into regions in China. Please read the addendum at the end of this FAQ for a list of countries that can and cannot transact {product-name} via the cloud marketplace.
+
+== Billing
+
+*_I have an existing {product-name} subscription; can I use this on the public cloud?_*
+
+BYOS (Bring Your Own Subscription) {product-name} Prime deployments are supported on the public cloud, but billing would be through your normal software purchase channels and not through the cloud provider marketplace. Once the existing subscription term ends, you can purchase {product-name} Prime via the cloud marketplace and reconfigure your cluster to support monthly billing through the cloud provider.
+
+*_I have an existing deployment covered by a {product-name} subscription; can I use this new listing in the cloud marketplace for new deployments?_*
+
+Yes, the marketplace listing works independently from your existing {product-name} Prime subscriptions. Please remember that support processes may be different for deployments using your existing subscription and those billed via the cloud Marketplace.
+
+*_Tell me more about how the billing for {product-name} Prime works via the cloud?_*
+
+When purchasing {product-name} Prime through the cloud provider marketplace, the billing is as follows:
+
+* Billing is monthly and handled via the cloud provider marketplace.
+* Nodes are counted hourly when {product-name} is active and added to a usage total.
+* An average node count is calculated for the month.
+* There is a monthly usage charge for each node in the average node count.
+* The monthly usage charge depends on the number of nodes in use.
+
+[IMPORTANT]
+.Nodes count
+====
+There is a 5-node minimum, if the average node count is less than 5 nodes, the charge will be for 5 nodes.
+====
+
+*_What are the pricing tiers?_*
+
+{product-name} Prime has different pricing tiers when purchasing via the cloud marketplace. This is based on the number of nodes on which {product-name} is deployed. Details of the tiers are below, please check the listing for further pricing information.
+
+Table 1. Pricing tiers
+[cols="1,1,1", options="header"]
+|===
+| Tier
+| Nodes (from)
+| Nodes (to)
+
+| 1
+| 5
+| 15
+
+| 2
+| 16
+| 50
+
+| 3
+| 51
+| 100
+
+| 4
+| 101
+| 250
+
+| 5
+| 251
+| 1000
+
+| 6
+| 1000
+| 15
+|===
+
+*_Is there a way to try {product-name} Prime before purchasing?_*
+
+If using the {product-name} Prime listing in the cloud provider marketplace, billing commences from the time of deployment. {product-name} can also be deployed manually using the standard documentation and repositories. When ready to add support to your {product-name} deployment and have this billed via the cloud marketplace, follow the https://open-docs.neuvector.com/[available documentation].
+
+*_How does SUSE calculate the '`average number of nodes`' to bill for?_*
+
+The average node count is calculated by adding the number of active nodes (counted hourly) and dividing by the number of hours {product-name} has been active in the billing cycle.
+
+Below are 3 examples of how the average node count is calculated.
+
+[NOTE]
+====
+The example uses 730 hours for the billing cycle. Actual billing would depend on the number of days in the month and the resulting billing cycle.
+====
+
+Table 2. Usage calculations for different scenarios
+[cols="1,1,1,1,1,1", options="header"]
+|===
+| Type
+| Hours Active
+| Nodes
+| Usage Total
+| Average Node count
+| Node billed
+
+| Static Usage
+| 730
+| 10
+| 7300
+| 10
+| 10 @Tier 1
+
+| Bursting Model
+| 730
+| 10 (562 Hours) & 20 (168 Hours)
+| 10660
+| 15
+| 15 @Tier 1 (Rounded from 14.6)
+
+| Transient Cluster
+| 336
+| 20
+| 6720
+| 20
+| 20 @Tier 2
+|===                 
+
+[NOTE]
+.Definitions
+====
+_Static usage_: Using {product-name} on 10 nodes, for 1 month (730 hours) with no additional nodes added in the month.
+
+_Bursting Model_: Using {product-name} on 10 nodes for 3 weeks (562 hours) in the month, bursting to 30 nodes for 1 week (168 hours).
+
+_Transient cluster_: A temporary deployment of {product-name} on 20 nodes for 2 weeks (336 hours).
+====
+
+*_Are special commercial terms available?_*
+
+Depending on the deployment, it may be possible to secure special commercial terms. e.g. An annual subscription would be handled via an AWS private offer. Please contact SUSE for more information.
+
+*_Can my spend on {product-name} Prime count towards my cloud discount program such as AWS EDP or Azure's MACC?_*
+
+* For AWS, the spend can count towards your EDP. Please contact your AWS Sales Team for more details.
+* For Azure, the spend can count towards your MACC. Please contact your Microsoft Azure Sales Team for more details.
+
+*_How do I purchase {product-name} Prime for additional nodes?_*
+
+Once {product-name} has been deployed from the listing on the cloud marketplace and billing is active, there is no need to make a specific purchase for additional nodes. Billing is dynamic and based on the number of nodes where {product-name} is deployed. Just add {product-name} to additional nodes in federated clusters as needed.
+
+*_Is this an annual commitment, will it auto-renew?_*
+
+By default, the {product-name} Prime listing in the cloud provider marketplace is billed on a monthly cycle, based on usage. Billing is on-going for as long as {product-name} is deployed.
+
+Depending on the deployment, custom monthly pricing may be available. This applies to AWS and Azure deployments.
+
+== Technical (Billing)
+
+*_Do I need a managed Kubernetes cluster running in my cloud provide to install {product-name} Prime and be billed via the marketplace?_*
+
+Yes. For AWS, to benefit from monthly billing via the AWS Marketplace, the primary cluster must be an EKS Cluster running in your AWS Account. For Azure, to benefit from monthly billing via the Azure Marketplace, the primary cluster must be an AKS Cluster running in your Azure Account.
+
+*_On which Kubernetes distributions can the {product-name} Prime Cloud Marketplace listing be deployed?_*
+
+For AWS, the {product-name} Prime AWS Marketplace listing must be deployed on an Amazon EKS. For Azure, the {product-name} Prime Azure Marketplace listing must be deployed on AKS via the marketplace offering.
+
+[IMPORTANT]
+====
+Downstream clusters can run any Supported Kubernetes platform, such as RKE, RKE2, K3s, AKS, EKS, GKE, vanilla Kubernetes, OpenShift, Mirantis Kubernetes Engine, and so on. Please see https://open-docs.neuvector.com/basics/requirements#supported-platforms[Supported Platforms].
+====
+
+*_What is the deployment mechanism?_*
+
+For AWS, the Marketplace listing for {product-name} Prime is deployed using Helm. For Azure, the {product-name} Prime Azure Marketplace listing is deployed using the Azure Portal (and the deployment is CNAB based).
+
+*_What is the easiest way to get started?_*
+
+The way to get started is to add the cloud marketplace listing for {product-name} Prime to a managed cubernetes cluster, such as as EKS or AKS. Follow the instructions in the usage section, a Helm chart in AWS and the Azure Portal for Azure, takes care of the application installation and setting up billing.
+
+*_What version of {product-name} is installed when using the marketplace listing?_*
+
+The marketplace listing for {product-name} Prime is tied to a specific version of {product-name}, typically the latest version available at the time of the listing update. Please check the listing for further information.
+
+*_I need a prior version of {product-name} installed, can I still use the listing?_*
+
+No. There is no choice of {product-name} version when deploying using the marketplace listing. If a prior version of {product-name} is required, must be installed manually using the standard documentation.
+
+*_How often is the listing updated (including the version of {product-name})?_*
+
+The marketplace listing is tied to a specific version of {product-name}, usually the latest version available at the time the listing was last updated.
+
+Typically, the marketplace listing is updated quarterly, or more frequently if there are security issues. {product-name} itself is updated with major, minor, or patch versions every 6-8 weeks.
+
+To update the {product-name} product to a current version before the marketplace listing is updated, please see xref:updating.adoc[Updating {product-name}].
+
+*_I have many Kubernetes clusters across multiple cloud accounts, does the {product-name} billing still work and enable tiered pricing?_*
+
+Yes. Downstream (federated) clusters running {product-name} can be deployed across single or multiple cloud accounts, on-premises or even across diffferent public clouds. Downstream nodes report up to the primary {product-name} deployment. This process is called federation and is needed to enable tiered pricing for your {product-name} deployments.
+
+Billing is routed to the cloud provider account in which the primary cluster is running.
+
+*_I have multiple independent clusters, each running a separate installation of the {product-name} Prime marketplace listing, how is this billed?_*
+
+As the {product-name} deployments are independent, each cluster is billed separately from the others. It is not possible to benefit from tiered pricing across clusters unless the {product-name} deployments are federated. Federation requires that only the primary cluster (not downstream remotes) be installed with the {product-name} Prime marketplace listing. Learn more about federation in xref:multicluster.adoc[Enterprise Multi-Cluster Management].
+
+If Federation is not possible, consider custom terms from SUSE.
+
+*_How can I federate {product-name} to benefit from tiered pricing across all deployments?_*
+
+The primary cluster must be running on a managed kubernetes cluster. This is EKS in the AWS Cloud, or AKS in Azure. The cluster must be running the {product-name} Prime marketplace listing.
+
+[CAUTION]
+====
+There MUST be network connectivity between the controllers in each cluster on the required ports. The controller is exposed externally to its cluster by either a primary or remote service. See xref:multicluster.adoc[Enterprise Multi-Cluster Management] for more information on federating clusters.
+====
+
+*_I have purchased multiple SUSE products from the public cloud marketplace (e.g., Rancher Prime and {product-name} Prime), does the marketplace billing method still work?_*
+
+Yes. The billing mechanisms for the two deployments are independent and will be billed separately via the marketplace.
+
+*_I already have an existing cluster in place and want to add {product-name} Prime and have this billed via the marketplace. Is this possible?_*
+
+Yes, providing it is an EKS cluster in AWS, or AKS in Azure. Simply deploy the AWS Marketplace listing for {product-name} Prime to your EKS or AKS cluster.
+
+*_I already have an existing cluster with {product-name} deployed, can I just install the {product-name} Prime marketplace listing and have support billed via the cloud marketplace?_*
+
+Yes. This is possible by redeploying the {product-name} Prime from the cloud provider marketplace listing. Please follow the documentation to xref:production.adoc#_backups_and_persistent_data[back up the existing {product-name} configuration], as it may be necessary to xref:restore.adoc[restore the configuration] into the new deployment.
+
+== Technical (Product)
+
+*_How do I get support?_*
+
+It is very simple to open a support case with SUSE for {product-name}. Create a '`supportconfig`' via the NewVector UI and upload the output to the https://scc.suse.com/cloudsupport/[SUSE Customer Center]. The support config bundle can be exported from the {product-name} console under `Settings > Configuration`.
+
+[TIP]
+====
+For multi-cluster (federated) deployments, export the `supportconfig` bundle from the primary cluster only. The {product-name} Prime billing mechanism must be active on the primary cluster to open a support case.
+====
+
+*_Is there any difference between the {product-name} Prime product on the cloud marketplace compared to the versions I can run in my own data center or install manually in the cloud?_*
+
+The {product-name} Prime product in the cloud marketplace is the same product with the same functionality as what you would install manually in the cloud or run on-premises. The only difference is the billing route.
+
+*_Does the primary cluster (responsible for billing) need to run 24/7?_*
+
+To ensure continuity with support, it is recommended that the primary {product-name} Prime cluster always remains active.
+
+*_What if the primary cluster responsible for billing is unable to connect to the cloud provider billing framework?_*
+
+There may be multiple reasons why the primary cluster is unable to connect to the billing framework, but it is the customer's responsibility to ensure that the primary cluster is active and connected. While the cluster is not connected to the billing framework, it is not possible to raise a support request.
+
+*_My primary cluster has been offline, what happens with billing when it reconnects?_*
+
+If the primary cluster is offline or disconnected from the cloud provider billing framework for a period of time, when it reconnects, the stored usage data will be uploaded and will appear on your next marketplace bill.
+
+[NOTE]
+====
+Depending on when in the month the primary cluster gets reconnected you may have several months of usage on your next billing cycle.
+====
+
+*_How do I get fixes and updates to {product-name}?_*
+
+{product-name} is updated with major, minor, or patch versions every 6-8 weeks. To update {product-name} to a current version before the {product-name} Prime marketplace listing is updated, please see xref:updating.adoc[Updating {product-name}].
+
+== Miscellaneous
+
+*_Where can I find out more about the {product-name} Prime Marketplace listing?_*
+
+* For AWS:
+ ** You can find out more about the {product-name} Prime AWS Marketplace listing in the xref:awsmarketplace.adoc[{product-name} documentation].
+* For Azure:
+ ** You can find out more about the {product-name} Prime AWS Marketplace listing in the xref:azuremarketplace.adoc[{product-name} documentation].
+
+*_Where can I find out more about {product-name}?_*
+
+Learn more about {product-name} and {product-name} Prime with:
+
+* https://www.suse.com/products/neuvector/[{product-name} by SUSE - full lifecycle container security]
+* https://open-docs.neuvector.com/[{product-name} by SUSE documentation]
+
+== Appendix
+
+Countries that can transact {product-name} Prime through the cloud marketplace
+Please see the https://documentation.suse.com/sle-public-cloud/all/html/public-cloud/countrylist.html[Geographical Availability] of {product-name} Prime and other SUSE Marketplace products at this link.
