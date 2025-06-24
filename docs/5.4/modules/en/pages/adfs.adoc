@@ -66,11 +66,11 @@ image:adfs12-13.png[adfsSetup]
 
 . Identify Provider Single Sign-On URL
 * View Endpoints from AD FS Management > Service and use "`SAML 2.0/WS-Federation`" endpoint URL.
-* Example: `https://<adfs-fqdn>/adfs/ls`
+* Example: `+https://<adfs-fqdn>/adfs/ls+`
 
 . Identity Provider Issuer
 * Right click on AD FS from AD FS Management console and select "`Edit Federation Service Properties...`"; use the "`Federation Service identifier`".
-* Example: `http://<adfs-fqdn>/adfs/services/trust`
+* Example: `+http://<adfs-fqdn>/adfs/services/trust+`
 
 . X.509 Certificate
 * From AD FS Management, select Service > Certificate, right click on Token-signing certificate and choose "`View Certificate...`"

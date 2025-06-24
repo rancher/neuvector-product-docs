@@ -40,7 +40,7 @@ Download the latest app tarball (`neuvector_app.tar.gz`) from the https://github
 
 ==== Splunkbase
 
-Download the latest app tarball from https://splunkbase.splunk.com/app/[Splunkbase].
+Download the latest app tarball from https://splunkbase.splunk.com/apps[Splunkbase].
 
 ==== Splunk Apps Browser
 

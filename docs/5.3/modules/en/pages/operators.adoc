@@ -10,11 +10,11 @@ Operators take human operational knowledge and encode it into software that is m
 
 The {product-name} Operator is based on the {product-name} Helm chart. The {product-name} RedHat OpenShift Operator runs in the OpenShift container platform to deploy and manage the {product-name} Security cluster components. The {product-name} Operator contains all necessary information to deploy {product-name} using Helm charts. You simply need to install the {product-name} operator from the OpenShift embedded Operator hub and create the {product-name} instance.
 
-To deploy the latest {product-name} container versions, please use either the https://catalog.redhat.com/search?searchType=software&deployed_as=Operator&partnerName={product-name}&p=1[Red Hat Certified Operator] from Operator Hub or the https://github.com/redhat-openshift-ecosystem/community-operators-prod/tree/main/operators/neuvector-community-operator[community operator]. Documentation for the community operator can be found https://github.com/neuvector/neuvector-operator[here].
+To deploy the latest {product-name} container versions, use either the link:https://catalog.redhat.com/search?searchType=software&deployed_as=Operator&partnerName={product-name}&p=1[Red Hat Certified Operator] from Operator Hub or the link:https://github.com/redhat-openshift-ecosystem/community-operators-prod/tree/main/operators/neuvector-community-operator[community operator]. Documentation for the community operator can be found https://github.com/neuvector/neuvector-operator[{product-name} operator].
 
 [NOTE]
 .Note about SCC and Upgrading
-====
+====  
 
 Privileged SCC is added to the Service Account specified in the deployment yaml by Operator version 1.3.4 and above in new deployments. In the case of upgrading the {product-name} Operator from a previous version to 1.3.4, please delete Privileged SCC before upgrading.
 
@@ -81,7 +81,7 @@ image:operator_cert.png[]
 ** Open the Resources tab 
 ** Verify that resources are in status Created or Running
 
-After you have successfully deployed the {product-name} Platform to your cluster, login to the {product-name} console at `https://neuvector-route-webui-neuvector.(OC_INGRESS)`. 
+After you have successfully deployed the {product-name} Platform to your cluster, login to the {product-name} console at `+https://neuvector-route-webui-neuvector.(OC_INGRESS)+`. 
 * Login with the initial username admin and password admin. 
 * Accept the {product-name} end user license agreement. 
 * Change the password of the admin user. Optionally, you can also create additional users in the Settings -> Users & Roles menu. Now you are ready to navigate the {product-name} console to start vulnerability scanning, observe running application pods, and apply security protections to containers.
@@ -195,7 +195,7 @@ spec:
 ** Select the neuvector-default instance 
 ** Open the Resources tab 
 ** Verify that resources are in status Created or Running
-. After you have successfully deployed the {product-name} Platform to your cluster, login to the {product-name} console at `https://neuvector-route-webui-neuvector.(INGRESS_DOMAIN)`. 
+. After you have successfully deployed the {product-name} Platform to your cluster, login to the {product-name} console at `+https://neuvector-route-webui-neuvector.(INGRESS_DOMAIN)+`. 
 ** Login with the initial username admin and password admin. 
 ** Accept the {product-name} end user license agreement. 
 ** Change the password of the admin user. 
