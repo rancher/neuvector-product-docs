@@ -25,7 +25,7 @@ First, go to Jenkins in your browser to search for the {product-name} plug-in. T
 
 -> Manage Jenkins -> Manage Plugins -> Available -> filter -> search `{product-name} Vulnerability Scanner` ->
 
-Select it and click `install without restart.'
+Select it and click `install without restart.`
 
 Deploy the {product-name} Controller and Scanner container if you haven't already done so on a host reachable by the Jenkins server. This can be on the same server as Jenkins if desired. Make a note of the IP address of the host where the Controller is running. Note: The default REST API port is 10443. This port must be exposed through the Allinone or Controller through a service in Kubernetes or a port map (e.g. - 10443:10443) in the Docker run or compose file.
 
@@ -128,6 +128,114 @@ Add your own pre- and post- image scan stages, for example in the Pipeline stage
 image:jenkins7a.png[stages]
 
 You are now ready to start your Jenkins builds and trigger the {product-name} Vulnerability Scanner to report any vulnerabilities!
+
+=== Setting Up the Pipeline to Build Large Scale Parallel Scans
+
+Available with NeuVector v5.4.3 and later, the NeuVector Vulnerability Scanner Jenkins plugin v2.5 and later supports the parallel scanning of up to 2000 concurrent scans when using the API key mode. For earlier versions of NeuVector, the maximum concurrent scans are limited to 32 with the use of Token mode. Click to expand and view the examples below for sample pipeline configurations.
+
+.Using Token Mode Sample Configuration (plugin v2.4 and below, or v2.5 and later) 
+[%collapsible]
+====
+[,groovy]
+----
+pipeline {
+    agent any
+    environment {
+        REPO_NAME = 'your repo'
+        REGISTRY_SELECTION = 'your registry'
+        CONTROLLER = 'your controller'
+        MAX_CONCURRENT_SCANS = 32
+    }
+    stages {
+        stage('Parallel Vulnerability Scanning') {
+            steps {
+                script {
+                    // There is a limit of 250 tags per list (by Jenkins) 
+                    TAGS_LIST_PART1 = ["your tags"...]
+                    TAGS_LIST_PART2 = ["your tags"...]
+                    TAGS_LIST_PART3 = ["your tags"...]
+                    TAGS_LIST_PART4 = ["your tags"...]
+                    TAGS_LIST_PART5 = ["your tags"...]...
+                    def allTags = TAGS_LIST_PART1 + TAGS_LIST_PART2 + TAGS_LIST_PART3 + TAGS_LIST_PART4 + TAGS_LIST_PART5
+                    def batches = allTags.collate(MAX_CONCURRENT_SCANS.toInteger()) // Ensure MAX_CONCURRENT_SCANS is an integer
+                    def batchCounter = 1                    for (batch in batches) {
+                        stage("Batch ${batchCounter}") {
+                            def scans = [:]
+                            batch.each { tag ->
+                                def currentTag = tag
+                                scans["Scan ${currentTag}"] = {
+                                    stage("Scan ${currentTag}") {
+                                        neuvector(
+                                            controllerEndpointUrlSelection: CONTROLLER,
+                                            registrySelection: REGISTRY_SELECTION,
+                                            repository: REPO_NAME,
+                                            scanTimeout: 20,
+                                            tag: "${currentTag}"
+                                        )
+                                        echo "Scan for tag ${currentTag} complete"
+                                    }
+                                }
+                            }
+                            parallel scans
+                        }
+                        batchCounter++
+                    }
+                }
+            }
+        }
+    }
+}
+----
+====
+
+.Using API Key Mode (plugin v2.5 and later)
+[%collapsible]
+====
+[,groovy]
+----
+pipeline {
+    agent any
+    environment {
+        REPO_NAME = 'your repo'
+        REGISTRY_SELECTION = 'your registry'
+        CONTROLLER = 'your controller'
+    }
+    stages {
+        stage('Parallel Vulnerability Scanning') {
+            steps {
+                script {
+                    // There is a limit of 250 tags per list (by Jenkins) 
+                    TAGS_LIST_PART1 = ["your tags"...]
+                    TAGS_LIST_PART2 = ["your tags"...]
+                    TAGS_LIST_PART3 = ["your tags"...]
+                    TAGS_LIST_PART4 = ["your tags"...]
+                    TAGS_LIST_PART5 = ["your tags"...]...
+                    def allTags = TAGS_LIST_PART1 + TAGS_LIST_PART2 + TAGS_LIST_PART3 + TAGS_LIST_PART4 + TAGS_LIST_PART5
+                    def scans = [:]
+                    
+                    allTags.each { tag ->
+                        def currentTag = tag
+                        scans["Scan ${currentTag}"] = {
+                            stage("Scan ${currentTag}") {
+                                neuvector(
+                                    controllerEndpointUrlSelection: CONTROLLER,
+                                    registrySelection: REGISTRY_SELECTION,
+                                    repository: REPO_NAME,
+                                    scanTimeout: 20,
+                                    tag: "${currentTag}"
+                                )
+                                echo "Scan for tag ${currentTag} complete"
+                            }
+                        }
+                    }
+                    parallel scans
+                }
+            }
+        }
+    }
+}
+----
+====
 
 == OpenShift Route and Registry Token Example
 

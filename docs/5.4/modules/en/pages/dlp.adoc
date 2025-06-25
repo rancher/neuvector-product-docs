@@ -67,6 +67,44 @@ istio\_(\w){5}
 
 *_Sensors must be applied to a Group to become effective._*
 
+=== Configuring Federated DLP and WAF Sensors
+
+This is the general process for configuring a federated DLP or WAF sensor:
+
+. Define and test the federated DLP/WAF sensor(s), which is the set of regular expressions used to match the header, URL, or entire packet in the **Primary cluster -> Federated Policy ->  DLP Sensors or WAF Sensors** tab.
+. Apply the desired sensor to a custom federated Group in the **Federated Policy -> Groups** tab.
+. Check that the federated DLP/WAF sensor(s) are synced to the Managed cluster and work as expected.
+
+==== Example
+
+Define a federated DLP/WAF sensor(s) in a Primary cluster and then apply it to a custom federated Group, and then check that those sensors are applied to all Managed clusters.
+
+Steps:
+
+. Define the federated DLP/WAF sensor(s) in the Primary cluster in the relevant **DLP Sensors** or **WAF Sensors** tab:
++
+image:federated_1.png[Federated WAF]
++
+image:federated_2.png[Federated DLP]
+
+. Apply the federated DLP/WAF sensor(s) to a custom federated Group in the **Federated Policy -> Groups** tab:
++
+image:federated_3.png[Custom Federated Group]
+
+. Check that the federated DLP/WAF sensor(s) are synced to the Managed clusters:
++
+image:federated_4.png[Federated WAF]
++
+image:federated_5.png[Federated DLP]
+
+. In the Managed clusters, containers send out traffic which match the federated DLP/WAF sensor(s) pattern:
++
+image:federated_6.png[Federated Container Traffic]
+
+. After Step 4, DLP/WAF "Security Events" notifications are generated:
++
+image:federated_7.png[DLP/WAF Security Notification Generation]
+
 === Applying DLP/WAF Sensors to Container Groups
 
 To activate a DLP or WAF sensor, go to Policy -> Groups to select the group desired. Enable DLP/WAF for the Group and add the sensor(s).
