@@ -1,6 +1,6 @@
 = Sensitive Information Exposure in NeuVector Manager Container Logs
-// :page-opendocs-origin: not sure
-// :page-opendocs-slug: not sure
+:page-opendocs-origin: /16.security_advisories/16.security_advisories.md
+:page-opendocs-slug:  /security_advisories/security_advisories/Exposure-ManagerContainerLogs
 
 *CVE ID:* CVE-2025-46808  
 *CVSS Score:* 6.8 — https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:N/AC:L/PR:L/UI:R/S:C/C:H/I:N/A:N&version=3.1[AV:N/AC:L/PR:L/UI:R/S:C/C:H/I:N/A:N]  
@@ -36,7 +36,7 @@ A vulnerability has been identified in NeuVector versions up to and including `5
 |`token1.token`
 |NeuVector user’s session token
 |Response body
-|GET request to `https://<neuvector-ui-url>/user?name=<username>`
+|GET request to `+https://<neuvector-ui-url>/user?name=<username>+`
 |NeuVector
 
 |`rekor_public_key`, `root_cert`, `sct_public_key`
