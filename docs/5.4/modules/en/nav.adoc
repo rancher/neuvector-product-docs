@@ -91,3 +91,9 @@
 ** xref:5x.adoc[5.x Release Notes]
 ** xref:4x.adoc[4.x Release Notes]
 ** xref:other.adoc[Integrations & Other Components]
+* UI Extension
+** xref:dashboard.adoc[5.x Dashboard]
+** xref:runtime_security.adoc[5.x Runtime Security]
+** xref:notifications.adoc[5.x Notifications]
+* Security Advisories and CVEs
+** xref:exposure-managercontainerlogs.adoc[Sensitive Information Exposure in NeuVector Manager Container Logs]
