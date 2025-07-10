@@ -1,0 +1,86 @@
+= Sensitive Information Exposure in NeuVector Manager Container Logs
+:page-opendocs-origin: /16.security_advisories/16.security_advisories.md
+:page-opendocs-slug:  /security_advisories/security_advisories/Exposure-ManagerContainerLogs
+
+*CVE ID:* CVE-2025-46808  
+*CVSS Score:* 6.8 — https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:N/AC:L/PR:L/UI:R/S:C/C:H/I:N/A:N&version=3.1[AV:N/AC:L/PR:L/UI:R/S:C/C:H/I:N/A:N]  
+*CWE:* https://cwe.mitre.org/data/definitions/532[CWE-532: Insertion of Sensitive Information into Log File]
+
+== Affected Versions
+
+* All versions earlier than `5.0.0`
+* Versions from `5.0.0` up to and including `5.4.4`
+
+*Fixed version: `5.4.5`*
+
+== Impact
+
+A vulnerability has been identified in NeuVector versions up to and including `5.4.4`, where sensitive information is leaked into the manager container’s log. The following fields may be exposed:
+
+[cols="1,2,2,2,2", options="header"]
+|===
+|Field |Field Description |Where it Appears |Reproduction |Environment
+
+|`X-R-Sess`
+|Rancher’s session token for single sign-on
+|Request header
+|Log in via Rancher UI and access NeuVector SSO
+|Rancher with NeuVector SSO
+
+|`personal_access_token`
+|GitHub / Azure DevOps token
+|Request body
+|Submit remote repository config under *Configuration > Settings*
+|NeuVector
+
+|`token1.token`
+|NeuVector user’s session token
+|Response body
+|GET request to `+https://<neuvector-ui-url>/user?name=<username>+`
+|NeuVector
+
+|`rekor_public_key`, `root_cert`, `sct_public_key`
+|Rekor public key, Root certificate, SCT public key in private root of trust
+|Request body
+|Create/update private root of trust in Sigstore page
+|NeuVector
+
+|`public_key`
+|Verifier’s public key
+|Request body
+|Create/update verifier in Sigstore page
+|NeuVector
+|===
+
+[NOTE]
+====
+NeuVector installations that do not use Rancher SSO or Remote Repository Configuration are *not affected* by this issue.
+====
+
+In the patched version, the `X-R-Sess` value is partially masked for safety. Other fields such as `personal_access_token`, `token`, `rekor_public_key`, `root_cert`, `sct_public_key`, and `public_key` are no longer logged, as request body logging was removed.
+
+[NOTE]
+====
+* The severity of this vulnerability depends on your logging strategy:
+  ** *Local logging (default):* Limits impact exposure.
+  ** *External logging:* Increases risk, depending on your external log collector's security posture.
+* Impact severity may also depend on the permissions of the exposed credentials.
+
+See also: https://attack.mitre.org/techniques/T1552/[MITRE Technique T1552: Unsecured Credentials].
+====
+
+== Patches
+
+Patched versions include `5.4.5` and above. Users should rotate any GitHub token used in Remote Repository Configuration after upgrading.
+
+== Workarounds
+
+No workarounds are currently available. Upgrade to the fixed version as soon as possible.
+
+== Questions and Support
+
+* Contact the https://github.com/rancher/rancher/security/policy[SUSE Rancher Security team].
+* Open an issue in the https://github.com/neuvector/neuvector/issues/new/choose[NeuVector GitHub repository].
+* Review:
+  ** https://www.suse.com/suse-neuvector/support-matrix/all-supported-versions/neuvector-v-all-versions/[NeuVector Support Matrix]
+  ** https://www.suse.com/lifecycle/#suse-security[Product Support Lifecycle]
