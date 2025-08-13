@@ -1,4 +1,6 @@
 = Air Gapping {product-name}
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /02.deploying/09.airgap/09.airgap.md
 :page-opendocs-slug: /deploying/airgap
 

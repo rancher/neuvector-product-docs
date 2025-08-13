@@ -1,4 +1,6 @@
 = Mirantis Kubernetes Engine
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /13.special/02.docker/02.docker.md
 :page-opendocs-slug:  /special/docker
 

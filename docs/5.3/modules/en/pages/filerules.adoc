@@ -1,4 +1,6 @@
 = File Access Rules
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/07.filerules/07.filerules.md
 :page-opendocs-slug:  /policy/filerules
 

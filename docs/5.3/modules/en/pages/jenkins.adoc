@@ -1,4 +1,6 @@
 = Jenkins Details
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /06.scanning/03.build/01.jenkins/01.jenkins.md
 :page-opendocs-slug:  /scanning/build/jenkins
 

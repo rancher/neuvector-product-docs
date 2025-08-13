@@ -1,4 +1,6 @@
 = Harbor Pluggable Scanner Module
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /06.scanning/02.registry/01.harbor/01.harbor.md
 :page-opendocs-slug:  /scanning/registry/harbor
 

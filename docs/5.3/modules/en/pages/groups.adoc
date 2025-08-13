@@ -1,4 +1,6 @@
 = Groups
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/04.groups/04.groups.md
 :page-opendocs-slug:  /policy/groups
 

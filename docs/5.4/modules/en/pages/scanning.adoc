@@ -1,4 +1,6 @@
 = Scanning & Compliance
+:revdate: 2025-01-16
+:page-revdate: {revdate}
 :page-opendocs-origin: /06.scanning/01.scanning/01.scanning.md
 :page-opendocs-slug:  /scanning/scanning
 

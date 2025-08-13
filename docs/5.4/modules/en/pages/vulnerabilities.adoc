@@ -1,4 +1,6 @@
 = Vulnerability Management
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /06.scanning/01.scanning/01.vulnerabilities/01.vulnerabilities.md
 :page-opendocs-slug:  /scanning/scanning/vulnerabilities
 

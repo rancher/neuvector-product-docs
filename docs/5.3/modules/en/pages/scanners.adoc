@@ -1,4 +1,6 @@
 = Parallel & Standalone Scanners
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /06.scanning/06.scanners/06.scanners.md
 :page-opendocs-slug:  /scanning/scanners
 

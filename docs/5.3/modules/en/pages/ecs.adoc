@@ -1,4 +1,6 @@
 = Amazon ECS
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /02.deploying/09.ecs/09.ecs.md
 :page-opendocs-slug: /deploying/ecs
 

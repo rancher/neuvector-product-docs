@@ -1,4 +1,6 @@
 = Gitlab
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /06.scanning/03.build/05.gitlab/05.gitlab.md
 :page-opendocs-slug:  /scanning/build/gitlab
 

@@ -1,4 +1,6 @@
 = Evaluating and Testing {product-name}
+:revdate: 2025-05-08
+:page-revdate: {revdate}
 :page-opendocs-origin: /09.testing/01.testing/01.testing.md
 :page-opendocs-slug:  /testing/testing
 

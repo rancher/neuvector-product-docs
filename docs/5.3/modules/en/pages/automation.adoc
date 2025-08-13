@@ -1,4 +1,6 @@
 = REST API and Automation
+:revdate: 2025-05-08
+:page-revdate: {revdate}
 :page-opendocs-origin: /11.automation/02.automation/02.automation.md
 :page-opendocs-slug:  /automation/automation
 

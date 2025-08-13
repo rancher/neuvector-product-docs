@@ -1,4 +1,6 @@
 = CircleCI
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /06.scanning/03.build/03.circleci/03.circleci.md
 :page-opendocs-slug:  /scanning/build/circleci
 

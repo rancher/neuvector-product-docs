@@ -1,4 +1,6 @@
 = Vulnerability Scanning, Compliance Testing, and Admission Controls
+:revdate: 2024-09-25
+:page-revdate: {revdate}
 :page-opendocs-origin: /06.scanning/06.scanning.md
 :page-opendocs-slug:  /scanning
 

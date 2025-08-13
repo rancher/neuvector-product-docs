@@ -1,4 +1,6 @@
 = Bamboo
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /06.scanning/03.build/02.bamboo/02.bamboo.md
 :page-opendocs-slug:  /scanning/build/bamboo
 

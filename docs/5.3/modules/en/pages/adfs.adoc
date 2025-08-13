@@ -1,4 +1,6 @@
 = SAML (ADFS)
+:revdate: 2025-05-08
+:page-revdate: {revdate}
 :page-opendocs-origin: /08.integration/06.adfs/06.adfs.md
 :page-opendocs-slug:  /integration/adfs
 

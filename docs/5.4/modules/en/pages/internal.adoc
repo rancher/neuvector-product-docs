@@ -1,4 +1,6 @@
 = Replacing Internal Certificates
+:revdate: 2025-01-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /02.deploying/01.production/04.internal/04.internal.md
 :page-opendocs-slug: /deploying/production/internal
 

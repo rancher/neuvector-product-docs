@@ -1,4 +1,6 @@
 = Azure DevOps
+:revdate: 2025-05-08
+:page-revdate: {revdate}
 :page-opendocs-origin: /06.scanning/03.build/04.azuredevops/04.azuredevops.md
 :page-opendocs-slug:  /scanning/build/azuredevops
 

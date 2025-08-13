@@ -1,4 +1,6 @@
 = Splunk
+:revdate: 2025-05-08
+:page-revdate: {revdate}
 :page-opendocs-origin: /08.integration/11.splunk/11.splunk.md
 :page-opendocs-slug:  /integration/splunk
 

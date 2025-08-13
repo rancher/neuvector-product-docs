@@ -1,4 +1,6 @@
 = Troubleshooting
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /12.troubleshooting/01.troubleshooting/01.troubleshooting.md
 :page-opendocs-slug:  /troubleshooting/troubleshooting
 

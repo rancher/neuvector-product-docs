@@ -1,4 +1,6 @@
 = Docker & Mirantis Kubernetes Engine
+:revdate: 2025-01-10
+:page-revdate: {revdate}
 :page-opendocs-origin: /02.deploying/05.docker/05.docker.md
 :page-opendocs-slug: /deploying/docker
 

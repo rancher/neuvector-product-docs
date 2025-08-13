@@ -1,4 +1,6 @@
 = Deployment Examples for Special Deployments Using the Allinone Container
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /13.special/13.special.md
 :page-opendocs-slug:  /special
 

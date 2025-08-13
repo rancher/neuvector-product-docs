@@ -1,4 +1,6 @@
 = SAML (Okta)
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /08.integration/04.saml/04.saml.md
 :page-opendocs-slug:  /integration/saml
 

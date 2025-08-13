@@ -1,4 +1,6 @@
 = 5.x Overview
+:revdate: 2025-01-10
+:page-revdate: {revdate}
 :page-opendocs-origin: /01.basics/01.overview/01.overview.adoc
 :page-opendocs-slug: /basics/overview
 

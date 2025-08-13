@@ -1,4 +1,6 @@
 = ECR Scanning using IAM Roles
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /06.scanning/02.registry/02.ecr-iam/02.ecr-iam.md
 :page-opendocs-slug:  /scanning/registry/ecr-iam
 

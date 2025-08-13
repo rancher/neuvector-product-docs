@@ -1,4 +1,6 @@
 = 5.x Release Notes
+:revdate: 2025-02-19
+:page-revdate: {revdate}
 :page-opendocs-origin: /14.releasenotes/01.5x/01.5x.md
 :page-opendocs-slug:  /releasenotes/5x
 

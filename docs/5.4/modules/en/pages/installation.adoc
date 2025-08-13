@@ -1,4 +1,6 @@
 = Deployment Preparation
+:revdate: 2025-01-10
+:page-revdate: {revdate}
 :page-opendocs-origin: /01.basics/03.installation/01.native/01.native.md
 :page-opendocs-slug: /basics/installation
 

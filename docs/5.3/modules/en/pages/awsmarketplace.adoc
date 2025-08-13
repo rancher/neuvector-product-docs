@@ -1,4 +1,6 @@
 = AWS Marketplace Listing
+:revdate: 2025-05-13
+:page-revdate: {revdate}
 :page-opendocs-origin: /02.deploying/06.awsmarketplace/06.awsmarketplace.md
 :page-opendocs-slug: /deploying/awsmarketplace
 

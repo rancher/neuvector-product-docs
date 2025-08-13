@@ -1,4 +1,6 @@
 = LDAP
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /08.integration/02.ldap/02.ldap.md
 :page-opendocs-slug:  /integration/ldap
 

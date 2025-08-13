@@ -1,4 +1,6 @@
 = Modes: Discover, Monitor, Protect
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/02.modes/02.modes.md
 :page-opendocs-slug:  /policy/modes
 

@@ -1,4 +1,6 @@
 = Updating {product-name}
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /10.updating/01.updating/01.updating.md
 :page-opendocs-slug:  /updating/updating
 

@@ -1,4 +1,6 @@
 = Environment Variables Details
+:revdate: 2024-12-03
+:page-revdate: {revdate}
 :page-opendocs-origin: /02.deploying/01.production/03.details/03.details.md
 :page-opendocs-slug: /deploying/production/details
 

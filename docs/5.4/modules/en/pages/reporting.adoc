@@ -1,4 +1,6 @@
 = Reporting & Notifications
+:revdate: 2025-05-02
+:page-revdate: {revdate}
 :page-opendocs-origin: /07.reporting/01.reporting/01.reporting.md
 :page-opendocs-slug:  /reporting/reporting
 
