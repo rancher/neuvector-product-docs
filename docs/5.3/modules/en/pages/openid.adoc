@@ -1,4 +1,6 @@
 = OpenID Connect Azure/Okta
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /08.integration/07.openid/07.openid.md
 :page-opendocs-slug:  /integration/openid
 

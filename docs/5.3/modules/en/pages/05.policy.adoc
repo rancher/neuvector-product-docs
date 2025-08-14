@@ -1,4 +1,6 @@
 = Security Policy & Rules
+:revdate: 2024-09-25
+:page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/05.policy.md
 :page-opendocs-slug:  /policy
 

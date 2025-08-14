@@ -1,4 +1,6 @@
 = Admission Controls
+:revdate: 2025-05-08
+:page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/03.admission/03.admission.md
 :page-opendocs-slug:  /policy/admission
 

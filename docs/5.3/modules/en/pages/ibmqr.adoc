@@ -1,4 +1,6 @@
 = IBM QRadar
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /08.integration/10.ibmqr/10.ibmqr.md
 :page-opendocs-slug:  /integration/ibmqr
 

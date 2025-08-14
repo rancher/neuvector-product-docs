@@ -1,4 +1,6 @@
 = Importing CRD from Console
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/13.usingcrd/1.import/1.import.md
 :page-opendocs-slug:  /policy/usingcrd/import
 

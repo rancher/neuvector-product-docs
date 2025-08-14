@@ -1,4 +1,6 @@
 = System Requirements
+:revdate: 2025-06-02
+:page-revdate: {revdate}
 :page-opendocs-origin: /01.basics/02.requirements/02.requirements.md
 :page-opendocs-slug: /basics/requirements
 

@@ -1,4 +1,6 @@
 = Configuration Assessment for Kubernetes Resources
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/03.admission/02.assessment/02.assessment.md
 :page-opendocs-slug:  /policy/admission/assessment
 

@@ -1,4 +1,6 @@
 = CRD - Custom Resource Definitions
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/13.usingcrd/13.usingcrd.md
 :page-opendocs-slug:  /policy/usingcrd
 

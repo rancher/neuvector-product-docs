@@ -1,4 +1,6 @@
 = Custom Login, Header and Footer
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /03.configuration/03.customui/03.customui.md
 :page-opendocs-slug: /configuration/customui
 

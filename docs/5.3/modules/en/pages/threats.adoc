@@ -1,4 +1,6 @@
 = Network Threat Signatures
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/10.threats/10.threats.md
 :page-opendocs-slug:  /policy/threats
 

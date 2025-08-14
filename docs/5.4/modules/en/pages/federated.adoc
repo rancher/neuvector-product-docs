@@ -1,4 +1,6 @@
 = Federated Policy
+:revdate: 2024-09-25
+:page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/12.federated/12.federated.md
 :page-opendocs-slug:  /policy/federated
 

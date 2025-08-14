@@ -1,4 +1,6 @@
 = Microsoft AD
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /08.integration/03.msad/03.msad.md
 :page-opendocs-slug:  /integration/msad
 

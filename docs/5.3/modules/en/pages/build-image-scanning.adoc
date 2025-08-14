@@ -1,4 +1,6 @@
 = Build Phase Image Scanning
+:revdate: 2025-01-10
+:page-revdate: {revdate}
 :page-opendocs-origin: /06.scanning/03.build/03.build.md
 :page-opendocs-slug:  /scanning/build
 

@@ -1,4 +1,6 @@
 = Connect to Manager, REST API server
+:revdate: 2025-05-08
+:page-revdate: {revdate}
 :page-opendocs-origin: /03.configuration/01.console/01.console.md
 :page-opendocs-slug: /configuration/console
 

@@ -1,4 +1,6 @@
 = {product-name} Workflow
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /11.automation/01.ci_workflow/01.ci_workflow.md
 :page-opendocs-slug:  /automation/ci_workflow
 

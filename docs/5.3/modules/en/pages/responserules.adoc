@@ -1,4 +1,6 @@
 = Response Rules
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/08.responserules/08.responserules.md
 :page-opendocs-slug:  /policy/responserules
 

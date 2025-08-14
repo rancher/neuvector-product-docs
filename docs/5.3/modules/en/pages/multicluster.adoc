@@ -1,4 +1,6 @@
 = Enterprise Multi-Cluster Management
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /04.navigation/02.multicluster/02.multicluster.md
 :page-opendocs-slug:  /navigation/multicluster
 

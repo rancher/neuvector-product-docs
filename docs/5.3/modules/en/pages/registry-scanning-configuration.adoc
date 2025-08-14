@@ -1,4 +1,6 @@
 = Registry Scanning Configuration
+:revdate: 2025-05-08
+:page-revdate: {revdate}
 :page-opendocs-origin: /06.scanning/02.registry/02.registry.md
 :page-opendocs-slug:  /scanning/registry
 

@@ -1,4 +1,6 @@
 = GCR Scanning using Service Accounts
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /06.scanning/02.registry/03.gcr-sa/03.gcr-sa.md
 :page-opendocs-slug:  /scanning/registry/gcr-sa
 

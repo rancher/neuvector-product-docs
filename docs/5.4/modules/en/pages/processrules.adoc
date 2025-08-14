@@ -1,4 +1,6 @@
 = Process Profile Rules
+:revdate: 2025-03-31
+:page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/06.processrules/06.processrules.md
 :page-opendocs-slug:  /policy/processrules
 

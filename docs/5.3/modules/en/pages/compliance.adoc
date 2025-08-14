@@ -1,4 +1,6 @@
 = Compliance & CIS Benchmarks
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /06.scanning/01.scanning/02.compliance/02.compliance.md
 :page-opendocs-slug:  /scanning/scanning/compliance
 

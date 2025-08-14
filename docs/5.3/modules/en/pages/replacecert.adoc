@@ -1,4 +1,6 @@
 = Replacing Self-Signed Certificate
+:revdate: 2024-09-27
+:page-revdate: {revdate}
 :page-opendocs-origin: /03.configuration/01.console/01.replacecert/01.replacecert.md
 :page-opendocs-slug: /configuration/console/replacecert
 

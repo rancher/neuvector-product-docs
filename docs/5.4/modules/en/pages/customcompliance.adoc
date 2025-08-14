@@ -1,4 +1,6 @@
 = Custom Compliance Checks
+:revdate: 2024-09-25
+:page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/11.customcompliance/11.customcompliance.md
 :page-opendocs-slug:  /policy/customcompliance
 
