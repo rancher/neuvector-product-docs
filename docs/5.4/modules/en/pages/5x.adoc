@@ -1,5 +1,5 @@
 = 5.x Release Notes
-:revdate: 2025-05-23
+:revdate: 2025-08-26
 :page-revdate: {revdate}
 :page-opendocs-origin: /14.releasenotes/01.5x/01.5x.md
 :page-opendocs-slug:  /releasenotes/5x
@@ -10,6 +10,31 @@
 ====
 To receive email notifications of new releases, please subscribe to this SUSE mailing list: https://lists.suse.com/mailman/listinfo/neuvector-updates
 ====
+
+=== 5.4.6 August 2025
+
+==== New Features:
+
+* *NVSHAS-6733*: Export response rules as CRD.
+* *NVSHAS-9899*: NeuVector Process Profile Alerts for Java Services contain sensitive data.
+* *NVSHAS-9990*: Adopt new hash algorithm for user passwords.
+* *NVSHAS-9968*: Support setting default admin account's default password.
+
+==== Bugs Fixed
+
+* *NVSHAS-10062*: Manager not showing ERROR when failing to create admin password during 1st login.
+* *NVSHAS-10041*: Federation operation failed "invalid data" when configuring federation through ConfigMap.
+* *NVSHAS-10018*: Neuvector is not scanning all images in GitLab Registry.
+* *NVSHAS-10017*: False Positive Security Alert related to allowed process.
+* *NVSHAS-10001*: Protect/Monitor enforcements "linger" after group deletion.
+* *NVSHAS-9985*:	NeuVector (Fed Master) creates a problem for all requests coming from outside.
+* *NVSHAS-9981*:	Security Event is triggered whenever a new "Process Profile Rule" is added or changed in a group.
+
+==== Security Advisories:
+
+* https://github.com/neuvector/neuvector/security/advisories/GHSA-8pxw-9c75-6w56[Admin account has insecure default password]
+* https://github.com/neuvector/neuvector/security/advisories/GHSA-8ff6-pc43-jwv3[Insecure password management vulnerable to rainbow attacks]
+* https://github.com/neuvector/neuvector/security/advisories/GHSA-w54x-xfxg-4gxq[Process with sensitive arguments lead to leakage]
 
 === 5.4.5 July 2025
 
