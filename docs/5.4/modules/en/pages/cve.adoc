@@ -24,6 +24,12 @@ NeuVector is committed to informing the community of security issues. Below is a
 | 25 Aug 2025 
 | https://github.com/neuvector/neuvector/releases/tag/v5.4.6[NeuVector v5.4.6]
 
+
+| CVE-2025-46808
+| Sensitive information may be logged in the manager container depending on logging configuration and credential permissions. For more information, refer to <<sensitive-information-exposure-in-neuvector-manager-container-logs>>
+| 09 Jul 2025
+| https://github.com/neuvector/neuvector/releases/tag/v5.4.5[NeuVector v5.4.5]
+
 |===
 
 == Sensitive Information Exposure in NeuVector Manager Container Logs
@@ -80,7 +86,7 @@ A vulnerability has been identified in NeuVector versions up to and including `5
 
 [NOTE]
 ====
-NeuVector installations that do not use Rancher SSO or Remote Repository Configuration are *not affected* by this issue.
+NeuVector installations that have single sign-on integration with Rancher Manager and the Remote Repository Configuration disabled are *not affected* by this issue.
 ====
 
 In the patched version, the `X-R-Sess` value is partially masked for safety. Other fields such as `personal_access_token`, `token`, `rekor_public_key`, `root_cert`, `sct_public_key`, and `public_key` are no longer logged, as request body logging was removed.
@@ -88,12 +94,13 @@ In the patched version, the `X-R-Sess` value is partially masked for safety. Oth
 [NOTE]
 ====
 * The severity of this vulnerability depends on your logging strategy:
-  ** *Local logging (default):* Limits impact exposure.
-  ** *External logging:* Increases risk, depending on your external log collector's security posture.
+** *Local logging (default):* Limits impact exposure.
+** *External logging:* Increases risk, depending on your external log collector's security posture.
 * Impact severity may also depend on the permissions of the exposed credentials.
+====
 
 See also: https://attack.mitre.org/techniques/T1552/[MITRE Technique T1552: Unsecured Credentials].
-====
+
 
 === Patches
 
@@ -108,5 +115,5 @@ No workarounds are currently available. Upgrade to the fixed version as soon as 
 * Contact the https://github.com/rancher/rancher/security/policy[SUSE Rancher Security team].
 * Open an issue in the https://github.com/neuvector/neuvector/issues/new/choose[NeuVector GitHub repository].
 * References:
-  ** https://www.suse.com/suse-neuvector/support-matrix/all-supported-versions/neuvector-v-all-versions/[NeuVector Support Matrix]
-  ** https://www.suse.com/lifecycle/#suse-security[Product Support Lifecycle]
+** https://www.suse.com/suse-neuvector/support-matrix/all-supported-versions/neuvector-v-all-versions/[NeuVector Support Matrix]
+** https://www.suse.com/lifecycle/#suse-security[Product Support Lifecycle]
