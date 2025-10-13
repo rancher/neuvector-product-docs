@@ -56,8 +56,8 @@ NeuVector is committed to informing the community of security issues. Below is a
 | https://github.com/neuvector/neuvector/releases/tag/v5.4.1[NeuVector v5.4.1]
 |===
 
-== Sensitive information exposure in NeuVector manager container logs
 [[sensitive-information-exposure-in-neuvector-manager-container-logs]]
+== Sensitive information exposure in NeuVector manager container logs
 **CVE ID:** CVE-2025-46808  
 **CVSS Score:** 6.8- https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:N/AC:L/PR:L/UI:R/S:C/C:H/I:N/A:N&version=3.1[AV:N/AC:L/PR:L/UI:R/S:C/C:H/I:N/A:N]  
 **CWE:** https://cwe.mitre.org/data/definitions/532[CWE-532: Insertion of Sensitive Information into Log File]  
