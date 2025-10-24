@@ -11,6 +11,37 @@
 To receive email notifications of new releases, please subscribe to this SUSE mailing list: https://lists.suse.com/mailman/listinfo/neuvector-updates
 ====
 
+== NeuVector v5.4.7 (October 2025)
+
+=== New Features
+
+* *NVSHAS-10085*: Added a configuration setting in the UI that allows groups to switch between least privileged and more privileged modes.
+* *NVSHAS-10084*: Moved admission control–related CRD structs in `nvsecurityrule_def.go` from `resource/` to `api/` to resolve a dependency issue when building `neuvector-kubewarden-policy-converter`.
+* *NVSHAS-10073*: Added a new field for exported admission control rules in the YAML file.
+* *NVSHAS-10067*: Added CLI support for a new configuration setting that allows namespace users to export.
+* *NVSHAS-10065*: Added a configuration setting in the UI that allows namespace users to export.
+* *NVSHAS-9918*: Added the ability to control policy restriction mode.
+
+=== Bugs Fixed
+
+* *NVSHAS-10080*: Fixed an issue where users couldn’t create a federal response rule for admission events.
+* *NVSHAS-10077*: Removed an unexpected checkbox for admission control export.
+* *NVSHAS-10071*: Fixed missing process rule in the enforcer pod.
+* *NVSHAS-10070*: Fixed an issue where creating multiple response rules failed on some clusters.
+* *NVSHAS-10066*: Fixed an issue where the bootstrap helper link didn’t appear after the first login when accessing the UI directly in a Rancher deployment.
+* *NVSHAS-10054*: Updated logic to avoid resetting the Kubernetes `ValidatingWebhookConfiguration` repeatedly and prevent infinite update loops.
+* *NVSHAS-10049*: Follow-up fix for the NeuVector scan JFrog Subdomain mode issue.
+* *NVSHAS-10006*: Fixed an issue where group export was empty for namespace users.
+* *NVSHAS-9761*: Fixed a Harbor registry scan error when using an S3 storage backend.
+
+=== References
+
+* https://github.com/neuvector/neuvector/security/advisories/GHSA-h773-7gf7-9m2x[Removal of hard-coded encryption key]
+* https://github.com/neuvector/neuvector/security/advisories/GHSA-qqj3-g7mx-5p4w[Enforce TLS verification for requests to the Telemetry server]
+* https://github.com/neuvector/neuvector/security/advisories/GHSA-c8g6-qrwh-m3vp[Check Consul ports for the Enforcer]
+
+Refer to the xref:cve.adoc[Security Advisories and CVEs] documentation for more information.
+
 === 5.4.6 August 2025
 
 ==== New Features

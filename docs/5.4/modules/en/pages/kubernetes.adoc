@@ -133,7 +133,7 @@ kubectl delete clusterrole neuvector-binding-nvsecurityrules neuvector-binding-n
 Versions prior to 5.2.0::
 +
 ====
-[,shell]
+[source,shell]
 ----
 kubectl delete clusterrolebinding neuvector-binding-app neuvector-binding-rbac neuvector-binding-admission neuvector-binding-customresourcedefinition neuvector-binding-nvsecurityrules neuvector-binding-view neuvector-binding-nvwafsecurityrules neuvector-binding-nvadmissioncontrolsecurityrules neuvector-binding-nvdlpsecurityrules
 kubectl delete rolebinding neuvector-admin -n neuvector 
@@ -143,7 +143,7 @@ kubectl delete rolebinding neuvector-admin -n neuvector
 
 Apply the read permissions via the following "create clusterrole" commands: 
 
-[,shell]
+[source,shell]
 ----
 kubectl create clusterrole neuvector-binding-app --verb=get,list,watch,update --resource=nodes,pods,services,namespaces
 kubectl create clusterrole neuvector-binding-rbac --verb=get,list,watch --resource=rolebindings.rbac.authorization.k8s.io,roles.rbac.authorization.k8s.io,clusterrolebindings.rbac.authorization.k8s.io,clusterroles.rbac.authorization.k8s.io
@@ -188,14 +188,14 @@ kubectl create clusterrolebinding neuvector-binding-nvresponserulesecurityrules 
 . Run the following commands to check if the neuvector/controller and neuvector/updater service accounts are added successfully. 
 +
 --
-[,shell]
+[source,shell]
 ----
 kubectl get ClusterRoleBinding neuvector-binding-app neuvector-binding-rbac neuvector-binding-admission neuvector-binding-customresourcedefinition neuvector-binding-nvsecurityrules neuvector-binding-view neuvector-binding-nvwafsecurityrules neuvector-binding-nvadmissioncontrolsecurityrules neuvector-binding-nvdlpsecurityrules neuvector-binding-nvgroupdefinitions neuvector-binding-nvresponserulesecurityrules -o wide
 ----
 
 Sample output: 
 
-[,shell]
+[source,shell]
 ----
 NAME                                                ROLE                                                            AGE   USERS   GROUPS   SERVICEACCOUNTS
 neuvector-binding-app                               ClusterRole/neuvector-binding-app                               66d                    neuvector/controller
