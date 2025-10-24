@@ -90,8 +90,6 @@ kubectl label namespace neuvector "pod-security.kubernetes.io/enforce=privileged
 [NOTE]
 ====
 If you are upgrading to version `5.4.6` using YAML, you must deploy the `responserules-crd-k8s.yaml` file. If you are using Helm charts, this step is handled automatically and no action is required.
-
-
 ====
 +
 --
@@ -181,6 +179,8 @@ kubectl create rolebinding neuvector-binding-job-creation --role=neuvector-bindi
 kubectl create rolebinding neuvector-binding-lease --role=neuvector-binding-lease --serviceaccount=neuvector:controller --serviceaccount=neuvector:cert-upgrader -n neuvector
 kubectl create clusterrole neuvector-binding-nvgroupdefinitions --verb=list,get,delete --resource=nvgroupdefinitions
 kubectl create clusterrolebinding neuvector-binding-nvgroupdefinitions --clusterrole=neuvector-binding-nvgroupdefinitions --serviceaccount=neuvector:controller
+kubectl create role neuvector-binding-secret-controller --verb=create,patch,update --resource=secrets -n neuvector
+kubectl create rolebinding neuvector-binding-secret-controller --role=neuvector-binding-secret-controller --serviceaccount=neuvector:controller --serviceaccount=neuvector:default -n neuvector
 kubectl create clusterrole neuvector-binding-nvresponserulesecurityrules --verb=get,list,delete --resource=nvresponserulesecurityrules
 kubectl create clusterrolebinding neuvector-binding-nvresponserulesecurityrules --clusterrole=neuvector-binding-nvresponserulesecurityrules --serviceaccount=neuvector:controller
 ----
