@@ -144,7 +144,7 @@ If the controller lacks RBAC permissions to access the Kubernetes secret, it log
 and exits.
 
 Device encryption keys rotate every 3 months. For more details, see:  
-xref:./certrotate.adoc#rotating-sensitive-field-in-configuration[Rotating sensitive field in configuration].
+xref:certrotate.adoc#_rotating_sensitive_field_in_configuration[Rotating sensitive field in configuration].
 
 === Patches
 
