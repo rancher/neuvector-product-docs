@@ -31,7 +31,7 @@ NeuVector is committed to informing the community about security issues. The fol
 | https://github.com/neuvector/neuvector/releases/tag/v5.4.6[NeuVector v5.4.6]
 
 | https://github.com/neuvector/manager/security/advisories/GHSA-fggw-hv56-8m6r[CVE-2025-46808]
-| Sensitive information may be logged in the manager container depending on logging configuration and credential permissions. For details, see <<sensitive-information-exposure-in-neuvector-manager-container-logs>>.
+| Sensitive information may be logged in the manager container depending on logging configuration and credential permissions.
 | 09 Jul 2025
 | https://github.com/neuvector/neuvector/releases/tag/v5.4.5[NeuVector v5.4.5]
 
