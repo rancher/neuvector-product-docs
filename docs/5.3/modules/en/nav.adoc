@@ -24,6 +24,7 @@
 ** xref:remove.adoc[Removing or Resetting {product-name}]
 ** xref:internal.adoc[Replacing Internal Certificates]
 ** xref:replacecert.adoc[Replacing Self-Signed Certificates]
+** xref:certrotate.adoc[Rotating Internal self signed certificate]
 ** xref:rest-api.adoc[Connect to Manager, REST API Server]
 ** xref:automation.adoc[Automation with REST API]
 * {product-name} Interface
