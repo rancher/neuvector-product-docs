@@ -11,33 +11,33 @@ To enable auto-rotation, ```internal.autoRotateCert``` has to be set to ```true`
 
 1. When all containers start running, controller's init containers will run and create an upgrader job.
 +
-image:../images/cert_rotate_01.png[certrotate]
+image:cert_rotate_01.png[certrotate]
 +
 2. The upgrader will run and initialize new internal secret. In the mean time, components are waiting for the secret being initialized.   
 +
-image:../images/cert_rotate_02.png[certrotate]
+image:cert_rotate_02.png[certrotate]
 +
 3. After internal secret is initialized, all components read the secret and go through the normal flow.
 +
-image:../images/cert_rotate_03.png[certrotate]
+image:cert_rotate_03.png[certrotate]
 
 === Upgrade
 
 1. Old deployment is already running.
 +
-image:../images/cert_rotate_04.png[certrotate]
+image:cert_rotate_04.png[certrotate]
 +
 2. After running helm upgrade, rolling update will start. Controller's init container will create an upgrader job.
 +
-image:../images/cert_rotate_05.png[certrotate]
+image:cert_rotate_05.png[certrotate]
 +
 3. The upgrader job will wait until rolling update completes.
 +
-image:../images/cert_rotate_06.png[certrotate]
+image:cert_rotate_06.png[certrotate]
 +
 4. Then, upgrader will update internal certificates. Each component will read the updated certificate via k8s Secret
 +
-image:../images/cert_rotate_07.png[certrotate]
+image:cert_rotate_07.png[certrotate]
 
 If `internal.autoRotateCert` is false, the upgrader job will still start but no actions will be performed. The original behavior will be followed, i.e., no init containers and the built-in certificates will still be used in all cases.
 
