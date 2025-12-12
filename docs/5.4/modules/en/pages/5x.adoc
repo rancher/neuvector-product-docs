@@ -11,6 +11,48 @@
 To receive email notifications of new releases, please subscribe to this SUSE mailing list: https://lists.suse.com/mailman/listinfo/neuvector-updates
 ====
 
+== 5.4.8 December 2025
+
+=== New Features
+
+* **NVSHAS-10186**: Return `file_path` after exporting to a remote repository successfully.
+* **NVSHAS-10168**: Add remote export option to the System Configurations page (Federation only).
+* **NVSHAS-10142**: Enable *Enforce TLS Verification* by default for new NeuVector deployments (6).
+* **NVSHAS-10068**: UI support for **Export**/**Import** buttons on all federation-related policy pages.
+* **NVSHAS-10026**: Allow creation of Federation rules through automation REST API only.
+* **NVSHAS-9300**: Helm chart: Manager-service and Controller-service now support customizable TCP ports.
+
+=== Bugs Fixed
+
+* **NVSHAS-10196**: Replace country flag images to avoid CVE-2025-66412 / GHSA-v4hv-rgfq-gp49.
+* **NVSHAS-10185**: Suggest adding "Fed" to exported file names when exporting federation policies to local or remote storage in the UI.
+* **NVSHAS-10180**: Container Scan fails to detect `package.json` related modules.
+* **NVSHAS-10174**: Controller incorrectly allows empty *Committer Name* and *Email* fields in Remote Repository Configuration POST requests.
+* **NVSHAS-10173**: UI: Newly created rules in federated DLP/WAF sensor pages cannot be edited.
+* **NVSHAS-10172**: UI: Incorrect floating message when deleting an in-use federated webhook.
+* **NVSHAS-10171**: UI: Unexpected behavior on the Federated Policy → Configuration page.
+* **NVSHAS-10169**: Federation: After webhook updates, the displayed record incorrectly shows the type as user-created.
+* **NVSHAS-10167**: UI: Incorrect response rules displayed after selecting a federated group.
+* **NVSHAS-10166**: UI: Incorrect floating message after importing federated configuration.
+* **NVSHAS-10165**: UI: Network policy mode and process profile mode should not appear in the export federated groups modal.
+* **NVSHAS-10164**: Groups: Hide selection checkbox on federated groups shown on the local groups page.
+* **NVSHAS-10163**: UI: *Export to Remote Repository* is missing from export options on all federated policy pages.
+* **NVSHAS-10162**: High CVEs found in NeuVector images.
+* **NVSHAS-10157**: Scan: Fixed version is empty for some images.
+* **NVSHAS-10156**: NeuVector Scanner does not report CVEs for the npm repository `tinymce`.
+* **NVSHAS-10154**: Only response rules without a group can be exported on the response rules page.
+* **NVSHAS-10151**: Incorrect payload for creating federated WAF sensor.
+* **NVSHAS-10140**: Unexpected checkbox displayed for DLP/WAF export.
+* **NVSHAS-10139**: Controller fails to initialize when Enforcer is not deployed.
+* **NVSHAS-10133**: Enforcer pods crash.
+* **NVSHAS-10128**: Controller does not initialize when disabling scanner using `cve.scanner.enabled=false`.
+* **NVSHAS-10116**: Controller logs repeated errors: “Watch failure – error…”.
+* **NVSHAS-10113**: UI: Issues with *View Federated Repositories* on Assets → Registries page.
+
+=== References
+
+* https://github.com/neuvector/neuvector/security/advisories/GHSA-4jj9-cgqc-x9h5[OpenID Connect is vulnerable to man-in-the-middle (MITM)]
+
 == NeuVector v5.4.7 (October 2025)
 
 === New Features

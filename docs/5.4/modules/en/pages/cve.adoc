@@ -10,6 +10,11 @@ NeuVector is committed to informing the community about security issues. The fol
 |===
 | ID | Description | Date | Resolution
 
+| https://github.com/neuvector/neuvector/security/advisories/GHSA-4jj9-cgqc-x9h5[CVE-2025-66001]
+| In the patched version, new NeuVector deployments enable TLS verification by default. For rolling upgrades, NeuVector does not change this setting automatically to avoid disruption.
+| 12 Dec 2025
+| https://github.com/neuvector/neuvector/releases/tag/v5.4.8[NeuVector v5.4.8]
+
 | https://github.com/neuvector/neuvector/security/advisories/GHSA-8pxw-9c75-6w56[CVE-2025-8077]
 | For NeuVector deployments on Kubernetes-based environments, the bootstrap password of the default admin user is now generated randomly and stored in a Kubernetes secret. The default admin must retrieve the bootstrap password from the secret and change it after the first successful UI login.
 | 25 Aug 2025
@@ -56,7 +61,160 @@ NeuVector is committed to informing the community about security issues. The fol
 | https://github.com/neuvector/neuvector/releases/tag/v5.4.1[NeuVector v5.4.1]
 |===
 
-[[sensitive-information-exposure-in-neuvector-manager-container-logs]]
+== OpenID Connect is vulnerable to MITM
+
+* **CVE ID:** https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H&version=3.1[CVE-2025-66001 (AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H)]
+* **CVSS Score:** 8.8
+
+=== Affected Versions
+
+* All versions earlier than `5.3.0`
+* Versions `5.3.0` through `5.4.7`
+
+*Fixed version:* `5.4.8`
+
+=== Impact
+
+NeuVector supports authentication using OpenID Connect. TLS verification, which validates the authenticity and integrity of the remote server, is not enforced by default. This can expose the system to man-in-the-middle (MITM) attacks.
+
+Beginning with version `5.4.0`, NeuVector supports TLS verification for:
+
+* Registry connections
+* Auth server connections (SAML, LDAP, and OIDC)
+* Webhook connections
+
+By default, TLS verification remains disabled. The setting is available under *Settings → Configuration* in the NeuVector UI.
+
+In the patched version, new NeuVector deployments enable TLS verification by default. Rolling upgrades do not modify existing configurations to prevent service disruption.
+
+[NOTE]
+====
+When TLS verification is enabled, it applies to:
+
+* Registry servers  
+* Auth servers (SAML, LDAP, and OIDC)  
+* Webhook servers  
+====
+
+=== Patches
+
+Patched versions include release `v5.4.8` and later.
+
+=== Workarounds
+
+To manually enable TLS verification:
+
+. Open the NeuVector UI.
+. Navigate to *Settings → Configuration*.
+. In **TLS Self-Signed Certificate Configuration**, select *Enable TLS verification*.
+. (Optional) Upload or paste the TLS self-signed certificate.
+
+== Questions and Support
+
+* Contact the SUSE Rancher Security team for security-related inquiries.
+* Open an issue in the NeuVector repository.
+* Review the support matrix and product support lifecycle.
+
+---
+
+== NeuVector is shipping cryptographic material into its binary
+
+* **CVE ID:** CVE-2025-54471  
+* **CVSS Score:** 6.5 – https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N&version=3.1[AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N]
+
+=== Affected Versions
+
+* All versions earlier than `5.3.0`
+* Versions `5.3.0` through `5.4.6`
+
+*Fixed version:* `5.4.7`
+
+=== Impact
+
+NeuVector previously used a hard-coded cryptographic key embedded in the source code. During compilation, this value was replaced with a static secret key used to encrypt sensitive configuration fields.
+
+In the patched release, NeuVector uses the Kubernetes secret `neuvector-store-secret` (in the `neuvector` namespace) to generate secure, dynamic encryption keys. This removes reliance on static keys and improves security by storing keys in Kubernetes-managed secrets.
+
+During rolling upgrades or when restoring from persistent storage, the NeuVector controller checks encrypted configuration fields. If a field is encrypted with the default fixed key, it is decrypted and re-encrypted using the new dynamic key.
+
+If the controller lacks RBAC permissions to access the Kubernetes secret, it logs:
+
+`Required Kubernetes RBAC for secrets are not found`
+
+and exits.
+
+Device encryption keys rotate every 3 months. For more details, see:  
+xref:../../03.configuration/01.console/03.certrotate/03.certrotate.adoc#rotating-sensitive-field-in-configuration[Rotating sensitive field in configuration].
+
+=== Patches
+
+Patched versions include release `v5.4.7` and later.
+
+=== Workarounds
+
+No workarounds are available. Upgrade to a patched version as soon as possible.
+
+== Questions and Support
+
+* Contact the https://github.com/rancher/rancher/security/policy[SUSE Rancher Security team].
+* Open an issue in the https://github.com/neuvector/neuvector/issues/new/choose[NeuVector GitHub repository].
+* References:
+  ** https://www.suse.com/suse-neuvector/support-matrix/all-supported-versions/neuvector-v-all-versions/[NeuVector Support Matrix]  
+  ** https://www.suse.com/lifecycle/#suse-security[Product Support Lifecycle]
+
+---
+
+== Telemetry sender is vulnerable to MITM and DoS
+
+* **CVE ID:** CVE-2025-54470  
+* **CVSS Score:** 8.6 – https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:H&version=3.1[AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:H]
+
+=== Affected Versions
+
+* All versions earlier than `5.3.0`
+* Versions `5.3.0` through `5.4.6`
+
+*Fixed versions:* `5.4.7`, `5.3.5`
+
+=== Impact
+
+This vulnerability affects NeuVector deployments only when **Report anonymous cluster data** is enabled. When active, NeuVector sends anonymous telemetry data to:
+
+`https://upgrades.neuvector-upgrade-responder.livestock.rancher.io`
+
+In affected versions, TLS certificate verification is not enforced, making telemetry communication vulnerable to MITM attacks. An attacker could intercept or modify the transmitted data.
+
+NeuVector also loaded the telemetry server response into memory without size limits, exposing the system to Denial-of-Service (DoS) risks.
+
+The patched version includes:
+
+* Verification of the TLS certificate chain and hostname for the telemetry server.
+* A response size limit of 256 bytes to mitigate memory exhaustion.
+
+These improvements are enabled by default and require no user action.
+
+=== Patches
+
+Patched versions include release `v5.4.7` and later.
+
+=== Workarounds
+
+If you cannot update, disable **Report anonymous cluster data**:
+
+*Settings → Configuration → Report anonymous cluster data*
+
+Disabling this setting prevents NeuVector from sending telemetry data, reducing exposure to this vulnerability.
+
+*Recommendation:* Upgrade to a patched version as soon as possible.
+
+== Questions and Support
+
+* Contact the https://github.com/rancher/rancher/security/policy[SUSE Rancher Security team].
+* Open an issue in the https://github.com/neuvector/neuvector/issues/new/choose[NeuVector GitHub repository].
+* References:
+  ** https://www.suse.com/suse-neuvector/support-matrix/all-supported-versions/neuvector-v-all-versions/[NeuVector Support Matrix]  
+  ** https://www.suse.com/lifecycle/#suse-security[Product Support Lifecycle]
+
 == Sensitive Information Exposure in NeuVector Manager Container Logs
 
 *CVEs:* CVE-2025-46808 +
