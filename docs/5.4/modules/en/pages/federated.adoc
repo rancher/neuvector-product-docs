@@ -25,3 +25,46 @@ In the above example, the Federated rule is shown which is different than learne
 Other rules such as Admission Control, Response, Process and File will behave in the same way, except that the order of rules is only relevant for the Network rules.
 
 Note that the configuration of Process and File rules requires the selection of a Federated Group, as these must be applied to a target group as defined in the Federated Group tab. After a new Group has been configured in Federated -> Groups, it will show as a selectable option when configuring a group in Process or File rules.
+
+== Export/Import Federation policy
+
+Federation policies—including *Groups*, *Admission Control*, *DLP Sensors*, *WAF Sensors*, *Response Rules*, and *Configuration*—can be imported and exported.
+
+You can select one or more entries and click **Export** to download the YAML file locally or export it to a remote repository.
+
+Federation policies can be imported only on the primary cluster. After import, the primary cluster deploys the policies to all managed clusters.
+
+The following example demonstrates how to export a federated group.
+
+. Select one or more federated groups and click **Export Group Policy**.
++
+image::select-group.png[Select federated group]
+
+. Select **Download to Local**, then click **Submit** to download the YAML file.
++
+image::download-to-local.png[Download to local]
+
+. Select **Export to Remote Repository**, then click **Submit** to export the YAML file to the configured remote repository.
++
+[NOTE]
+====
+The **Export to Remote Repository** option is disabled until a remote repository is configured under *Settings > Configuration*.
+====
++
+image::Remote-repo-configurations.png[Remote repository configuration]
+
+. After a successful export, the response message displays the exported file path and file name.
+
+If the *Destination* field is empty, NeuVector generates a default file name and displays it in the response.
++
+image::response-for-empty-destination.png[Response for empty destination]
+
+If you specify a custom file name, the response message displays the provided name.
+
+* Define a custom name for the exported file:
++
+image::define-name-for-exported-file.png[Define name for exported file]
+
+* Response for a customized destination:
++
+image::response-for-customized-destination.png[Response for customized destination]
