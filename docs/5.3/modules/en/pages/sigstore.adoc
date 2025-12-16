@@ -10,7 +10,7 @@
 
 [NOTE]
 ====
-NeuVector currently supports scanning image signatures generated with cosign v2 only. Signatures created with cosign v3 do not trigger Sigstore verification.
+NeuVector currently supports scanning image signatures generated with Cosign v2 only. Signatures created with Cosign v3 do not trigger Sigstore verification.
 ====
 
 The following is an example of an admission control configuration that requires a deployment's image be signed by an appropriate key or identity.
