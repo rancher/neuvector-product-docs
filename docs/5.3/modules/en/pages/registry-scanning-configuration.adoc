@@ -339,7 +339,7 @@ For NeuVector registry scanning with a JFrog registry in subdomain mode, the sub
 
 **Standard JFrog Subdomain Example**
 
-JFrog registry URL: `http://mysubdomain.myhost.com`
+JFrog registry URL: `<https://mysubdomain.myhost.com>`
 
 * **mysubdomain**:  subdomain
 * **myhost.com**: JFrog registry hostname
@@ -350,7 +350,7 @@ Registry filter example: `mysubdomain/docker-service-broker-tmp-local/devop/test
 
 When you use a modified subdomain in the registry URL.
 
-JFrog registry URL: `http://artifact-mysubdomain.myhost.com`
+JFrog registry URL: `<https://artifact-mysubdomain.myhost.com>
 
 * **artifact-mysubdomain**: modified subdomain used only in the registry URL
 * **mysubdomain**: actual subdomain in the JFrog server
@@ -367,7 +367,7 @@ NeuVector previously supported these environments. However, support broke after 
 
 If subdomain is not the prefix of the JFrog registry server URL, you must configure the registry filter using this format:
 
-JFrog registry URL: `http://artifact-mysubdomain.myhost.com`
+JFrog registry URL: `<https://artifact-mysubdomain.myhost.com>`
 
 Registry filter: `<mysubdomain>/docker-service-broker-tmp-local/devop/test/joe/*` 
 
