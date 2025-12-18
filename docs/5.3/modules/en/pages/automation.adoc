@@ -231,7 +231,8 @@ curl -k -X "DELETE" -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKE
 
 If the Groups already exist in {product-name} then the new rule can be created, skipping the Group creation steps. This example also removes the authentication token at the end. Note that a Rule ID number can be specified and {product-name} executes rules in numerical order lowest to highest.
 
-=== Export/Import Configuration File[[export-import-configuration-file]]
+[[export-import-configuration-file]]
+=== Export/Import Configuration File
 
 Here are samples to backup the {product-name} configuration file automatically. You can select whether to export all configuration settings (policy, users, Settings etc), or only the policy.
 
