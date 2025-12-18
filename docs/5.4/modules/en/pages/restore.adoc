@@ -1,37 +1,102 @@
 = Restoring {product-name} Configuration
-:revdate: 2024-09-27
+:revdate: 2024-12-08
 :page-revdate: {revdate}
 :page-opendocs-origin: /02.deploying/11.restore/11.restore.md
 :page-opendocs-slug: /deploying/restore
 
 == Restoring {product-name} Configuration
 
-A backup of the {product-name} configuration can be applied to restore a previous configuration of {product-name}. The backup file can be generated manually as well as imported from the console in Settings -> Configuration, choosing all configuration (e.g. registry configurations, integrations, other settings plus policy) or Policy only (e.g. rules/security policy). The rest API can also be used to automatically backup the configuration, as seen in this xref:automation.adoc#_exportimport_configuration_file[example].
+You can restore a previous {product-name} configuration by applying a configuration backup file. You can generate a backup manually or export one from the {product-name} console by navigating to *Settings > Configuration* and selecting one of the following options:
 
-Cluster events where all controllers stop running, thereby losing real-time configuration state, can be automatically restored when xref:production.adoc#_backups_and_persistent_data[persistent storage] has been properly configured.
+* *All configuration* – Includes registry configurations, integrations, system settings, and policies.
+* *Policy only* – Includes rules and security policies.
+
+You can also automate backups by using the REST API. For an example, see
+xref:./automation.adoc#exportimport-configuration-file[Export and import configuration files].
+
+If all controllers stop running and the real-time configuration state is lost, {product-name} can automatically restore configuration when
+xref:./production.adoc#backups-and-persistent-data[persistent storage]
+is properly configured.
+
+[WARNING]
+====
+Starting with *{product-name} v5.4.7*, sensitive configuration data is encrypted by using a Kubernetes Secret named `neuvector-store-secret` in the `neuvector` namespace.
+
+Versions *5.3.0 through 5.4.6* used a fixed, hard-coded encryption key. During an upgrade or restore, {product-name} automatically detects data encrypted with the legacy key and re-encrypts it by using a new key derived from `neuvector-store-secret`.
+
+Always upgrade to *v5.4.7 or later* before restoring configuration data.
+
+For details, see the security advisory:
+https://github.com/neuvector/neuvector/security/advisories/GHSA-h773-7gf7-9m2x
+====
 
 [NOTE]
 ====
-{product-name} does not support partial restoration of objects (e.g. network rules only) nor timestamped restoration (e.g. restore from date/time snapshots). Please use xref:automation.adoc#_exportimport_configuration_file[automation scripts] to regularly backup configuration files and manage timestamps.
+{product-name} does not support partial restores (for example, restoring only network rules) or point-in-time restores. Use automation scripts to back up configuration files regularly and manage timestamped backups.
+
+For more information, see
+xref:./automation.adoc#exportimport-configuration-file[Export and import configuration files].
+====
+
+[WARNING]
+====
+Do not modify backup configuration files. Editing a backup file after export can cause restore failures or result in an unpredictable system state.
 ====
 
 [CAUTION]
 ====
-The backup configuration files should not be edited in any way. Any changes to these from their exported state could result in restoration errors and an unpredictable result.
+Use backup configuration files only to restore {product-name} on the same cluster from which they were exported. Restoring a backup to a different cluster can result in unpredictable behavior.
 ====
 
-[IMPORTANT]
+== Encryption Key Management
+
+The `neuvector-store-secret` contains the *Key Encryption Key (KEK)*. {product-name} uses the KEK to generate *Data Encryption Keys (DEKs)*, which encrypt sensitive configuration data.
+
+Key behavior:
+
+* You must maintain and back up the `neuvector-store-secret`.
+* If the secret is missing or the key value does not meet length requirements, {product-name} automatically creates or updates it.
+* When {product-name} creates or updates the secret, it generates an alert reminding you to back it up.
+* If the KEK changes or is lost, previously encrypted data cannot be decrypted.
+
+During rolling upgrades or restores:
+
+. Data encrypted with the legacy hard-coded key is re-encrypted by using a DEK derived from the KEK.
+. Data encrypted with a DEK derived from the KEK can be decrypted only by {product-name} using the same KEK.
+
+image:rolling-upgrade-event.png[Rolling upgrade re-encryption event]
+
+When re-encryption occurs, {product-name} records the action and generates an event.
+
+== Sensitive Data Protected by Encryption
+
+{product-name} encrypts sensitive data stored under the following key-value paths:
+
+* `object/config/server/ldap1`
+* `object/config/server/oidc1`
+* `object/config/server/saml1`
+* `object/config/system`
+* `object/config/registry`
+* `object/config/federation/membership`
+* `object/config/federation/clusters/...`
+* `object/cert/...`
+
+image:neuvector-store-secret.png[NeuVector store secret]
+
+[NOTE]
 ====
-Backup configuration files should be used to restore a {product-name} state on the same cluster from which they were exported. Applying a backup configuration file from a different cluster could result in unpredictable results.
+Always back up the `neuvector-store-secret` together with {product-name} configuration data.
+
+When restoring {product-name} after data loss or to a new cluster, you must restore the *same secret*. Configuration backups without the corresponding secret cannot be decrypted.
 ====
 
-=== Recommended High Availability Settings
+== Recommended High Availability Settings
 
-Manual backup and restore of configuration should be planned only as a last resort. The following steps are recommended for high availability.
+Manual backup and restore should be treated as a last-resort recovery option. For high availability, follow these recommendations:
 
-. Use Helm with a ConfigMap for initial deployment and configuration.
-. Use CRDs for defining policy such as network/process, admission control, and other rules.
-. Run multiple controllers (minimum 3) to auto-sync configuration between running pods, and ensure they run on different hosts.
-. Configure persistent storage (as part of step 1) to recover from any cluster wide failures where all controllers stop running.
-. Regularly backup configuration to timestamped backup files.
-. Restore a cluster's {product-name} configuration from a backup file as a last resort, applying any CRDs after restoration that were new or changed since the previous backup.
+. Deploy {product-name} by using Helm with a ConfigMap for initial configuration.
+. Use CRDs to define policies such as network rules, process profiles, admission control, and other policies.
+. Run multiple controllers (a minimum of three) to synchronize configuration across pods, and schedule them on different hosts.
+. Configure persistent storage to recover from cluster-wide failures where all controllers stop running.
+. Regularly back up configuration to timestamped backup files.
+. Restore {product-name} configuration from a backup file only as a last resort, and reapply any CRDs that changed after the backup was created.
