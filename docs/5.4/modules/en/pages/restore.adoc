@@ -12,10 +12,10 @@ You can restore a previous {product-name} configuration by applying a configurat
 * *Policy only* – Includes rules and security policies.
 
 You can also automate backups by using the REST API. For an example, see
-xref:./automation.adoc#exportimport-configuration-file[Export and import configuration files].
+xref:automation.adoc#export-import-configuration-file[Export and import configuration files].
 
 If all controllers stop running and the real-time configuration state is lost, {product-name} can automatically restore configuration when
-xref:./production.adoc#backups-and-persistent-data[persistent storage]
+xref:production.adoc#_backups_and_persistent_data[persistent storage]
 is properly configured.
 
 [WARNING]
@@ -35,7 +35,7 @@ https://github.com/neuvector/neuvector/security/advisories/GHSA-h773-7gf7-9m2x
 {product-name} does not support partial restores (for example, restoring only network rules) or point-in-time restores. Use automation scripts to back up configuration files regularly and manage timestamped backups.
 
 For more information, see
-xref:./automation.adoc#exportimport-configuration-file[Export and import configuration files].
+xref:automation.adoc#export-import-configuration-file[Export and import configuration files].
 ====
 
 [WARNING]

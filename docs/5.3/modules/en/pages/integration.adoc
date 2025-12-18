@@ -120,4 +120,4 @@ You can configure webhook notifications for custom events under *Policy* → *Re
 
 {product-name} supports directory and single sign-on (SSO) integrations, including LDAP, Microsoft Active Directory, SAML, and OpenID Connect.
 
-For information about predefined and custom roles that can be mapped during integration, see xref:configuration/users.adoc#users[Users and Roles].
+For information about predefined and custom roles that can be mapped during integration, see xref:users.adoc#_users[Users and Roles].
