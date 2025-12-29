@@ -60,9 +60,10 @@ controller:
         enable_tls_verification: true
 ----
 
-.Deploy {product-name} with Helm
+. Deploy {product-name} with Helm.
++
 Deploy {product-name} by using the override file:
-
++
 [source,bash]
 ----
 helm install neuvector neuvector/core \
