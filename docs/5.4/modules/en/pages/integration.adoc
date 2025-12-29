@@ -80,7 +80,7 @@ Confirm that the configuration is applied by inspecting the `neuvector-init` Con
 ----
 kubectl get cm neuvector-init -o yaml
 ----
-
++
 Verify that the CA certificate and `enable_tls_verification` setting appear in the output.
 +
 [NOTE]
