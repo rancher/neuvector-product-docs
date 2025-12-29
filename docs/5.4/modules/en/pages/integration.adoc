@@ -82,7 +82,7 @@ kubectl get cm neuvector-init -o yaml
 ----
 
 Verify that the CA certificate and `enable_tls_verification` setting appear in the output.
-
++
 [NOTE]
 ====
 After installation, verify that {product-name} is running and accessible:
