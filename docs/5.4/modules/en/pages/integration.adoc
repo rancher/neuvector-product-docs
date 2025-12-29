@@ -42,9 +42,10 @@ When you configure trusted root CAs through the {product-name} Manager UI, the C
 
 To configure trusted root CAs by using Helm, create a custom ConfigMap that provides the CA certificates and enables TLS verification.
 
-.Create an override file
+. Create an override file. 
++
 Create an `override.yaml` file that includes the CA certificate and TLS settings:
-
++
 [source,yaml]
 ----
 controller:
