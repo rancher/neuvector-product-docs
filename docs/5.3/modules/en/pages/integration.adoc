@@ -69,7 +69,7 @@ helm install neuvector neuvector/core \
   --set manager.svc.type=NodePort,imagePullSecrets=regsecret \
   -f override.yaml
 ----
-
++
 After deployment, Helm reports a successful installation.
 
 .Verify the configuration
