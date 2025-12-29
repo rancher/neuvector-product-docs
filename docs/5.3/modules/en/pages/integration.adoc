@@ -74,9 +74,10 @@ helm install neuvector neuvector/core \
 +
 After deployment, Helm reports a successful installation.
 
-.Verify the configuration
+.Verify the configuration.
++
 Confirm that the configuration is applied by inspecting the `neuvector-init` ConfigMap:
-
++
 [source,bash]
 ----
 kubectl get cm neuvector-init -o yaml
