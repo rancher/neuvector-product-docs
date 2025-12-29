@@ -6,7 +6,7 @@
 
 == Integration
 
-{product-name} provides multiple integration options, including a REST API, CLI, Syslog, RBAC, SAML, LDAP, and webhooks. For examples of automating tasks by using the REST API, see the *Automation* section.
+{product-name} provides multiple integration options, including a REST API, CLI, Syslog, RBAC, SAML, LDAP, and webhooks. For examples of automating tasks by using the REST API, see the xref:automation.adoc[*Automation*] section.
 
 {product-name} also integrates with ecosystem partners such as Sonatype (Nexus Lifecycle), IBM Cloud (QRadar and Security Advisor), and Prometheus/Grafana. Many integrations are available in the https://github.com/neuvector[NeuVector GitHub repository].
 
@@ -42,9 +42,10 @@ When you configure trusted root CAs through the {product-name} Manager UI, the C
 
 To configure trusted root CAs by using Helm, create a custom ConfigMap that provides the CA certificates and enables TLS verification.
 
-.Create an override file
+. Create an override file.
++
 Create an `override.yaml` file that includes the CA certificate and TLS settings:
-
++
 [source,yaml]
 ----
 controller:
@@ -59,9 +60,10 @@ controller:
         enable_tls_verification: true
 ----
 
-.Deploy {product-name} with Helm
+. Deploy {product-name} with Helm.
++
 Deploy {product-name} by using the override file:
-
++
 [source,bash]
 ----
 helm install neuvector neuvector/core \
@@ -69,19 +71,20 @@ helm install neuvector neuvector/core \
   --set manager.svc.type=NodePort,imagePullSecrets=regsecret \
   -f override.yaml
 ----
-
++
 After deployment, Helm reports a successful installation.
 
-.Verify the configuration
+.Verify the configuration.
++
 Confirm that the configuration is applied by inspecting the `neuvector-init` ConfigMap:
-
++
 [source,bash]
 ----
 kubectl get cm neuvector-init -o yaml
 ----
-
++
 Verify that the CA certificate and `enable_tls_verification` setting appear in the output.
-
++
 [NOTE]
 ====
 After installation, verify that {product-name} is running and accessible:

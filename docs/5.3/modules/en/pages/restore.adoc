@@ -8,8 +8,8 @@
 
 You can restore a previous {product-name} configuration by applying a configuration backup file. You can generate a backup manually or export one from the {product-name} console by navigating to *Settings > Configuration* and selecting one of the following options:
 
-* *All configuration* – Includes registry configurations, integrations, system settings, and policies.
-* *Policy only* – Includes rules and security policies.
+* *All configuration*: Includes registry configurations, integrations, system settings, and policies.
+* *Policy only*: Includes rules and security policies.
 
 You can also automate backups by using the REST API. For an example, see
 xref:automation.adoc#export-import-configuration-file[Export and import configuration files].
