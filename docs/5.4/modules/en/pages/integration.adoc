@@ -1,47 +1,126 @@
 = Enterprise Integration
-:revdate: 2025-01-10
+:revdate: 2025-12-18
 :page-revdate: {revdate}
 :page-opendocs-origin: /08.integration/01.integration/01.integration.md
 :page-opendocs-slug:  /integration/integration
 
 == Integration
 
-{product-name} provides a number of ways to integrate, including a REST API, CLI, SYSLOG, RBACs, SAML, LDAP, and webhooks. See the Automation section for examples of scripting using the REST API.
+{product-name} provides multiple integration options, including a REST API, CLI, Syslog, RBAC, SAML, LDAP, and webhooks. For examples of automating tasks by using the REST API, see the xref:automation.adoc[*Automation*] section.
 
-Integrations with other ecosystem partners such as Sonatype (Nexus Lifecycle), IBM Cloud (QRadar and Security Advisor), Prometheus/Grafana, are also supported. Many of these can be found on the https://github.com/neuvector[{product-name} Github] page.
+{product-name} also integrates with ecosystem partners such as Sonatype (Nexus Lifecycle), IBM Cloud (QRadar and Security Advisor), and Prometheus/Grafana. Many integrations are available in the https://github.com/neuvector[NeuVector GitHub repository].
 
-The following configurations can be found in Settings:
+The following integration settings are available in the {product-name} UI under *Settings*.
 
-=== OpenShift/Kubernetes RBACs
+=== OpenShift and Kubernetes RBAC
 
-Select this option if you are using Red Hat OpenShift Role Based Access Controls (RBACs) and would like {product-name} to automatically read and enforce those. If selected, OpenShift users can log into the {product-name} console using their OpenShift credentials, and will only have access to the resources (Projects, containers, nodes etc) according to their role in the OpenShift cluster. OpenShift integration uses the OAuth2 protocol.
+Enable this option if you use Red Hat OpenShift role-based access control (RBAC) and want {product-name} to read and enforce those permissions automatically.
+
+When enabled:
+
+* OpenShift users can sign in to the {product-name} console using their OpenShift credentials.
+* Users can access only the resources (projects, containers, nodes, and so on) allowed by their OpenShift role.
+* Authentication uses the OAuth 2.0 protocol.
 
 image:openshift-rbac.png[OpenShift]
 
-[IMPORTANT]
+[WARNING]
 ====
-Do not use the setting in OpenShift AllowAllPasswordIdentityProvider which allows any password to be used to log in. This will allow a user to login into {product-name} with any password as well (as a read only user). It will also create a new user in OpenShift for every login (see '`oc get user`' results).
+Do not use the OpenShift `AllowAllPasswordIdentityProvider` setting. This configuration allows users to sign in with any password, which also permits access to {product-name} as a read-only user. It also creates a new OpenShift user for every login.
 ====
 
 [NOTE]
 ====
-The default Admin user of {product-name} and any additional users created in {product-name} will still be active with OpenShift RBACs enabled.
+The default {product-name} *Admin* user and any users created directly in {product-name} remain active when OpenShift RBAC is enabled.
 ====
 
-==== Kubernetes RBACs
+=== Trust External Root CAs with Helm
 
-To manually configure RBACs for Kubernetes namespaces, open the Advanced Setting in the new user creation screen in Settings -> Users -> Add User. Here you can enter the namespaces(s) which this user should have access to in {product-name}.
+{product-name} can trust external root Certificate Authorities (CAs) for secure connections such as LDAPS, OpenID Connect (OIDC), and registry scanning. This capability enables trusted communication with external authentication services and image registries.
+
+When you configure trusted root CAs through the {product-name} Manager UI, the CA information is stored in the internal database. No Kubernetes Secret or ConfigMap is created automatically. Because Helm manages configuration through Kubernetes resources, this setting cannot be managed through Helm by default.
+
+To configure trusted root CAs by using Helm, create a custom ConfigMap that provides the CA certificates and enables TLS verification.
+
+. Create an override file. 
++
+Create an `override.yaml` file that includes the CA certificate and TLS settings:
++
+[source,yaml]
+----
+controller:
+  configmap:
+    enabled: true
+    data:
+      sysinitcfg.yaml: |
+        cacerts:
+        - -----BEGIN CERTIFICATE-----
+          MIID0zCCArugAwIBAgIU...
+          -----END CERTIFICATE-----
+        enable_tls_verification: true
+----
+
+. Deploy {product-name} with Helm.
++
+Deploy {product-name} by using the override file:
++
+[source,bash]
+----
+helm install neuvector neuvector/core \
+  -n neuvector \
+  --set manager.svc.type=NodePort,imagePullSecrets=regsecret \
+  -f override.yaml
+----
++
+After deployment, Helm reports a successful installation.
+
+. Verify the configuration.
++
+Confirm that the configuration is applied by inspecting the `neuvector-init` ConfigMap:
++
+[source,bash]
+----
+kubectl get cm neuvector-init -o yaml
+----
++
+Verify that the CA certificate and `enable_tls_verification` setting appear in the output.
++
+[NOTE]
+====
+After installation, verify that {product-name} is running and accessible:
+
+[source,bash]
+----
+NODE_PORT=$(kubectl get -n neuvector -o jsonpath="{.spec.ports[0].nodePort}" svc neuvector-service-webui)
+NODE_IP=$(kubectl get nodes -o jsonpath="{.items[0].status.addresses[0].address}")
+echo https://$NODE_IP:$NODE_PORT
+----
+
+Open the displayed URL in a browser to access the {product-name} Manager UI.
+====
+
+=== Kubernetes RBAC
+
+To manually configure Kubernetes RBAC for specific namespaces:
+
+. Go to *Settings* → *Users* → *Add User*.
+. Open *Advanced Settings*.
+. Specify the namespaces that the user can access in {product-name}.
 
 image:k8s-rbac.png[Kubernetes]
 
-=== SYSLOG
+=== Syslog
 
-Enter the SYSLOG server IP and select the level of notification. You can also use a DNS name and/or select TCP for configuration.
+Configure Syslog integration by entering the Syslog server address and selecting the notification level. You can use an IP address or DNS name and choose either UDP or TCP.
 
 === Webhooks
 
-Notifications can be sent via webhooks to an endpoint. Enter the endpoint URL for notifications to be sent. Webhook notifications for custom events can be configured in Policy -> Response Rules
+{product-name} can send notifications to an external endpoint by using webhooks. Specify the webhook endpoint URL to receive notifications.
 
-=== Directory/SSO Integration
+You can configure webhook notifications for custom events under *Policy* → *Response Rules*.
 
-See the next sections for LDAP, MSAD, SAML, OpenId and other integrations. See the xref:users.adoc#_users[Basics -> Users & Roles] section for predefined and custom roles in {product-name} which can be mapped in the integration.
+=== Directory and SSO Integration
+
+{product-name} supports directory and single sign-on (SSO) integrations, including LDAP, Microsoft Active Directory, SAML, and OpenID Connect.
+
+For information about predefined and custom roles that can be mapped during integration, see xref:users.adoc#_users[Users and Roles].
