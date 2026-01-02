@@ -1,12 +1,14 @@
 * xref:overview.adoc[{product-name} Overview]
 * Understanding {product-name}
 ** xref:requirements.adoc[System Requirements]
-** xref:installation.adoc[Deployment Preparation]
+** xref:03.installation.adoc[Deployment Preparation introduction]
+*** xref:installation.adoc[Deployment Preparation]
 ** xref:policy-overview.adoc[Security Policy Overview]
 ** xref:integration.adoc[Enterprise Integration]
 ** xref:ci-workflow.adoc[CI/CD Workflow]
 * Operational Tasks
 ** Deploying {product-name}
+*** xref:production.adoc[{product-name} Production]
 *** xref:configmap.adoc[Deploy Using ConfigMap]
 *** xref:operators.adoc[Deploy Using Operators]
 *** xref:publick8s.adoc[Deploying SUSE Security on Public Cloud]
@@ -16,7 +18,9 @@
 *** xref:rancher.adoc[Rancher Deployment]
 *** xref:airgap.adoc[Air-Gapped Deployment]
 *** xref:docker.adoc[Docker]
-*** xref:updating.adoc[Updating {product-name}]
+*** xref:ecs.adoc[Amazon ECS]
+*** xref:10.updating.adoc[Updating {product-name} introduction]
+**** xref:updating.adoc[Updating {product-name}]
 *** xref:testing.adoc[Evaluating and Testing {product-name}]
 *** xref:troubleshooting.adoc[Troubleshooting Deployments]
 ** xref:users.adoc[Users and Roles]
@@ -24,6 +28,7 @@
 ** xref:remove.adoc[Removing or Resetting {product-name}]
 ** xref:internal.adoc[Replacing Internal Certificates]
 ** xref:replacecert.adoc[Replacing Self-Signed Certificates]
+** xref:chrome.adoc[Enabling Chrome Browsers to Accept the {product-name} Self-Signed Certificate]
 ** xref:certrotate.adoc[Rotating Internal self signed certificate]
 ** xref:rest-api.adoc[Connect to Manager, REST API Server]
 ** xref:automation.adoc[Automation with REST API]
@@ -98,3 +103,22 @@
 ** xref:notifications.adoc[5.x Notifications]
 * Security Advisories and CVEs
 ** xref:cve.adoc[Security Advisories and CVEs]
+
+
+
+// docs/5.4/modules/en/pages/general-guidelines.adoc 
+docs/5.4/modules/en/pages/12.troubleshooting.adoc
+docs/5.4/modules/en/pages/13.special.adoc
+docs/5.4/modules/en/pages/05.policy.adoc
+docs/5.4/modules/en/pages/06.scanning.adoc
+docs/5.4/modules/en/pages/03.configuration.adoc
+docs/5.4/modules/en/pages/08.integration.adoc
+// docs/5.4/modules/en/pages/docker-ee.adoc
+docs/5.4/modules/en/pages/09.testing.adoc
+docs/5.4/modules/en/pages/07.reporting.adoc
+// docs/5.4/modules/en/pages/azuremarketplace.adoc
+docs/5.4/modules/en/pages/11.automation.adoc
+docs/5.4/modules/en/pages/14.releasenotes.adoc
+docs/5.4/modules/en/pages/04.navigation.adoc
+docs/5.4/modules/en/pages/02.deploying.adoc
+
