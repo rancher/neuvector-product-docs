@@ -50,7 +50,7 @@ DNS.1 = Neuvector
 
 [IMPORTANT]
 ====
-For additional information on `ca.cfg`, see https://open-docs.neuvector.com/configuration/console/replacecert.
+For additional information on `ca.cfg`, refer to xref:replacecert.adoc[Replacing Self-Signed Certificate].
 ====
 
 * Choose your scenario from the options below:

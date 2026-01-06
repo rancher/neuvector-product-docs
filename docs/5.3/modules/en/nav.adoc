@@ -92,3 +92,13 @@
 ** xref:5x.adoc[5.x Release Notes]
 ** xref:4x.adoc[4.x Release Notes]
 ** xref:other.adoc[Integrations & Other Components]
+
+Broken links
+// * docs/5.3/modules/en/pages/public-cloud.adoc:115:If using the {product-name} Prime listing in the cloud provider marketplace, billing commences from the time of deployment. {product-name} can also be deployed manually using the standard documentation and repositories. When ready to add support to your {product-name} deployment and have this billed via the cloud marketplace, follow the https://open-docs.neuvector.com/[available documentation].
+// * docs/5.3/modules/en/pages/public-cloud.adoc:201:Downstream clusters can run any Supported Kubernetes platform, such as RKE, RKE2, K3s, AKS, EKS, GKE, vanilla Kubernetes, OpenShift, Mirantis Kubernetes Engine, and so on. Please see https://open-docs.neuvector.com/basics/requirements#supported-platforms[Supported Platforms].
+// * docs/5.3/modules/en/pages/public-cloud.adoc:311:* https://open-docs.neuvector.com/[{product-name} by SUSE documentation]
+
+// * docs/5.3/modules/en/pages/azuremarketplace.adoc:36:To be able to aggregate the node counts from multiple clusters in order to take advantage of volume discounts, the clusters must have been configured for Multi-cluster federation as described in the {product-name} https://open-docs.neuvector.com/navigation/multicluster[docs]. {product-name} on the Primary cluster MUST have been deployed through the Azure Marketplace, with the billing adapter installed in the primary cluster, in order to be able to report the primary and all downstream remote cluster node counts. Do not deploy {product-name} through the marketplace on downstream remote clusters. Use standard deployment methods (Helm, Operator, kubectl etc) described in the {product-name} https://open-docs.neuvector.com/deploying[docs] on remote clusters.
+// * docs/5.3/modules/en/pages/azuremarketplace.adoc:85:Once logged in, you can begin to https://open-docs.neuvector.com/navigation/navigation[navigate and configure {product-name}].
+
+* Binary file docs/5.3/modules/en/attachments/NV_Onboarding_5.0.pdf matches
