@@ -19,8 +19,7 @@
 *** xref:airgap.adoc[Air-Gapped Deployment]
 *** xref:docker.adoc[Docker]
 *** xref:ecs.adoc[Amazon ECS]
-*** xref:10.updating.adoc[Updating {product-name} introduction]
-**** xref:updating.adoc[Updating {product-name}]
+*** xref:updating.adoc[Updating {product-name}]
 *** xref:testing.adoc[Evaluating and Testing {product-name}]
 *** xref:troubleshooting.adoc[Troubleshooting Deployments]
 ** xref:users.adoc[Users and Roles]
@@ -90,6 +89,9 @@
 *** xref:ibmsa.adoc[IBM Security Advisor]
 *** xref:ibmqr.adoc[IBM QRadar]
 *** xref:splunk.adoc[Splunk]
+** Special Use Cases with All-in-One
+*** xref:general-guidelines.adoc[General Guidelines]
+*** xref:docker-ee.adoc[Docker Swarm]
 * References
 ** xref:details.adoc[Environment Variables Details]
 ** xref:cli.adoc[Command Line]
@@ -105,20 +107,17 @@
 ** xref:cve.adoc[Security Advisories and CVEs]
 
 
+10,15,16
 
-// docs/5.4/modules/en/pages/general-guidelines.adoc 
-docs/5.4/modules/en/pages/12.troubleshooting.adoc
-docs/5.4/modules/en/pages/13.special.adoc
+docs/5.4/modules/en/pages/02.deploying.adoc
+docs/5.4/modules/en/pages/03.configuration.adoc
+docs/5.4/modules/en/pages/04.navigation.adoc
 docs/5.4/modules/en/pages/05.policy.adoc
 docs/5.4/modules/en/pages/06.scanning.adoc
-docs/5.4/modules/en/pages/03.configuration.adoc
-docs/5.4/modules/en/pages/08.integration.adoc
-// docs/5.4/modules/en/pages/docker-ee.adoc
-docs/5.4/modules/en/pages/09.testing.adoc
 docs/5.4/modules/en/pages/07.reporting.adoc
-// docs/5.4/modules/en/pages/azuremarketplace.adoc
+docs/5.4/modules/en/pages/08.integration.adoc
+docs/5.4/modules/en/pages/09.testing.adoc
 docs/5.4/modules/en/pages/11.automation.adoc
+docs/5.4/modules/en/pages/12.troubleshooting.adoc
+docs/5.4/modules/en/pages/13.special.adoc
 docs/5.4/modules/en/pages/14.releasenotes.adoc
-docs/5.4/modules/en/pages/04.navigation.adoc
-docs/5.4/modules/en/pages/02.deploying.adoc
-
