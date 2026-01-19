@@ -379,7 +379,7 @@ docker run --rm --privileged --pid=host neuvector/scanner -n
 ==== Enhancements
 
 * Support tokens for {product-name} API access. See Settings -> User, API Keys... to create a new API key. Keys can be set to default or custom roles.
-* Support AWS Marketplace PAYG billing for {product-name} monthly support subscriptions. Users can subscribe to {product-name} by SUSE support, billed monthly to their AWS account based on previous month's average node count usage. Details xref:awsmarketplace.adoc[AWS marketplace].
+* Support AWS Marketplace PAYG billing for {product-name} monthly support subscriptions. Users can subscribe to {product-name} by SUSE support, billed monthly to their AWS account based on previous month's average node count usage. For more information, refer to xref:awsmarketplace.adoc[AWS marketplace].
 * Support image signing for admission controls. Users can require {product-name} to verify that images are signed by specific parties before they can be deployed into the production environment, through an integration with Sigstore/Cosign. See Assets -> Sigstore Verifiers for creating new signature assets. Rules can then be created with criteria Image Signing and/or Image Sigstore Verifiers.
 * Enable each admission control rule to have its own mode of Monitor or Protect. A Deny action in Monitor mode will alert, and a Deny action in Protect mode will block. Allow actions are unaffected.
 * Add a new regex operator in Policy > Admission Control > Add Rule for Users and User Groups to support regex. Support operators "matches ANY regex in" and "matches NONE regex in".
