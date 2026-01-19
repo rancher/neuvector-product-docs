@@ -32,7 +32,7 @@ If deploying with the current {product-name} Helm chart (v1.8.9+), the following
 
 === Best Practices, Tips, Q&A for Deploying and Managing {product-name}
 
-// Download and review this xref:attachment$NV_Onboarding_5.0.pdf[Deployment Best Practices document] for tips such as performance and sizing, best practices, and frequently asked questions about deployments.
+// Download and review xref:attachment$NV_Onboarding_5.0.pdf[Deployment Best Practices document] for tips, such as performance and sizing, best practices, and frequently asked questions about deployments.
 
 == Deployment Using Helm or Operators
 
