@@ -46,6 +46,37 @@ If deploying with the current {product-name} Helm chart (v1.8.9+), the following
 If deploying from the Rancher Manager 2.6.5+ {product-name} chart, images are pulled automatically from the Rancher Registry mirrored image repo, and deploys into the cattle-neuvector-system namespace.
 ====
 
+=== Using Rancher Registry for stand-alone deployments
+
+The Security images are also available from the Rancher Registry (`registry.rancher.com`).  
+You can use these images for stand-alone deployments when installing {product-name} with the Rancher-provided Helm charts.
+
+This approach is supported for Helm-based installations that use the charts shipped with Rancher.
+
+[NOTE]
+====
+When {product-name} is deployed directly from Rancher Manager, image registry configuration is handled automatically. Manual registry configuration is required only for stand-alone Helm or kubectl installations.
+====
+
+===== Requirements
+ 
+* Helm charts:
+** `neuvector`
+** `neuvector-crd`
+* Chart version `107.0.2+up2.8.9` or later
+
+===== Helm values configuration
+
+When deploying without Rancher Manager, set the following values in your Helm configuration:
+
+[source,yaml]
+----
+registry: registry.rancher.com
+
+global:
+  cattle:
+    systemDefaultRegistry: registry.rancher.com
+----
 
 == Deploy {product-name}
 
