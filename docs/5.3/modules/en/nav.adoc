@@ -116,6 +116,3 @@
 ** xref:5x.adoc[5.x Release Notes]
 ** xref:4x.adoc[4.x Release Notes]
 ** xref:other.adoc[Integrations and Components]
-
-* Security Advisories
-** xref:cve.adoc[Security Advisories and CVEs]
