@@ -1,4 +1,6 @@
 = Assets Security Scan Result
+:revdate: 2026-02-05
+:page-revdate: {revdate}
 :page-opendocs-origin: /15.ui_extension/02.runtime_security/02.runtime_security.md
 :page-opendocs-slug:  /ui_extension/runtime_security
 

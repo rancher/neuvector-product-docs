@@ -1,5 +1,5 @@
 = Integration with Rancher RBAC
-:revdate: 2025-05-08
+:revdate: 2026-02-05
 :page-revdate: {revdate}
 :page-opendocs-origin: /08.integration/12.rancher_sso_rbac.md
 :page-opendocs-slug:  /integration/12.rancher_sso_rbac

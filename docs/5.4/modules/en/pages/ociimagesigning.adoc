@@ -1,5 +1,5 @@
 = Image Signing for OCI Image
-:revdate: 2026-02-04
+:revdate: 2026-02-05
 :page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/03.admission/01.sigstore/03.ociimagesigning.md
 :page-opendocs-slug:  /policy/admission/ociimagesigning

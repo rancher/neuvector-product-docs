@@ -1,4 +1,6 @@
 = Monitor Overview of Security Status
+:revdate: 2026-02-05
+:page-revdate: {revdate}
 :page-opendocs-origin: /15.ui_extension/01.dashboard/01.dashboard.md
 :page-opendocs-slug:  /ui_extension/dashboard
 

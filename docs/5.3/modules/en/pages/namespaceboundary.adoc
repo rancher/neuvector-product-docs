@@ -1,5 +1,5 @@
 = Namespace Boundary Enforcement
-:revdate: 2025-05-14
+:revdate: 2026-02-05
 :page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/14.namespaceboundary/14.namespaceboundary.md
 :page-opendocs-slug:  /policy/namespaceboundary

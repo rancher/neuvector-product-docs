@@ -1,5 +1,5 @@
 = Detect High Bandwidth Used by a Pod/Group (DDoS)
-:revdate: 2025-05-14
+:revdate: 2026-02-05
 :page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/15.detectbandwidthddos/15.detectbandwidthddos.md
 :page-opendocs-slug:  /policy/detectbandwidthddos
