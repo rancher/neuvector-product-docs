@@ -6,7 +6,7 @@
 
 == Configuring Users and Custom Roles
 
-The Settings -> Users and Roles menu enables management of users as well as roles. Each user is assigned to a predefined or custom role. Users can be mapped to roles through group integration with LDAP/AD or other SSO system integrations. See the xref:integration.adoc#_directorysso_integration[Enterprise Integration] section for detailed instructions for each type or directory or SSO integration.
+The Settings -> Users and Roles menu enables management of users as well as roles. Each user is assigned to a predefined or custom role. Users can be mapped to roles through group integration with LDAP/AD or other SSO system integrations. See the xref:integration.adoc#_directory_and_sso_integration[Enterprise Integration] section for detailed instructions for each type or directory or SSO integration.
 
 === Users
 
