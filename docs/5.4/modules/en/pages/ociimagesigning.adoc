@@ -1,0 +1,55 @@
+= Image Signing for OCI Image
+:revdate: 2026-02-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/03.admission/01.sigstore/03.ociimagesigning.md
+:page-opendocs-slug:  /policy/admission/ociimagesigning
+
+== Verify SUSE Rancher Application Collection images with Sigstore
+
+SUSE Rancher Application Collection uses an OCI-based registry where all applications are signed by Sigstore. Users can verify the apps in the Application Collection with Sigstore Verifiers in {product-name}.
+
+You need the cosign public key from SUSE Rancher Application Collection in advance, then the Sigstore Verifiers can be configured in {product-name}.
+
+image:oci_image_1.png[Add Sigstore Verifier]
+
+Follow these steps to configure Sigstore verification for images in the SUSE Rancher Application Collection.
+
+. Create an access token by following the authentication guide:
++
+https://docs.apps.rancher.io/get-started/authentication/
+
+. Retrieve the Cosign public key (`ap-pubkey.pem`) by following the signature verification guide:
++
+https://docs.apps.rancher.io/howto-guides/verify-signatures-with-cosign/
+
+. In the {product-name} web UI, create a Sigstore root of trust.
++
+--
+* Go to *Assets* > *Sigstore Verifiers*.
+* Create a new verifier.
+* Add the Cosign public key as a key-pair verifier.
+--
+
+. Configure the registry and start a scan.
++
+--
+* Go to *Assets* > *Registries*.
+* Create a new registry with the following values:
++
+[source,text]
+----
+Registry: https://dp.apps.rancher.io/
+Filter: containers/openjdk:21.0.4-build7
+Username: <your SUSE username>
+Password: <access token created earlier>
+----
+--
++
+The filtered image is an OCI image published in the SUSE Rancher Application Collection.
+
+. Review the scan results to confirm signature verification.
+
+
+image:oci_image_2.png[Verifier Scan Result]
+
+After the scan completes, {product-name} displays the Sigstore verifier details in the scan results, confirming that the image signature was successfully validated.

@@ -1,7 +1,0 @@
-= Testing
-:revdate: 2024-09-27
-:page-revdate: {revdate}
-:page-opendocs-origin: /09.testing/09.testing.md
-:page-opendocs-slug:  /testing
-
-Evaluate and Test {product-name} Using Sample Applications

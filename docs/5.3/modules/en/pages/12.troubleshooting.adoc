@@ -1,7 +1,0 @@
-= Troubleshooting {product-name} Deployments
-:revdate: 2024-09-27
-:page-revdate: {revdate}
-:page-opendocs-origin: /12.troubleshooting/12.troubleshooting.md
-:page-opendocs-slug:  /troubleshooting
-
-How to troubleshoot {product-name} Deployments and collect logs for support.

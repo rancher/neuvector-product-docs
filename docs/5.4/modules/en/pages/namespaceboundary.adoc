@@ -1,0 +1,86 @@
+= Namespace Boundary Enforcement
+:revdate: 2026-02-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/14.namespaceboundary/14.namespaceboundary.md
+:page-opendocs-slug:  /policy/namespaceboundary
+
+== Policy: Namespace Boundary Enforcement
+
+By default, pods in different namespaces can communicate with each other, even when they use different labels. To restrict this behavior, you must create additional network rules.
+
+Namespace boundary enforcement provides a simpler way to limit pod communication to a namespace or to natural application boundaries.
+
+== How namespace boundary enforcement works
+
+The `NeuvectorNamespaceBoundary` namespace label enforces communication boundaries between pods. When enabled, NeuVector restricts traffic so that pods communicate only within the same namespace or within defined application boundaries.
+
+This approach reduces the need for custom groups and additional network policies.
+
+== Enable or disable namespace boundary enforcement
+
+To control namespace boundary enforcement, apply the `NeuvectorNamespaceBoundary` label to a namespace.
+
+=== Enable enforcement
+
+[source,bash]
+----
+kubectl label namespace <namespace> NeuvectorNamespaceBoundary=enabled
+----
+
+=== Disable enforcement
+
+[source,bash]
+----
+kubectl label namespace <namespace> NeuvectorNamespaceBoundary=disabled
+----
+
+=== Remove the label
+
+Removing the label disables namespace boundary enforcement.
+
+[source,bash]
+----
+kubectl label namespace <namespace> NeuvectorNamespaceBoundary-
+----
+
+== Example scenario
+
+This example shows how namespace boundary enforcement simplifies ingress and egress control.
+
+=== Environment
+
+* Two namespaces: `ns1` and `ns2`
+* Pods:
+** `ns1`: `pod1` (labels: `app=app1`, `label=one`), `pod2` (labels: `app=app2`, `label=two`)
+** `ns2`: `pod3` (labels: `app=app1`, `label=three`), `pod4` (labels: `app=app2`, `label=four`)
+* Groups:
+** `g1`: `app=app1` (includes `pod1` and `pod3`)
+** `g2`: `app=app2` (includes `pod2` and `pod4`)
+
+A network policy allows traffic from `g1` to `g2` on any application and port.
+
+=== Behavior without namespace boundary enforcement
+
+With only the group-based policy:
+
+* `pod1` can communicate with `pod2` and `pod4`
+* `pod3` can communicate with `pod2` and `pod4`
+
+To restrict communication to the same namespace, you must create additional groups and deny policies:
+
+* Create groups based on individual labels
+* Add deny rules to block cross-namespace traffic
+
+This increases policy complexity and maintenance effort.
+
+=== Behavior with namespace boundary enforcement
+
+When namespace boundary enforcement is enabled:
+
+* `pod1` can communicate only with `pod2`
+* `pod3` can communicate only with `pod4`
+* Cross-namespace communication is blocked automatically
+
+No additional groups or network policies are required.
+
+Namespace boundary enforcement simplifies policy management while enforcing strict namespace-level isolation.

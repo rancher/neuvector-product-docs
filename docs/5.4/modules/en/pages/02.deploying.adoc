@@ -1,7 +1,0 @@
-= Deployments of the {product-name} Containers, Services, and Required Configurations
-:revdate: 2024-09-27
-:page-revdate: {revdate}
-:page-opendocs-origin: /02.deploying/02.deploying.md
-:page-opendocs-slug:  /deploying
-
-Topics for planning and deploying for testing and to production on various platforms using Kubernetes, Rancher, OpenShift, & Docker compose.
