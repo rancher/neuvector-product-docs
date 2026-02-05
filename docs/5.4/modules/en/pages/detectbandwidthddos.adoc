@@ -1,0 +1,80 @@
+= Detect High Bandwidth Used by a Pod/Group (DDoS)
+:revdate: 2025-05-14
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/15.detectbandwidthddos/15.detectbandwidthddos.md
+:page-opendocs-slug:  /policy/detectbandwidthddos
+
+{product-name} users can set Group level bandwidth or session-rate violation detection based on preconfigured threshold settings. These settings work for Learned or user-created Groups, but not for Reserved Groups.
+
+A one minute timer is created to periodically check the Group metric threshold for violations. Once a violation is detected, a `Group.Metric.Violation` event is generated and a message is printed out to describe the event.
+
+You can configure the following metric thresholds for each group:
+
+* `Mon_metric`: Enables or disables metric monitoring for the group.
+
+* `Grp_sess_rate`: Session rate threshold, measured in connections per second (cps). The default value is `0`, which disables detection.
+
+* `Grp_band_width`: Throughput threshold, measured in megabits per second (Mbps). The default value is `0`, which disables detection.
+
+* `Grp_cur_sess`: Active session count threshold.
+
+== Configure group metric thresholds
+
+You can configure group metric thresholds by using either the {product-name} CLI or the web UI.
+
+=== Configure thresholds by using the CLI
+
+To view available group metric options, run the following command:
+
+[source,shell]
+----
+set group <group-name> setting -h
+----
+
+Example output:
+
+[source,shell]
+----
+--monitor_metric [enable|disable]   Monitor metric status
+--cur_sess INTEGER                  Active session threshold
+--sess_rate INTEGER                 Session rate threshold (cps)
+--bandwidth INTEGER                 Throughput threshold (Mbps)
+----
+
+=== Configure thresholds by using the web UI
+
+You can enable or disable group metric thresholds when creating or editing a group.
+
+* Use the *Add Group* view to configure thresholds for a new group.
++
+image:bandwidth_ddos_1.png[Add Group]
++
+* Use the *Edit Group* view to update thresholds for an existing group.
++
+image:bandwidth_ddos_2.png[Edit Group]
+
+== Example workflow
+
+The following example shows how group metric threshold detection works.
+
+. Add metric thresholds to a learned or user-created group.
++
+image:bandwidth_ddos_3.png[Add Group]
++
+. Generate traffic to the group until the active session count reaches the configured threshold.
++
+image:bandwidth_ddos_4.png[Add Group]
++
+. When a threshold is exceeded, {product-name} generates a `Group.Metric.Violation` event.
++
+image:bandwidth_ddos_5.png[Add Group]
+
+
+[NOTE]
+====
+* {product-name} evaluates the average traffic over the previous 60 seconds to determine whether a threshold has been exceeded.
+* Protect mode provides the most accurate measurements because the enforcer operates inline on the data path.
+* In multi-cluster environments, both the primary and managed clusters must run version 5.4 or later to support federated group metric thresholds.
+* If managed clusters run versions earlier than 5.4, federated threshold settings are ignored until those clusters are upgraded.
+* After upgrading managed clusters to version 5.4 or later, manually resynchronize the clusters to enable DDoS monitoring for federated groups.
+====

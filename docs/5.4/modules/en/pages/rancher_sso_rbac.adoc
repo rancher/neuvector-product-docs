@@ -1,0 +1,178 @@
+= Integration with Rancher RBAC
+:revdate: 2025-05-08
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/12.rancher_sso_rbac.md
+:page-opendocs-slug:  /integration/12.rancher_sso_rbac
+
+
+Starting with {product-name} 5.4, full compatibility and integration of {product-name} with Rancher RBAC has been included. This offers users the possibility of customizing specific permissions based on the profile of the user or group that should access {product-name}.
+
+In the Rancher console, *Users & Authentication* -> *Role Templates* page, customers can create Global, Cluster, Project, and Namespace roles with specific {product-name} Verbs, Resources, and API Groups. When such a Rancher role is assigned to a Rancher user, the user's {product-name} SSO session is assigned different {product-name} permissions accordingly. This is to provide SSO users with custom roles (that is, roles other than the reserved admin, reader, fedAdmin, and fedReader roles).
+
+== Supported custom {product-name} role mapping in Rancher SSO
+
+Below are supported role mappings for {product-name} Verbs, Resources, and API Groups used in the Rancher UI at *Users & Authentication* -> *Role Templates* -> *Create Global, Cluster, or Project Role Template*.
+
+* APIGroup: `permission.neuvector.com`
+
+* Verbs:
+** `get` -> read-only (view)
+** `*` -> read/write (modify)
+
+* Resources (cluster-scoped):
+** AdmissionControl
+** Authentication
+** CI Scan
+** Cluster
+** Federation
+** Vulnerability
+
+* Resources (namespaced):
+** AuditEvents
+** Authorization
+** Compliance
+** Events
+** Namespace
+** RegistryScan
+** RuntimePolicy
+** RuntimeScan
+** SecurityEvents
+** SystemConfig
+
+=== Resource display and logical name mapping
+
+The following table illustrates the logical names of resources.
+
+|===
+| Resource display | Logical name
+
+| All Permissions | nv-perm.all-permissions
+| Admission Control | nv-perm.admctrl
+| Audit Events | nv-perm.audit-events
+| Authentication | nv-perm.authentication
+| Authorization | nv-perm.authorization
+| CI Scan | nv-perm.ci-scan
+| Compliance | nv-perm.compliance
+| Events | nv-perm.events
+| Federation | nv-perm.fed
+| Registry Scan | nv-perm.reg-scan
+| Runtime Policy | nv-perm.rt-policy
+| Runtime Scan | nv-perm.rt-scan
+| Security Events | nv-perm.security-events
+| System Config | nv-perm.config
+| Vulnerability Profile | nv-perm.vulnerability
+|===
+
+[NOTE]
+====
+This integration supports roles at the Global, Cluster, Project, and Namespace levels. Users must customize and create rules based on their requirements and scope permissions for SSO.
+====
+
+== Definitions and expectations with Global, Cluster, and Project/Namespace roles
+
+* Cluster resource with `*` verb on a Rancher Global role:
+** Mapped to the {product-name} `fedAdmin` role on the {product-name} federation master cluster  
+  (Users cannot map a Rancher Global role to a {product-name} `admin` role when {product-name} is deployed on a federation master cluster.)
+** Mapped to the {product-name} `admin` role on {product-name} federation-managed clusters
+
+* Cluster resource with `*` verb on Rancher Cluster roles:
+** Always mapped to the {product-name} `cluster-admin` role
+
+* Namespace resource with `*` verb on Rancher Project roles:
+** Always mapped to the {product-name} `namespace-admin` role
+
+== Use cases and examples
+
+=== Use case 1
+
+* Use a Global role to run runtime scans from a {product-name} SSO session on all clusters managed by Rancher Manager except the local cluster. Users must create Cluster roles to propagate the Global role to all downstream clusters.
+
+** Create a Cluster role template with the following parameters:
++
+[source,yaml]
+----
+Verb: *
+Resource: RuntimeScan
+API: permission.neuvector.com
+----
+
+** Create a Project or Namespace role to allow UI access and enable SSO. You must add this role to the project for it to work correctly:
++
+[source,yaml]
+----
+Verb: get, patch, create
+Resource: services/proxy
+API: neuvector.com
+----
+
+** Create a Global role to inherit the Cluster role across downstream clusters:
++
+[source,yaml]
+----
+apiVersion: management.cattle.io/v3
+kind: GlobalRole
+displayName: All Downstream NV RT scan
+metadata:
+  name: all-downstream-nvrtscan
+inheritedClusterRoles:
+- rt-gpmbs
+----
+
+** Create a standard user and assign the Global role.
+** Create a Project role binding on all downstream clusters for the project that contains the `cattle-neuvector-system` namespace.
+** Log in to Rancher Manager and launch {product-name} from any downstream cluster.  
+  The user can perform runtime scan tasks such as container scans, node scans, and browsing vulnerability pages. This also applies to newly joined clusters.
+
+=== Use case 2
+
+* Create a FedAdmin user. Always log in as a FedAdmin through the federation master cluster. If the environment is not federated, roles are downgraded to Reader or Admin.
+
+** Create a Global role:
++
+[source,yaml]
+----
+Verb: *
+Resource: All permissions
+API: nv-perm.all-permissions
+----
+
+** Create a Project or Namespace role to allow UI access and enable SSO:
++
+[source,yaml]
+----
+Verb: get, patch, create
+Resource: services/proxy
+API: neuvector.com
+----
+
+** Create a standard user and assign the Global role.
+** In the Rancher UI, go to *Master Cluster* -> *Cluster and Project Members* -> *Project Membership* -> *Add*.  
+   Add the user and assign the UI proxy project role.
+** Log in to Rancher Manager and launch {product-name} from a downstream cluster. {product-name} reads the Rancher Global role and assigns the matching permission (FedAdmin).
+
+[NOTE]
+====
+To switch between FedAdmin and FedReader, change the verb from `*` to `get`. The `get` verb provides read-only access.
+====
+
+=== Use case 3
+
+A user can perform a limited set of read-only tasks and modify a limited set of tasks on a cluster.
+
+=== Use case 4
+
+A user can perform read-only tasks on selected domains and modify tasks on other domains within a cluster.
+
+=== Use case 5
+
+A user obtains permissions by combining Global, Cluster, and Project roles.
+
+== Additional considerations
+
+* Use this documentation and parameters as a reference when creating SSO and RBAC rules.
+* For errors or advanced use cases, contact SUSE Support through SCC.
+* {product-name} 5.4 is backward compatible with pre-5.4 SSO role mappings. For the previous structure, see https://github.com/horantj/rancher-nv-rbac.
+
+Starting with {product-name} 5.4, full compatibility and integration of {product-name} with Rancher RBAC has been included. This offers users the possibility of customizing specific permissions based on the profile of the user or group that should access {product-name}.
+
+In the Rancher console, *Users & Authentication* -> *Role Templates* page, customers can create Global, Cluster, Project, and Namespace roles with specific {product-name} Verbs, Resources, and API Groups. When such a Rancher role is assigned to a Rancher user, the user's {product-name} SSO session is assigned different {product-name} permissions accordingly. This is to provide SSO users with custom roles (that is, roles other than the reserved admin, reader, fedAdmin, and fedReader roles).

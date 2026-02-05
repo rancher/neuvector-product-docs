@@ -1,7 +1,0 @@
-= Release Notes
-:revdate: 2024-09-25
-:page-revdate: {revdate}
-:page-opendocs-origin: /14.releasenotes/14.releasenotes.md
-:page-opendocs-slug:  /releasenotes
-
-Here you will find a log of major changes in releases.

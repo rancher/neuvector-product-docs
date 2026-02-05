@@ -87,3 +87,36 @@ In version 5.1, a new listener port has been added on 8181 in the controller for
 ----
 tcp        0      0 :::8181                 :::*                    LISTEN      8/opa
 ----
+
+=== {product-name} images
+
+{product-name} images are published to Docker Hub. Use a fixed version tag for core components and the `latest` tag for scanner and updater images.
+
+Use the same version tag for the manager, controller, and enforcer images. Use `latest` for the scanner and updater images.
+
+.Example image tags
+[source,text]
+----
+neuvector/manager:5.4.1
+neuvector/controller:5.4.1
+neuvector/enforcer:5.4.1
+neuvector/scanner:latest
+neuvector/updater:latest
+----
+
+Update image references in your Kubernetes manifests or Helm values file to match the target NeuVector version.
+
+==== Helm chart configuration
+
+When deploying product-nam using the Helm chart version 1.8.9 or later, update the following settings in `values.yaml`:
+
+* Set the image registry to `docker.io`
+* Update image names and tags to the required version
+* Leave `imagePullSecrets` empty
+
+==== Rancher registry images
+
+{product-name} images are also mirrored to the Rancher registry for deployments managed through Rancher.
+
+* Image availability may lag by a few days after each release
+* For deployment details, see the Rancher deployment documentation

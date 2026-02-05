@@ -1,7 +1,0 @@
-= Update the {product-name} Containers
-:revdate: 2024-09-27
-:page-revdate: {revdate}
-:page-opendocs-origin: /10.updating/10.updating.md
-:page-opendocs-slug:  /updating
-
-How to update the {product-name} components

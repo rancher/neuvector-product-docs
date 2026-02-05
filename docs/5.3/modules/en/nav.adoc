@@ -1,117 +1,121 @@
 * xref:overview.adoc[{product-name} Overview]
+
 * Understanding {product-name}
 ** xref:requirements.adoc[System Requirements]
-** xref:03.installation.adoc[Deployment Preparation introduction]
-*** xref:installation.adoc[Deployment Preparation]
-** xref:policy-overview.adoc[Security Policy Overview]
-** xref:integration.adoc[Enterprise Integration]
+** xref:installation.adoc[Deployment Preparation]
 ** xref:ci-workflow.adoc[CI/CD Workflow]
-* Operational Tasks
-** Deploying {product-name}
-*** xref:production.adoc[{product-name} Production]
-*** xref:configmap.adoc[Deploy Using ConfigMap]
-*** xref:operators.adoc[Deploy Using Operators]
-*** xref:publick8s.adoc[Deploying SUSE Security on Public Cloud]
-**** xref:awsmarketplace.adoc[AWS Marketplace Listing]
-*** xref:kubernetes.adoc[Kubernetes]
-*** xref:openshift.adoc[OpenShift]
-*** xref:rancher.adoc[Rancher Deployment]
-*** xref:airgap.adoc[Air-Gapped Deployment]
-*** xref:docker.adoc[Docker]
-*** xref:ecs.adoc[Amazon ECS]
-*** xref:10.updating.adoc[Updating {product-name} introduction]
-**** xref:updating.adoc[Updating {product-name}]
-*** xref:testing.adoc[Evaluating and Testing {product-name}]
-*** xref:troubleshooting.adoc[Troubleshooting Deployments]
+** xref:policy-overview.adoc[Security Policy Model]
+** xref:modes.adoc[Modes: Discover, Monitor, Protect]
+** xref:multicluster.adoc[Multi-Cluster Architecture]
+
+* Deploy {product-name}
+** xref:production.adoc[Production Deployment]
+** xref:configmap.adoc[Deploy Using ConfigMap]
+** xref:operators.adoc[Deploy Using Operators]
+** xref:kubernetes.adoc[Kubernetes]
+** xref:openshift.adoc[OpenShift]
+** xref:rancher.adoc[Rancher]
+** xref:publick8s.adoc[Public Cloud]
+*** xref:awsmarketplace.adoc[AWS Marketplace]
+** xref:ecs.adoc[Amazon ECS]
+** xref:docker.adoc[Docker]
+** xref:airgap.adoc[Air-Gapped Deployment]
+** xref:updating.adoc[Upgrade and Update]
+** xref:testing.adoc[Evaluation and Testing]
+** xref:troubleshooting.adoc[Deployment Troubleshooting]
+
+* Operate and Administer
 ** xref:users.adoc[Users and Roles]
-** xref:restore.adoc[Restoring {product-name} Configuration]
-** xref:remove.adoc[Removing or Resetting {product-name}]
-** xref:internal.adoc[Replacing Internal Certificates]
-** xref:replacecert.adoc[Replacing Self-Signed Certificates]
-** xref:chrome.adoc[Enabling Chrome Browsers to Accept the {product-name} Self-Signed Certificate]
-** xref:certrotate.adoc[Rotating Internal self signed certificate]
-** xref:rest-api.adoc[Connect to Manager, REST API Server]
+** xref:restore.adoc[Backup and Restore]
+** xref:remove.adoc[Remove or Reset]
+** Certificates and TLS
+*** xref:internal.adoc[Replacing Internal Certificates]
+*** xref:replacecert.adoc[Replacing Self-Signed Certificates]
+*** xref:certrotate.adoc[Rotating Certificates]
+*** xref:chrome.adoc[Browser Trust Configuration]
+** xref:rest-api.adoc[Manager and REST API Access]
 ** xref:automation.adoc[Automation with REST API]
+
 * {product-name} Interface
 ** xref:navigation.adoc[Navigating the Console]
-** xref:multicluster.adoc[Enterprise Multi-Cluster Management]
-** xref:modes.adoc[Modes: Discover, Monitor, Protect]
-** xref:reporting.adoc[Reporting & Notifications]
+** xref:reporting.adoc[Reporting and Notifications]
 ** xref:customui.adoc[Customizing the UI]
-* Security Management
-** Security Policy
-*** Admission Controls
-**** xref:admission.adoc[Admission Controls]
-**** xref:sigstore.adoc[Sigstore Cosign Signature Verifiers]
-**** xref:assessment.adoc[Configuration Assessment for Kubernetes Resources]
-*** xref:groups.adoc[Groups]
-*** xref:networkrules.adoc[Network Rules]
-*** xref:processrules.adoc[Process Profile Rules]
-*** xref:filerules.adoc[File Access Rules]
-*** xref:responserules.adoc[Response Rules]
-*** xref:dlp.adoc[DLP & WAF Sensors]
-*** xref:threats.adoc[Network Threat Signatures]
-*** xref:customcompliance.adoc[Custom Compliance Checks]
-*** xref:federated.adoc[Federated Policy]
-*** Custom Resource Definitions
-**** xref:usingcrd.adoc[Using CRD]
-**** xref:import.adoc[Importing CRD from Console]
-** Security Risks, Scanning & Compliance
-*** Scanning & Compliance
-**** xref:scanning.adoc[Scanning]
-**** xref:vulnerabilities.adoc[Vulnerability Management]
-**** xref:compliance.adoc[Compliance & CIS Benchmarks]
-*** Registry Scanning
-**** xref:registry-scanning-configuration.adoc[Registry Scanning Configuration]
-**** xref:harbor.adoc[Harbor Pluggable Scanner Module]
-**** xref:ecr-iam.adoc[ECR Scanning Using IAM Roles]
-**** xref:gcr-sa.adoc[GCR Scanning Using Service Accounts]
-*** Build Phase Image Scanning
-**** xref:build-image-scanning.adoc[Local]
-**** xref:jenkins.adoc[Jenkins]
-**** xref:bamboo.adoc[Bamboo]
-**** xref:circleci.adoc[CircleCI]
-**** xref:azuredevops.adoc[Azure DevOps]
-**** xref:gitlab.adoc[Gitlab]
-**** xref:github.adoc[GitHub]
-*** xref:improve-score.adoc[Improve Security Risk Score]
-*** xref:cve-sources.adoc[CVE Database Sources & Version]
-*** xref:updating-cve-database.adoc[Updating the CVE Database]
-*** xref:scanners.adoc[Parallel & Stand-Alone Scanners]
-* Enterprise Features
-** Integration
+
+* Security Policy Management
+** Admission Control
+*** xref:admission.adoc[Admission Controls]
+*** xref:sigstore.adoc[Sigstore and Cosign Verification]
+*** xref:ociimagesigning.adoc[OCI Image Signing]
+*** xref:assessment.adoc[Kubernetes Configuration Assessment]
+** xref:groups.adoc[Groups]
+** xref:networkrules.adoc[Network Rules]
+** xref:processrules.adoc[Process Profile Rules]
+** xref:filerules.adoc[File Access Rules]
+** xref:responserules.adoc[Response Rules]
+** xref:dlp.adoc[DLP and WAF Sensors]
+** xref:threats.adoc[Network Threat Signatures]
+** xref:customcompliance.adoc[Custom Compliance Checks]
+** xref:federated.adoc[Federated Policy]
+** Custom Resource Definitions
+*** xref:usingcrd.adoc[Using CRDs]
+**** xref:import.adoc[Importing CRDs]
+** xref:namespaceboundary.adoc[Namespace Boundary Enforcement]
+** xref:detectbandwidthddos.adoc[Bandwidth and DDoS Detection]
+
+* Vulnerability, Scanning, and Compliance
+** xref:scanning.adoc[Scanning Overview]
+** xref:vulnerabilities.adoc[Vulnerability Management]
+** xref:compliance.adoc[Compliance and CIS Benchmarks]
+** Registry Scanning
+*** xref:registry-scanning-configuration.adoc[Configuration]
+*** xref:harbor.adoc[Harbor Scanner Integration]
+*** xref:ecr-iam.adoc[ECR with IAM Roles]
+*** xref:gcr-sa.adoc[GCR with Service Accounts]
+** Build-Time Image Scanning
+*** xref:build-image-scanning.adoc[Local Scanning]
+*** xref:jenkins.adoc[Jenkins]
+*** xref:bamboo.adoc[Bamboo]
+*** xref:circleci.adoc[CircleCI]
+*** xref:azuredevops.adoc[Azure DevOps]
+*** xref:gitlab.adoc[GitLab]
+*** xref:github.adoc[GitHub]
+** xref:improve-score.adoc[Improving Security Risk Score]
+** xref:cve-sources.adoc[CVE Sources and Versions]
+** xref:updating-cve-database.adoc[Updating CVE Databases]
+** xref:scanners.adoc[Parallel and Standalone Scanners]
+
+* Enterprise Integrations
+** Identity and Access
 *** xref:ldap.adoc[LDAP]
 *** xref:msad.adoc[Microsoft AD]
-*** xref:saml.adoc[SAML (Okta)]
+*** xref:saml.adoc[SAML]
 *** xref:msazure.adoc[SAML (Azure AD)]
 *** xref:adfs.adoc[SAML (ADFS)]
-*** xref:openid.adoc[OpenID Connect Azure/Okta]
-*** xref:oidc-adfs.adoc[OpenID Connect (OIDC) for ADFS]
+*** xref:openid.adoc[OpenID Connect]
+*** xref:oidc-adfs.adoc[OIDC for ADFS]
+*** xref:rancher_sso_rbac.adoc[Rancher RBAC Integration]
+** SIEM and Ecosystem
 *** xref:ibmsa.adoc[IBM Security Advisor]
 *** xref:ibmqr.adoc[IBM QRadar]
 *** xref:splunk.adoc[Splunk]
-** Special Use Cases with All-in-One
-*** xref:general-guidelines.adoc[General Guidelines]
-*** xref:docker-ee.adoc[Docker Swarm]
-* References
-** xref:details.adoc[Environment Variables Details]
-** xref:cli.adoc[Command Line]
+
+* Special Deployment Models
+** xref:general-guidelines.adoc[All-in-One Guidelines]
+** xref:docker-ee.adoc[Docker Swarm]
+
+* UI Extensions
+** xref:dashboard.adoc[Dashboard]
+** xref:runtime_security.adoc[Runtime Security]
+** xref:notifications.adoc[Notifications]
+
+* Reference
+** xref:details.adoc[Environment Variables]
+** xref:cli.adoc[Command Line Reference]
+
 * Release Notes
 ** xref:5x.adoc[5.x Release Notes]
 ** xref:4x.adoc[4.x Release Notes]
-** xref:other.adoc[Integrations & Other Components]
+** xref:other.adoc[Integrations and Components]
 
-
-docs/5.3/modules/en/pages/02.deploying.adoc
-docs/5.3/modules/en/pages/03.configuration.adoc
-docs/5.3/modules/en/pages/04.navigation.adoc
-docs/5.3/modules/en/pages/05.policy.adoc
-docs/5.3/modules/en/pages/06.scanning.adoc
-docs/5.3/modules/en/pages/07.reporting.adoc
-docs/5.3/modules/en/pages/08.integration.adoc
-docs/5.3/modules/en/pages/09.testing.adoc
-docs/5.3/modules/en/pages/10.updating.adoc
-docs/5.3/modules/en/pages/11.automation.adoc
-docs/5.3/modules/en/pages/12.troubleshooting.adoc
-docs/5.3/modules/en/pages/13.special.adoc
-docs/5.3/modules/en/pages/14.releasenotes.adoc
+* Security Advisories
+** xref:cve.adoc[Security Advisories and CVEs]
