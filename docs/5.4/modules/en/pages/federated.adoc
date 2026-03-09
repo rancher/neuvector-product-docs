@@ -56,9 +56,9 @@ image::Remote-repo-configurations.png[Remote repository configuration]
 . After a successful export, the response message displays the exported file path and file name.
 
 If the *Destination* field is empty, NeuVector generates a default file name and displays it in the response.
-+
-image::response-for-empty-destination.png[Response for empty destination]
 
+image::response-for-empty-destination.png[Response for empty destination]
+ 
 If you specify a custom file name, the response message displays the provided name.
 
 * Define a custom name for the exported file:
