@@ -1182,8 +1182,8 @@ TOTAL: 6, HIGH: 1, MEDIUM: 5, LOW: 0, UNKNOWN: 0
 * Support vulnerability scan of openSUSE Leap OS (in scanner image).
 * Scanner: implement wipe-out attributes during reconstructing image repo.
 * Verify {product-name} deployment and support for SELinux enabled hosts. See below for details on interim patching until helm chart is updated.
-* Distinguish between Feature Chart and Partner Charts in Rancher UI more prominently.+ Improve ingress annotation for nginx in Rancher helm chart. Add / update
-ingress.kubernetes.io/protocol: https to nginx.ingress.kubernetes.io/backend-protocol: "HTTPS".
+* Distinguish between Feature Chart and Partner Charts in Rancher UI more prominently.
+* Optimized Ingress annotations in the Rancher Helm chart. Updated configurations to ensure backend communication correctly utilizes the HTTPS scheme (e.g., via `traefik.ingress.kubernetes.io/service.serversscheme: https`).
 * Current OpenShift Operator supports passthrough routes for api and federation services. Additional Helm Value parameters are added to support edge and re-encrypt route termination types.
 
 ==== Bug Fixes
