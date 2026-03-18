@@ -1,0 +1,72 @@
+= SAML (Azure AD)
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/05.msazure/05.msazure.md
+:page-opendocs-slug:  /integration/msazure
+
+== Integrate with Azure AD SAML authentication
+
+. In the Azure management console, select the `"Enterprise applications" menu item in Azure Active Directory
++
+image:azure1.png[azure_config1]
+
+. Select "`New Application`"
++
+image:azure2.png[azure_config2]
+
+. Create a Non-gallery application and give it a unique name
++
+image:azure3.png[azure_config3]
+
+. In the application's configuration page, select "Single sign-on" in the left-side panel and choose the SAML-based sign-on
++
+image:azure4.png[azure_config4]
+
+. Download the certificate in the base64 format and note the application's Login URL and Azure AD Identifier
++
+image:azure5.png[azure_config5]
+
+. In the {product-name} management console, login as an administrator. Select "`Settings" in the administrator dropdown menu at the top-right corner. Click SAML settings
++
+image:azure6.png[azure_config6]
+
+. Configure the SAML server as follows:
+* Copy application's "Login URL" as the Single Sign-On URL.
+* Copy "Azure AD Identifier" as the Issuer.
+* Open downloaded the certificate and copy the text to X.509 Certificate box.
+* Set a default role.
+* Enter the group name for role mapping. The group claim returned by Azure are identified by the "Object ID" instead of the name. The group's object ID can be located in menu:Azure Active Directory[Groups > Group name Page]. You should use this value to configure group-based role mapping in {product-name}.
++
+image:openid5.png[OpenID5]
++
+Then Enable the SAML server.
++
+image:azure7.png[azure_config7]
+
+. Copy the Redirect URL
++
+image:azure8.png[azure_config8]
+
+. Return to the Azure management console to setup "Basic SAML Configuration". Copy {product-name} console's Redirect URL to both "Identifier" and "Reply URL" boxes
++
+image:azure9.png[azure_config9]
+
+. Edit "SAML Signing Certificate", changing the Signing Option to "Sign SAML response"
++
+image:azure10.png[azure_config10]
+
+. Edit "User Attributes & Claims" so the response can carry the login user's attributes back to {product-name}. Click "Add new claim" to add "Username" and "Email" claims with "user.userprincipalname" and "user.mail" respectively.
++
+image:azure11.png[azure_config11]
+
+. If the users are assigned to the groups in the active directory, their group membership can be added to the claim. Find the application in "App registrations" and edit the manifest. Modify the value of "groupMembershipClaims" to "All".
++
+image:azure12.png[azure_config12]
+
+. Authorize users and groups to access the application so they can login {product-name} console with Azure AD SAML SSO
++
+image:azure13.png[azure_config13]
+
+=== Mapping Groups to Roles and Namespaces
+
+Please see the xref:users.adoc#_mapping_groups_to_roles_and_namespaces[Users and Roles] section for how to map groups to preset and custom roles as well as namespaces in {product-name}.

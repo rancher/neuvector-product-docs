@@ -1,0 +1,122 @@
+= Deployment Preparation
+:revdate: 2026-02-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /01.basics/03.installation/01.native/01.native.md
+:page-opendocs-slug: /basics/installation
+
+== Understanding How to Deploy {product-name}
+
+Deploy the {product-name} containers using Kubernetes, OpenShift, Rancher, Docker, or other platforms. Each type of {product-name} container has a unique purpose and may require special performance or node selection requirements for optimum operation.
+
+The {product-name} open source images are hosted on Docker Hub at `/neuvector/{image name}`.
+
+See the xref:production.adoc#_best_practices_tips_qa_for_deploying_and_managing_suse_security[Onboarding/Best Practices section] to download an on boarding guide.
+
+=== Deploy using Kubernetes, OpenShift, Rancher, or other Kubernetes-based tools
+
+To deploy {product-name} using Kubernetes, OpenShift, Rancher or other orchestration tools, see the preparation steps and sample files in the section xref:production.adoc#_planning_deployments[Deploying {product-name}]. This deploys manager, controller, scanner, and enforcer containers. For simple testing using the {product-name} Allinone container, see the section Special Use Cases with Allinone.
+
+{product-name} supports Helm-based deployment with a Helm chart at https://github.com/neuvector/neuvector-helm.
+
+Automated deployments are supported using Helm, Red Hat/Community Operators, the rest API, or a Kubernetes ConfigMap. See the section xref:configmap.adoc#_kubernetes_configmap[Deploy Using ConfigMap] for more details on automating deployment.
+
+=== Deploy using Docker Native
+
+Before you xref:docker.adoc[deploy {product-name}] with docker run or compose, you MUST set the CLUSTER_JOIN_ADDR to the appropriate IP address. Find the node IP address, node name (if using a name server, or node variable (if using orchestration tools) for the allinone (controller) to use for the "`node IP`" in the docker-compose files for both allinone and enforcer.  For example:
+
+[,yaml]
+----
+- CLUSTER_JOIN_ADDR=192.168.33.10
+----
+
+For Swarm-Based deployments, also add the following environment variable:
+
+[,yaml]
+----
+- NV_PLATFORM_INFO=platform=Docker
+----
+
+See the section Deploying {product-name} -> xref:docker.adoc[Docker Production Deployment] for instructions and examples.
+
+=== Backing Up Configuration Files
+
+By default {product-name} stores various config files in  /var/neuvector/config/backup on the Controller or Allinone node.
+
+This volume can be mapped to xref:production.adoc#_backups_and_persistent_data[persistent storage] to maintain configuration. Files in the folder may need to be deleted in order to start fresh.
+
+=== Volume Mapping
+
+Make sure volumes are mapped properly. {product-name} requires these to operate (/var/neuvector is only required on controller/allinone). For example:
+
+[,yaml]
+----
+volumes:
+        - /lib/modules:/lib/modules:ro
+        - /var/neuvector:/var/neuvector
+        - /var/run/docker.sock:/var/run/docker.sock:ro
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup:/host/cgroup:ro
+----
+
+Also, you may need to ensure that other tools are not blocking access to the docker.sock interface.
+
+=== Ports and Port Mapping
+
+Make sure the required ports are mapped properly and open on the host. The Manager or Allinone requires 8443 (if using the console). The Allinone and Controller requires 18300, 18301, 18400, 18401 and optionally 10443, 11443, 20443, 30443. The Enforcer requires 18301 and 18401.
+
+[NOTE]
+====
+If deploying docker native (including SWARM) make sure there is not any host firewall blocking access to required ports such as firewalld. If enabled, the docker0 interface must be added as a trusted zone for the allinone/controller hosts.
+====
+
+==== Port Summary
+
+The following table lists communications from each {product-name} container. The Allinone container combines the Manager, Controller and Enforcer containers so requires the ports listed for those containers.
+
+image:Communication_Matrix_From_To.png[Ports]
+
+The following table summarizes the listening ports for each {product-name} container.
+
+image:Communication_Matrix_Listening_Ports.png[Listening]
+
+===== Additional Ports
+
+In version 5.1, a new listener port has been added on 8181 in the controller for local controller communication only.
+
+[,shell]
+----
+tcp        0      0 :::8181                 :::*                    LISTEN      8/opa
+----
+
+=== {product-name} images
+
+{product-name} images are published to Docker Hub. Use a fixed version tag for core components and the `latest` tag for scanner and updater images.
+
+Use the same version tag for the manager, controller, and enforcer images. Use `latest` for the scanner and updater images.
+
+.Example image tags
+[source,text]
+----
+neuvector/manager:5.4.1
+neuvector/controller:5.4.1
+neuvector/enforcer:5.4.1
+neuvector/scanner:latest
+neuvector/updater:latest
+----
+
+Update image references in your Kubernetes manifests or Helm values file to match the target NeuVector version.
+
+==== Helm chart configuration
+
+When deploying product-nam using the Helm chart version 1.8.9 or later, update the following settings in `values.yaml`:
+
+* Set the image registry to `docker.io`
+* Update image names and tags to the required version
+* Leave `imagePullSecrets` empty
+
+==== Rancher registry images
+
+{product-name} images are also mirrored to the Rancher registry for deployments managed through Rancher.
+
+* Image availability may lag by a few days after each release
+* For deployment details, see the Rancher deployment documentation

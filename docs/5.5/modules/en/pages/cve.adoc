@@ -1,0 +1,13 @@
+= Security Advisories and CVEs
+:revdate: 2025-08-26
+:page-revdate: {revdate}
+
+NeuVector is committed to informing the community about security issues. The following table lists published security advisories and CVEs (Common Vulnerabilities and Exposures) for resolved issues.
+
+== Questions and Support
+
+* Contact the https://github.com/rancher/rancher/security/policy[SUSE Rancher Security team].
+* Open an issue in the https://github.com/neuvector/neuvector/issues/new/choose[NeuVector GitHub repository].
+* References:
+** https://www.suse.com/suse-neuvector/support-matrix/all-supported-versions/neuvector-v-all-versions/[NeuVector Support Matrix]
+** https://www.suse.com/lifecycle/#suse-security[Product Support Lifecycle]

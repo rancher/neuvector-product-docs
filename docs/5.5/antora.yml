@@ -1,0 +1,14 @@
+name: security
+title: SUSE® Security
+version: 5.5
+display_version: '5.5'
+start_page: en:overview.adoc
+asciidoc:
+  attributes:
+    CVE-critical: 🔴 Critical
+    CVE-high: 🟠 High
+    CVE-medium: 🟡 Medium
+    CVE-low: 🟢 Low
+    product-name: SUSE® Security
+nav:
+- modules/en/nav.adoc

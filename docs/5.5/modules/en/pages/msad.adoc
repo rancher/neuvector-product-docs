@@ -1,0 +1,48 @@
+= Microsoft AD
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/03.msad/03.msad.md
+:page-opendocs-slug:  /integration/msad
+
+== Configuring Active Directory
+
+This explains how {product-name} authenticates with Windows Active Directory.
+The configuration page for Windows Active Directory server is shown below.
+
+image:ad1.png[ad_config]
+
+User name: This can be any user who has read permission on the Base DN object. The dn attribute should be used as shown below, or the windows logon name such as user@local.nvtest.com.
+
+image:ad2.png[ad_config]
+
+Base DN: This is a root Windows Active Director object for user authentication. The minimum access permission requirement is read. As shown in the example above, the OU=IT,DC=local,DC=nvtest,DC=com object is only allowed for a user account which is defined in the User name field to allow a read.
+
+image:ad3.png[ad_config]
+
+With the above User name and Base DN settings, {product-name} is able to bind with Windows Active Directory successfully. Click the TEST CONNECTION to check it.
+
+image:ad4.png[ad_config]
+
+User name: It is required to use the sAMAccountName attribute ONLY to match. For example, in the screen below {product-name} is going to verify if the ituser(CN=ituser,OU=IT,DC=local,DC=nvtest,DC=com) user is able to login with {product-name} web console.
+
+[NOTE]
+====
+{product-name} doesn't use the values of cn, displayName, dn, givenName, name or userPrincipalName attributes etc to verify the test user.
+====
+
+image:ad5.png[ad_config]
+
+The last part is role mapping for {product-name} for the web console login.
+
+image:ad6.png[ad_config]
+
+In the example above, the defined group, _d_s_itgroup,  in the {product-name} role must have member and sAMAccountType attributes. The value of the sAMAccountType attribute MUST be 268435456 which is the Global Security group and the login username must be in the member lists.
+
+image:ad7.png[ad_config]
+
+Group member attribute: This is a member attribute for Windows Active Directory by default and it is used for the role mapping purpose, as shown above.
+If all the requirements are met above, the Windows Active Directory user should be able to login to the {product-name} web console successfully.
+
+=== Mapping Groups to Roles and Namespaces
+
+Please see the xref:users.adoc#_mapping_groups_to_roles_and_namespaces[Users and Roles] section for how to map groups to preset and custom roles as well as namespaces in {product-name}.

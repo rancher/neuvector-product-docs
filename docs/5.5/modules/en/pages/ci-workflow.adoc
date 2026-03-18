@@ -1,0 +1,25 @@
+= {product-name} Workflow
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /11.automation/01.ci_workflow/01.ci_workflow.md
+:page-opendocs-slug:  /automation/ci_workflow
+
+== {product-name} Integration into CI/CD Workflow
+
+{product-name} supports the entire CI/CD process and can be easily integrated into the workflow to provide security throughout the development and deployment process.
+
+=== Dev and Continuous Integration Workflow
+
+{product-name} can be integrated into the Dev and CI processes to automate vulnerability scanning. The use of the {product-name} Jenkins plug-in and Registry scanning functions enable image scanning during this phase.
+
+image:ci_workflow.png[integration]
+
+In addition, {product-name} can be used during automated application testing to analyze network connections and container behavior to anticipate any issues in staging or production.
+
+=== Continuous Deployment and Production Workflow
+
+{product-name} can conduct pre-deployment compliance testing and security auditing prior to production as well as in production.
+
+image:cd_workflow.png[production]
+
+The multi-vector security platform is able to combine network security, container inspections, and host security to protect containers at run-time.
