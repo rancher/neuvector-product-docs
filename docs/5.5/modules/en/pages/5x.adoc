@@ -1,5 +1,5 @@
 = 5.x Release Notes
-:revdate: 2026-02-13
+:revdate: 2026-03-18
 :page-revdate: {revdate}
 :page-opendocs-origin: /14.releasenotes/01.5x/01.5x.md
 :page-opendocs-slug:  /releasenotes/5x
@@ -10,6 +10,28 @@
 ====
 To receive email notifications of new releases, please subscribe to this SUSE mailing list: https://lists.suse.com/mailman/listinfo/neuvector-updates
 ====
+
+== 5.5.0 March 2026
+
+=== Feature requests
+
+* **NVSHAS-10131**: Improve the Vulnerabilities Report
+* **NVSHAS-10195**: Upgrade UI framework from Angular 14 to Angular 20
+
+=== Bugs fixed
+
+* ** NVSHAS-10244**: NeuVector Rancher SSO authentication error when Rancher Helm release name is not `rancher`
+* ** NVSHAS-10255**: Add user validation on APIs that do not communicate with the controller
+* ** NVSHAS-10264**: Display control is missing on the API key page
+* ** NVSHAS-10281**: Suppress log in the response rule is not working
+
+=== Announcement
+
+* **NVSHAS-10246**: Deprecate Docker native support in NeuVector
+
+=== References
+
+* https://github.com/neuvector/manager/security/advisories/GHSA-hx45-873x-74qv[Potential information leakage from manager `/network/graph` API]
 
 == 5.4.9 February 2026
 

@@ -1,7 +1,7 @@
 site:
   title: SUSE® Security Documentation
   url: /
-  start_page: 5.4@security:en:overview.adoc
+  start_page: 5.5@security:en:overview.adoc
 
 content:
   sources:
