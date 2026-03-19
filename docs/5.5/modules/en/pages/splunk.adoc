@@ -1,0 +1,74 @@
+= Splunk
+:revdate: 2025-05-08
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/11.splunk/11.splunk.md
+:page-opendocs-slug:  /integration/splunk
+
+== Integrating with Splunk with the {product-name} Splunk App
+
+The {product-name} Splunk App can be found in the splunkbase catalog https://splunkbase.splunk.com/app/6205/[here] or by searching for {product-name}.
+
+The {product-name} Security dashboard helps to identify security events such as suspicious login attempts, network violations and vulnerable images.
+
+Below are sample screens displayed in the Splunk app.
+
+=== Image Vulnerabilities
+
+image:vulnerable_images.png[vulnerabilities]
+
+=== Admission Control and Security Events
+
+image:admission_security_events.png[admission_security]
+
+=== Network Violations by Pod/Service (Deployments)
+
+image:network_violations.png[network]
+
+=== Egress Connection Summary
+
+image:egress_destinations.png[egress]
+
+=== {product-name} Login Activity Dashboard
+
+image:login_summary.png[logins]
+
+== Setup and Configuration
+
+=== Getting the app
+
+==== GitHub
+
+Download the latest app tarball (`neuvector_app.tar.gz`) from the https://github.com/neuvector/neuvector-splunk-app[neuvector/neuvector-splunk-app repository].
+
+==== Splunkbase
+
+Download the latest app tarball from https://splunkbase.splunk.com/apps[Splunkbase].
+
+==== Splunk Apps Browser
+
+In the Splunk UI, click on the Apps dropdown, click "Find More Apps", then search for {product-name} Splunk App.
+
+=== Installation and Setup
+
+Install the app by either uploading the tarball or following the Splunkbase prompts.
+
+==== Configure syslog in {product-name} console
+
+Go to Settings -> Configuration -> Syslog
+
+[loweralpha]
+. set the server value as the IP address that Splunk is running
+. choose TCP as the protocol
+. set port number as 10514
+. choose Info Level
+. click SUBMIT to save the setting.
+
+image:syslog-config.png[syslog]
+
+You can configure multiple clusters to send syslog to your splunk instance and your splunk instance will receive these syslogs in real time.
+
+=== FAQs
+
+==== What user role is required?
+
+Any user role.

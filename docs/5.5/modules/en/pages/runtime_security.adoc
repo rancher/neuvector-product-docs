@@ -1,0 +1,41 @@
+= Assets Security Scan Result
+:page-opendocs-origin: /15.ui_extension/02.runtime_security/02.runtime_security.md
+:page-opendocs-slug:  /ui_extension/runtime_security
+
+As Rancher Manager has its own **Nodes** and **Workloads** tab to manage and monitor the assets statuses, NeuVector injects components to display its runtime scan result.
+
+== Nodes
+
+In the **Nodes** tab table view, the **Vulnerabilities** column is injected to show each node's detected vulnerabilities amount by high / medium severity.
+
+image:nodes.png[Nodes]
+
+Clicking on the **Vulnerabilities** cell will pop up a new display page to show the scan result details. The database version of the scanner is shown as well as a filterable vulnerability list.
+
+image:nodes_vul.png[Nodes]
+
+Clicking on the **Name** cell on the **Nodes** table redirects to the node detail page. NeuVector injects a **Vulnerabilities** tab to display a table with listed vulnerabilities.
+
+image:node_detail_vul.png[Nodes]
+
+Clicking on the CVE link in the **Name** cell in the **Vulnerabilities** table opens a pop up to show CVE descriptions with an external link inn the header to SUSE's CVE information website.
+
+image:node_detail_vul_cve.png[Nodes]
+
+image:suse_cve.png[SUSE]
+
+A CSV file download button is provided above the **Vulnerabilities** table. The file data includes all the fields which are in the table.
+
+image:download_vul.png[CSV]
+
+image:cve_csv.png[CSV]
+
+== Workloads
+
+Temporarily, the **Vulnerabilities** column will not be injected in the **Workloads** table in the v5.4 release due to potential performance concern. The NeuVector team will work with the Rancher team to integrate it soon.
+
+Clicking on a **Name** in the **Pods** table redirects to the pod detail page. NeuVector injects a **Vulnerabilities** tab to display a table with listed vulnerabilities.
+
+image:pods.png[Pods]
+
+image:pod_detail_vul.png[Pod_Detail]

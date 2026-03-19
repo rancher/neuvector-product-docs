@@ -1,0 +1,69 @@
+= IBM QRadar
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/10.ibmqr/10.ibmqr.md
+:page-opendocs-slug:  /integration/ibmqr
+
+== Integrating with IBM Qradar
+
+The IBM® QRadar® Security Information and Event Management (SIEM) helps security teams accurately detect and prioritize threats across the enterprise, and it provides intelligent insights that enable teams to respond quickly to reduce the impact of incidents. By consolidating log events and network flow data from thousands of devices, endpoints and applications distributed throughout your network, QRadar correlates all this different information and aggregates related events into single alerts to accelerates incident analysis and remediation. QRadar SIEM is available on premises and in a cloud environment.
+
+{product-name} is a full lifecycle container security platform which fully supports QRadar integration. This integration enables QRadar to be able to collect events, logs and incident information for container and Kubernetes environment. By using {product-name}'s DSM for QRadar, customers will be able to normalize the {product-name} security log data in QRadar, then analyze, report or remediate container security events.
+
+=== IBM QRadar and {product-name} DSM
+
+The {product-name} DSM for integrating with IBM QRadar is published and IBM validated on the IBM X-Force / App Exchange website. It is available for download https://exchange.xforce.ibmcloud.com/hub/extension/f6dcde294cac1237ce08bcd4dfbc9142[here] from the App Exchange website.
+
+It is also available for download from this site xref:attachment$NeuVectorDSM_1.0.2.zip[here]
+
+=== How to Integrate {product-name} with QRadar
+
+Before importing the {product-name} DSM into QRadar, we recommend you check/modify these QRadar configurations to make sure everything will work as expected:
+
+. IBM QRadar version 7.3.1 and later
+. Configure QRadar "`System Settings`" to make sure the Syslog Payload Length is big enough for example:
++
+image:Qradar1.png[QRadar]
+
+=== Configure {product-name} to Send Syslog to QRadar
+
+Enable Syslog configuration in Settings -> Configuration. The Server IP/URL and port should be pointing to the QRadar service IP and Port, and the default Syslog port will be 514. Use the UDP protocol and "`In Json`" log format. Select the log level and categories to report. In a multi-cluster {product-name} environment, to collect all clusters logs, this setting needs to be enabled in every cluster. You can configure the cluster name on this page to distinguish cluster events from each other.
+
+image:Qradar_syslog2.png[QRadar]
+
+=== Configure QRadar to Analyze {product-name} Logs
+
+. Enable or Import the {product-name} DSM to QRadar
+When adding a new QRadar log source, if "`{product-name}`" appears in the QRadar log source type, then please ignore the log source importing instructions below and take the next step "`Add and enable log sources for {product-name}`".
+
+image:Qradar3.png[QRadar]
+
+If the "`{product-name}`" log source type was not found in QRadar, please refer to QRadar user manual to install {product-name} DSM via Admin > Extension Management.
+
+image:Qradar4.png[QRadar]
+
+. Add and enable log sources for {product-name}
+
+Now we can add a new log source for {product-name} logs:
+
+image:Qradar5.png[QRadar]
+
+"`Log Source Identifier`" should be the lead controller's pod name. {product-name}'s lead controller's pod name can be found in the raw log data of QRadar or from {product-name}'s management console "`Assets\Controllers`" as below:
+
+image:Qradar6.png[QRadar]
+
+Multiple log sources should be added if there are multiple {product-name} clusters running. {product-name} log source is added and enabled:
+
+image:Qradar7.png[QRadar]
+
+=== Verify the Log Activities
+
+Generate some {product-name} logs, for example Network Policy Violations, Configuration change events or do some Vulnerability Scans on containers/nodes. These incident or event logs will be sent to QRadar in seconds. And the {product-name} logs should be normalized in QRadar console. It can also be verified through QRadar's DSM editor:
+
+image:Qradar8.png[QRadar]
+
+image:Qradar9.png[QRadar]
+
+=== Integration Summary
+
+With the completed integration, {product-name} security and management events can be managed through QRadar together with event data from other sources. QRadar serves as the permanent event storage for {product-name} events, while the {product-name} controller performs real-time security responses and short-term cluster storage for events. QRadar can perform advanced correlation and alerting for critical container and Kubernetes security events.

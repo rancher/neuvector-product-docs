@@ -1,0 +1,15 @@
+= Configuration Assessment for Kubernetes Resources
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/03.admission/02.assessment/02.assessment.md
+:page-opendocs-slug:  /policy/admission/assessment
+
+== Kubernetes Resource Deployment File Scanning
+
+{product-name} is able to scan deployment yaml files for configuration assessments against Admission Control rules. This is useful to scan deployment yaml files early in the pipeline to determine if the deployment would violate any rules before attempting the deployment.
+
+To upload a yaml file to be scanned, go to Policy -> Admission Control and click the Configuration Assessment button. In the window, select a file to upload, then Test.
+
+image:assessment.png[Assessment]
+
+You will then see an analysis of the file, whether the deployment would be allowed, and messages for rules that would apply to the deployment file.

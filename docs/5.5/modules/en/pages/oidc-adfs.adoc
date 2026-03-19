@@ -1,0 +1,72 @@
+= OpenID Connect (OIDC) for ADFS
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/08.oidc_adfs/08.oidc_adfs.md
+:page-opendocs-slug:  /integration/oidc_adfs
+
+== Integrating with OpenID Connect (OIDC) for ADFS
+
+From AD FS Management, click on "Application Groups" and then click on "Add Application Group..."
+
+image:adfs1.png[adfs]
+
+Enter a name, select "Server application accessing a web API" and then click Next
+
+image:adfs2.png[adfs]
+
+Enter Redirect URI from {product-name} Settings > OpenID Connect Setting page and then click Next
+
+image:adfs3.png[adfs]
+
+Enable "Generate a shared secret" checkbox and then click Next
+
+image:adfs4.png[adfs]
+
+Enter the Identifier created in previous step and then click Next
+
+image:adfs5.png[adfs]
+
+image:adfs6.png[adfs]
+
+Enable allatclaims, email, openid and profile scopes and then click Next
+
+image:adfs7.png[adfs]
+
+image:adfs8.png[adfs]
+
+image:adfs9.png[adfs]
+
+Double click on an application group you just created previously
+
+image:adfs10.png[adfs]
+
+Double click on Web API and then click Issuance Transform Rules tab
+
+image:adfs11.png[adfs]
+
+Click Add Rule... and select "Send LDAP Attributes as Claims" and then click Next
+
+image:adfs12.png[adfs]
+
+Enter a Claim rule name, choose Active Directory as the Attribute store and provide the mapping of LDAP attributes to outgoing claim types as below
+
+* Token-Groups -- Unqualified Names -> groups
+* User-Principal-Name -> preferred_username
+* E-Mail-Address -> email
+
+image:adfs13.png[adfs]
+
+image:adfs14.png[adfs]
+
+=== {product-name} Setup
+
+* Identity Provider Issuer: "https://<adfs-fqdn>/adfs"
+* Client ID: It is a "Client Identifier" showing in "Server application" dialog in "Add Application Group Wizard"
+* Client Secret: It is a Secret showing in "Configure Application Credentials" dialog in "Add Application Group Wizard"
+* Group Claim: groups
+
+image:adfs15.png[adfs]
+
+image:adfs16.png[adfs]
+
+image:adfs17.png[adfs]

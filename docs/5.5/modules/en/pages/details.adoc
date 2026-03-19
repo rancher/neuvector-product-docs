@@ -1,0 +1,173 @@
+= Environment Variables Details
+:revdate: 2024-12-03
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/01.production/03.details/03.details.md
+:page-opendocs-slug: /deploying/production/details
+
+== Environment Variables
+
+=== For Both Controller (Allinone) and Enforcer
+
+* CLUSTER_JOIN_ADDR
++
+____
+Set the variable to the host IP for the first controller; and set it to the master controller's host IP for other controllers and enforcers. It's not necessary to set this IP for Kubernetes based deployments, just use the sample file.
+____
+
+* CLUSTER_LAN_PORT
++
+____
+(Optional) Cluster Serf LAN port. Both TCP and UDP ports must be mapped to the host directly. Optional if there is no port conflict on the host. Default `18301`
+____
+
+* DOCKER_URL
++
+____
+(Optional) If the docker engine on the host does not bind on the normal Unix socket, use this variable to specify the TCP connection point, in the format of `tcp://10.0.0.1:2376`.
+____
+
+* NV_PLATFORM_INFO
++
+____
+(Optional) Use value platform=Docker for Docker Swarm/EE deployments, or platform=Kubernetes:GKE for GKE (to run GKE CIS Benchmarks).
+____
+
+* CUSTOM_CHECK_CONTROL
++
+____
+(Optional) Used to enable/disable ability to create custom compliance scripts in containers/hosts. Values are "disable" (default, not allowed), "strict" (admin role only), or "loose" (admin, compliance, and runtime-policy roles).
+____
+
+* AUTO_PROFILE_COLLECT
++
+____
+(Optional) Set value to 1 to enable collection of memory profile data to help investigate memory pressure issues.
+____
+
+=== Controller
+
+* CTRL_PERSIST_CONFIG
++
+____
+(Optional) To backup configuration files and restore them from a persistent volume. Add this to the yaml to enable; remove to disable.
+____
+
+* CLUSTER_RPC_PORT
++
+____
+(Optional) Cluster server RPC port. Must be mapped to the host directly. The environment variable is optional if there is no port conflict on the host. Default `18300`
+____
+
+* CTRL_SERVER_PORT
++
+____
+(Optional) HTTPS port that the REST server should be listening on. Default is `10443`. Normally it can be left as default and use docker port option to map the port on the host.
+____
+
+* DISABLE_PACKET_CAPTURE
++
+____
+(Optional) Add this to the yaml to disable packet capture; remove to re-enable (default).
+____
+
+* NO_DEFAULT_ADMIN
++
+____
+(Optional) When enabled does not create an 'admin' user in the local cluster. This is used for Rancher SSO integration as the default. If not enabled, persistently warn the user and record events to change the default admin password if it is not changed from default.
+____
+
+* CTRL_EN_ICMP_POLICY
++
+____
+(Optional) When enabled (value=1) icmp traffic can be learned in discover mode, and policy can be generated. If there is no network policy in monitor or protect mode for the group, an implicit violation will be generated for icmp traffic.
+____
+
+=== Manager
+
+* CTRL_SERVER_IP
++
+____
+(Optional for all-in-one) Controller REST server IP address. Default is `127.0.0.1`. For all-in-one container, leave it as default. If the Manager is running separately, the Manager must specify this IP to connect to the controller.
+____
+
+* CTRL_SERVER_PORT
++
+____
+(Optional for all-in-one) Controller REST server port. Default is `10443`. For all-in-one container, leave it as default. If the Manager is running separately, the Manager should specify this variable to connect to the controller.
+____
+
+* MANAGER_SERVER_PORT
++
+____
+(Optional) Manager UI port. Default is `8443`. Unless the Manager is running in host mode, leave it and user docker port option to map the port on the host.
+____
+
+* MANAGER_SSL
++
+____
+(Optional) Manager by default uses and HTTPS/SSL connection. Set the value to "`off`" to use HTTP.
+____
++
+[IMPORTANT]
+====
+This environment variable is only for the standalone NeuVector product. Please set the variable to "on" if using Rancher SSO or leave unset as NeuVector will use HTTPS by default.
+====
+
+=== Enforcer
+
+* CONTAINER_NET_TYPE
++
+____
+(Optional) To support special network plug-in set value to "macvlan`"
+____
+
+* ENF_NO_SECRET_SCANS
++
+____
+(Optional) Set the value to "`1`" to disable scanning for secrets in files (improves performance).
+____
+
+* ENF_NO_AUTO_BENCHMARK
++
+____
+(Optional) Set the value to "`1`" to disable CIS benchmarks on host and containers (improves performance).
+____
+
+* ENF_NO_SYSTEM_PROFILES
++
+____
+(Optional) Set the value to "1" to disable the process and file monitors. No learning processes, no profile modes, no process/file (package) incidents, and no file activity monitor will be performed. This will reduce CPU/memory resource usage and file operations.
+____
+
+* ENF_NETPOLICY_PULL_INTERVAL
++
+____
+(Optional) Value in seconds (recommended value 60) to reduce network traffic and resource consumption by Enforcer due to policy updates/recalculations, in clusters with high node counts or workloads. Default is zero, meaning no delay in updating Enforcer policy.
+____
+
+* THRT_SSL_TLS_1DOT0
++
+____
+(Optional) Set the value to "`1`" to enable the detection for TLS Version 1.0 (Deprecated).
+____
+
+* THRT_SSL_TLS_1DOT1
++
+____
+(Optional) Set the value to "`1`" to enable the detection for TLS Version 1.1 (Deprecated).
+____
+
+* NV_SYSTEM_GROUPS
++
+____
+(Optional) Specify what groups or namespaces that {product-name} considers to be 'system containers', separated by semi-colons. For example, for Rancher-based apps and the default namespace, NV_SYSTEM_GROUPS=__cattle-system;__default. These values are translated in regex. System containers (which also include {product-name} and Kubernetes system containers) operate only in Monitor mode (alert only) even if the group is set to Protect mode.
+____
+
+== Open Ports
+
+* CLUSTER_RPC_PORT - on controller and all-in-one. Default 18300.
+* CLUSTER_LAN_PORT - on controller, enforcer and all-in-one. Default 18301.
+* MANAGER_SERVER_PORT - on manager or all-in-one. Default 8443.
+* CTRL_SERVER_PORT - on controller. Default 10443.
+
+Please see the section xref:installation.adoc[Deployment Preparation] for a full description of the port communication requirements for the {product-name} containers.
