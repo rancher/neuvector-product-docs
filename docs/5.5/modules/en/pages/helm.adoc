@@ -1,0 +1,81 @@
+= Deploy Using Helm
+
+This is an example guide on how to deploy SUSE Security via Helm to be used alongside https://documentation.suse.com/cloudnative/rancher-manager/latest/en/installation-and-upgrade/installation-and-upgrade.html[SUSE Rancher installations]. The example deploys the SUSE Security v5.4.9 chart (https://github.com/rancher/charts/blob/release-v2.13/charts/neuvector/108.0.2%2Bup2.8.11/[`108.0.2+up2.8.11`]) for the Rancher v2.13 release line. Based on your Rancher cluster versioning, ensure you choose the correct chart in the related Rancher `/release-v<version>/charts/neuvector/` branch. Note all SUSE Security 5.x versions can be applied to all supported https://www.suse.com/suse-neuvector/support-matrix/all-supported-versions/neuvector-v-all-versions/[Rancher versions]. For further information regarding SUSE Security deployment methods, refer to xref:production.adoc#_planning_deployments[Planning Deployments].
+
+== Prerequisites
+
+* A running SUSE Rancher cluster.
+* Ensure you have https://helm.sh/docs/intro/quickstart/#install-helm[Helm] installed to make use of the Helm CLI.
+* The https://kubernetes.io/docs/tasks/tools/#kubectl[Kubectl] command-line tool configured to communicate with your cluster.
+
+== Installation
+
+. Add the Helm repository and update to get the latest charts:
++
+[source,shell]
+----
+helm repo add rancher-charts https://charts.rancher.io/
+helm repo update
+----
+
+. Install the `neuvector-crd` chart:
++
+[source,shell]
+----
+helm install neuvector-crd --namespace cattle-neuvector-system --create-namespace rancher-charts/neuvector-crd --version=108.0.2+up2.8.11
+----
++
+.. If your cluster has Pod Security Admission (PSA) enabled, you must label the namespace to allow privileged containers:
++
+[source,shell]
+----
+kubectl label namespace cattle-neuvector-system pod-security.kubernetes.io/enforce=privileged
+----
+
+. If you already have a custom `values.yaml` file, ensure the following values are set. You can use the `values.yaml` file at the following https://github.com/rancher/charts/blob/release-v2.13/charts/neuvector/108.0.2%2Bup2.8.11/values.yaml[`release-v2.13` chart] as a template if needed.
+.. The `global.cattle.url` is set to your Rancher URL in a format such as `+https://your-rancher-url.com+`.
+.. Ensure the value of `controller.federation.managedsvc.type` is set to `NodePort`.
+.. The `global.cattle.systemDefaultRegistry` is set to `<Prime-Registry-URL>`.
++
+[NOTE]
+====
+To learn more about the Prime Registry URL, see our https://scc.suse.com/rancher-docs/rancherprime/latest/en/reference-guide.html#prime-registry-url[Prime-only documentation]. Authentication is required. Use your https://scc.suse.com/[SUSE Customer Center (SCC)] credentials to log in.
+====
++
+[source,yaml]
+.Example: values.yaml
+----
+...
+global: # required for Rancher authentication (https://<Rancher_URL>/)
+  cattle:
+    url: https://your-rancher-url.com # Update with your Rancher URL
+    systemDefaultRegistry: <Prime-Registry-URL>
+...
+controller:
+  federation:
+    managedsvc:
+      type: NodePort
+  prime:
+    enabled: true # Activates Prime features in v5.4.6+
+----
+
+. Install the main chart:
++
+[source,shell]
+----
+helm install neuvector --namespace cattle-neuvector-system --create-namespace rancher-charts/neuvector --version=108.0.2+up2.8.11 -f values.yaml
+----
+
+. Run the following command to find your `NodePort` to access the SUSE Security UI. From the result below the specified `NodePort` is `30101`.
++
+[source,shell]
+----
+kubectl get svc --namespace cattle-neuvector-system neuvector-service-webui
+
+NAME                      TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+neuvector-service-webui   NodePort   10.43.207.222   <none>        8443:30101/TCP   21m
+----
+
+== Post-Installation
+
+The default login credentials for the SUSE Security UI username and password is `admin` / `admin`. You will be prompted to change this upon your first login.
