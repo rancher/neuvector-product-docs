@@ -1,4 +1,6 @@
 = Deploy Using Helm
+:revdate: 2026-03-24
+:page-revdate: {revdate}
 
 This is an example guide on how to deploy SUSE Security via Helm to be used alongside https://documentation.suse.com/cloudnative/rancher-manager/latest/en/installation-and-upgrade/installation-and-upgrade.html[SUSE Rancher installations]. The example deploys the SUSE Security v5.4.9 chart (https://github.com/rancher/charts/blob/release-v2.13/charts/neuvector/108.0.2%2Bup2.8.11/[`108.0.2+up2.8.11`]) for the Rancher v2.13 release line. Based on your Rancher cluster versioning, ensure you choose the correct chart in the related Rancher `/release-v<version>/charts/neuvector/` branch. Note all SUSE Security 5.x versions can be applied to all supported https://www.suse.com/suse-neuvector/support-matrix/all-supported-versions/neuvector-v-all-versions/[Rancher versions]. For further information regarding SUSE Security deployment methods, refer to xref:production.adoc#_planning_deployments[Planning Deployments].
 
