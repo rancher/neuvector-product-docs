@@ -15,6 +15,7 @@
 ** xref:kubernetes.adoc[Kubernetes]
 ** xref:openshift.adoc[OpenShift]
 ** xref:rancher.adoc[Rancher]
+*** xref:helm.adoc[Deploy Using Helm]
 ** xref:publick8s.adoc[Public Cloud]
 *** xref:awsmarketplace.adoc[AWS Marketplace]
 ** xref:ecs.adoc[Amazon ECS]
