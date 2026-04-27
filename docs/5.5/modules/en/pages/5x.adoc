@@ -1,5 +1,5 @@
 = 5.x Release Notes
-:revdate: 2026-03-18
+:revdate: 2026-04-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /14.releasenotes/01.5x/01.5x.md
 :page-opendocs-slug:  /releasenotes/5x
@@ -10,6 +10,23 @@
 ====
 To receive email notifications of new releases, please subscribe to this SUSE mailing list: https://lists.suse.com/mailman/listinfo/neuvector-updates
 ====
+
+== 5.5.1 April 2026
+
+=== Feature requests
+
+* https://github.com/neuvector/neuvector/issues/2248[#2248]: Expose OS scan support status from scanner results
+  
+=== Bugs fixed
+  
+* https://github.com/neuvector/neuvector/issues/1140[#1140]: The **accept vulnerabilities in Node** page can be brought out of the View drop down box like that of the container
+* https://github.com/neuvector/neuvector/issues/1154[#1154]: Report column content shifting with multiple fix versions separated by a comma
+* https://github.com/neuvector/neuvector/issues/2255[#2255]: Unable to scan image registry by API(v1/scan/repository) with proxy enabled through curl
+* https://github.com/neuvector/neuvector/issues/1170[#1170]: Event handling function that is set in the icon element does not work after Angular 20 migration.
+* https://github.com/neuvector/neuvector/issues/1175[#1175]: The federated prefix and the registry name are not properly aligned when attempting to add a federated registry to the primary cluster
+* https://github.com/neuvector/neuvector/issues/1156[#1156]: Auto-scan button malfunctioning
+* https://github.com/neuvector/neuvector/issues/1179[#1179]: Show advance setting button is not displayed when creating user
+* https://github.com/neuvector/neuvector/issues/1183[#1183]: Auto-scan toggle state is not synchronized between **Dashboard** and **Assets -> Nodes** page
 
 == 5.5.0 March 2026
 
