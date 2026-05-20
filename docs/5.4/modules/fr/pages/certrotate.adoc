@@ -1,0 +1,64 @@
+= Rotation du certificat interne auto-signé
+
+Cette fonctionnalité permet aux utilisateurs de mettre à jour/faire la rotation automatiquement des certificats internes de NeuVector.
+
+Une fois activé, un nouveau conteneur d'initialisation du pod contrôleur créera une ressource Job Kubernetes pour effectuer la rotation des certificats internes. Le job de mise à niveau peut également être déclenché via un objet CronJob, de sorte que le certificat interne sera soumis à une rotation régulière.
+
+Pour activer la rotation automatique, ```internal.autoRotateCert``` doit être défini sur ```true```. (désactivé par défaut).
+
+== Comportement attendu lorsque internal.autoRotateCert est activé
+=== Nouvelle installation
+
+1. Lorsque tous les conteneurs commencent à fonctionner, les conteneurs d'initialisation du contrôleur s'exécuteront et créeront un job de mise à niveau.
++
+image:cert_rotate_01.png[certrotate]
++
+2. Le job de mise à niveau s'exécutera et initialisera un nouveau secret interne. En attendant, les composants attendent que le secret soit initialisé.
++
+image:cert_rotate_02.png[certrotate]
++
+3. Après que le secret interne soit initialisé, tous les composants lisent le secret et suivent le flux normal.
++
+image:cert_rotate_03.png[certrotate]
+
+=== Mise à niveau
+
+1. Le déploiement ancien est déjà en cours d'exécution.
++
+image:cert_rotate_04.png[certrotate]
++
+2. Après avoir exécuté helm upgrade, la mise à jour progressive commencera. Le conteneur d'initialisation du contrôleur créera un job de mise à niveau.
++
+image:cert_rotate_05.png[certrotate]
++
+3. Le job de mise à niveau attendra que la mise à jour progressive soit terminée.
++
+image:cert_rotate_06.png[certrotate]
++
+4. Ensuite, le job de mise à niveau mettra à jour les certificats internes. Chaque composant lira le certificat mis à jour via le Secret k8s.
++
+image:cert_rotate_07.png[certrotate]
+
+Si `internal.autoRotateCert` est faux, le job de mise à niveau démarrera toujours mais aucune action ne sera effectuée. Le comportement original sera suivi, c'est-à-dire qu'il n'y aura pas de conteneur d'initialisation et que les certificats intégrés seront toujours utilisés dans tous les cas.
+
+== Nouvelles options dans le chart HELM
+Dans les charts HELM, ces options sont ajoutées{nbsp}:
+[source, yaml]
+---
+internal.autoGenerateCert (default true): Control whether to automatically generate internal certificate.
+internal.autoRotateCert (default false): Control whether the auto rotation is on/off.
+controller.upgrader.env (default []): Control upgrader's environment variables.
+controller.upgrader.imagePullPolicy (default IfNotPresent): Upgrader's pull policy.
+controller.upgrader.schedule (default "0 0 1 * *"): Upgrader's cronjob schedule.
+---
+
+== Rotation du champ sensible dans la configuration
+
+Lorsque la clé de chiffrement de l'appareil est tournée, NeuVector ne re-chiffre pas immédiatement les champs de configuration sensibles existants. Ces champs ne sont re-chiffrés que lorsqu'ils sont mis à jour ou modifiés après la rotation. 
+
+Chaque fois que la clé de chiffrement est tournée, son numéro de version augmente d'un. NeuVector utilise ce versionnage pour suivre et gérer plusieurs générations de clés de chiffrement de manière sécurisée.
+
+[NOTE]
+====
+L'équipe de NeuVector vous recommande de sauvegarder périodiquement les données du secret Kubernetes `neuvector-store-secret` dans l'espace de noms `neuvector`. 
+====

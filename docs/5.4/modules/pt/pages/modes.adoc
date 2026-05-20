@@ -1,0 +1,110 @@
+= Modos: Descobrir, Monitorar, Proteger
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/02.modes/02.modes.md
+:page-opendocs-slug:  /policy/modos
+
+== {product-name} Modos
+
+{product-name} O módulo de Detecção de Violação possui três modos: Descobrir, Monitorar e Proteger. A qualquer momento, qualquer Grupo (começando com 'nv', ou o grupo 'Nodos') pode estar em qualquer um desses modos. O modo pode ser alterado a partir do menu Grupos, da visualização de Atividade da Rede ou do Painel. Grupos de Contêineres podem ter regras de processo/arquivo em um modo diferente das regras de rede, conforme descrito xref:modes.adoc#_network_service_policy_mode[aqui].
+
+image:switchmodes.png[Modos]
+
+[NOTE]
+====
+Grupos criados de forma personalizada não têm um modo de Proteção. Isso ocorre porque eles podem conter contêineres de diferentes grupos subjacentes, cada um dos quais pode estar em um modo diferente, causando confusão sobre o comportamento.
+====
+
+=== Descobrir
+
+Por padrão, {product-name} começa no modo Descobrir. Neste modo, {product-name}:
+
+* Descobre sua infraestrutura de contêineres, incluindo contêineres, nodos e hosts.
+* Aprende suas aplicações e comportamentos observando conversas (conexões de rede) entre contêineres.
+* Identifica serviços e aplicações separados em execução.
+* Constrói automaticamente uma lista de permissões de Regras de Rede para proteger o comportamento normal da rede da aplicação.
+* Estabelece as linhas de base dos processos em execução em contêineres para cada serviço e cria Regras de Arquivo de Controle de Processo na lista de permissões.
+
+[NOTE]
+====
+Para determinar quanto tempo executar um serviço em modo Descobrir, execute tráfego de teste pelo aplicativo e revise todas as regras para completude. Várias horas devem ser suficientes, mas alguns aplicativos podem exigir alguns dias para serem totalmente testados. Quando em dúvida, mude para o modo Monitor e verifique as violações, que podem ser convertidas em regras de lista de permissões antes de passar para o modo Proteger.
+====
+
+=== Monitorar
+
+No modo Monitor, {product-name} monitora conversas e detecta violações em tempo de execução da sua Política de Segurança. Neste modo, nenhuma nova regra é criada por {product-name}, mas regras podem ser adicionadas manualmente a qualquer momento.
+
+Quando violações são detectadas, elas são visíveis no mapa de Atividade da Rede visualmente por uma linha vermelha. As violações também são registradas e exibidas na aba de Notificações. Regras de Arquivo de Controle de Processo e violações de acesso a arquivos são registradas nas Notificações -> Eventos de Segurança.
+
+No mapa da Rede, você pode clicar em qualquer conversa (linha verde, amarela ou vermelha) para exibir mais detalhes sobre o tipo de conexão e o protocolo monitorado por último. Você também pode usar os botões de Pesquisa e Filtrar por Grupo no canto inferior direito para restringir a exibição dos seus contêineres.
+
+=== Proteger
+
+No modo Proteger, {product-name} aplicadores bloquearão (negarão) quaisquer violações de rede e ataques detectados. As violações são mostradas no mapa da Rede com um '`x`' vermelho nelas, significando que foram bloqueadas. Processos não autorizados e acessos a arquivos também serão bloqueados no modo Proteger. Sensores DLP que correspondam bloquearão conexões de rede.
+
+== Mudando Entre Modos
+
+Você pode facilmente mudar {product-name} Grupos de um modo para outro. Lembre-se de que, no modo Descobrir, {product-name} está construindo uma Política de Segurança para o comportamento normal e permitido dos contêineres. Você pode ver essas regras na aba Política -> Grupos ou em detalhes no menu de Regras de Rede da Política ->.
+
+Quando você muda do modo Descobrir para o modo Monitorar, {product-name} sinalizará todas as violações de comportamento normal que não estão explicitamente permitidas. Porque {product-name} impõe políticas com base em aplicativos e grupos com atributos semelhantes, geralmente não é necessário adicionar ou editar regras ao aumentar ou diminuir contêineres.
+
+Por favor, certifique-se de que, antes de introduzir novas atualizações que resultem em novos tipos de conexões entre contêineres, você mude o(s) Serviço(s) afetado(s) para o modo Descobrir para aprender esses novos comportamentos. Alternativamente, você pode adicionar novas regras manualmente em qualquer modo, ou editar o CRD usado para criar as regras para adicionar novos comportamentos.
+
+=== Novo Modo de Serviço
+
+Se novos serviços forem descobertos pelo {product-name}, por exemplo, um contêiner anteriormente desconhecido começar a ser executado, ele pode ser definido para um modo padrão. No modo Descobrir, {product-name} começará a aprender seu comportamento e construir Regras. No modo Monitor, uma violação será gerada quando conexões com o novo serviço forem detectadas. No modo Proteger, todas as conexões com o novo serviço serão bloqueadas, a menos que as regras tenham sido criadas anteriormente.
+
+image:newservices.png[NewServiceMode]
+
+=== Modo de Política de Serviço de Rede
+
+Há uma configuração global disponível em Configurações -> para definir separadamente o modo de proteção de rede para a aplicação das regras de rede. Ativar isso (o padrão é desativado) faz com que todas as regras de rede estejam no modo de proteção selecionado (Descobrir, Monitorar, Proteger), enquanto as regras de processo/arquivo permanecem no modo de proteção para aquele Grupo, conforme exibido na tela de Grupos da Política ->. Dessa forma, as regras de rede podem ser definidas para Proteger (bloqueio), enquanto a política de processo/arquivo pode ser definida para Monitorar, ou vice-versa.
+
+=== Promoção Automatizada de Modos de Grupo
+
+Promove o Modo de proteção de um Grupo com base no tempo decorrido e critérios. Essa automação não se aplica a Grupos criados por CRD. Esse recurso permite que um novo aplicativo funcione em Descobrir por um determinado período, aprendendo o comportamento e {product-name} criando regras de lista de permissão para Rede e Processo, e então movendo-se automaticamente para o modo Monitorar, e depois Proteger.
+
+O critério para mover do modo Descobrir para o modo Monitorar é: tempo decorrido para aprender toda a atividade de rede e processo de pelo menos um pod ativo no Grupo. Por exemplo, se isso estiver definido para 7 dias, então 7 dias após um pod em execução para o grupo ser detectado, o modo será promovido automaticamente para Monitorar.
+
+O critério para mover do modo Monitorar para o modo Proteger é: não há eventos de segurança (rede, processo etc.) para o período definido para o Grupo. Por exemplo, se isso estiver definido para 14 dias, então se nenhuma violação (rede, processo, arquivo) for acionada por 14 dias (por exemplo, o período silencioso), então o modo é promovido automaticamente para Proteger. Se não houver pods em execução no grupo, a promoção não ocorrerá.
+
+image:policy_promotion.png[Promoção]
+
+==== Resolução de Conflitos Entre Serviços em Diferentes Modos
+
+Para conexões de rede entre contêineres em diferentes grupos de serviços, se seus modos de política forem diferentes, a tabela a seguir mostra como o sistema resolve os conflitos.
+
+|===
+| Origem | Destino | Modo Efetivo
+
+| Descobrir
+| Monitorar
+| Descobrir
+
+| Descobrir
+| Proteger
+| Descobrir
+
+| Monitorar
+| Descobrir
+| Descobrir
+
+| Monitorar
+| Proteger
+| Monitorar
+
+| Proteger
+| Descobrir
+| Descobrir
+
+| Proteger
+| Monitorar
+| Monitorar
+|===
+
+Como você pode ver, o modo efetivo é, por padrão, o modo de política menos restritivo.
+
+[NOTE]
+====
+O acima se aplica apenas para Regras de Rede
+====

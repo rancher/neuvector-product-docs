@@ -1,0 +1,68 @@
+= IBM QRadar
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/10.ibmqr/10.ibmqr.md
+:page-opendocs-slug:  /integration/ibmqr
+
+== Integración con IBM Qradar
+
+El IBM® QRadar® Security Information and Event Management (SIEM) ayuda a los equipos de seguridad a detectar y priorizar amenazas de manera precisa en toda la empresa, y proporciona información inteligente que permite a los equipos responder rápidamente para reducir el impacto de los incidentes. Al consolidar eventos de registro y datos de flujo de red de miles de dispositivos, puntos finales y aplicaciones distribuidas a lo largo de su red, QRadar correlaciona toda esta información diferente y agrega eventos relacionados en alertas únicas para acelerar el análisis y la remediación de incidentes. QRadar SIEM está disponible in situ y en un entorno en la nube.
+
+{product-name} es una plataforma de seguridad de contenedores de ciclo de vida completo que admite completamente la integración con QRadar. Esta integración permite que QRadar pueda recopilar eventos, registros e información de incidentes para entornos de contenedores y Kubernetes. Al utilizar el DSM de {product-name} para QRadar, los clientes podrán normalizar los datos de registro de seguridad {product-name} en QRadar, luego analizar, informar o remediar eventos de seguridad de contenedores.
+
+=== IBM QRadar y {product-name} DSM
+
+El DSM de {product-name} para integrar con IBM QRadar está publicado y validado por IBM en el sitio web de IBM X-Force / App Exchange. Está disponible para descargar https://exchange.xforce.ibmcloud.com/hub/extension/f6dcde294cac1237ce08bcd4dfbc9142[aquí] desde el sitio web de App Exchange.
+
+También está disponible para descargar desde este sitio xref:attachment$NeuVectorDSM_1.0.2.zip[aquí]
+
+=== Instrucciones para integrar {product-name} con QRadar
+
+Antes de importar el DSM de {product-name} en QRadar, recomendamos que verifiques/modifiques estas configuraciones de QRadar para asegurarte de que todo funcione como se espera:
+
+. IBM QRadar versión 7.3.1 y posteriores
+. Configura QRadar "`System Settings`" para asegurarte de que la longitud de carga útil de Syslog sea lo suficientemente grande, por ejemplo:
++
+image:Qradar1.png[QRadar]
+
+=== Configura {product-name} para enviar Syslog a QRadar
+
+Habilita la configuración de Syslog en la Configuración ->. La IP/URL del servidor y el puerto deben apuntar a la IP y puerto del servicio QRadar, y el puerto Syslog por defecto será el 514. Utiliza el protocolo UDP y el formato de registro "`In Json`". Selecciona el nivel de registro y las categorías a informar. En un entorno de clúster múltiple {product-name}, para recopilar los registros de todos los clústeres, esta configuración debe habilitarse en cada clúster. Puedes configurar el nombre del clúster en esta página para distinguir los eventos del clúster entre sí.
+
+image:Qradar_syslog2.png[QRadar]
+
+=== Configura QRadar para analizar los registros {product-name}
+
+. Habilita o importa el DSM {product-name} a QRadar. Al añadir una nueva fuente de registro QRadar, si "`{product-name}`" aparece en el tipo de fuente de registro QRadar, por favor ignora las instrucciones de importación de la fuente de registro a continuación y pasa al siguiente paso "`Add and enable log sources for {product-name}`".
+
+image:Qradar3.png[QRadar]
+
+Si el tipo de fuente de registro "`{product-name}`" no se encontró en QRadar, por favor consulta el manual del usuario de QRadar para instalar el DSM {product-name} a través de Admin > Gestión de extensiones.
+
+image:Qradar4.png[QRadar]
+
+. Añade y habilita fuentes de registro para {product-name}.
+
+Ahora podemos añadir una nueva fuente de registro para los registros {product-name}:
+
+image:Qradar5.png[QRadar]
+
+"`Log Source Identifier`" debe ser el nombre del pod del controlador principal. El nombre del pod del controlador principal de {product-name} se puede encontrar en los datos de registro en bruto de QRadar o desde la consola de gestión de {product-name} "`Assets\Controllers`" como se muestra a continuación:
+
+image:Qradar6.png[QRadar]
+
+Se deben añadir múltiples fuentes de registro si hay múltiples clústeres {product-name} en funcionamiento. Se han añadido y habilitado las fuentes de registro {product-name}:
+
+image:Qradar7.png[QRadar]
+
+=== Verifica las actividades de registro.
+
+Genera algunos registros {product-name}, por ejemplo, violaciones de políticas de red, eventos de cambio de configuración o realiza algunos escaneos de vulnerabilidades en contenedores/nodos. Estos registros de incidentes o eventos se enviarán a QRadar en segundos. Y los registros {product-name} deben ser normalizados en la consola de QRadar. También se puede verificar a través del editor DSM de QRadar:
+
+image:Qradar8.png[QRadar]
+
+image:Qradar9.png[QRadar]
+
+=== Resumen de integración.
+
+Con la integración completada, los eventos de seguridad y gestión {product-name} pueden ser gestionados a través de QRadar junto con los datos de eventos de otras fuentes. QRadar sirve como el almacenamiento permanente de eventos para {product-name} eventos, mientras que el controlador {product-name} realiza respuestas de seguridad en tiempo real y almacenamiento a corto plazo en clúster para eventos. QRadar puede realizar correlación avanzada y alertas para eventos de seguridad críticos de contenedores y Kubernetes.

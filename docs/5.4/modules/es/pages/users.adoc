@@ -1,0 +1,87 @@
+= Usuarios y funciones
+:revdate: 2025-01-10
+:page-revdate: {revdate}
+:page-opendocs-origin: /03.configuration/02.users/02.users.md
+:page-opendocs-slug: /configuración/usuarios
+
+== Configurando Usuarios y Roles Personalizados
+
+El menú de Configuración -> Usuarios y Roles permite la gestión de usuarios así como de roles. A cada usuario se le asigna un rol predefinido o personalizado. Los usuarios pueden ser asignados a roles a través de la integración de grupos con LDAP/AD u otras integraciones de sistemas SSO. Consulta la sección xref:integration.adoc#_directory_and_sso_integration[Integración Empresarial] para instrucciones detalladas para cada tipo de integración de directorio o SSO.
+
+=== Usuarios
+
+Los usuarios pueden ser configurados directamente en {product-name} o integrados a través de directorios/SSO. Para crear un nuevo usuario en {product-name}, ve a Configuración -> Usuarios y Roles y añade el usuario. Selecciona el rol del usuario de los roles predefinidos, o consulta a continuación para crear un rol personalizado.
+
+El requisito de contraseña por defecto es un mínimo de 8 caracteres de longitud, 1 letra mayúscula, 1 letra minúscula, 1 carácter numérico. Estos y otros requisitos pueden ser cambiados por un administrador en Configuración -> Usuarios bajo Políticas de Autenticación y Seguridad.
+
+=== Usuarios restringidos a espacio de nombres
+
+Los usuarios pueden ser restringidos a ciertos espacios de nombres. Primero selecciona el rol global (usa 'ninguno' si no se desea un rol global), luego haz clic en Configuración Avanzada.
+
+Selecciona un nombre de rol de la lista de roles, luego introduce los espacios de nombres permitidos para el usuario. Por ejemplo, a continuación se muestra un rol de lector global (solo vista), pero para el espacio de nombres 'demo' el usuario tiene permisos de administrador y para el espacio de nombres 'staging' el usuario tiene permisos de CI/Ops. Si se configuró previamente un rol personalizado, también se puede seleccionar.
+
+image:namespace_user_4.png[namespace_user]
+
+[NOTE]
+====
+Si un usuario ha iniciado sesión previamente a través de una integración empresarial, su Proveedor de Identidad (por ejemplo, OpenID Connect) será listado. Un usuario puede ser promovido a administrador Federado si se está utilizando la gestión de múltiples clústeres seleccionando al usuario y editando.
+====
+
+[NOTE]
+====
+Cuando un usuario restringido por espacio de nombres configura un registro en Activos en {product-name}, solo los usuarios con acceso a ese espacio de nombres pueden ver/escanear ese registro. Los usuarios globales podrán ver/gestionar ese registro, pero no los usuarios con espacios de nombres/roles restringidos.
+====
+
+=== Funciones
+
+Los roles preconfigurados incluyen Administrador, Lector y CI/Ops. Para crear un nuevo rol personalizado, selecciona la pestaña Roles en Configuración -> Usuarios y Roles. Nombra el rol y añade los permisos de lectura o escritura apropiados.
+
+image:roles_4.png[roles]
+
+=== Permisos RBAC
+
+* Control de admisión. Gestiona las reglas de control de admisión.
+* Eventos de auditoría. Ver notificaciones -> registros de informes de riesgo.
+* Autenticación. Habilitar la configuración de directorio y SSO (oidc/saml/ldap).
+* Autorización. Crear nuevos usuarios y roles personalizados.
+* Escaneo CI. Permite escanear imágenes a través de la API REST. Útil para configurar un usuario escáner de complemento en la fase de construcción.
+* Cumplimiento. Crear scripts de cumplimiento personalizados y revisar los resultados de las verificaciones de cumplimiento.
+* Evento. Acceder a las notificaciones y -> registros de eventos.
+* Exploración del registro. Configurar la exploración del registro y ver los resultados.
+* Política de tiempo de ejecución. Gestionar los menús de políticas para el modo de política (Descubrir, Monitorizar, Proteger), Reglas de red, Reglas de proceso, Reglas de acceso a archivos, DLP, Captura de paquetes, Reglas de respuesta.
+* Exploración en tiempo de ejecución. Activar y ver la exploración de vulnerabilidades en tiempo de ejecución de contenedores/nodos/plataforma.
+* Evento de seguridad. Acceder a las notificaciones -> registros de eventos de seguridad.
+* Configuración del sistema. Permitir la configuración de Ajustes -> Configuración.
+
+=== Asignación de grupos a roles y espacios de nombres.
+
+Los grupos pueden ser asignados a roles predefinidos o personalizados en {product-name}. Además, un rol puede ser restringido a uno o más espacios de nombres.
+
+En la configuración de LDAP/AD, SAML o OIDC en Ajustes, la última sección de la pantalla de configuración asigna grupos a roles y espacios de nombres. Primero selecciona un rol predeterminado, si lo hay, para la asignación.
+
+image:groups_default_role.png[DefaultRole]
+
+Para asignar un grupo a un rol y espacio de nombres, haz clic en Añadir para crear una nueva asignación. Selecciona un rol global o ninguno. Si se selecciona admin o FedAdmin, esto otorga acceso de escritura a todos los espacios de nombres. Si se selecciona un rol diferente, se puede restringir aún más seleccionando los espacios de nombres deseados.
+
+image:group_role_map_namespace.png[AddMapping]
+
+El siguiente ejemplo proporciona algunas posibles asignaciones. Demo_admin puede leer/ver todos los espacios de nombres, pero tiene derechos de administrador en los espacios de nombres demo y demo2. System_admin solo tiene derechos de administrador en el espacio de nombres kube-system.  Y los fed_admins tienen el rol preestablecido de fedAdmin, que otorga acceso de escritura a todos los recursos en múltiples clústeres.
+
+image:group_role_map_examples.png[EjemplosDeMapeo]
+
+[IMPORTANT]
+====
+Si el usuario está en múltiples grupos, el rol será el 'primer coincidente' en el orden listado y se asignará el rol del grupo. Por favor, ajusta el orden de configuración para un comportamiento adecuado arrastrando y soltando las asignaciones en el orden apropiado en la lista.
+====
+
+=== Roles de FedAdmin y Admin de múltiples clústeres para gestión primaria y remota.
+
+Cuando un clúster es xref:multicluster.adoc[promovido] a ser un clúster primario, el administrador se convierte automáticamente en un FedAdmin. El FedAdmin puede realizar operaciones en el primario, como generar un token de federación para conectar un clúster remoto, así como crear reglas de seguridad federadas como reglas de red, proceso, archivo y control de admisión.
+
+Los roles de gestión de múltiples clústeres son los siguientes:
+
+* En cualquier clúster, un administrador local o un administrador de Rancher SSO puede promover el clúster para convertirse en primario.
+* Los usuarios de LDAP/SSO/SAML/OIDC con roles de administrador no pueden promover un clúster a primario.
+* Solo el FedAdmin puede generar el token requerido para unir un clúster remoto al primario.
+* Cualquier administrador, incluidos los usuarios de LDAP/SSO/SAML/OIDC, puede unir un clúster remoto al primario si tiene el token.
+* Solo el FedAdmin puede crear un nuevo usuario como FedAdmin (o FedReader) o asignar el rol de FedAdmin (o FedReader) a un usuario existente (incluidos los usuarios de LDAP/SSO/SAML/OIDC).

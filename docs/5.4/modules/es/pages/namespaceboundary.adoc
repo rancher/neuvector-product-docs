@@ -1,0 +1,86 @@
+= Aplicación de límites de espacio de nombres
+:revdate: 2026-02-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/14.namespaceboundary/14.namespaceboundary.md
+:page-opendocs-slug:  /policy/namespaceboundary
+
+== Directiva: Aplicación de límites de espacio de nombres
+
+Por defecto, los pods en diferentes espacios de nombres pueden comunicarse entre sí, incluso cuando utilizan diferentes etiquetas. Para restringir este comportamiento, debes crear reglas de red adicionales.
+
+La aplicación de límites de espacio de nombres proporciona una forma más sencilla de limitar la comunicación de pods a un espacio de nombres o a límites de aplicación naturales.
+
+== Cómo funciona la aplicación de límites de espacio de nombres
+
+La etiqueta de espacio de nombres `NeuvectorNamespaceBoundary` impone límites de comunicación entre pods. Cuando está habilitado, NeuVector restringe el tráfico para que los pods se comuniquen solo dentro del mismo espacio de nombres o dentro de límites de aplicación definidos.
+
+Este enfoque reduce la necesidad de grupos personalizados y políticas de red adicionales.
+
+== Habilitar o deshabilitar la aplicación de límites de espacio de nombres
+
+Para controlar la aplicación de límites de espacio de nombres, aplica la etiqueta `NeuvectorNamespaceBoundary` a un espacio de nombres.
+
+=== Habilitar aplicación de límites de espacio de nombres
+
+[source,bash]
+----
+kubectl label namespace <namespace> NeuvectorNamespaceBoundary=enabled
+----
+
+=== Deshabilitar aplicación de límites de espacio de nombres
+
+[source,bash]
+----
+kubectl label namespace <namespace> NeuvectorNamespaceBoundary=disabled
+----
+
+=== Eliminar la etiqueta
+
+Eliminar la etiqueta deshabilita la aplicación de límites de espacio de nombres.
+
+[source,bash]
+----
+kubectl label namespace <namespace> NeuvectorNamespaceBoundary-
+----
+
+== Situación de ejemplo
+
+Este ejemplo muestra cómo la aplicación de límites de espacio de nombres simplifica el control de entrada y salida.
+
+=== Entorno
+
+* Dos espacios de nombres: `ns1` y `ns2`
+* Pods:
+** `ns1`: `pod1` (etiquetas: `app=app1`, `label=one`), `pod2` (etiquetas: `app=app2`, `label=two`)
+** `ns2`: `pod3` (etiquetas: `app=app1`, `label=three`), `pod4` (etiquetas: `app=app2`, `label=four`)
+* Grupos:
+** `g1`: `app=app1` (incluye `pod1` y `pod3`)
+** `g2`: `app=app2` (incluye `pod2` y `pod4`)
+
+Una directiva de red permite el tráfico desde `g1` a `g2` en cualquier aplicación y puerto.
+
+=== Comportamiento sin aplicación de límites de espacio de nombres
+
+Con solo la directiva basada en grupos:
+
+* `pod1` puede comunicarse con `pod2` y `pod4`
+* `pod3` puede comunicarse con `pod2` y `pod4`
+
+Para restringir la comunicación al mismo espacio de nombres, debes crear grupos adicionales y directivas de denegación:
+
+* Crea grupos basados en etiquetas individuales
+* Añade reglas de denegación para bloquear el tráfico entre espacios de nombres
+
+Esto aumenta la complejidad de la directiva y el esfuerzo de mantenimiento.
+
+=== Comportamiento con aplicación de límites de espacio de nombres
+
+Cuando la aplicación de límites de espacio de nombres está habilitada:
+
+* `pod1` solo puede comunicarse con `pod2`
+* `pod3` solo puede comunicarse con `pod4`
+* La comunicación entre espacios de nombres se bloquea automáticamente
+
+No se requieren grupos adicionales ni políticas de red.
+
+La aplicación de límites de espacio de nombres simplifica la gestión de directivas mientras impone un aislamiento estricto a nivel de espacio de nombres.

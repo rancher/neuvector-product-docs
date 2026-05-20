@@ -1,0 +1,125 @@
+= Air Gap {product-name}
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/09.airgap/09.airgap.md
+:page-opendocs-slug: /deploying/airgap
+
+== Ferramentas Necessárias
+
+Precisamos instalar três ferramentas para baixar todos os componentes para {product-name}.
+
+* https://helm.sh/[Helm] - Gerenciador de Ciclo de Vida de Aplicativo
+* https://github.com/containers/skopeo[Skopeo] - Ferramenta de Imagem/Registro
+* https://github.com/facebook/zstd[ZStandard] - Algoritmo de Compressão
+
+[,bash]
+----
+# install helm
+curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+# install skopeo - rocky linux based
+yum install zstd skopeo -y
+----
+
+== Obter Imagens e Chart
+
+Para obter todas as imagens, vamos usar o próprio chart. Usando https://helm.sh/[Helm], vamos adicionar o repositório e baixar o chart. Também usaremos https://github.com/containers/skopeo[skopeo] para baixar e fazer upload.
+
+[,bash]
+----
+# make a directory
+mkdir -p neuvector/images
+
+# add repo
+helm repo add neuvector https://neuvector.github.io/neuvector-helm/
+
+# update local chart
+helm repo update
+
+# pull
+helm pull neuvector/core -d neuvector
+----
+
+Agora você deve ver um arquivo como `core-2.4.0.tgz`. A versão pode variar, mas isso está correto. Este é o chart baixado. Agora precisamos das imagens. Ainda bem que podemos usar o chart para descobrir isso.
+
+[,bash]
+----
+# create image list
+helm template neuvector/core-*.tgz | awk '$1 ~ /image:/ {print $2}' | sed -e 's/\"//g' > neuvector/images/list.txt
+
+# get images
+for i in $(cat neuvector/images/list.txt); do
+  skopeo copy docker://$i docker-archive:neuvector/images/$(echo $i| awk -F/ '{print $3}'|sed 's/:/_/g').tar:$(echo $i| awk -F/ '{print $3}')
+done
+----
+
+Fantástico, devemos ter um diretório que se pareça com:
+
+[,bash]
+----
+[root@flux ~]# ls -lR neuvector
+neuvector:
+total 16
+-rw-r--r--. 1 root root 15892 Jan  8 14:33 core-2.4.0.tgz
+drwxr-xr-x. 2 root root   153 Jan  8 14:35 images
+
+neuvector/images:
+total 953920
+-rw-r--r--. 1 root root 236693504 Jan  8 14:35 controller_5.3.2.tar
+-rw-r--r--. 1 root root 226704384 Jan  8 14:35 enforcer_5.3.2.tar
+-rw-r--r--. 1 root root       176 Jan  8 14:34 list.txt
+-rw-r--r--. 1 root root 331550208 Jan  8 14:35 manager_5.3.2.tar
+-rw-r--r--. 1 root root 169589760 Jan  8 14:35 scanner_latest.tar
+-rw-r--r--. 1 root root  12265472 Jan  8 14:35 updater_latest.tar
+----
+
+E podemos comprimir e mover tudo.
+
+== Compactar e Mover
+
+Compactar é bastante simples. Usaremos `tar` com o formato ZST para máxima compressão.
+
+[,bash]
+----
+# compress
+tar -I zstd -vcf neuvector_airgap.zst neuvector
+----
+
+Agora, basta mover o `neuvector_airgap.zst` de 400M para sua rede.
+
+== Descompactar e Carregar
+
+Tudo o que precisamos fazer agora é descompactar com um comando semelhante. O seguinte será enviado para o diretório chamado `neuvector`.
+
+[,bash]
+----
+tar -I zstd -vxf neuvector_airgap.zst
+----
+
+Carregar as imagens em um registro exigirá uma compreensão da sua rede interna. Para este documento, vamos usar "registry.awesome.sauce" como o nome DNS. Carregar as imagens é novamente bastante simples com `skopeo`. Por favor, certifique-se de que está instalado na máquina "interna". Você provavelmente precisará se autenticar com `skopeo login` para que funcione.
+
+[,bash]
+----
+# skopeo load
+export REGISTRY=registry.awesome.sauce
+for file in $(ls neuvector/images | grep -v txt ); do
+     skopeo copy docker-archive:neuvector/images/$file docker://$(echo $file | sed 's/.tar//g' | awk -F_ '{print "'$REGISTRY'/neuvector/"$1":"$2}')
+done
+----
+
+Com todas as imagens carregadas em um registro, podemos instalar com o Helm.
+
+== Implantar com o Helm
+
+Implantar com o Helm é bastante direto. Existem alguns valores que são necessários para garantir que as imagens sejam puxadas do registro local. Aqui está um bom exemplo. Você pode precisar ajustar algumas configurações. Por favor, siga as melhores práticas do Helm para `values.yaml`. Observe o campo `imagePullSecrets`. Este é o segredo para o seu cluster se autenticar no registro.
+
+[,bash]
+----
+# helm install example
+# variables
+export REGISTRY=registry.awesome.sauce  # registry URL
+export NEU_URL=neuvector.awesome.sauce   # neuvector URL
+
+# helm all the things -- read all the options being set
+helm upgrade -i neuvector --namespace neuvector neuvector/core --create-namespace  --set imagePullSecrets=regsecret --set k3s.enabled=true --set k3s.runtimePath=/run/k3s/containerd/containerd.sock  --set manager.ingress.enabled=true --set controller.pvc.enabled=true --set controller.pvc.capacity=10Gi --set manager.svc.type=ClusterIP --set registry=$REGISTRY --set tag=5.3.2 --set controller.image.repository=neuvector/controller --set enforcer.image.repository=neuvector/enforcer --set manager.image.repository=neuvector/manager --set cve.updater.image.repository=neuvector/updater --set manager.ingress.host=$NEU_URL
+----

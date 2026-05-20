@@ -1,0 +1,72 @@
+= OpenID Connect (OIDC) para ADFS
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/08.oidc_adfs/08.oidc_adfs.md
+:page-opendocs-slug:  /integration/oidc_adfs
+
+== Integración con OpenID Connect (OIDC) para ADFS
+
+Desde la gestión de AD FS, haz clic en "Grupos de aplicaciones" y luego haz clic en "Añadir grupo de aplicaciones..."
+
+image:adfs1.png[adfs]
+
+Introduce un nombre, selecciona "Aplicación de servidor que accede a una API web" y luego haz clic en Siguiente
+
+image:adfs2.png[adfs]
+
+Introduce la URI de redirección de la configuración de {product-name} > página de configuración de OpenID Connect y luego haz clic en Siguiente
+
+image:adfs3.png[adfs]
+
+Habilita la casilla "Generar un secreto compartido" y luego haz clic en Siguiente
+
+image:adfs4.png[adfs]
+
+Introduce el Identificador creado en el paso anterior y luego haz clic en Siguiente
+
+image:adfs5.png[adfs]
+
+image:adfs6.png[adfs]
+
+Habilita los ámbitos allatclaims, email, openid y perfil y luego haz clic en Siguiente
+
+image:adfs7.png[adfs]
+
+image:adfs8.png[adfs]
+
+image:adfs9.png[adfs]
+
+Haz doble clic en un grupo de aplicaciones que acabas de crear
+
+image:adfs10.png[adfs]
+
+Haz doble clic en API Web y luego haz clic en la pestaña Reglas de Transformación de Emisión
+
+image:adfs11.png[adfs]
+
+Haz clic en Añadir Regla... y selecciona "Enviar atributos LDAP como reclamaciones" y luego haz clic en Siguiente
+
+image:adfs12.png[adfs]
+
+Introduce un nombre de regla de reclamación, elige Active Directory como el almacén de atributos y proporciona el mapeo de atributos LDAP a tipos de reclamaciones salientes como se indica a continuación
+
+* Grupos de token -- Nombres no calificados -> grupos
+* Nombre Principal de Usuario -> preferred_username
+* Dirección de Correo Electrónico -> email
+
+image:adfs13.png[adfs]
+
+image:adfs14.png[adfs]
+
+=== {product-name} Configuración
+
+* Emisor del Proveedor de Identidad: "https://<adfs-fqdn>/adfs"
+* ID del Cliente: Es un "Identificador de Cliente" que se muestra en el diálogo de "Aplicación del Servidor" en el "Asistente para Añadir Grupo de Aplicaciones"
+* Secreto del Cliente: Es un Secreto que se muestra en el diálogo de "Configurar Credenciales de Aplicación" en el "Asistente para Añadir Grupo de Aplicaciones"
+* Reclamación de grupo: grupos
+
+image:adfs15.png[adfs]
+
+image:adfs16.png[adfs]
+
+image:adfs17.png[adfs]

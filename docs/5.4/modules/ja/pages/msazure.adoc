@@ -1,0 +1,72 @@
+= SAML (Azure AD)
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/05.msazure/05.msazure.md
+:page-opendocs-slug:  /integration/msazure
+
+== Azure AD SAML 認証と統合する
+
+. Azure 管理コンソールで、Azure Active Directory の「エンタープライズ アプリケーション」メニュー項目を選択します。
++
+image:azure1.png[azure_config1]
+
+. "`New Application`"を選択します。
++
+image:azure2.png[azure_config2]
+
+. ギャラリーにないアプリケーションを作成し、一意の名前を付けます。
++
+image:azure3.png[azure_config3]
+
+. アプリケーションの設定ページで、左側のパネルから「シングル サインオン」を選択し、SAML ベースのサインオンを選択します。
++
+image:azure4.png[azure_config4]
+
+. 証明書を base64 形式でダウンロードし、アプリケーションのログイン URL と Azure AD 識別子をメモします。
++
+image:azure5.png[azure_config5]
+
+. {product-name} 管理コンソールに管理者としてログインします。右上隅の管理者ドロップダウンメニューから「設定」を選択します。SAML 設定をクリックします。
++
+image:azure6.png[azure_config6]
+
+. SAML サーバーを次のように構成します：
+* アプリケーションの「ログイン URL」をシングル サインオン URL としてコピーします。
+* 「Azure AD 識別子」を発行者としてコピーします。
+* ダウンロードした証明書を開き、テキストを X.509 証明書ボックスにコピーします。
+* デフォルトの役割を設定します。
+* 役割マッピングのためのグループ名を入力します。Azure によって返されるグループクレームは、名前ではなく「オブジェクト ID」で識別されます。グループのオブジェクト ID は、menu:Azure Active Directory[グループ> グループ名ページ] にあります。この値を使用して、{product-name} でグループベースの役割マッピングを構成する必要があります。
++
+image:openid5.png[OpenID5]
++
+次に、SAML サーバーを有効にします。
++
+image:azure7.png[azure_config7]
+
+. リダイレクト URL をコピーします。
++
+image:azure8.png[azure_config8]
+
+. Azure 管理コンソールに戻り、「基本 SAML 構成」を設定します。{product-name} コンソールのリダイレクト URL を「識別子」と「応答 URL」ボックスの両方にコピーします。
++
+image:azure9.png[azure_config9]
+
+. 「SAML 署名証明書」を編集し、署名オプションを「SAML 応答に署名」に変更します。
++
+image:azure10.png[azure_config10]
+
+. 「ユーザー属性とクレーム」を編集して、応答がログインユーザーの属性を{product-name}に返すことができるようにします。「新しいクレームを追加」をクリックして、「ユーザー名」と「メール」クレームをそれぞれ「user.userprincipalname」と「user.mail」で追加します。
++
+image:azure11.png[azure_config11]
+
+. ユーザーがアクティブディレクトリのグループに割り当てられている場合、そのグループメンバーシップをクレームに追加できます。「アプリ登録」からアプリケーションを見つけ、マニフェストを編集します。「groupMembershipClaims」の値を「All」に変更します。
++
+image:azure12.png[azure_config12]
+
+. ユーザーとグループにアプリケーションへのアクセスを許可し、Azure AD SAML SSO を使用して {product-name} コンソールにログインできるようにします。
++
+image:azure13.png[azure_config13]
+
+=== グループを役割およびネームスペースにマッピングします。
+
+{product-name}内のプリセットおよびカスタム役割、ならびにネームスペースにグループをマッピングする方法については、xref:users.adoc#_mapping_groups_to_roles_and_namespaces[ユーザーと役割]セクションをご覧ください。

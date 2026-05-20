@@ -1,0 +1,89 @@
+= Déployer avec Helm
+:revdate: 2026-03-24
+:page-revdate: {revdate}
+:chart-version: 108.0.2+up2.8.11
+:chart-version-url: https://github.com/rancher/charts/blob/release-v2.13/charts/neuvector/108.0.2%2Bup2.8.11/
+
+Ceci est un guide d'exemple sur la façon de déployer {neuvector-product-name} via Helm à utiliser avec https://documentation.suse.com/cloudnative/rancher-manager/latest/en/installation-and-upgrade/installation-and-upgrade.html[les installations SUSE Rancher]. Pour plus d'informations concernant les méthodes de déploiement {neuvector-product-name}, référez-vous à xref:production.adoc#_planning_deployments[la planification des déploiements].
+
+== Conditions préalables
+
+* Un cluster SUSE Rancher en cours d'exécution.
+* Assurez-vous d'avoir https://helm.sh/docs/intro/quickstart/#install-helm[Helm] installé pour utiliser le CLI Helm.
+* L'outil de ligne de commande https://kubernetes.io/docs/tasks/tools/#kubectl[Kubectl] configuré pour communiquer avec votre cluster.
+
+Assurez-vous de choisir une version de chart {neuvector-product-name} qui est compatible avec votre version de SUSE Rancher. Référez-vous à la fonctionnalité `NeuVector` dans la section https://www.suse.com/suse-rancher/support-matrix/all-supported-versions/rancher-v2-13-3/#:~:text=Rancher%20Apps%20/%20Cluster%20Tools[Rancher Apps / Outils de Cluster] de la matrice de support SUSE Rancher pour le dernier chart compatible. Notez que toutes les versions {neuvector-product-name} 5.x peuvent être appliquées à toutes les versions https://www.suse.com/suse-neuvector/support-matrix/all-supported-versions/neuvector-v-all-versions/[Rancher prises en charge].
+
+Cet exemple déploie le chart {neuvector-product-name} v5.4.9 ({chart-version-url}[`{chart-version}`]) pour la ligne de version Rancher v2.13.x.
+
+== Installation
+
+. Ajoutez le dépôt Helm et mettez à jour pour obtenir les derniers charts{nbsp}:
++
+[source,shell]
+----
+helm repo add rancher-charts https://charts.rancher.io/
+helm repo update
+----
+
+. Installez le chart `neuvector-crd`{nbsp}:
++
+[source,shell]
+----
+helm install neuvector-crd --namespace cattle-neuvector-system --create-namespace rancher-charts/neuvector-crd --version={chart-version}
+----
++
+.. Si votre cluster a l'admission de sécurité des pods (PSA) activée, vous devez étiqueter l'espace de noms pour autoriser les conteneurs privilégiés{nbsp}:
++
+[source,shell]
+----
+kubectl label namespace cattle-neuvector-system pod-security.kubernetes.io/enforce=privileged
+----
+
+. Si vous avez déjà un fichier `values.yaml` personnalisé, assurez-vous que les valeurs suivantes sont définies. Vous pouvez utiliser le fichier `values.yaml` présent dans {chart-version-url}values.yaml[`release-v2.13` chart] comme modèle, si nécessaire.
+.. Le `global.cattle.url` est défini sur votre URL Rancher dans un format tel que `https://your-rancher-url.com`.
+.. Assurez-vous que la valeur de `controller.federation.managedsvc.type` est définie sur `NodePort`.
+.. Le `global.cattle.systemDefaultRegistry` est défini sur `<Prime-Registry-URL>`.
++
+[NOTE]
+====
+Pour en savoir plus sur l'URL du registre Prime, consultez notre https://scc.suse.com/rancher-docs/rancherprime/latest/en/reference-guide.html#prime-registry-url[documentation réservée aux Prime]. Une authentification est requise. Utilisez vos identifiants https://scc.suse.com/[du Centre Client SUSE (SCC)] pour vous connecter.
+====
++
+[source,yaml]
+.Example: values.yaml
+----
+...
+global: # required for Rancher authentication (https://<Rancher_URL>/)
+  cattle:
+    url: https://your-rancher-url.com # Update with your Rancher URL
+    systemDefaultRegistry: <Prime-Registry-URL>
+...
+controller:
+  federation:
+    managedsvc:
+      type: NodePort
+  prime:
+    enabled: true # Activates Prime features in v5.4.6+
+----
+
+. Installez le chart principal :
++
+[source,shell]
+----
+helm install neuvector --namespace cattle-neuvector-system --create-namespace rancher-charts/neuvector --version={chart-version} -f values.yaml
+----
+
+. Exécutez la commande suivante pour trouver votre `NodePort` afin d'accéder à l'interface utilisateur {neuvector-product-name}. D'après le résultat ci-dessous, le `NodePort` spécifié est `30101`.
++
+[source,shell]
+----
+kubectl get svc --namespace cattle-neuvector-system neuvector-service-webui
+
+NAME                      TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+neuvector-service-webui   NodePort   10.43.207.222   <none>        8443:30101/TCP   21m
+----
+
+== Post-installation
+
+Les identifiants de connexion par défaut pour l'interface utilisateur {neuvector-product-name} sont le nom d'utilisateur `admin` et le mot de passe `admin`. Vous êtes invité à changer cela lors de votre première connexion.

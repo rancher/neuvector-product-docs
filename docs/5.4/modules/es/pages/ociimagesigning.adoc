@@ -1,0 +1,55 @@
+= Firma de imagen OCI
+:revdate: 2026-02-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/03.admission/01.sigstore/03.ociimagesigning.md
+:page-opendocs-slug:  /policy/admission/ociimagesigning
+
+== Verifica las imágenes de la Colección de Aplicación de SUSE Rancher con Sigstore
+
+La Colección de Aplicación de SUSE Rancher utiliza un registro basado en OCI donde todas las aplicaciones están firmadas por Sigstore. Los usuarios pueden verificar las aplicaciones en la Colección de Aplicación con los Verificadores de Sigstore en {product-name}.
+
+Necesitas la clave pública de cosign de la Colección de Aplicación de SUSE Rancher por adelantado, luego los Verificadores de Sigstore pueden configurarse en {product-name}.
+
+image:oci_image_1.png[Añadir Verificador de Sigstore]
+
+Sigue estos pasos para configurar la verificación de Sigstore para las imágenes en la Colección de Aplicación de SUSE Rancher.
+
+. Crea un token de acceso siguiendo la guía de autenticación:
++
+https://docs.apps.rancher.io/get-started/authentication/
+
+. Recupera la clave pública de Cosign (`ap-pubkey.pem`) siguiendo la guía de verificación de firma:
++
+https://docs.apps.rancher.io/howto-guides/verify-signatures-with-cosign/
+
+. En la interfaz web de {product-name}, crea una raíz de confianza de Sigstore.
++
+--
+* Ve a *Assets* > *Verificadores de Sigstore*.
+* Crea un nuevo verificador.
+* Añade la clave pública de Cosign como verificador de par de claves.
+--
+
+. Configura el registro y comienza un escaneo.
++
+--
+* Ve a *Assets* > *Registros*.
+* Crea un nuevo registro con los siguientes valores:
++
+[source,text]
+----
+Registry: https://dp.apps.rancher.io/
+Filter: containers/openjdk:21.0.4-build7
+Username: <your SUSE username>
+Password: <access token created earlier>
+----
+--
++
+La imagen filtrada es una imagen OCI publicada en la Colección de Aplicación de SUSE Rancher.
+
+. Revisa los resultados del escaneo para confirmar la verificación de la firma.
+
+
+image:oci_image_2.png[Resultado del Escaneo del Verificador]
+
+Una vez que se complete el escaneo, {product-name} mostrará los detalles del verificador de Sigstore en los resultados del escaneo, confirmando que la firma de la imagen se ha validado con éxito.

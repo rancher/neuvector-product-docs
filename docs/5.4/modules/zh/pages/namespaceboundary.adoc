@@ -1,0 +1,86 @@
+= 名称空间边界强制执行
+:revdate: 2026-02-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/14.namespaceboundary/14.namespaceboundary.md
+:page-opendocs-slug:  /policy/namespaceboundary
+
+== 策略：名称空间边界强制执行
+
+默认情况下，不同名称空间中的 Pod 可以相互通信，即使它们使用不同的标签。要限制此行为，您必须创建额外的网络规则。
+
+名称空间边界强制执行提供了一种更简单的方法来限制 Pod 通信到一个名称空间或自然应用边界。
+
+== 名称空间边界强制执行的工作原理
+
+`NeuvectorNamespaceBoundary` 名称空间标签强制执行 Pod 之间的通信边界。启用时，NeuVector 限制流量，使 Pod 仅在同一名称空间内或在定义的应用边界内进行通信。
+
+这种方法减少了对自定义组和额外网络策略的需求。
+
+== 启用或禁用名称空间边界强制执行
+
+要控制名称空间边界强制执行，请将 `NeuvectorNamespaceBoundary` 标签应用于名称空间。
+
+=== 启用强制执行
+
+[source,bash]
+----
+kubectl label namespace <namespace> NeuvectorNamespaceBoundary=enabled
+----
+
+=== 禁用强制执行
+
+[source,bash]
+----
+kubectl label namespace <namespace> NeuvectorNamespaceBoundary=disabled
+----
+
+=== 去除标签
+
+去除标签将禁用名称空间边界强制执行。
+
+[source,bash]
+----
+kubectl label namespace <namespace> NeuvectorNamespaceBoundary-
+----
+
+== 示例场景
+
+此示例展示了名称空间边界强制执行如何简化入口和出口控制。
+
+=== 环境
+
+* 两个名称空间：`ns1` 和 `ns2`
+* Pods：
+** `ns1`：`pod1`（标签：`app=app1`，`label=one`），`pod2`（标签：`app=app2`，`label=two`）
+** `ns2`：`pod3`（标签：`app=app1`，`label=three`），`pod4`（标签：`app=app2`，`label=four`）
+* 组：
+** `g1`：`app=app1`（包括 `pod1` 和 `pod3`）
+** `g2`：`app=app2`（包括 `pod2` 和 `pod4`）
+
+网络策略允许从`g1`到`g2`的任何应用程序和端口的流量通过。
+
+=== 没有名称空间边界强制执行的行为
+
+仅使用基于组的策略：
+
+* `pod1`可以与`pod2`和`pod4`进行通信
+* `pod3`可以与`pod2`和`pod4`进行通信
+
+要限制通信在同一名称空间内，您必须创建额外的组并拒绝策略：
+
+* 根据单个标签创建组
+* 添加拒绝规则以阻止跨名称空间流量
+
+这增加了策略的复杂性和维护工作量。
+
+=== 具有名称空间边界强制执行的行为
+
+当启用名称空间边界强制执行时：
+
+* `pod1`只能与`pod2`进行通信
+* `pod3`只能与`pod4`进行通信
+* 跨名称空间的通信会被自动阻止
+
+不需要额外的组或网络策略。
+
+名称空间边界强制执行简化了策略管理，同时强制执行严格的名称空间级隔离。

@@ -1,0 +1,950 @@
+= CRD - Definições de Recursos Personalizados
+:revdate: 2025-05-14
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/13.usingcrd/13.usingcrd.md
+:page-opendocs-slug:  /policy/usingcrd
+
+== {product-name} CRD para Política como Código
+
+{product-name} definições de recursos personalizados (CRDs) podem ser usadas por várias equipes para definir automaticamente políticas de segurança na plataforma de segurança de contêineres {product-name}. Desenvolvedores, DevOps, DevSecOps e equipes de Segurança podem colaborar para automatizar políticas de segurança para novos ou atualizados aplicativos implantados em produção. CRDs também podem ser usadas para impor políticas de segurança globais em múltiplos clusters Kubernetes.
+
+[NOTE]
+====
+CRDs são suportadas no Kubernetes 1.11 e versões posteriores. Implantar a {product-name} CRD da regra de segurança em versões anteriores pode não resultar em um erro, mas a CRD não será processada.
+====
+
+CRDs podem ser usadas para suportar muitos casos de uso e fluxos de trabalho:
+
+* Defina a política de segurança durante o desenvolvimento do aplicativo, para implantar em produção.
+* Aprender o comportamento usando {product-name} e exportar a CRD para revisão antes de implantar em produção.
+* Migrar políticas de segurança de clusters de staging para produção.
+* Replicar regras em múltiplos clusters replicados em ambientes híbridos ou multi-nuvem.
+* Impor políticas de segurança globais (veja exemplos para isso no final).
+
+CRDs trazem muitos benefícios, incluindo:
+
+* Definir / declarar a política de segurança, como código.
+* Versionar e rastrear as políticas de segurança da mesma forma que os manifests de implantação de aplicativos.
+* Definir o comportamento permitido de qualquer aplicação, incluindo comportamento de rede, arquivos e processos.
+
+== Tipos de Recursos Suportados
+
+{product-name} suporta as seguintes definições de recursos personalizados:
+
+* NvAdmissionControlSecurityRule
+* NvClusterSecurityRule
+* NvGroupDefinition
+* NvSecurityRule
+
+=== NvGroupDefinition
+
+O recurso personalizado `NvGroupDefinition` representa a definição de um grupo, incluindo sua descrição e critérios. Ele não representa um grupo ativo ou imposto por si só. Em vez disso, serve como uma definição de referência dentro do sistema NeuVector.
+
+O NeuVector cria e aplica grupos ativos apenas quando um `NvGroupDefinition` é referenciado em um `NvSecurityRule` ou `NvClusterSecurityRule`. Até então, o `NvGroupDefinition` existe no cluster Kubernetes, sem qualquer imposição ou efeito de runtime. Esse comportamento é intencional e parte do design do NeuVector.
+
+**Resumo**:
+
+* `NvGroupDefinition` define os metadados e critérios de seleção do grupo.
+* `NvSecurityRule` e `NvClusterSecurityRule` aplicam e ativam o grupo.
+* A presença de um `NvGroupDefinition` significa que a definição existe, mas se torna ativa apenas quando referenciada por uma regra de segurança.
+
+Todos os recursos `NvGroupDefinition` são criados sob o namespace `neuvector`.
+
+==== Atributo do Esquema: `name_referral`
+
+A partir da versão v5.4.3, o NeuVector utiliza o atributo `name_referral` (booleano) como uma configuração no seletor de grupos (`target.selector`, `ingress.items[].selector`, `egress.items[].selector`) no esquema CRD NvSecurityRule/NvClusterSecurityRule. Você pode habilitar essa configuração na interface do usuário marcando "Usar Referência de Nome" na caixa de diálogo de Exportação de Grupos. 
+
+Se o atributo `name_referral` estiver definido como `true`, os campos `criteria/comment` do seletor de grupos em NvSecurityRule/NvClusterSecurityRule são ignorados pelo NeuVector. Isso significa que o NeuVector tentará determinar o `criteria/comment` do grupo por referência. Isso introduz "referência de grupo" nos CRDs NvSecurityRule/NvClusterSecurityRule para auxiliar nas modificações ao editar grupos. Se não definido, os usuários precisarão atualizar os grupos em cada local definido nos respectivos arquivos YAML, se modificações forem necessárias.
+
+=== NvClusterSecurityRule e NvSecurityRule
+
+A diferença entre o NvSecurityRule e o NvClusterSecurityRule é o limite definido pela definição do escopo. O recurso NvSecurityRule é definido no nível do namespace, enquanto o NvClusterSecurityRule é definido no nível do cluster. Os tipos de recursos podem ser configurados em um arquivo YAML e podem ser criados durante a implantação, conforme mostrado nas instruções de implantação e exemplos para o NeuVector.
+
+A importância do tipo de recurso NvSecurityRule com um escopo de namespace reside na aplicação do domínio configurado do grupo-alvo, que deve corresponder ao namespace configurado na política de segurança CRD do NeuVector. Isso impõe restrições para evitar a criação indesejada de políticas entre namespaces que afetam uma regra de política de grupo-alvo.
+
+Para a definição de recurso personalizado NvClusterSecurityRule, isso tem um escopo de nível de cluster e, portanto, não impõe nenhum limite de namespace a um alvo definido. No entanto, o contexto do usuário que é usado para importar o arquivo CRD-yaml deve ter as permissões necessárias para acessar ou residir no mesmo namespace que o configurado no arquivo CRD-yaml, ou a importação será rejeitada.
+
+==== Habilitando o Suporte a CRD
+
+Conforme descrito nas seções de implantação do xref:kubernetes.adoc#_deploy_using_kubernetes[Kubernetes] e xref:openshift.adoc#_deploy_on_openshift[OpenShift] (Implantando {product-name}), os clusterroles e bindings de clusterrole apropriados para recursos personalizados e NvSecurityRules devem ser adicionados primeiro.
+
+Em seguida, o NvSecurityRule e o NvClusterSecurityRule devem ser criados usando o YAML de exemplo nessas seções. {product-name} CRDs agora podem ser implantados.
+
+== Gerando um Exemplo de {product-name} CRD
+
+A maneira mais simples de ver como o formato do arquivo YAML se parece para um {product-name} CRD é exportá-lo do {product-name} Console. Depois de testar seu aplicativo enquanto {product-name} está no modo de Descoberta, aprendendo o comportamento da rede, dos arquivos e dos processos, você pode exportar a política aprendida.
+
+Vá ao menu de Grupos de Política -> e clique em Exportar Política de Grupo no canto superior direito.
+
+image:export_crd.png[CRDExport]
+
+Em seguida, selecione os Grupos que você deseja exportar, como os três no namespace de demonstração acima. Inspecione o YAML CRD salvo abaixo para ver como as regras de rede, de processo e de arquivo do {product-name} são expressas.
+
+[NOTE]
+====
+Além do(s) grupo(s) selecionado(s), todos os grupos 'vinculados' também serão exportados. Um grupo vinculado é qualquer outro grupo ao qual um grupo selecionado se conectará, ou do qual ele se conectará, conforme permitido por uma regra de rede.
+====
+
+CRD Exportado de Exemplo
+
+.Clique aqui para ver os detalhes
+[%collapsible]
+====
+[,yaml]
+----
+apiVersion: v1
+items:
+- apiVersion: neuvector.com/v1
+  kind: NvSecurityRule
+  metadata:
+    name: nv.nginx-pod.demo
+    namespace: demo
+  spec:
+    egress:
+    - selector:
+        criteria:
+        - key: service
+          op: =
+          value: node-pod.demo
+        - key: domain
+          op: =
+          value: demo
+        name: nv.node-pod.demo
+      action: allow
+      applications:
+      - HTTP
+      name: nv.node-pod.demo-egress-0
+      ports: any
+    file: []
+    ingress:
+    - selector:
+        criteria:
+        - key: service
+          op: =
+          value: exploit.demo
+        - key: domain
+          op: =
+          value: demo
+        name: nv.exploit.demo
+      action: allow
+      applications:
+      - HTTP
+      name: nv.nginx-pod.demo-ingress-0
+      ports: any
+    process:
+    - action: allow
+      name: nginx
+      path: /usr/sbin/nginx
+    - action: allow
+      name: pause
+      path: /pause
+    - action: allow
+      name: ps
+      path: /bin/ps
+    target:
+      selector:
+        criteria:
+        - key: service
+          op: =
+          value: nginx-pod.demo
+        - key: domain
+          op: =
+          value: demo
+        name: nv.nginx-pod.demo
+      policymode: Monitor
+- apiVersion: neuvector.com/v1
+  kind: NvSecurityRule
+  metadata:
+    name: nv.node-pod.demo
+    namespace: demo
+  spec:
+    egress:
+    - selector:
+        criteria:
+        - key: address
+          op: =
+          value: google.com
+        name: test
+      action: allow
+      applications:
+      - SSL
+      name: test-egress-1
+      ports: any
+    - selector:
+        criteria:
+        - key: service
+          op: =
+          value: redis-pod.demo
+        - key: domain
+          op: =
+          value: demo
+        name: nv.redis-pod.demo
+      action: allow
+      applications:
+      - Redis
+      name: nv.redis-pod.demo-egress-2
+      ports: any
+    - selector:
+        criteria:
+        - key: service
+          op: =
+          value: kube-dns.kube-system
+        - key: domain
+          op: =
+          value: kube-system
+        name: nv.kube-dns.kube-system
+      action: allow
+      applications:
+      - DNS
+      name: nv.kube-dns.kube-system-egress-3
+      ports: any
+    file: []
+    ingress: []
+    process:
+    - action: allow
+      name: curl
+      path: ""
+    - action: allow
+      name: node
+      path: /usr/bin/nodejs
+    - action: allow
+      name: pause
+      path: /pause
+    - action: allow
+      name: ps
+      path: /bin/ps
+    - action: allow
+      name: sh
+      path: /bin/dash
+    - action: allow
+      name: whoami
+      path: /usr/bin/whoami
+    target:
+      selector:
+        criteria:
+        - key: service
+          op: =
+          value: node-pod.demo
+        - key: domain
+          op: =
+          value: demo
+        name: nv.node-pod.demo
+      policymode: Protect
+- apiVersion: neuvector.com/v1
+  kind: NvSecurityRule
+  metadata:
+    name: nv.redis-pod.demo
+    namespace: demo
+  spec:
+    egress: []
+    file: []
+    ingress: []
+    process:
+    - action: allow
+      name: pause
+      path: /pause
+    - action: allow
+      name: redis-server
+      path: /usr/local/bin/redis-server
+    target:
+      selector:
+        criteria:
+        - key: service
+          op: =
+          value: redis-pod.demo
+        - key: domain
+          op: =
+          value: demo
+        name: nv.redis-pod.demo
+      policymode: Monitor
+- apiVersion: neuvector.com/v1
+  kind: NvSecurityRule
+  metadata:
+    name: nv.kube-dns.kube-system
+    namespace: kube-system
+  spec:
+    egress: null
+    file: null
+    ingress: null
+    process: null
+    target:
+      selector:
+        criteria:
+        - key: service
+          op: =
+          value: kube-dns.kube-system
+        - key: domain
+          op: =
+          value: kube-system
+        name: nv.kube-dns.kube-system
+      policymode: Monitor
+- apiVersion: neuvector.com/v1
+  kind: NvSecurityRule
+  metadata:
+    name: nv.exploit.demo
+    namespace: demo
+  spec:
+    egress: null
+    file: null
+    ingress: null
+    process: null
+    target:
+      selector:
+        criteria:
+        - key: service
+          op: =
+          value: exploit.demo
+        - key: domain
+          op: =
+          value: demo
+        name: nv.exploit.demo
+      policymode: Monitor
+kind: List
+metadata: null
+----
+====
+
+Por exemplo:
+
+* Este é um CRD com escopo de namespace, de NvSecurityRule
+* nginx-pod.demo pode se comunicar com node-pod.demo por HTTP, e os processos permitidos estão listados
+* node-pod.demo pode se comunicar com redis-pod.demo usando o protocolo Redis
+* O modo de política dos serviços está definido para o modo Monitor
+* node-pod.demo tem permissão para sair para google.com usando SSL
+* Nomes de grupos como nv.node-pod.demo são referenciados, mas não definidos no CRD, portanto, espera-se que já existam quando implantados. Veja abaixo como definir Grupos.
+
+== CRD NeuVector de Exemplo - NvAdmissionControlSecurityRule
+
+Outro método para gerar um manifesto CRD é a partir da visualização **Política > Controle de Admissão** clicando na lista suspensa **Mais Operações** e selecionando **Exportar**. Abaixo está um exemplo de manifesto CRD NvAdmissionControlSecurityRule:
+
+[NOTE]
+====
+NvAdmissionControlSecurityRule `metadata.name` deve sempre ser definido como `local` para futura extensibilidade.
+====
+
+.Clique aqui para exemplo de CRD
+[%collapsible]
+====
+[,yaml]
+----
+apiVersion: neuvector.com/v1
+kind: NvAdmissionControlSecurityRule
+metadata:
+  creationTimestamp: null
+  name: local
+spec:
+  config:
+    client_mode: service
+    enable: true
+    mode: monitor
+  rules:
+  - action: deny
+    containers:
+    - containers
+    criteria:
+    - name: namespace
+      op: containsAny
+      path: namespace
+      value: n2,ns1
+    disabled: false
+    rule_mode: ""
+----
+====
+
+Você pode se referir ao https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.3.0/admission-crd-k8s-1.19.yaml[esquema completo para o CRD] para modificações no manifesto gerado acima para atender às suas necessidades.
+
+Uma vez que as modificações estejam feitas, você pode aplicar o manifesto ao seu cluster Kubernetes.
+
+== Configuração do Modo de Política e Definição de Grupo
+
+A configuração do modo de política e a definição de grupos são suportadas dentro do arquivo de configuração YAML do CRD. Com o modo de política configurado no arquivo de configuração YAML, importar tal arquivo definirá o grupo alvo para este valor na importação do CRD.
+
+[IMPORTANT]
+====
+O modo de política alvo importado não pode ser modificado a partir do {product-name} console (Grupos de Política ->). Por exemplo, uma vez que o modo está definido como Monitor, ele só pode ser alterado através da modificação do CRD, não através do console.
+====
+
+[NOTE]
+====
+O comportamento de importação do CRD ignora o PolicyMode de qualquer grupo 'vinculado', deixando o modo de política inalterado se o grupo vinculado já existir. Se o grupo vinculado não existir, ele será criado automaticamente e definido para o modo padrão de Novos Serviços em Configurações -> Configuração.
+====
+
+=== Requisitos de Configuração do Modo de Política
+
+* O modo se aplica apenas ao grupo de Destino configurado
+* A configuração do grupo de destino deve ter o formato nv.NOME_DO_SERVIÇO.DOMÍNIO.
+** Exemplo: nv.xxx.yyy
+** xxx.yyy=SERVIÇO
+** yyy=DOMÍNIO
+* Os valores suportados são Descobrir, Monitor e Proteger.
+* O grupo de destino deve conter o par chave-valor chave: serviço
+* A chave configurada 'domínio' deve corresponder ao sufixo de domínio do serviço, conforme o par chave-valor configurado para o serviço.
+
+Exemplo de arquivo YAML de Configuração do Modo de Política
+
+[,yaml]
+----
+  target:
+      policymode: Protect
+      selector:
+          name: nv.xxx.yyy
+          criteria:
+          - key: service            #1 of 2 Criteria must exist
+            value: xxx.yyy
+            op: "="
+          - key: domain             #2 of 2 Criteria must exist
+            value: yyy
+            op: "="
+----
+
+== Sintaxe e Semântica das Regras de Política do CRD
+
+=== Nome do Grupo
+
+* Evite usar nomes que começam com fed., nv.ip., host: ou workload:, que são reservados para grupos federados ou serviços baseados em IP.
+* Você pode usar node, external ou containers como um nome de grupo. No entanto, isso será o mesmo que os nomes de grupos padrão reservados, portanto, um novo grupo não será criado. Qualquer critério de definição de grupo no CRD será ignorado, mas as regras para o grupo serão processadas. As novas regras serão exibidas sob o nome do grupo.
+* Atende aos critérios: {caret}[a-zA-Z0-9]+[.:a-zA-Z0-9_-]*$
+* Não deve começar com fed, workload ou nv.ip
+* Se o nome tiver o formato nv.xxx.yyy, deve existir uma definição de serviço e domínio correspondente, ou a validação de importação falhará.  Por favor, consulte a Configuração do Modo de Política acima para detalhes.
+* Se o nome do grupo a ser importado já existir no sistema de destino, os critérios devem corresponder entre o CRD importado e o que está no sistema de destino.  Se houver diferenças, a importação do CRD será rejeitada.
+
+=== Nome da Política
+
+* Deve ser único dentro de um arquivo yaml.
+* Não pode estar vazio.
+
+=== Ingress
+
+* É o tráfego de entrada para o destino.
+
+=== Egress
+
+* É o tráfego saindo do destino.
+
+=== Critérios
+
+* Não deve estar vazio, a menos que o nome seja nodes, external ou containers
+* nome - Se o nome tiver o formato de serviço nv.xxx.yyy, consulte a seção acima sobre detalhes da Configuração do Modo de Política
+* chave - A chave está em conformidade com o padrão de expressão regular {caret}[a-zA-Z0-9]+[.:a-zA-Z0-9_-]*$
+* op (operação)
+** string = "="
+** string = "!="
+** string = "contém"
+** string = "prefix"
+** string = "regex"
+** string = "!regex"
+* valor - Uma string sem limitações
+* chave - Não pode estar vazia
+* op - Operador
+** Se o operador for igual (=) ou diferente (!=), então seu `' valor não pode estar vazio.
+** Se o operador for igual (=) ou diferente (!=) com um valor (como * ou ?), então o valor não pode ter nenhum formato de expressão regular como {caret}$.
+** Exemplo:
+*** Chave: serviço
+*** Op :  =
+*** Valor: ab?c*e{caret}$  (isto está incorreto)
+* Ação - Permitir ou negar
+* Aplicações (valores suportados)
+** ActiveMQ
+** Apache
+** Cassandra
+** Consul
+** Couchbase
+** CouchDB
+** DHCP
+** DNS
+** Eco
+** ElasticSearch
+** etcd
+** GRPC
+** HTTP
+** Jetty
+** Kafka
+** Memcached
+** MongoDB
+** MSSQL
+** MySQL
+** nginx
+** NTP
+** Oracle
+** PostgreSQL
+** RabbitMQ
+** Radius
+** Redis
+** RTSP
+** SIP
+** Spark
+** SSH
+** SSL
+** Syslog
+** TFTP
+** VoltDB
+** Wordpress
+** ZooKeeper
+* Porta - O formato especificado é xxx/yyy. Onde xxx=protocolo(tcp, udp), e yyy=número_da_porta (0-65535).
+** TCP/123 ou TCP/qualquer
+** UDP/123 ou UDP/123
+** ICMP
+** 123 = TCP/123
+* Processo - Uma lista de processos com ação, nome, caminho para cada um
+** ação: permitir/negar  #Esta ação tem precedência sobre a regra de acesso ao arquivo.  Isto deve ser definido como permitir se a intenção for permitir que a regra de acesso ao arquivo tenha efeito.
+** nome: nome do processo
+** caminho: caminho do processo (opcional)
+* Arquivo - Uma lista de regras de acesso a arquivos; estas se aplicam apenas ao grupo de contêiner de destino definido
+** app: lista de apps
+** comportamento: bloquear_acesso / monitorar_mudança  #Isto bloqueia o acesso ao filtro definido abaixo.  Se monitorar_mudança for escolhido, então um evento de segurança será gerado a partir do console web do {product-name} na página Notificações > Eventos de segurança.
+** filtro: caminho/nome do arquivo
+** recursivo: verdadeiro/falso
+
+== Suporte RBAC com CRDs
+
+Utilizando o modelo RBAC existente do Kubernetes, {product-name} estende a CRD (Definição de Recurso Personalizado) para suportar RBAC ao utilizar o Rolebinding do Kubernetes em associação com o Namespace configurado nas regras da CRD configurada {product-name} ao usar o tipo de recurso NvSecurityRule. Esse Namespace configurado é então usado para impor o Target configurado, que deve residir neste namespace configurado na política de segurança {product-name}. Ao fazer o rolebinding de um clusterrole definido, isso pode ser usado para vincular a um Usuário ou Grupo do Kubernetes. Os dois tipos de recursos clusterrole que {product-name} suporta são NvSecurityRule e NvClusterSecurityRule.
+
+=== Rolebinding e Clusterrolebinding com 2 Usuários em diferentes Namespaces a um Clusterrole (recursos NvSecurityRules e NvClusterSecurityRules)
+
+O seguinte ilustra um cenário criando um Clusterrole contendo ambos os recursos (NvSecurityRules e NvClusterSecurityRules) para serem vinculados a dois usuários diferentes.
+
+Um usuário (user1) pertence ao Namespace (ns1), enquanto o outro usuário (user2) pertence ao Namespace (ns2).  User1 irá Rolebind a este Clusterrole criado (nvsecnvclustrole), enquanto User2 será Clusterrolebind a este mesmo Clusterrole (nvsecnvclustrole).
+
+A principal conclusão aqui é ilustrar que, ao usar Rolebinding, isso terá Escopo em Nível de Namespace, enquanto usar Clusterrolebinding terá Escopo em Nível de Cluster.  User1 irá Rolebind (Escopo em Nível de Namespace), e User2 será Clusterrolebind (Escopo em Nível de Cluster).  Isso é mais importante durante a aplicação do RBAC com base no nível de escopo que limita o acesso dos usuários criados.
+
+=== Exemplo usando 2 tipos diferentes de arquivos yaml definidos e o efeito de usar cada usuário.
+
+. Crie um Clusterrole contendo os recursos NvSecurityRules e NvClusterSecurityRules.
++
+--
+[NOTE]
+====
+Observe que este clusterrole tem 2 recursos configurados, nvsecurityrules e nvclustersecurityrules. Exemplo (nvsecnvclustroles.yaml):
+
+[,yaml]
+----
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+   name: nvsecnvclustrole
+rules:
+- apiGroups:
+  - neuvector.com
+  resources:
+  - nvsecurityrules
+  - nvclustersecurityrules
+  verbs:
+  - list
+  - delete
+  - create
+  - get
+  - update
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - get
+  - list
+----
+====
+--
+. Crie 2 arquivos yaml de teste. Um para os NvSecurityRules e o outro para o recurso NvClusterSecurityRules.
++
+--
+Exemplo do arquivo `NvSecurityRules` nvsecurity.yaml:
+
+[,yaml]
+----
+apiVersion: neuvector.com/v1
+kind:     NvSecurityRule
+metadata:
+  name:    ns1crd
+  namespace: ns1
+spec:
+  target:
+      selector:
+          name: nv.nginx-pod.ns1
+          criteria:
+          - key: service
+            value: nginx-pod.ns1
+            op: "="
+          - key: domain
+            value: ns1
+            op: "="
+  ingress:
+      -
+        selector:
+            name: ingress
+            criteria:
+            - key: domain
+              value: demo
+              op: "="
+        ports: "tcp/65535"
+        applications:
+            - SSL
+        action:  allow
+        name:    ingress
+----
+
+Exemplo do arquivo `NvClusterSecurityRules` nvclustersecurity.yaml:
+
+[,yaml]
+----
+apiVersion: neuvector.com/v1
+kind:     NvClusterSecurityRule
+metadata:
+  name:    rbacnvclustmatchnamespacengtargserving
+  namespace: nvclusterspace
+spec:
+  target:
+      policymode: Protect
+      selector:
+          name: nv.nginx-pod.eng
+          criteria:
+          - key: service
+            value: nginx-pod.eng
+            op: "="
+          - key: domain
+            value: eng
+            op: "="
+  ingress:
+      -
+        selector:
+            name: ingress
+            criteria:
+            - key: service
+              value: nginx-pod.demo
+              op: "="
+        ports: "tcp/65535"
+        applications:
+            - SSL
+        action:  allow
+        name:    ingress
+----
+--
+. Alterar o contexto do usuário para user1 (pertence ao Namespace ns1) tem um Rolebind ao recurso NvSecurityRules, que está vinculado ao Namespace ns1.  Portanto, a importação do arquivo yaml de teste (kubectl create --f nvsecurity.yaml) deve ser permitida, uma vez que a configuração deste arquivo yaml possui o recurso NvSecurityRules e o Namespace ao qual este usuário está vinculado.
+
+Se houver uma tentativa de importar o arquivo yaml de teste (nvclustersecurity.yaml), no entanto, isso será negado, uma vez que o arquivo yaml do CRD de importação é definido com o recurso NvClusterSecurityRules que possui um escopo de Cluster, mas o user1 foi vinculado a um escopo de Namespace.  O escopo de namespace tem um privilégio inferior ao escopo de Cluster.  Portanto, o RBAC do Kubernetes negará tal solicitação.
+
+Mensagem de Erro de Exemplo:
+
+[,shell]
+----
+Error from server (Forbidden): error when creating "rbacnvclustnamespacengtargnvclustingress.yamltmp": nvclustersecurityrules.neuvector.com is forbidden: User "user1" cannot create resource "nvclustersecurityrules" in API group "neuvector.com" at the cluster scope
+----
+
+Em seguida, podemos mudar o contexto do usuário para user2 com um privilégio de escopo mais amplo, escopo de nível de cluster.  Este user2 possui um Clusterrolebinding que não está vinculado a um Namespace, mas tem um escopo de nível de cluster e está associado ao recurso NvClusterSecurityRules.
+
+Portanto, usar o user2 para importar qualquer um dos arquivos yaml (nvsecurity.yaml ou nvclustersecurity.yaml) será permitido, uma vez que o Clusterrolebinding deste usuário não está restrito a nenhum dos recursos NvSecurityRules (Escopo de Namespace) ou NvClusterSecurityRules (Escopo de Cluster).
+
+== Expressando Regras de Rede (objetos Ingress, Egress) em CRDs
+
+As regras de rede expressas em CRDs possuem um objeto Ingress e/ou Egress, que define as conexões de entrada e de saída permitidas para e da carga de trabalho (Grupo). Cada regra de rede em {product-name} deve ter um nome único em um CRD. Observe que no console, as regras de rede têm apenas um número de ID único.
+
+Se o 'Para' (destino) da regra for um grupo aprendido ou descoberto, ao exportar {product-name} o identificador 'nv.' é adicionado ao nome. Por exemplo "nv.redis-master.demo-ingress-0". Para grupos descobertos e personalizados, {product-name} também adiciona um identificador de nome único, como '-ingress-0' no nome da regra 'nv.redis-master.demo-ingress-0'. Para nomes de regras de CRD, o identificador 'nv.' NÃO é obrigatório e é adicionado às regras exportadas para clareza. Por exemplo:
+
+[,yaml]
+----
+    ingress:
+    - action: allow
+      applications:
+      - Redis
+      name: nv.redis-master.demo-ingress-0
+----
+
+Grupos personalizados, criados pelo usuário, não podem ter o prefixo 'nv.'. Apenas grupos descobertos/aprendidos com os objetos de domínio e serviço devem ter o prefixo. Por exemplo:
+
+[,yaml]
+----
+    - action: allow
+      applications:
+      - HTTP
+      name: nv.node-pod.demo-egress-1
+      ports: any
+      priority: 0
+      selector:
+        comment: ""
+        criteria:
+        - key: service
+          op: =
+          value: node-pod.demo
+        - key: domain
+          op: =
+          value: demo
+        name: nv.node-pod.demo
+----
+
+== Configurações Personalizadas para Aplicativos Implantados
+
+Com o uso de um arquivo yaml CRD personalizado, isso permite que você personalize regras de segurança de rede, regras de acesso a arquivos e regras de segurança de processos, tudo agrupado em um único arquivo de configuração.  Existem múltiplos benefícios em permitir essas personalizações.
+
+* Primeiro, isso permite que as mesmas regras sejam aplicadas em múltiplos ambientes Kubernetes, permitindo a sincronização entre os clusters.
+* Segundo, isso permite a implantação de regras preemptivas antes que as aplicações entrem online, o que proporciona um fluxo de trabalho proativo e eficaz para a implantação de regras de segurança.
+* Terceiro, isso permite que o modo de política mude de um modo de avaliação (como Descobrir ou Monitorar) para um que protege o ambiente de estágio final.
+
+Essas regras CRD dentro de um arquivo yaml podem ser importadas para a plataforma de segurança {product-name} através do uso de comandos CLI do Kubernetes, como 'kubectl create --f crd.yaml'.  Isso capacita a equipe de segurança a personalizar as regras de segurança a serem aplicadas em vários contêineres que residem no ambiente Kubernetes.
+
+Por exemplo, um arquivo yaml específico pode ser configurado para permitir que o modo de política descubra ou monitore um contêiner específico chamado nv.alpine.ns1 em um ambiente de cluster de estágio.  Além disso, você pode limitar o acesso ssh para um contêiner alvo configurado nv.alpine.ns1 a outro contêiner nv.redhat.ns2.
+
+Uma vez que todos os testes e avaliações necessários dessas regras de segurança sejam considerados corretos, você pode migrar isso para um ambiente de cluster de produção simultaneamente às implantações de aplicações usando o recurso de migração de políticas {product-name}, que será discutido mais adiante nesta seção.
+
+=== Exemplos de configurações CRD que realizam essas funções
+
+A seguir, um trecho de amostra de tais configurações
+
+[,yaml]
+----
+apiVersion: neuvector.com/v1
+kind:     NvSecurityRule
+metadata:
+  name:    ns1global
+  namespace: ns1              #The target's native namespace
+spec:
+  target:
+      selector:
+          name: nv.alpine.ns1
+          criteria:
+          - key: service
+            value: alpine.ns1   #The source target's running container
+            op: "="
+          - key: domain
+            value: ns1
+            op: "="
+  egress:
+      -
+        selector:
+            name: egress
+            criteria:
+            - key: service
+              value: nv.redhat.ns2      #The destination's running container
+              op: "="
+        ports:   tcp/22                     #Denies ssh to the destination container nv.redhat.ns2
+        applications:
+            - SSH
+        action:  deny
+        name:    egress
+  file:                                       #Applies only to the defined target container group
+  - app:
+    - chmod                              #The application chmod is the only application allowed to access, while all other apps are denied.
+    behavior: block_access      #Supported values are block_access and monitor_change.  This blocks access to the defined filter below.
+    filter: /tmp/passwd.txt
+    recursive: false
+  process:
+  - action: allow                  #This action has precedence over the file access rule.  This should be allowed if the intent is to allow the file access rule to take effect.
+    name: chmod                # This configured should match the application defined under the file section.
+    path: /bin/chmod
+----
+
+O trecho acima está configurado para impor o acesso ssh do contêiner do grupo alvo nv.alpine.ns1 para o grupo egress nv.redhat.ns2.  Além disso, a imposição de acesso a arquivos e as regras de processo são definidas e aplicadas ao contêiner alvo configurado nv.alpine.ns1.  Com essa configuração agrupada, permitimos que as regras de segurança de rede, arquivo e processo definidas atuem sobre o grupo alvo configurado.
+
+== Suporte à Migração de Grupos e Regras de Políticas
+
+{product-name} suporta a exportação de certos tipos de grupos {product-name} de um cluster Kubernetes em um arquivo yaml e a importação em outro cluster Kubernetes utilizando comandos nativos do kubectl.
+
+=== Casos de Uso de Migração
+
+* Exporte grupos CRD testados e regras de segurança que são considerados "`production ready`" de um ambiente de cluster k8s de estágio para um ambiente de cluster k8s de produção.
+* Exporte regras de segurança aprendidas para serem migradas de um ambiente k8s de estágio para um ambiente k8s de produção.
+* Permita a modificação do modo de política de um grupo alvo configurado, por exemplo, como o modo Descobrir ou Monitorar em um ambiente de estágio, para o modo Proteger em um ambiente de produção.
+
+=== Condições de Exportação Suportadas
+
+* Alvo, Ingress, Egress, Autoaprendido
+
+=== Exemplo de exportação de grupos
+
+* Grupos exportados com um atributo configurado como domain=xx são exportados com o Tipo de Recurso NvsecurityRule junto com o namespace.
+
+image:group_crd.png[GroupExport]
+
+=== Exemplo de um arquivo yaml de grupo exportado com o tipo de recurso NvsecurityRule
+
+[,yaml]
+----
+  kind: NvSecurityRule
+  metadata:
+    name: nv.nginx-pod.neuvector
+    namespace: neuvector
+  spec:
+    egress: []
+    file: []
+    ingress: []
+    process: []
+    target:
+      selector:
+        criteria:
+        - key: service
+          op: =
+          value: nginx-pod.neuvector
+        - key: domain
+          op: =
+          value: neuvector
+        name: nv.nginx-pod.neuvector
+      policymode: Discover
+----
+
+* Grupos exportados sem os critérios definidos como domain=xx (namespace) são exportados com um Tipo de Recurso NvClusterSecurityRule e um namespace como padrão.  Exemplos de grupos exportados sem um Namespace são externo, contêiner, etc.
+
+=== Exemplo de um arquivo yaml de grupo exportado com o tipo de recurso NvClusterSecurityRule
+
+[,yaml]
+----
+  kind: NvClusterSecurityRule
+  metadata:
+    name: egress
+    namespace: default
+  spec:
+    egress: []
+    file:             #File path profile applicable to the Target group only, and only applies to self-learned and user create groups
+    - app:
+      - vi
+      - cat
+      behavior: block_access
+      filter: /etc/mysecret              #Only vi and cat can access this file with “block_access”.
+      recursive: false
+    ingress:
+    - selector:
+        criteria:
+        - key: service
+          op: =
+          value: nginx-pod.neuvector
+        - key: domain
+          op: =
+          value: neuvector
+        name: nv.nginx-pod.neuvector     #Group Name
+      action: allow
+      applications:
+      - Apache
+      - ElasticSearch
+      name: egress-ingress-0             #Policy Name
+      ports: tcp/9400
+    process:      #Process profile applicable to the Target group only, and only applies to self-learned and user create groups.
+       - action: deny     #Possible values are deny and allow
+          name: ls
+          path: /bin/ls        #This example shows it denies the ls command for this target.
+    target:
+      selector:
+        criteria:
+        - key: service
+          op: =
+          value: nginx-pod.demo
+        name: egress                     #Group Name
+      policymode: null
+- apiVersion: neuvector.com/v1
+  kind: NvSecurityRule
+  metadata:
+    name: ingress
+    namespace: demo
+  spec:
+----
+
+[NOTE]
+====
+O comportamento de importação do CRD ignora o modo de política de qualquer grupo 'vinculado', deixando o modo de política inalterado se o grupo vinculado já existir. Se o grupo vinculado não existir, ele será criado automaticamente e definido para o modo padrão de Novos Serviços nas Configurações -> Configuração.
+====
+
+=== Tipos de Grupos de Exportação Não Suportados
+
+* Autenticação
+* Baseado em IP (não suportado apenas para IP de serviço aprendido, grupos de IP criados por usuários personalizados são suportados)
+
+=== Cenários de Importação
+
+* A importação criará novos grupos no sistema de destino se os grupos ainda não existirem no ambiente de destino, e o contexto de usuário Kubernetes atualmente utilizado tiver as permissões necessárias para acessar os namespaces configurados no arquivo CRD-yaml a ser importado.
+* Se o grupo importado existir no sistema de destino com critérios ou valores diferentes, a importação será rejeitada.
+* Se o grupo importado existir no sistema de destino com configurações idênticas, reutilizaremos o grupo existente com um tipo diferente.
+
+== Amostras de CRDs para Regras Globais
+
+A amostra de CRD abaixo tem duas partes:
+
+. A primeira parte é uma NvClusterSecurityRule para o grupo chamado contêineres:
+O alvo para esta NvClusterSecurityRule são todos os contêineres. Possui uma política de ingress que não permite conexões externas (fora do seu cluster) para ssh em seus contêineres. Também impede que todos os contêineres utilizem o processo ssh.  Esse comportamento global definido se aplica a todos os contêineres.
+. A segunda parte é uma NvSecurityRule para serviços alpine:
+O alvo é um serviço chamado nv.alpine.default no namespace 'default'. Como pertence a todos os contêineres, ele herdará a política de rede e a regra de processo acima. Ele também adiciona regras que não permitem conexões de tráfego HTTP através da porta 80 para uma rede externa. Além disso, não permite a execução do processo scp.
+
+Observe que para o serviço nv.alpine.default (definido como nv.xxx.yyy, onde xxx representa o nome do serviço, como alpine, e yyy o namespace, como default), podemos definir o modo de política para o qual ele está configurado. Aqui está definido como Modo de Proteção (bloqueando toda atividade anormal).
+
+No geral, como nv.alpine.default está no modo de proteção, ele negará que os contêineres executem ssh e scp, e também negará conexões ssh de uma rede externa ou de http para uma rede externa.
+
+Se você mudar o modo de política de nv.alpine.default para monitorar, então {product-name} apenas registrará quando scp/ssh for invocado, ou houver conexões ssh de uma rede externa ou de http para uma rede externa.
+
+[,yaml]
+----
+apiVersion: v1
+items:
+- apiVersion: neuvector.com/v1
+  kind: NvClusterSecurityRule
+  metadata:
+    name: containers
+    namespace: default
+  spec:
+    egress: []
+    file: []
+    ingress:
+    - selector:
+        criteria: []
+        name: external
+      action: deny
+      applications:
+      - SSH
+      name: containers-ingress-0
+      ports: tcp/22
+    process:
+    - action: deny
+      name: ssh
+      path: /bin/ssh
+    target:
+      selector:
+        criteria:
+        - key: container
+          op: =
+          value: '*'
+        name: containers
+      policymode: null
+- apiVersion: neuvector.com/v1
+  kind: NvSecurityRule
+  metadata:
+    name: nv.alpine.default
+    namespace: default
+  spec:
+    egress:
+    - selector:
+        criteria: []
+        name: external
+      action: deny
+      applications:
+      - HTTP
+      name: external-egress-0
+      ports: tcp/80
+    file: []
+    ingress: []
+    process:
+    - action: deny
+      name: scp
+      path: /bin/scp
+    target:
+      selector:
+        criteria:
+        - key: service
+          op: =
+          value: alpine.default
+        - key: domain
+          op: =
+          value: default
+        name: nv.alpine.default
+      policymode: Protect
+kind: List
+metadata: null
+----
+
+Para permitir, ou colocar na lista branca um processo como um processo de monitoramento para ser executado, basta adicionar uma regra de processo com a ação: permitir para o nome do processo e adicionar o caminho.  O caminho deve ser especificado para regras de permissão, mas é opcional para regras de negação.
+
+== Atualizando Regras CRD e Adicionando a Grupos Existentes
+
+Atualizar as regras geradas pelo CRD em {product-name} é tão simples quanto atualizar o arquivo yaml apropriado e aplicar a atualização:
+
+[,shell]
+----
+kubectl apply -f <crdrule.yaml>
+----
+
+=== Suporte a critérios dinâmicos para NvClusterSecurityRule
+
+Múltiplos CRDs que alteram os critérios para grupos personalizados existentes são suportados. Esse recurso também permite que o usuário aplique múltiplos CRDs de uma vez, onde o comportamento de {product-name} é aceitar e enfileirar o CRD, de modo que a resposta imediata ao usuário seja sempre sucesso.  Durante o processamento, quaisquer erros são relatados no console de Notificações -> Eventos.

@@ -1,0 +1,33 @@
+= 网络威胁签名
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/10.threats/10.threats.md
+:page-opendocs-slug:  /policy/threats
+
+== 检测网络威胁
+
+{product-name} 深度数据包检测可用于检查网络数据包和有效载荷中是否存在攻击，例如 OWASP 前十中列出的攻击以及在 Web 应用防火墙 (WAF) 中常见的攻击。
+
+=== OWASP 签名
+
+可以创建 DLP 传感器来检测 OWASP 攻击，使用以下模式示例。和往常一样，这些可能需要根据您的环境和应用程序进行调整。
+
+[,shell]
+----
+img src=javascript
+/servlet/.*/org.apache.
+/modules.php?.*name=Wiki.*<script
+/error/500error.jsp.*et=.*<script
+/mailman/.*?.*info=.*<script
+\x0aReferer\x3a res\x3a/C\x3a
+/cgi-bin/cgictl?action=setTaskSettings.*settings={\x22.*taskId=
+/cgi-bin/cgictl.*scriptName=.*[?&]scriptName=[^&]*?([\x22\x27\x3c\x3e\x28\x29]|script|onload|src)
+----
+
+以下是其他简单示例：
+
+image:owasp_top10_dlp.png[owasp]
+
+=== 内置威胁检测
+
+{product-name} 还内置了对其他网络威胁的检测，例如 SQL 注入攻击、DDoS（例如 Ping 死亡）和隧道攻击。对于 SQL 注入攻击，{product-name} 检查前端与 SQL 数据库 pod 之间的网络连接（SQL 协议），减少误报并提高准确性。

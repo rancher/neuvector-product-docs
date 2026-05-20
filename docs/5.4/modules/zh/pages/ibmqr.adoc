@@ -1,0 +1,68 @@
+= IBM QRadar
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/10.ibmqr/10.ibmqr.md
+:page-opendocs-slug:  /integration/ibmqr
+
+== 与 IBM QRadar 集成
+
+IBM® QRadar® 安全信息和事件管理 (SIEM) 帮助安全团队准确检测和优先处理企业中的威胁，并提供智能洞察，使团队能够快速响应以减少事件的影响。通过整合来自网络中数千个设备、终端和应用程序的日志事件和网络流数据，QRadar 将所有这些不同的信息关联起来，并将相关事件聚合成单个警报，以加速事件分析和修复。QRadar SIEM 可在本地和云环境中使用。
+
+{product-name} 是一个完整生命周期的容器安全平台，完全支持 QRadar 集成。此集成使 QRadar 能够收集容器和 Kubernetes 环境的事件、日志和事件信息。通过使用 {product-name} 的 QRadar DSM，客户将能够在 QRadar 中规范化 {product-name} 安全日志数据，然后分析、报告或修复容器安全事件。
+
+=== IBM QRadar 和 {product-name} DSM
+
+用于与 IBM QRadar 集成的 {product-name} DSM 已在 IBM X-Force / App Exchange 网站上发布并经过 IBM 验证。可以从 App Exchange 网站 https://exchange.xforce.ibmcloud.com/hub/extension/f6dcde294cac1237ce08bcd4dfbc9142[这里] 下载。
+
+也可以从此网站 xref:attachment$NeuVectorDSM_1.0.2.zip[这里] 下载。
+
+=== 如何将 {product-name} 与 QRadar 集成
+
+在将 {product-name} DSM 导入 QRadar 之前，我们建议您检查/修改这些 QRadar 配置，以确保一切按预期工作：
+
+. IBM QRadar 版本 7.3.1 及更高版本
+. 配置 QRadar "`System Settings`" 以确保 Syslog 负载长度足够大，例如：
++
+image:Qradar1.png[QRadar]
+
+=== 配置 {product-name} 以将 Syslog 发送到 QRadar
+
+在设置 -> 配置中启用 Syslog 配置。服务器 IP/URL 和端口应指向 QRadar 服务的 IP 和端口，默认的 Syslog 端口为 514。使用 UDP 协议和 "`In Json`" 日志格式。选择日志级别和报告类别。在多集群{product-name}环境中，要收集所有集群的日志，需要在每个集群中启用此设置。您可以在此页面上配置集群名称，以区分集群事件。
+
+image:Qradar_syslog2.png[QRadar]
+
+=== 配置 QRadar 以分析 {product-name} 日志。
+
+. 启用或导入 {product-name} DSM 到 QRadar。当添加新的 QRadar 日志源时，如果 "`{product-name}`" 出现在 QRadar 日志源类型中，请忽略下面的日志源导入说明，直接进行下一步 "`Add and enable log sources for {product-name}`"。
+
+image:Qradar3.png[QRadar]
+
+如果在 QRadar 中未找到 "`{product-name}`" 日志源类型，请参考 QRadar 用户手册，通过 Admin > 扩展管理 安装 {product-name} DSM。
+
+image:Qradar4.png[QRadar]
+
+. 为{product-name}添加并启用日志源。
+
+现在我们可以为{product-name}日志添加新的日志源：
+
+image:Qradar5.png[QRadar]
+
+"`Log Source Identifier`"应为主控制器的Pod名称。{product-name}的主控制器Pod名称可以在QRadar的原始日志数据中找到，或从{product-name}的管理控制台"`Assets\Controllers`"中找到，如下所示：
+
+image:Qradar6.png[QRadar]
+
+如果运行多个{product-name}集群，则应添加多个日志源。已添加并启用{product-name}日志源：
+
+image:Qradar7.png[QRadar]
+
+=== 验证日志活动
+
+生成一些{product-name}日志，例如网络策略违规、配置更改事件或对容器/节点进行一些漏洞扫描。这些事件或日志将在几秒钟内发送到QRadar。而{product-name}日志应在QRadar控制台中进行规范化。也可以通过QRadar的DSM编辑器进行验证：
+
+image:Qradar8.png[QRadar]
+
+image:Qradar9.png[QRadar]
+
+=== 集成摘要
+
+通过完成的集成，{product-name}安全和管理事件可以与来自其他来源的事件数据一起通过QRadar进行管理。QRadar作为{product-name}事件的永久事件存储，而{product-name}控制器执行实时安全响应和事件的短期集群存储。QRadar可以对关键容器和Kubernetes安全事件执行高级关联和警报。

@@ -1,0 +1,171 @@
+= 在公有云上部署 SUSE Security
+:revdate: 2025-06-25
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/08.publick8s/08.publick8s.md
+:page-opendocs-slug: /deploying/publick8s
+
+== 在公有云Kubernetes服务上部署{product-name}
+
+在任何公有云K8s服务上部署{product-name}，例如AWS EKS、Azure AKS、IBM Cloud K8s、Google Cloud、阿里云或Oracle Cloud。{product-name}已通过Amazon EKS Anywhere合规性和验证框架，因此是经过验证的解决方案，并可作为EKS-Anywhere在Snowball Edge设备上的附加产品通过AWS控制台使用。
+
+首先，创建您的 K8s 集群，并确认可以访问 `kubectl get nodes`。
+
+要部署{product-name}，请使用来自生产部署Kubernetes部分的示例部署说明和示例。如果您从本地或云注册表（如ECR或ACR）拉取{product-name}镜像，请编辑示例yaml。
+
+一些云服务提供商集成了负载均衡器，通过使用 `Type: LoadBalancer` 而非 NodePort 来部署 {product-name} webui 非常简单。
+
+{product-name}还支持基于Helm的部署，Helm图表位于 https://github.com/neuvector/neuvector-helm.。
+
+=== 网络访问
+
+确保内部和外部的入口访问配置正确。对于NodePort服务，3xxxx范围内的随机端口必须可以从外部访问工作节点或主节点的公共IP。您可以使用任何工作节点的公共IP地址和该端口（NodePort）或负载均衡器的公共IP和默认端口8443访问控制台。您可以使用以下方式查看IP/端口：
+
+[,shell]
+----
+kubectl get svc -n neuvector
+----
+
+大多数K8s服务自动启用/允许节点之间的所有跨Pod/跨集群通信，这也使得{product-name}容器（enforcer、控制器、管理器）能够在集群内进行通信。
+
+示例Kubernetes yaml文件将部署一个管理器和三个控制器。它将在每个节点上作为守护程序集部署一个 enforcer。注意：由于潜在的会话状态问题，不建议在负载均衡器后面部署（扩展）多个管理器。
+
+== Microsoft Azure AKS
+
+在Azure上部署K8s集群时，Kubernetes RBAC的默认设置为关闭。请启用RBAC以启用cluster-admin集群角色，否则您需要稍后手动创建该角色以支持基于Helm的部署。
+
+== 谷歌云平台 / GKE
+
+您可以使用集成的负载均衡器，通过使用 '`Type: LoadBalancer`' 而不是 NodePort 来轻松部署 {product-name} webui。配置类型为 RWM（可读写多）的持久存储可能需要在部署 {product-name} 之前创建一个存储服务，例如 NFS。
+
+{product-name} 需要一个 SDN 插件，例如 flannel、weave 或 calico。
+
+使用环境变量 NV_PLATFORM_INFO，值为 platform=Kubernetes:GKE，以启用 {product-name} 执行 GKE 特定操作，例如运行 GKE Kubernetes CIS 基准测试。
+
+== GKE Autopilot 支持
+
+GKE Autopilot 支持在 NeuVector v5.4.3 及更高版本中可用。请按照以下步骤在 Autopilot 集群上部署 NeuVector。
+
+在部署 NeuVector 之前，应在集群上创建一个 `AllowlistSynchronizer`。以下是带有 `allowlistPath` 的配置 YAML 及应用 YAML 的命令：
+
+应用 YAML 的示例命令：
+
+[,shell]
+----
+kubectl apply -f allowlist.yaml
+----
+
+示例 YAML 配置：
+
+[,yaml]
+----
+apiVersion: auto.gke.io/v1
+kind: AllowlistSynchronizer
+metadata:
+  name: neuvector-allowlist
+spec:
+  allowlistPaths:
+  - SUSE/neuvector-enforcer/v1.0.0/suse-neuvector-enforcer.yaml
+  - SUSE/neuvector-scanner/v1.0.0/suse-neuvector-scanner.yaml
+----
+
+执行命令 `kubectl apply -f <YAML file>` 后，请检查 `AllowlistSynchronizer` 是否已准备好。
+
+示例命令：
+
+[,shell]
+----
+kubectl get AllowlistSynchronizer neuvector-allowlist -o yaml
+----
+
+示例 YAML 配置：
+
+[,yaml]
+----
+apiVersion: auto.gke.io/v1
+kind: AllowlistSynchronizer
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"auto.gke.io/v1","kind":"AllowlistSynchronizer","metadata":{"annotations":{},"name":"neuvector-allowlist"},"spec":{"allowlistPaths":["SUSE/neuvector-enforcer/v1.0.0/suse-neuvector-enforcer.yaml","SUSE/neuvector-scanner/v1.0.0/suse-neuvector-scanner.yaml"]}}
+  creationTimestamp: "2025-04-28T18:17:16Z"
+  generation: 1
+  name: neuvector-allowlist
+  resourceVersion: "13326"
+  uid: 3e425c28-9bef-4459-b769-381d974f17f6
+spec:
+  allowlistPaths:
+  - SUSE/neuvector-enforcer/v1.0.0/suse-neuvector-enforcer.yaml
+  - SUSE/neuvector-scanner/v1.0.0/suse-neuvector-scanner.yaml
+status:
+  conditions:
+  - lastTransitionTime: "2025-04-28T18:17:17Z"
+    message: Synchronization completed successfully; allowlists up to date
+    observedGeneration: 1
+    reason: SyncSuccessful
+    status: "True"
+    type: Ready
+  lastSyncAttempt: "2025-04-28T18:17:17Z"
+  managedAllowlistStatus:
+  - filePath: SUSE/neuvector-enforcer/v1.0.0/suse-neuvector-enforcer.yaml
+    generation: 1
+    lastSuccessfulSync: "2025-04-28T18:17:16Z"
+    phase: Installed
+  - filePath: SUSE/neuvector-scanner/v1.0.0/suse-neuvector-scanner.yaml
+    generation: 1
+    lastSuccessfulSync: "2025-04-28T18:17:17Z"
+    phase: Installed
+----
+
+下面的 `override.yaml` 文件需要在使用 Helm 时用于在 GKE Autopilot 集群上部署 NeuVector。
+
+[,yaml]
+----
+cve:
+  scanner:
+    podLabels:
+      # The scanner allowlist should be mapped with scanner deployment workload.
+      cloud.google.com/matching-allowlist: suse-neuvector-scanner
+    resources:
+      # Below are the tested limits for scanner deployment in GKE Auto-Pilot cluster for scanner pod.
+      limits:
+        ephemeral-storage: "3Gi"
+      requests:
+        ephemeral-storage: "2Gi"
+enforcer:
+  podLabels:
+     # The enforcer allowlist should be mapped with the enforcer daemon set workload.
+    cloud.google.com/matching-allowlist: suse-neuvector-enforcer
+----
+
+如果使用 YAML 部署，请相应地在 `enforcer` 和 `scanner` YAML 配置中添加 `podLabels` 和资源限制。
+
+要了解有关 `allowlistSynchronizer` 的更多信息，请查看 https://cloud.google.com/kubernetes-engine/docs/how-to/run-autopilot-partner-workloads[GKE 文档]。
+
+== 处理具有 Pod 中断预算的自动扩展节点
+
+公有云提供商支持自动扩展节点的能力，这可以动态驱逐包括 {product-name} 控制器在内的 Pods。为了防止对控制器的干扰，可以创建一个 {product-name} Pod 中断预算。
+
+例如，创建下面的文件 nv_pdr.yaml，以确保始终运行至少 2 个控制器。
+
+[,yaml]
+----
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: neuvector-controller-pdb
+  namespace: neuvector
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: neuvector-controller-pod
+----
+
+然后，
+
+[,shell]
+----
+kubectl create -f nv_pdr.yaml
+----
+
+有关详细信息，请参见 https://kubernetes.io/docs/tasks/run-application/configure-pdb/。

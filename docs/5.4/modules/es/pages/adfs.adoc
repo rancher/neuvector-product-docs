@@ -1,0 +1,157 @@
+= SAML (ADFS)
+:revdate: 2025-05-08
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/06.adfs/06.adfs.md
+:page-opendocs-slug:  /integration/adfs
+
+== Configuración de ADFS e integración con {product-name}
+
+Esta sección describe los pasos de configuración en ADFS primero, luego en la consola de {product-name}.
+
+=== Configuración de ADFS
+
+. Desde la gestión de AD FS, haz clic derecho en "`Relying Party Trusts`" y selecciona "`Add Relying Party Trust...`".
++
+image:adfs1.png[adfsSetup]
+
+. Selecciona el botón "`Start`" del paso de bienvenida.
++
+image:adfs2.png[adfsSetup]
+
+. Selecciona "`Enter data about the relying party manually`" y selecciona "`Next`".
++
+image:adfs3.png[adfsSetup]
+
+. Introduce un nombre único en el campo de nombre para mostrar y selecciona "`Next`".
++
+image:adfs4.png[adfsSetup]
+
+. Selecciona "`Next`" para omitir la encriptación del token.
++
+image:adfs5.png[adfsSetup]
+
+. Marca "`Enable support for the SAML 2.0 WebSSO protocol`" e introduce la URI de redirección SAML de la página Configuración > Configuración SAML de {product-name} en el campo "`Relying party SAML 2.0 SSO service URL`".  Selecciona "`Next`" para continuar.
++
+image:adfs6.png[adfsSetup]
+
+. Introduce la misma URI de redirección SAML en el campo "`Relying party trust identifier`" y haz clic en "`Add`"; luego selecciona "`Next`" para continuar.
++
+image:adfs7.png[adfsSetup]
+
+. Personaliza el control de acceso; luego selecciona "`Next`" para continuar.
++
+image:adfs8.png[adfsSetup]
+
+. Selecciona "`Next`" para continuar.
++
+image:adfs9.png[adfsSetup]
+
+. Selecciona "`Close`" para finalizar.
+. Selecciona Editar Política de Emisión de Reclamaciones ...
++
+image:adfs10-11.png[adfsSetup]
+
+. Selecciona "`Add Rule...`" y elige "`Send LDAP Attributes as Claims`"; luego selecciona "`Next`".  Nombra la regla y elige Active Directory como el almacén de atributos. Solo se requiere la reclamación de nombre de usuario saliente para la autenticación si el rol predeterminado está configurado; de lo contrario, se necesitan grupos para el mapeo de roles.  El correo electrónico es opcional.
++
+--
+* Nombre de cuenta SAM -> Nombre de usuario
+* Dirección de correo electrónico -> Correo electrónico
+* Grupos de token -- Nombres no cualificados -> grupos
+
+image:adfs11-12.png[adfsSetup]
+--
+. Selecciona "`Add Rule...`" y elige "`Transform an Incoming Claim`"; luego selecciona "`Next`".  Nombra la regla y configura el campo tal y como se muestra en la captura de pantalla a continuación.  El formato de ID de nombre saliente necesita ser Identificador Transitorio.
++
+image:adfs12-13.png[adfsSetup]
+
+=== {product-name} Configuración
+
+. Identifica la URL de inicio de sesión único del proveedor de identidad
+* Ver puntos finales desde la gestión de AD FS > Servicio y usar la URL del punto final "`SAML 2.0/WS-Federation`".
+* Ejemplo: `https://<adfs-fqdn>/adfs/ls`
+
+. Emisor del proveedor de identidad
+* Haz clic derecho en AD FS desde la consola de gestión de AD FS y selecciona "`Edit Federation Service Properties...`"; usa el "`Federation Service identifier`".
+* Ejemplo: `http://<adfs-fqdn>/adfs/services/trust`
+
+. Certificado X.509
+* Desde la gestión de AD FS, selecciona Servicio > Certificado, haz clic derecho en el certificado de firma de token y elige "`View Certificate...`"
+* Selecciona la pestaña Detalles y haz clic en "`Copy to File`"
+* Guárdalo como un archivo x.509 (.CER) codificado en Base-64
+* Copia y pega el contenido del archivo en el campo de Certificado X.509
+
+. Reclamación de grupo
+* Introduce el nombre de la reclamación saliente para los grupos
+* Ejemplo: grupos
+
+. Rol predeterminado
+* Se recomienda que sea "`None`" a menos que desees permitir que cualquier usuario autenticado tenga un rol predeterminado.
+
+. Mapa de roles
+* Establece los nombres de grupo de los usuarios para el rol correspondiente.  (Ver ejemplo de captura de pantalla a continuación.)
++
+image:nv_adfs1.png[NVadfsSetup]
+
+=== Asignación de grupos a roles y espacios de nombres
+
+Por favor, consulta la sección xref:users.adoc#_mapping_groups_to_roles_and_namespaces[Usuarios y Roles] para saber cómo asignar grupos a roles predefinidos y personalizados, así como a espacios de nombres en {product-name}.
+
+== Solución de problemas
+
+. La firma de respuesta SAML de ADFS debe ser o solo Mensaje o Mensaje y Afirmación.  Utiliza el comando Get-AdfsRelyingPartyTrust para verificar o actualizarlo.
++
+image:nv_adfs2.png[adfsTroubleshooting]
+
+. Sincronización de tiempo entre nodos de Kubernetes y servidor ADFS
+
+Para una autenticación exitosa, el tiempo entre los nodos de Kubernetes y el servidor ADFS debe ser el mismo para evitar problemas de sincronización de tiempo o desvío del reloj.
+
+Se recomienda utilizar un https://en.wikipedia.org/wiki/Network_Time_Protocol[servidor NTP], con configuraciones de tiempo iguales en todos los servidores.
+
+Por favor, verifica y confirma que tanto ADFS como los hosts de {product-name} están sincronizados y que los posibles retrasos no superan los 10 segundos. Puedes utilizar comandos de Linux y Windows para comprobar fechas, horas y la actividad del servidor NTP.
+
+[TIP]
+====
+Puedes recargar los tiempos de autenticación desactivando y volviendo a habilitar la configuración en la interfaz de usuario de {product-name} de la siguiente manera:
+
+* Inicia sesión en {product-name} con el usuario administrador
+* Ve a Configuración
+* Haz clic en el botón para desactivar y habilitar la configuración SAML
+** *Asegúrate de mantener la configuración!*
+
+Una vez que la configuración ha sido reactivada, puedes intentar iniciar sesión con un usuario de ADFS. Si funciona, esto confirma que el problema se debió a un error de sincronización de tiempo entre los nodos de Kubernetes y el servidor ADFS.
+====
+
+. Los caracteres SAML deben distinguir entre mayúsculas y minúsculas en la interfaz de usuario de {product-name}.
++
+Los nombres de atributo distinguen entre mayúsculas y minúsculas. Asegúrate de que cualquier nombre de atributo SAML configurado aquí coincida exactamente con la configuración de la aplicación. SAML debe apuntar a la URL correcta para autenticar.
++
+Todos los campos en `{product-name} UI -> Settings -> SAML Settings` son sensibles a mayúsculas y minúsculas.
++
+Los registros del controlador {product-name} contienen la información relevante sobre la autenticación con el servidor ADFS y los errores que ayudarán a identificar la causa raíz. Recomendamos recrear la condición de inicio de sesión fallido y revisar los registros.
+
+. Asegúrate de introducir los grupos, certificados y protocolos correctos.
++
+La configuración de SAML necesita coincidir con la siguiente configuración:
++
+|===
+| Valor | Valor
+
+| Identifica la URL de inicio de sesión único del proveedor
+| Requiere el protocolo HTTPS.
+
+| Emisor del proveedor de identidad
+| Requiere el protocolo HTTP.
+
+| Firma de SAML de ADFS.
+| Necesita ser o solo Mensaje o Mensaje y Afirmación.
+|===
+
+[CAUTION]
+====
+Estos ajustes deben ser validados en tu servidor ADFS y en la interfaz de usuario de {product-name}.
+====
+
+El certificado seleccionado debe ser válido y estar correctamente generado, incluyendo su `CA Root` y `Intermediate Certificates`. Puedes generarlos utilizando tu autoridad de certificación de confianza, Windows o una herramienta de automatización como https://letsencrypt.org/[LetsEncrypt].
+
+Si alguno de estos parámetros es incorrecto, recibirás un `Authentication Failed` error cuando intentes iniciar sesión en {product-name} con un usuario ADFS utilizando la autenticación SAML.

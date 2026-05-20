@@ -1,0 +1,86 @@
+= Application des limites de l'espace de noms
+:revdate: 2026-02-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/14.namespaceboundary/14.namespaceboundary.md
+:page-opendocs-slug:  /stratégie/limites_de_l'espace_de_noms
+
+== Stratégie{nbsp}: Application des limites de l'espace de noms
+
+Par défaut, les pods dans des espaces de noms différents peuvent communiquer entre eux, même s'ils utilisent des étiquettes différentes. Pour restreindre ce comportement, vous devez créer des règles réseau supplémentaires.
+
+L'application des limites de l'espace de noms offre un moyen plus simple de limiter la communication des pods à un espace de noms ou à des frontières d'application naturelles.
+
+== Comment fonctionne l'application des limites de l'espace de noms
+
+L'étiquette d'espace de noms `NeuvectorNamespaceBoundary` impose des limites de communication entre les pods. Lorsqu'elle est activée, NeuVector restreint le trafic afin que les pods ne communiquent qu'au sein du même espace de noms ou dans des frontières d'application définies.
+
+Cette approche réduit le besoin de groupes personnalisés et de politiques réseau supplémentaires.
+
+== Activer ou désactiver l'application des limites de l'espace de noms
+
+Pour contrôler l'application des limites de l'espace de noms, appliquez l'étiquette `NeuvectorNamespaceBoundary` à un espace de noms.
+
+=== Activer l'application
+
+[source,bash]
+----
+kubectl label namespace <namespace> NeuvectorNamespaceBoundary=enabled
+----
+
+=== Désactiver l'application
+
+[source,bash]
+----
+kubectl label namespace <namespace> NeuvectorNamespaceBoundary=disabled
+----
+
+=== Supprimer l'étiquette
+
+La suppression de l'étiquette désactive l'application des limites de l'espace de noms.
+
+[source,bash]
+----
+kubectl label namespace <namespace> NeuvectorNamespaceBoundary-
+----
+
+== Exemple de scénario
+
+Cet exemple montre comment l'application des limites de l'espace de noms simplifie le contrôle des entrées et des sorties.
+
+=== de confiance
+
+* Deux espaces de noms{nbsp}: `ns1` et `ns2`
+* Pods{nbsp}:
+** `ns1`{nbsp}: `pod1` (étiquettes{nbsp}: `app=app1`, `label=one`), `pod2` (étiquettes{nbsp}: `app=app2`, `label=two`)
+** `ns2`{nbsp}: `pod3` (étiquettes{nbsp}: `app=app1`, `label=three`), `pod4` (étiquettes{nbsp}: `app=app2`, `label=four`)
+* Groupes :
+** `g1`{nbsp}: `app=app1` (inclut `pod1` et `pod3`)
+** `g2`{nbsp}: `app=app2` (inclut `pod2` et `pod4`)
+
+Une politique réseau permet le trafic de `g1` à `g2` sur n'importe quelle application et port.
+
+=== Comportement sans application des limites de l'espace de noms
+
+Avec uniquement la politique basée sur les groupes{nbsp}:
+
+* `pod1` peut communiquer avec `pod2` et `pod4`
+* `pod3` peut communiquer avec `pod2` et `pod4`
+
+Pour restreindre la communication au même espace de noms, vous devez créer des groupes supplémentaires et des politiques de refus{nbsp}:
+
+* Créer des groupes basés sur des étiquettes individuelles
+* Ajouter des règles de refus pour bloquer le trafic inter-espaces de noms
+
+Cela augmente la complexité des politiques et l'effort de maintenance.
+
+=== Comportement avec application des limites de l'espace de noms
+
+Lorsque l'application des limites de l'espace de noms est activée{nbsp}:
+
+* `pod1` ne peut communiquer qu'avec `pod2`
+* `pod3` ne peut communiquer qu'avec `pod4`
+* La communication inter-espaces de noms est automatiquement bloquée
+
+Aucun groupe supplémentaire ou politique de réseau n'est requis.
+
+L'application des limites de l'espace de noms simplifie la gestion des politiques tout en imposant une isolation stricte au niveau de l'espace de noms.

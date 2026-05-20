@@ -1,0 +1,31 @@
+= Bamboo
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/03.build/02.bamboo/02.bamboo.md
+:page-opendocs-slug:  /scanning/build/bamboo
+
+== Scannen Sie nach Schwachstellen während der Bamboo-Build-Pipeline.
+
+Das Bamboo-Plugin für {product-name} kann verwendet werden, um nach Schwachstellen in der Bamboo-Pipeline zu scannen. Das Plugin kann über das Admin -> Add-ons-Menü in Bamboo heruntergeladen werden. Verwenden Sie 'Find New Apps', um nach {product-name} zu suchen. Das Plugin wird auch im https://marketplace.atlassian.com/apps/1221199/neuvector[Atlassian Marketplace] beschrieben.
+
+Stellen Sie den {product-name} Allinone- oder Controller-Container bereit, falls Sie dies noch nicht auf einem von Bamboo erreichbaren Host getan haben. Notieren Sie die IP-Adresse des Hosts, auf dem der Allinone- oder Controller-Container läuft.
+
+Stellen Sie außerdem sicher, dass ein {product-name} Scanner-Container bereitgestellt und konfiguriert ist, um sich mit dem Allinone- oder Controller-Container zu verbinden. In Version 4.0 und später muss der neuvector/scanner-Container getrennt vom Allinone- oder Controller-Container bereitgestellt werden.
+
+=== Globale Einstellungen konfigurieren
+
+Konfigurieren Sie die Einstellungen für den {product-name} Controller/Allinone, einschließlich der {product-name} Authentifizierung sowie der Registry-Authentifizierung.
+
+image:bamboo_nv_global_config.png[global-image]
+
+=== Konfigurieren Sie das Repository und die Build-Richtlinie
+
+Erstellen Sie eine Aufgabe und geben Sie das Repository und das Tag zum Scannen sowie die Build-Richtlinie an, um den Build zu fehlschlagen, wenn Schwachstellen erkannt werden. Aktivieren Sie das schichtbasierte Scannen, wenn die Ergebnisse eine Analyse der Schwachstellen für jede Schicht im Bild enthalten sollen.
+
+image:bamboo_nv_local_config_2.png[local-image]
+
+=== Ergebnisse überprüfen
+
+Überprüfen Sie die Ergebnisse in den Scan-Protokollen, einschließlich der Scan-Zusammenfassung, des Grundes für das Scheitern, falls zutreffend, und der Details zu jedem erkannten CVE.
+
+image:bamboo_set_criteria_to_fail_3.png[fail-image]

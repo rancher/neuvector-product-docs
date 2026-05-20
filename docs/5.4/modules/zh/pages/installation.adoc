@@ -1,0 +1,122 @@
+= 部署准备
+:revdate: 2026-02-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /01.basics/03.installation/01.native/01.native.md
+:page-opendocs-slug: /basics/installation
+
+== 了解如何部署 {product-name}
+
+使用 Kubernetes、OpenShift、Rancher、Docker 或其他平台部署 {product-name} 容器。每种类型的 {product-name} 容器都有其独特的目的，可能需要特殊的性能或节点选择要求以实现最佳操作。
+
+{product-name} 开源镜像托管在 Docker Hub 的 `/neuvector/{image name}` 上。
+
+请参阅 xref:production.adoc#_best_practices_tips_qa_for_deploying_and_managing_suse_security[入职/最佳实践部分] 下载入职指南。
+
+=== 使用 Kubernetes、OpenShift、Rancher 或其他基于 Kubernetes 的工具进行部署
+
+要使用 Kubernetes、OpenShift、Rancher 或其他编排工具部署 {product-name}，请参阅 xref:production.adoc#_planning_deployments[部署 {product-name}] 部分中的准备步骤和示例文件。这将部署管理器、控制器、扫描器和执行器容器。有关使用 {product-name} Allinone 容器进行简单测试，请参阅“与 Allinone 相关的特殊用例”部分。
+
+{product-name} 支持基于 Helm 的部署，Helm 图表位于 https://github.com/neuvector/neuvector-helm.。
+
+支持使用 Helm、Red Hat/Community Operators、REST API 或 Kubernetes ConfigMap 进行自动化部署。有关自动化部署的更多详细信息，请参阅 xref:configmap.adoc#_kubernetes_configmap[使用 ConfigMap 部署] 部分。
+
+=== 使用 Docker 原生进行部署
+
+在使用 docker run 或 compose xref:docker.adoc[部署 {product-name}] 之前，您必须将 CLUSTER_JOIN_ADDR 设置为适当的 IP 地址。找到节点 IP 地址、节点名称（如果使用名称服务器）或节点变量（如果使用编排工具），以便 Allinone（控制器）在 docker-compose 文件中使用 "`node IP`"，适用于 Allinone 和执行器。 例如：
+
+[,yaml]
+----
+- CLUSTER_JOIN_ADDR=192.168.33.10
+----
+
+对于基于 Swarm 的部署，还需添加以下环境变量：
+
+[,yaml]
+----
+- NV_PLATFORM_INFO=platform=Docker
+----
+
+请参阅部署 {product-name} -> xref:docker.adoc[Docker 生产部署] 部分以获取说明和示例。
+
+=== 备份配置文件
+
+默认情况下，{product-name} 将各种配置文件存储在控制器或 Allinone 节点的 /var/neuvector/config/backup 中。
+
+此卷可以映射到xref:production.adoc#_backups_and_persistent_data[持久存储]以保持配置。文件夹中的文件可能需要被删除以便重新开始。
+
+=== 卷映射
+
+确保卷正确映射。{product-name} 需要这些才能运行（/var/neuvector 仅在控制器/Allinone 中需要）。例如：
+
+[,yaml]
+----
+volumes:
+        - /lib/modules:/lib/modules:ro
+        - /var/neuvector:/var/neuvector
+        - /var/run/docker.sock:/var/run/docker.sock:ro
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup:/host/cgroup:ro
+----
+
+此外，您可能需要确保其他工具没有阻止访问docker.sock接口。
+
+=== 端口和端口映射
+
+确保所需的端口在主机上正确映射并开放。管理器或 Allinone 需要8443（如果使用控制台）。Allinone 和控制器需要18300、18301、18400、18401，并可选10443、11443、20443、30443。执行器需要18301和18401。
+
+[NOTE]
+====
+如果部署 Docker 原生（包括 SWARM），请确保没有主机防火墙阻止访问所需端口，例如 firewalld。如果启用，docker0 接口必须被添加为 Allinone/控制器主机的受信任区域。
+====
+
+==== 端口摘要
+
+下表列出了来自每个{product-name}容器的通信。Allinone 容器结合了管理器、控制器和执行器容器，因此需要使用这些容器所列出的端口。
+
+image:Communication_Matrix_From_To.png[端口]
+
+下表总结了每个{product-name}容器的侦听端口。
+
+image:Communication_Matrix_Listening_Ports.png[监听]
+
+===== 附加端口
+
+在5.1版本中，控制器上新增了8181的侦听端口，仅用于本地控制器通信。
+
+[,shell]
+----
+tcp        0      0 :::8181                 :::*                    LISTEN      8/opa
+----
+
+=== {product-name} 镜像
+
+{product-name} 镜像已发布到 Docker Hub。对核心组件使用固定版本标签，对扫描器和更新器图像使用 `latest` 标签。
+
+对管理器、控制器和执行器图像使用相同的版本标签。对扫描器和更新器图像使用 `latest`。
+
+.示例图像标签
+[source,text]
+----
+neuvector/manager:5.4.1
+neuvector/controller:5.4.1
+neuvector/enforcer:5.4.1
+neuvector/scanner:latest
+neuvector/updater:latest
+----
+
+在您的 Kubernetes 清单或 Helm 值文件中更新图像引用，以匹配目标 NeuVector 版本。
+
+==== Helm 图表配置
+
+在使用 Helm 图表版本 1.8.9 或更高版本部署产品名称时，请在 `values.yaml` 中更新以下设置：
+
+* 将图像注册表设置为 `docker.io`
+* 将图像名称和标签更新为所需版本
+* 将 `imagePullSecrets` 留空
+
+==== Rancher 注册表图像
+
+{product-name} 镜像也会同步到 Rancher 注册表，以便通过 Rancher 管理部署。
+
+* 镜像可用性可能在每次发布后滞后几天。
+* 有关部署的详细信息，请参见 Rancher 部署文档。

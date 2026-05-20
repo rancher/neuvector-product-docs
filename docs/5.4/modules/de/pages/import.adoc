@@ -1,0 +1,28 @@
+= Importieren von CRD aus der Konsole
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/13.usingcrd/1.import/1.import.md
+:page-opendocs-slug:  /policy/usingcrd/import
+
+== Importieren einer CRD-Formatdatei aus der Konsole oder API
+
+{product-name} unterstützt das Importieren einer CRD-formatierten Datei aus der Konsole. Dies ist jedoch nicht dasselbe wie das Anwenden in Kubernetes als benutzerdefinierte Ressourcendefinition (CRD).
+
+Eine Datei im {product-name} CRD-Format kann über die Konsole importiert werden, um die in der Datei angegebene Sicherheitsrichtlinie (Regeln) festzulegen. Diese Regeln werden NICHT als 'CRD'-bezeichnete Regeln importiert, sondern als reguläre 'benutzerdefinierte' Regeln. Die Implikation ist, dass diese Regeln wie andere Regeln über die Konsole oder über die API geändert oder gelöscht werden können. Sie sind nicht als CRD-Regeln vor Änderungen geschützt.
+
+Um aus der Konsole zu importieren, gehen Sie zu den Richtlinien -> Gruppen und wählen Sie 'Richtliniengruppe importieren' aus.
+
+image:4-3_Import_Policy.png[import]
+
+[IMPORTANT]
+====
+Importierte Regeln überschreiben alle vorhandenen Regeln für die Gruppe.
+====
+
+Regeln, die mit den Kubernetes CRD-Funktionen festgelegt werden, z.B. durch 'kubectl apply my_crd.yaml', erstellen CRD-Typregeln in {product-name}, die nicht über die Konsole oder API geändert werden können. Diese können nur durch Aktualisieren der CRD-Datei und Anwenden der Änderung über Kubernetes geändert werden.
+
+Mögliche Anwendungsfälle für den Konsolenimport der Regeldatei sind:
+
+* Erstkonfiguration (einmalig) der Regeln für eine Gruppe oder mehrere Gruppen.
+* Migration von Regeln von einer Umgebung in eine andere
+* Regelerstellung, bei der Änderungen über die Konsole oder API erlaubt sein müssen.

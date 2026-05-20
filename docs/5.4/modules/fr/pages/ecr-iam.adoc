@@ -1,0 +1,47 @@
+= Numérisation ECR utilisant des rôles IAM
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/02.registry/02.ecr-iam/02.ecr-iam.md
+:page-opendocs-slug:  /scanning/registry/ecr-iam
+
+== AWS ECR - Rôles IAM
+
+Lorsque les {product-name} conteneurs sont déployés dans AWS, et qu’une instance EC2 se voit attribuer un rôle de "`EC2 Container Registry`" Accès en lecture, le registre AWS ECR peut être analysé sans clé d’accès ni clé secrète.
+
+Voici comment créer un rôle AWS et l’attribuer au nœud.
+
+=== Sélectionnez l'instance
+
+Notez que le rôle IAM est soit vide, soit n'inclut pas le rôle ECR
+
+image:ecr1.png[awsrole]
+
+=== Attacher un rôle
+
+Sélectionnez Actions -> Paramètres de l'instance -> Attacher/Remplacer le rôle IAM
+
+image:ecr2.png[awsrole]
+
+Si vous n'avez pas précédemment créé le rôle ECR, cliquez sur Créer un nouveau rôle IAM. Entrez le nom du rôle.
+
+image:ecr3.png[attachrole]
+
+=== Sélectionnez le service AWS
+
+image:ecr4.png[select]
+
+=== Liste des rôles
+
+image:ecr5.png[awsroles]
+
+=== Attacher la permission de lecture ECR au rôle
+
+image:ecr6.png[permissions]
+
+=== Révisez vos paramètres
+
+image:ecr7.png[révision]
+
+=== Vérifiez l'instance pour le rôle IAM
+
+image:ecr9.png[instance]

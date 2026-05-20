@@ -1,0 +1,89 @@
+= 使用 Helm 部署
+:revdate: 2026-03-24
+:page-revdate: {revdate}
+:chart-version: 108.0.2+up2.8.11
+:chart-version-url: https://github.com/rancher/charts/blob/release-v2.13/charts/neuvector/108.0.2%2Bup2.8.11/
+
+这是一个关于如何通过 Helm 部署 {neuvector-product-name} 的示例指南，以便与 https://documentation.suse.com/cloudnative/rancher-manager/latest/en/installation-and-upgrade/installation-and-upgrade.html[SUSE Rancher 安装] 一起使用。有关 {neuvector-product-name} 部署方法的更多信息，请参阅 xref:production.adoc#_planning_deployments[规划部署]。
+
+== 先决条件
+
+* 一个正在运行的 SUSE Rancher 集群。
+* 确保您已安装 https://helm.sh/docs/intro/quickstart/#install-helm[Helm] 以使用 Helm CLI。
+* 已配置为与您的集群通信的 https://kubernetes.io/docs/tasks/tools/#kubectl[Kubectl] 命令行工具。
+
+确保选择与您的 SUSE Rancher 版本兼容的 {neuvector-product-name} chart 版本。请参阅 SUSE Rancher 支持矩阵中 `NeuVector` https://www.suse.com/suse-rancher/support-matrix/all-supported-versions/rancher-v2-13-3/#:~:text=Rancher%20Apps%20/%20Cluster%20Tools[Rancher 应用程序 / 集群工具] 部分的 功能，以获取最新的兼容 chart。请注意，所有 {neuvector-product-name} 5.x 版本均可应用于所有受支持的 https://www.suse.com/suse-neuvector/support-matrix/all-supported-versions/neuvector-v-all-versions/[Rancher 版本]。
+
+此示例部署了 Rancher v2.13.x 发布线的 {neuvector-product-name} v5.4.9 chart ({chart-version-url}[`{chart-version}`])。
+
+== 安装
+
+. 添加 Helm 储存库并更新以获取最新的 charts：
++
+[source,shell]
+----
+helm repo add rancher-charts https://charts.rancher.io/
+helm repo update
+----
+
+. 安装 `neuvector-crd` chart：
++
+[source,shell]
+----
+helm install neuvector-crd --namespace cattle-neuvector-system --create-namespace rancher-charts/neuvector-crd --version={chart-version}
+----
++
+.. 如果您的集群启用了 Pod 安全准入 (PSA)，您必须标记名称空间以允许特权容器：
++
+[source,shell]
+----
+kubectl label namespace cattle-neuvector-system pod-security.kubernetes.io/enforce=privileged
+----
+
+. 如果您已经有自定义 `values.yaml` 文件，请确保设置以下值。如果需要，您可以使用以下 {chart-version-url}values.yaml[`release-v2.13` chart] 中的 `values.yaml` 文件作为模板。
+.. `global.cattle.url` 被设置为您的 Rancher URL，格式为 `https://your-rancher-url.com`。
+.. 确保 `controller.federation.managedsvc.type` 的值被设置为 `NodePort`。
+.. `global.cattle.systemDefaultRegistry` 被设置为 `<Prime-Registry-URL>`。
++
+[NOTE]
+====
+要了解有关 Prime Registry URL 的更多信息，请参阅我们的 https://scc.suse.com/rancher-docs/rancherprime/latest/en/reference-guide.html#prime-registry-url[仅限 Prime 的文档]。需要身份验证。使用您的 https://scc.suse.com/[SUSE 客户中心 (SCC)] 凭据登录。
+====
++
+[source,yaml]
+.Example: values.yaml
+----
+...
+global: # required for Rancher authentication (https://<Rancher_URL>/)
+  cattle:
+    url: https://your-rancher-url.com # Update with your Rancher URL
+    systemDefaultRegistry: <Prime-Registry-URL>
+...
+controller:
+  federation:
+    managedsvc:
+      type: NodePort
+  prime:
+    enabled: true # Activates Prime features in v5.4.6+
+----
+
+. 安装主 chart：
++
+[source,shell]
+----
+helm install neuvector --namespace cattle-neuvector-system --create-namespace rancher-charts/neuvector --version={chart-version} -f values.yaml
+----
+
+. 运行以下命令以找到您的 `NodePort` 以访问 {neuvector-product-name} 用户界面。在指定的结果中，`NodePort` 的值为 `30101`。
++
+[source,shell]
+----
+kubectl get svc --namespace cattle-neuvector-system neuvector-service-webui
+
+NAME                      TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+neuvector-service-webui   NodePort   10.43.207.222   <none>        8443:30101/TCP   21m
+----
+
+== 安装后
+
+{neuvector-product-name} 用户界面的默认登录凭据是 `admin` / `admin`。您在第一次登录时会被提示更改此信息。

@@ -1,0 +1,68 @@
+= IBM QRadar
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/10.ibmqr/10.ibmqr.md
+:page-opendocs-slug:  /integration/ibmqr
+
+== Integration mit IBM QRadar
+
+Das IBM® QRadar® Security Information and Event Management (SIEM) hilft Sicherheitsteams, Bedrohungen im gesamten Unternehmen genau zu erkennen und zu priorisieren, und es bietet intelligente Einblicke, die es den Teams ermöglichen, schnell zu reagieren, um die Auswirkungen von Vorfällen zu verringern. Durch die Konsolidierung von Protokollereignissen und Netzwerkflussdaten von Tausenden von Geräten, Endpunkten und Anwendungen, die in Ihrem Netzwerk verteilt sind, korreliert QRadar all diese unterschiedlichen Informationen und aggregiert verwandte Ereignisse in einzelnen Warnmeldungen, um die Analyse und Behebung von Vorfällen zu beschleunigen. QRadar SIEM ist sowohl lokal als auch in einer Cloud-Umgebung verfügbar.
+
+{product-name} ist eine vollständige Lebenszyklus-Container-Sicherheitsplattform, die die QRadar-Integration vollständig unterstützt. Diese Integration ermöglicht es QRadar, Ereignisse, Protokolle und Vorfallinformationen für Container- und Kubernetes-Umgebungen zu sammeln. Durch die Verwendung von {product-name}'s DSM für QRadar können Kunden die {product-name} Sicherheitsprotokolldaten in QRadar normalisieren und dann Sicherheitsereignisse von Containern analysieren, berichten oder beheben.
+
+=== IBM QRadar und {product-name} DSM
+
+Das {product-name} DSM zur Integration mit IBM QRadar ist veröffentlicht und von IBM auf der IBM X-Force / App Exchange-Website validiert. Es ist zum Download verfügbar https://exchange.xforce.ibmcloud.com/hub/extension/f6dcde294cac1237ce08bcd4dfbc9142[hier] von der App Exchange-Website.
+
+Es ist auch von dieser Seite xref:attachment$NeuVectorDSM_1.0.2.zip[hier] zum Download verfügbar.
+
+=== Wie man {product-name} mit QRadar integriert
+
+Bevor Sie das {product-name} DSM in QRadar importieren, empfehlen wir, diese QRadar-Konfigurationen zu überprüfen/zu ändern, um sicherzustellen, dass alles wie erwartet funktioniert:
+
+. IBM QRadar Version 7.3.1 und höher
+. Konfigurieren Sie QRadar "`System Settings`", um sicherzustellen, dass die Syslog-Payload-Länge groß genug ist, zum Beispiel:
++
+image:Qradar1.png[QRadar]
+
+=== Konfigurieren Sie {product-name}, um Syslog an QRadar zu senden.
+
+Aktivieren Sie die Syslog-Konfiguration in den Einstellungen -> Konfiguration. Die Server-IP/URL und der Port sollten auf die QRadar-Dienst-IP und den Port zeigen, und der Standard-Syslog-Port ist 514. Verwenden Sie das UDP-Protokoll und "`In Json`" Protokollformat. Wählen Sie die Protokollebene und die Kategorien aus, die gemeldet werden sollen. In einer Multi-Cluster {product-name} Umgebung muss diese Einstellung in jedem Cluster aktiviert werden, um alle Cluster-Protokolle zu sammeln. Sie können den Clusternamen auf dieser Seite konfigurieren, um Clusterereignisse voneinander zu unterscheiden.
+
+image:Qradar_syslog2.png[QRadar]
+
+=== Konfigurieren Sie QRadar zur Analyse von {product-name} Protokollen.
+
+. Aktivieren oder importieren Sie das {product-name} DSM in QRadar. Wenn Sie eine neue QRadar-Protokollquelle hinzufügen und "`{product-name}`" im QRadar-Protokollquellentyp erscheint, ignorieren Sie bitte die Anweisungen zum Importieren der Protokollquelle unten und fahren Sie mit dem nächsten Schritt "`Add and enable log sources for {product-name}`" fort.
+
+image:Qradar3.png[QRadar]
+
+Wenn der Protokollquellentyp "`{product-name}`" in QRadar nicht gefunden wurde, konsultieren Sie bitte das QRadar-Benutzerhandbuch, um das {product-name} DSM über Admin > Erweiterungsmanagement zu installieren.
+
+image:Qradar4.png[QRadar]
+
+. Fügen Sie Protokollquellen für {product-name} hinzu und aktivieren Sie sie.
+
+Jetzt können wir eine neue Protokollquelle für {product-name} Protokolle hinzufügen:
+
+image:Qradar5.png[QRadar]
+
+"`Log Source Identifier`" sollte der Pod-Name des Hauptcontrollers sein. Der Pod-Name des Hauptcontrollers von {product-name} kann in den Rohprotokolldaten von QRadar oder aus der Verwaltungskonsole von {product-name} "`Assets\Controllers`" wie folgt gefunden werden:
+
+image:Qradar6.png[QRadar]
+
+Mehrere Protokollquellen sollten hinzugefügt werden, wenn mehrere {product-name} Cluster laufen. {product-name} Protokollquelle wurde hinzugefügt und aktiviert:
+
+image:Qradar7.png[QRadar]
+
+=== Überprüfen Sie die Protokollaktivitäten.
+
+Generieren Sie einige {product-name} Protokolle, zum Beispiel Netzwerk-Richtlinienverletzungen, Konfigurationsänderungsereignisse oder führen Sie einige Schwachstellenscans auf Containern/Knoten durch. Diese Vorfall- oder Ereignisprotokolle werden in Sekunden an QRadar gesendet. Und die {product-name} Protokolle sollten in der QRadar-Konsole normalisiert werden. Es kann auch über den DSM-Editor von QRadar überprüft werden:
+
+image:Qradar8.png[QRadar]
+
+image:Qradar9.png[QRadar]
+
+=== Integrationsübersicht.
+
+Mit der abgeschlossenen Integration können {product-name} Sicherheits- und Verwaltungsereignisse zusammen mit Ereignisdaten aus anderen Quellen über QRadar verwaltet werden. QRadar dient als permanente Ereignisspeicherung für {product-name} Ereignisse, während der {product-name} Controller Echtzeitsicherheitsreaktionen und kurzfristige Cluster-Speicherung für Ereignisse durchführt. QRadar kann fortgeschrittene Korrelation und Alarmierung für kritische Sicherheitsereignisse von Containern und Kubernetes durchführen.

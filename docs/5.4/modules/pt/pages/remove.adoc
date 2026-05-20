@@ -1,0 +1,76 @@
+= Removendo ou resetando {product-name}
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/10.remove/10.remove.md
+:page-opendocs-slug: /implantando/remover
+
+== Removendo {product-name} Implantação / Contêineres
+
+Para remover a implantação {product-name} no Kubernetes, use o mesmo arquivo yaml para implantação no comando de exclusão.
+
+[,shell]
+----
+kubectl delete -f neuvector.yaml
+----
+
+Isso removerá os serviços e implantações de contêineres de {product-name}. Você também pode querer excluir o namespace neuvector, o volume persistente e os papéis de cluster e bindings de papéis de cluster criados nas etapas de implantação.
+
+Se você implantou {product-name} usando um Helm chart ou operador, deve excluir {product-name} usando o Helm ou o comando apropriado do operador.
+
+== Resetando {product-name} para um estado inicial
+
+Além de excluir conforme discutido acima e reimplantar {product-name}, as seguintes etapas podem ser realizadas no Kubernetes para resetar {product-name}, o que removerá regras aprendidas, grupos e outras configurações, mas deixará a implantação {product-name} intacta.
+
+. Escale a implantação do controlador para 0.
+. (Opcional) se um Volume Persistente for usado, exclua o backup do volume persistente e as pastas de registro criadas.
+. Escale a implantação do controlador para 3.
+
+== Resetando a senha do administrador
+
+A senha do administrador é a chave para administrar a implantação {product-name} e visualizar as atividades da rede do cluster.  É importante mudar a senha ao instalar e mantê-la bem guardada.  Às vezes, a senha é guardada tão bem que se perde ou o administrador deixa a empresa.  Se você tiver acesso kubectl ao cluster, pode redefinir a senha do administrador para o padrão usando os seguintes passos.
+
+Acesse um dos controladores.
+
+[,shell]
+----
+kubectl exec -it <controller> -n neuvector -- sh
+----
+
+Verifique se a entrada do administrador existe e salve o JSON de saída em algum lugar para segurança.
+
+[,shell]
+----
+consul kv get object/config/user/admin
+----
+
+Pegue a saída do comando acima 'consul kv get' e substitua a string 'password_hash' pela string abaixo.
+
+[,shell]
+----
+c7ad44cbad762a5da0a452f9e854fdc1e0e7a52a38015f23f3eab1d80b931dd472634dfac71cd34ebc35d16ab7fb8a90c81f975113d6c7538dc69dd8de9077ec
+----
+
+Redefina a senha da conta de administrador para o padrão. (SUBSTITUA <UPDATED_consul_kv_get_output_with_new_password_hash> ANTES DA EXECUÇÃO!!!)
+
+[,shell]
+----
+consul kv put object/config/user/admin '<UPDATED_consul_kv_get_output_with_new_password_hash>'
+----
+
+[WARNING]
+.EXEMPLO ABAIXO: (NÃO EXECUTE SEM SUBSTITUIR PELA SAÍDA)
+====
+[,shell]
+----
+consul kv put object/config/user/admin '{"fullname":"admin","username":"admin","password_hash":"c7ad44cbad762a5da0a452f9e854fdc1e0e7a52a38015f23f3eab1d80b931dd472634dfac71cd34ebc35d16ab7fb8a90c81f975113d6c7538dc69dd8de9077ec","pwd_reset_time":"2022-03-24T20:50:15.341074451Z","pwd_hash_history":null,"domain":"","server":"","email":"","role":"admin","role_oride":false,"timeout":300,"locale":"en","role_domains":{},"last_login_at":"2022-03-24T20:49:32.577877044Z","login_count":1,"failed_login_count":0,"block_login_since":"0001-01-01T00:00:00Z"}'
+----
+
+Resposta:
+
+[,shell]
+----
+Success! Data written to: object/config/user/admin
+----
+
+Faça login com admin/admin e altere a senha.
+====

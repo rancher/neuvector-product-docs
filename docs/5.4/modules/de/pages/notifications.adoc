@@ -1,0 +1,50 @@
+= Ereignisberichterstattung
+:page-opendocs-origin: /15.ui_extension/03.notifications/03.notifications.md
+:page-opendocs-slug:  /ui_extension/notifications
+
+== Sicherheitsereignisse
+
+In der UI-Erweiterung auf dem Rancher-Portal funktioniert der **Sicherheitsereignisse**-Tab ähnlich wie die NeuVector-Standalone-Seite. Die Ereignisse können durch mehrere Faktoren ausgelöst werden:
+
+* Gefährliche Gespräche oder Datenübertragungen von irgendwo zum Endpunkt (Knoten oder Pod).
+* Die End-to-End-Verbindung verstößt gegen die Netzwerkrichtlinie.
+* Verletzte Operation gegen die Prozessprofilregel.
+* Verletzte Operation gegen die Dateizugriffsregel.
+
+image:sec_events.png[Sicherheitsereignisse]
+
+Schieben Sie den Punkt nach links oder rechts auf dem Zeitregler, um Ereignisse nach Datum zu filtern.
+
+image:sec_events_time_filter.png[Sicherheitsereignisse]
+
+Geben Sie Schlüsselwörter in das Schnellfilterfeld ein, um jedes Ereignis zu filtern, das das Schlüsselwort enthält.
+
+image:sec_events_quick_filter.png[Sicherheitsereignisse]
+
+Öffnen Sie das **Erweiterte Filter** seitlichés Fenster, und Sie finden mehrere Optionen, die Ihre Suche unterstützen:
+
+* Schweregrad, Standort und Kategorie können gemäß den Tags auf der rechten Seite des Ereignistitels gefiltert werden.
+* Die Autovervollständigungsliste unterstützt Benutzereingaben für Host-, Quell- und Ziel-Felder und unterstützt ein Mehrfach-Tag-Eingabefeld für Namespace.
+
+image:sec_events_adv_filter.png[Sicherheitsereignisse]
+
+Klicken Sie auf ein Ereignis, um das Panel aufzuklappen und weitere Details anzuzeigen. Im Nachrichtenfeld können Sie weitere Informationen anzeigen.
+
+image:sec_event_detail.png[Sicherheitsereignisse]
+
+Der **Host** Name ist anklickbar und öffnet das Host-Detail-Popup. Die **Schwachstellen** und **Gruppe** Felder haben einen externen Link, um zur NeuVector SSO-Seite weiterzuleiten.
+
+image:node_detail_open.png[Sicherheitsereignisse]
+
+Der **Arbeitslast** Name ist anklickbar und öffnet das Arbeitslast-Detail-Popup. Das **Gruppe** Feld hat einen externen Link, um zur NeuVector SSO-Seite weiterzuleiten.
+
+image:pod_detail_open.png[Sicherheitsereignisse]
+
+Das **Gemeldet von**-Feld im Nachrichtenfeld ist anklickbar und öffnet das Enforcer-Detail-Popup.
+
+image:enforcer_detail_open.png[Sicherheitsereignisse]
+
+== Funktionen, die beim Vergleich mit der NeuVector-Standalone-Seite nicht enthalten sind.
+
+* Regel überprüfen / vorschlagen.
+* PDF-Berichte.

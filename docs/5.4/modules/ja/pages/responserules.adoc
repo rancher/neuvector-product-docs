@@ -1,0 +1,326 @@
+= 応答ルール
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/08.responserules/08.responserules.md
+:page-opendocs-slug:  /policy/responserules
+
+== ポリシー:応答ルール
+
+応答ルールは、重要なセキュリティイベントに対する応答を自動化するための柔軟でカスタマイズ可能なルールエンジンを提供します。トリガーには、セキュリティイベント、脆弱性スキャンの結果、CISベンチマーク、入場制御イベント、一般的なイベントが含まれます。アクションには、コンテナの隔離、Webhook、およびアラートの抑制が含まれます。
+
+image:response1.png[応答ルール]
+
+次の内容を使用して新しい応答ルールを作成します：
+
+* グループ。ルールはグループに適用されます。グループの詳細および必要に応じて新しいグループを作成する方法については、実行時セキュリティポリシー->グループのセクションを参照してください。
+* カテゴリ。これは、セキュリティイベントやCVE脆弱性スキャン結果などのイベントの種類です。
+* 基準。1つ以上の基準を指定してください。各カテゴリには、適用可能な異なる基準があります。例えば、イベント名、重大度、または高いCVEの最小数によってです。
+* アクション.1つ以上のアクションを選択してください。隔離は、コンテナの出入りするすべてのネットワークトラフィックをブロックします。Webhookは、設定->設定でWebhookエンドポイントが定義されている必要があります。ログの抑制は、このイベントが通知に記録されるのを防ぎます。
+
+image:newrule1.png[NewResponseRules]
+
+[IMPORTANT]
+====
+すべての応答ルールは、条件/基準に一致するかどうかを評価されます。複数のルールが一致する場合、各アクションが実行されます。これは、上から下に評価され、最初に一致したルールのみが実行されるネットワークルールの動作とは異なります。
+====
+
+将来的なリリースでは、{product-name}によって追加のイベントとアクションが追加され続けます。
+
+== 応答ルールの詳細な設定
+
+応答ルールは、特定のセキュリティイベントに基づいて、隔離、Webhook、およびログ抑制などの自動応答を可能にします。現在、応答ルールで定義できるイベントには、イベントログ、セキュリティイベントログ、CVE（脆弱性スキャン）およびCISベンチマークレポートが含まれます。応答ルールはすべてのモードに適用されます：発見、監視、保護のモードで、すべての3つのモードで動作は同じです。
+
+イベントが複数のルールに一致する場合、複数のルールからのアクションが適用されます。各ルールには、複数のアクションと複数の一致基準を持つことができます。定義されたすべてのアクションは、イベントが応答ルールの基準に一致する場合、コンテナに適用されます。ホスト（コンテナではない）イベントに一致する場合、現在、アクションの webhook および suppress log がサポートされています。
+
+{product-name}には、各カテゴリごとに1つずつ、ステータス'`disabled,`'に設定された6つのデフォルトの応答ルールが含まれています。ユーザーは、デフォルトのルールを変更して要件に合わせるか、新しいルールを作成できます。適用されるべきルールを必ず有効にしてください。
+
+=== 応答ルールパラメータマトリックス
+
+image:resp1.png[matrix]
+
+=== 単一のルールで複数の基準を使用する
+
+複数の基準に対する応答ルールの一致ロジックは次のとおりです。
+
+* 単一のルール内で異なる基準タイプ（例：name:Network.Violation、name:Process.Profile.Violation）に対しては、「and」を適用します。
+
+=== アクション
+
+* Quarantine -- コンテナは隔離されます。隔離とは、すべてのネットワークトラフィックがブロックされることを意味します。 コンテナは残り、実行を続けます - ただし、ネットワーク接続はありません。 Kubernetesは、隔離されたコンテナを置き換えるためにコンテナを起動しません。api-serverはまだコンテナに到達できるためです。
+* Webhook - webhookログが生成されました。
+* suppress-log -- ログは抑制されます - syslogとwebhookログの両方が抑制されます。
+
+[NOTE]
+====
+* 隔離アクションは、ホストイベントに対してトリガーされたルールには適用されません。
+* アクションとイベントパラメータは必須です。他のパラメータは、より広い条件に一致させるために空にすることができます。
+* 単一のログに対して複数のルールが一致することがあり、その結果、複数のアクションが実行される可能性があります。
+* 各ルールには複数のアクションを設定できます。
+====
+
+=== セキュリティイベントログの応答ルールを作成する
+
+* 「上に挿入」をクリックして、ルールを最上部に挿入します。
+* ルールを特定のサービスグループに適用する必要がある場合は、サービスグループ名を選択してください。
+* カテゴリーをセキュリティイベントとして選択します。
+* イベントログを一致基準として含めるための基準を追加します。
+* 適用するアクションを選択します：隔離、Webhook、またはログ抑制。
+* ステータスを有効にします。
+* ログレベルまたはプロセス名は、他の一致基準として使用できます。
+
+=== パッケージがnv.alpinepython.defaultコンテナで更新されたときに、コンテナを隔離し、webhookを送信するためのサンプルルール。
+
+image:resp3.png[rulesample]
+
+=== ルールを管理するためのアイコン - 編集、削除、無効化、および新しいルールを下に挿入
+
+image:resp4.png[管理]
+
+=== イベントログの応答ルールを作成する
+
+* 「上に挿入」をクリックして、ルールを最上部に挿入します。
+* ルールを特定のサービスグループに適用する必要がある場合は、サービスグループ名を選択してください。
+* イベントカテゴリを選択する
+* 一致基準として含めるイベントログの名前を追加する
+* 適用するアクションを選択する - 隔離、Webhook、またはログを抑制する
+* ステータスを有効にします。
+* ログレベルは他の一致基準として使用できます
+
+=== 応答ルールのために選択できるサンプルイベント
+
+image:resp5.png[イベント]
+
+=== 入場制御イベントのサンプル基準
+
+image:admission.png[イベント]
+
+=== 一致基準としてログレベルとレポート名を使用したcve-reportカテゴリの応答ルールを作成する
+
+* 「上に挿入」をクリックして、ルールを最上部に挿入します。
+* ルールを特定のサービスグループに適用する必要がある場合は、サービスグループ名を選択してください。
+* カテゴリCVE-Reportを選択してください
+* 一致基準としてログレベルまたはcve-reportタイプを追加する
+* 適用するアクションを選択する - 隔離、Webhook、またはログを抑制する（隔離はレジストリスキャンには適用されません）
+* ステータスを有効にします。
+
+=== CVE-Reportカテゴリの応答ルールのために選択できるサンプルCVEレポートタイプ
+
+image:resp7.png[cvereport]
+
+=== 脆弱性スキャンの結果がそのコンテナに対して5つ以上の高レベルのCVE脆弱性を含む場合、コンテナを隔離し、Webhookを送信する
+
+image:resp8.png[cvequarantine]
+
+=== コンテナにcve-2018-12という名前の脆弱性が含まれている場合、Webhookを送信します。
+
+image:resp8-a.png[Webhook]
+
+=== CISベンチマークのレスポンスルールを作成しています（ログレベルとベンチマーク番号を一致基準として）
+
+* 「上に挿入」をクリックして、ルールを最上部に挿入します。
+* 特定のサービスグループにルールを適用する必要がある場合は、サービスグループ名を選択してください。
+* カテゴリベンチマークを選択してください。
+* 一致基準としてログレベルまたはベンチマーク番号を追加します。例："`5.12`" コンテナのルートファイルシステムが読み取り専用としてマウントされていることを確認してください。
+* 適用するアクションを選択します。隔離、Webhook、ログの抑制（隔離はホストDockerおよびKubernetesベンチマークには適用されません）。
+* ステータスを有効にします。
+
+image:resp8-b.png[cis]
+
+=== レスポンスルールを削除することでコンテナの隔離を解除します。
+
+* レスポンスルールによってコンテナが隔離されている場合、隔離を解除したいかもしれません。
+* コンテナが隔離される原因となったレスポンスルールを削除します。これはイベントログにあります。
+* ルールを削除した後、コンテナの隔離を解除するために隔離解除オプションを選択します。
+
+=== コンテナの隔離に関与したルールIDを表示します（「通知」->「イベント」で）。
+
+image:resp9.png[隔離解除]
+
+=== 適切なレスポンスルールが削除されたときの隔離解除オプションのポップアップ。
+
+このルールによって隔離されたコンテナの隔離を解除するため、チェックボックスにチェックを入れてください。
+
+image:resp10.png[オプション]
+
+=== レスポンスルールのために設定できるカテゴリ別の基準の完全なリスト。
+
+いくつかの基準には値が必要です（例：cve-high:1、name:D.5.4、level:critical）、値はコロンで区切られています。一方、他の基準はプリセットされており、基準の入力を始めるとドロップダウンに表示されます。
+
+==== ［Events (イベント)］
+
+[,shell]
+----
+Container.Start
+Container.Stop
+Container.Remove
+Container.Secured
+Container.Unsecured
+Enforcer.Start
+Enforcer.Join
+Enforcer.Stop
+Enforcer.Disconnect
+Enforcer.Connect
+Enforcer.Kicked
+Controller.Start
+Controller.Join
+Controller.Leave
+Controller.Stop
+Controller.Disconnect
+Controller.Connect
+Controller.Lead.Lost
+Controller.Lead.Elected
+User.Login
+User.Logout
+User.Timeout
+User.Login.Failed
+User.Login.Blocked
+User.Login.Unblocked
+User.Password.Reset
+User.Resource.Access.Denied
+RESTful.Write
+RESTful.Read
+Scanner.Join
+Scanner.Update
+Scanner.Leave
+Scan.Failed
+Scan.Succeeded
+Docker.CIS.Benchmark.Failed
+Kubenetes.CIS.Benchmark.Failed
+License.Update
+License.Expire
+License.Remove
+License.EnforcerLimitReached
+Admission.Control.Configured   // for admission control
+Admission.Control.ConfigFailed // for admission control
+ConfigMap.Load                 // for initial Config
+ConfigMap.Failed               // for initial Config failure
+Crd.Import                     // for crd Config import
+Crd.Remove                     // for crd Config remove due to k8s miss
+Crd.Error                      // for remove error crd
+Federation.Promote             // for multi-clusters
+Federation.Demote              // for multi-clusters
+Federation.Join                // for joint cluster in multi-clusters
+Federation.Leave               // for multi-clusters
+Federation.Kick                // for multi-clusters
+Federation.Policy.Sync         // for multi-clusters
+Configuration.Import
+Configuration.Export
+Configuration.Import.Failed
+Configuration.Export.Failed
+Cloud.Scan.Normal // for cloud scan nomal ret
+Cloud.Scan.Alert  // for cloud scan ret with alert
+Cloud.Scan.Fail   // for cloud scan fail
+Group.Auto.Remove
+Agent.Memory.Pressure
+Controller.Memory.Pressure
+Kubenetes.{product-name}.RBAC
+Group.Auto.Promote
+User.Password.Alert
+----
+
+==== インシデント（セキュリティイベント）
+
+[,shell]
+----
+Host.Privilege.Escalation
+Container.Privilege.Escalation
+Host.Suspicious.Process
+Container.Suspicious.Process
+Container.Quarantined
+Container.Unquarantined
+Host.FileAccess.Violation
+Container.FileAccess.Violation
+Host.Package.Updated
+Container.Package.Updated
+Host.Tunnel.Detected
+Container.Tunnel.Detected
+Process.Profile.Violation // container
+Host.Process.Violation    // host
+----
+
+==== 脅威（セキュリティイベント）
+
+[,shell]
+----
+TCP.SYN.Flood
+ICMP.Flood
+Source.IP.Session.Limit
+Invalid.Packet.Format
+IP.Fragment.Teardrop
+TCP.SYN.With.Data
+TCP.Split.Handshake
+TCP.No.Client.Data
+TCP.Small.Window
+TCP.SACK.DDoS.With.Small.MSS
+Ping.Death
+DNS.Loop.Pointer
+SSH.Version.1
+SSL.Heartbleed
+SSL.Cipher.Overflow
+SSL.Version.2or3
+SSL.TLS1.0or1.1
+HTTP.Negative.Body.Length
+HTTP.Request.Smuggling
+HTTP.Request.Slowloris
+DNS.Stack.Overflow
+MySQL.Access.Deny
+DNS.Zone.Transfer
+ICMP.Tunneling
+DNS.Type.Null
+SQL.Injection
+Apache.Struts.Remote.Code.Execution
+DNS.Tunneling
+K8S.externalIPs.MitM
+----
+
+==== 違反（セキュリティイベント）
+
+[,shell]
+----
+Network.Violation
+----
+
+==== コンプライアンス
+
+[,shell]
+----
+Compliance.Container.Violation
+Compliance.ContainerFile.Violation
+Compliance.Host.Violation
+Compliance.Image.Violation
+Compliance.ContainerCustomCheck.Violation
+Compliance.HostCustomCheck.Violation
+Compliance.Test.Name   // D.[1-5].*
+----
+
+==== CVEレポート
+
+[,shell]
+----
+ContainerScanReport
+HostScanReport
+RegistryScanReport
+PlatformScanReport
+cve-name
+cve-high
+cve-medium
+cve-high-with-fix // cve-high-with-fix:N (fixed high vul.>N) cve-high-with-fix:N/D (fixed high vul.>N and reported more than D days ago)
+----
+
+==== 入場
+
+[,shell]
+----
+Admission.Control.Allowed   // for admission control
+Admission.Control.Violation // for admission control
+Admission.Control.Denied    // for admission control
+----
+
+==== 動的に生成された基準
+
+[,shell]
+----
+DLP
+WAF
+CustomCheckCompliance
+----

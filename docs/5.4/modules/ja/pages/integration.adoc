@@ -1,0 +1,126 @@
+= エンタープライズ統合
+:revdate: 2025-12-18
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/01.integration/01.integration.md
+:page-opendocs-slug:  /integration/integration
+
+== 統合
+
+{product-name} は、REST API、CLI、Syslog、RBAC、SAML、LDAP、およびウェブフックを含む複数の統合オプションを提供します。REST APIを使用してタスクを自動化する例については、xref:automation.adoc[*自動化*] セクションを参照してください。
+
+{product-name} は、Sonatype（Nexus Lifecycle）、IBM Cloud（QRadarおよびSecurity Advisor）、Prometheus/Grafanaなどのエコシステムパートナーとも統合されています。多くの統合は、 https://github.com/neuvector[NeuVector GitHubリポジトリ] で利用可能です。
+
+以下の統合設定は、{product-name} UI の *設定* にあります。
+
+=== OpenShift and Kubernetes RBAC
+
+Red Hat OpenShiftのロールベースのアクセス制御（RBAC）を使用している場合は、このオプションを有効にして、{product-name} がその権限を自動的に読み取り、適用するようにしてください。
+
+有効にすると：
+
+* OpenShiftユーザーは、OpenShiftの資格情報を使用して {product-name} コンソールにサインインできます。
+* ユーザーは、自分のOpenShiftロールによって許可されたリソース（プロジェクト、コンテナ、ノードなど）にのみアクセスできます。
+* 認証はOAuth 2.0プロトコルを使用します。
+
+image:openshift-rbac.png[OpenShift]
+
+[WARNING]
+====
+OpenShiftの`AllowAllPasswordIdentityProvider`設定を使用しないでください。この構成により、ユーザーは任意のパスワードでサインインでき、{product-name}に対して読み取り専用ユーザーとしてのアクセスも許可されます。また、ログインごとに新しいOpenShiftユーザーが作成されます。
+====
+
+[NOTE]
+====
+デフォルトの{product-name} *管理者*ユーザーおよび{product-name}に直接作成されたユーザーは、OpenShift RBACが有効な場合でもアクティブなままです。
+====
+
+=== Helmで外部ルートCAを信頼する
+
+{product-name}は、LDAPS、OpenID Connect（OIDC）、およびレジストリスキャンなどの安全な接続のために外部ルートCAを信頼できます。この機能により、外部認証サービスおよびイメージレジストリとの信頼された通信が可能になります。
+
+{product-name}マネージャーUIを通じて信頼されたルートCAを構成すると、CA情報は内部データベースに保存されます。KubernetesのSecretやConfigMapは自動的には作成されません。HelmはKubernetesリソースを通じて構成を管理するため、この設定はデフォルトではHelmを通じて管理できません。
+
+Helmを使用して信頼されたルートCAを構成するには、CA証明書を提供し、TLS検証を有効にするカスタムConfigMapを作成します。
+
+. オーバーライドファイルを作成します。
++
+CA証明書とTLS設定を含む`override.yaml`ファイルを作成します：
++
+[source,yaml]
+----
+controller:
+  configmap:
+    enabled: true
+    data:
+      sysinitcfg.yaml: |
+        cacerts:
+        - -----BEGIN CERTIFICATE-----
+          MIID0zCCArugAwIBAgIU...
+          -----END CERTIFICATE-----
+        enable_tls_verification: true
+----
+
+. Helmを使用して{product-name}をデプロイします。
++
+オーバーライドファイルを使用して{product-name}をデプロイします：
++
+[source,bash]
+----
+helm install neuvector neuvector/core \
+  -n neuvector \
+  --set manager.svc.type=NodePort,imagePullSecrets=regsecret \
+  -f override.yaml
+----
++
+デプロイ後、Helmは成功したインストールを報告します。
+
+. 設定を確認します。
++
+`neuvector-init` ConfigMapを検査して、設定が適用されていることを確認します：
++
+[source,bash]
+----
+kubectl get cm neuvector-init -o yaml
+----
++
+出力にCA証明書と`enable_tls_verification`設定が表示されることを確認します。
++
+[NOTE]
+====
+インストール後、{product-name}が実行中でアクセス可能であることを確認します：
+
+[source,bash]
+----
+NODE_PORT=$(kubectl get -n neuvector -o jsonpath="{.spec.ports[0].nodePort}" svc neuvector-service-webui)
+NODE_IP=$(kubectl get nodes -o jsonpath="{.items[0].status.addresses[0].address}")
+echo https://$NODE_IP:$NODE_PORT
+----
+
+表示されたURLをブラウザで開いて、{product-name}マネージャーUIにアクセスします。
+====
+
+=== Kubernetes RBAC
+
+特定のネームスペースのためにKubernetes RBACを手動で構成するには：
+
+. *設定* → *ユーザー* → *ユーザーを追加*に移動します。
+. *詳細設定*を開きます。
+. {product-name}でユーザーがアクセスできるネームスペースを指定します。
+
+image:k8s-rbac.png[Kubernetes]
+
+=== Syslog
+
+Syslogサーバーのアドレスを入力し、通知レベルを選択することで、Syslog統合を構成します。IPアドレスまたはDNS名を使用し、UDPまたはTCPのいずれかを選択できます。
+
+=== ウェブフック
+
+{product-name}は、ウェブフックを使用して外部エンドポイントに通知を送信できます。通知を受信するためのWebhookエンドポイントURLを指定してください。
+
+*ポリシー* → *レスポンスルール*の下でカスタムイベントのウェブフック通知を構成できます。
+
+=== ディレクトリおよびSSO統合
+
+{product-name}は、LDAP、Microsoft Active Directory、SAML、およびOpenID Connectを含むディレクトリおよびシングルサインオン（SSO）統合をサポートしています。
+
+統合中にマッピングできる事前定義されたロールとカスタムロールに関する情報は、xref:users.adoc#_users[ユーザーとロール]を参照してください。

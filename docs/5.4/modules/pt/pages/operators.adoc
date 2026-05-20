@@ -1,0 +1,230 @@
+= Implantar Usando Operadores
+:revdate: 2025-06-02
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/01.production/02.operators/02.operators.md
+:page-opendocs-slug: /implantação/produção/operadores
+
+== Operadores
+
+Os operadores pegam o conhecimento operacional humano e o codificam em software que é mais facilmente compartilhado com os consumidores. Os operadores são peças de software que facilitam a complexidade operacional de executar outra peça de software. Mais tecnicamente, os operadores são um método de empacotamento, implantação e gerenciamento de um aplicativo Kubernetes.
+
+== {product-name} Operadores
+
+O {product-name} Operador é baseado no gráfico Helm {product-name}. O {product-name} Operador RedHat OpenShift é executado na plataforma de contêiner OpenShift para implantar e gerenciar os componentes do cluster de Segurança {product-name}. O {product-name} Operador contém todas as informações necessárias para implantar {product-name} usando gráficos Helm. Você simplesmente precisa instalar o operador {product-name} do hub de operadores incorporado do OpenShift e criar a instância {product-name}.
+
+Para implantar as versões mais recentes do contêiner {product-name}, use o link:https://catalog.redhat.com/search?searchType=software&deployed_as=Operator&partnerName={product-name}&p=1[Operador Certificado Red Hat] do Operator Hub ou o link:https://github.com/redhat-openshift-ecosystem/community-operators-prod/tree/main/operators/neuvector-community-operator[operador comunitário]. A documentação para o operador comunitário pode ser encontrada https://github.com/neuvector/neuvector-operator[{product-name} operador].
+
+[NOTE]
+.Nota sobre SCC e Fazer upgrade
+====
+
+O SCC privilegiado é adicionado à Conta de Serviço especificada no yaml de implantação pela versão do Operador 1.3.4 e acima em novas implantações. No caso de fazer upgrade do Operador {product-name} de uma versão anterior para 1.3.4, por favor, exclua o SCC privilegiado antes de fazer upgrade.
+
+[,shell]
+----
+oc delete rolebinding -n neuvector system:openshift:scc:privileged
+----
+====
+
+[IMPORTANT]
+====
+As versões do Operador Certificado {product-name} estão vinculadas às versões do produto {product-name}, e cada nova versão deve passar por um processo de certificação com a Red Hat antes de ser publicada. A versão do operador certificado para 5.3.x está vinculada à versão helm 2.7.2 e à versão do aplicativo {product-name} 5.3.2. A versão do operador certificado 1.3.9 está vinculada à versão {product-name} 5.2.0. A versão do operador certificado 1.3.7 está vinculada à versão {product-name} 5.1.0. A versão do operador 1.3.4 está vinculada à versão {product-name} 5.0.0. Se você deseja poder alterar as tags de versão dos contêineres {product-name} implantados, por favor, use a versão comunitária.
+====
+
+.Implantar Usando o Operador Certificado
+[%collapsible]
+======
+*Implantar Usando o Operador Certificado da Red Hat do Operator Hub*
+
+[IMPORTANT]
+====
+As versões do operador {product-name} estão vinculadas às versões do produto {product-name}, e cada nova versão do produto deve passar por um processo de certificação com a Red Hat antes de ser publicada.
+====
+
+*Notas técnicas*
+
+* As imagens de contêiner {product-name} são puxadas de registry.connect.redhat.com usando o segredo de pull de imagem do mercado da Red Hat.
+* A interface do usuário do gerenciador {product-name} é tipicamente exposta através de uma rota de passthrough do OpenShift em um domínio. Por exemplo, no IBM Cloud neuvector-route-webui-neuvector.(nome_do_cluster)-(hash_aleatório)-0000.(região).containers.appdomain.cloud. Ela também pode ser exposta como o serviço neuvector-service-webui através de um endereço de porta de nó ou IP público.
+* OpenShift version >=4.6.
+
+. Crie o projeto neuvector
++
+--
+[,shell]
+----
+oc new-project neuvector
+----
+--
+. Instale o Operador Certificado da Red Hat do Operator Hub 
+** Na interface do usuário do Console do OpenShift, navegue até o OperatorHub 
+** Pesquise por {product-name} Operador e selecione a listagem sem o selo de comunidade ou marketplace 
+** Clique em Instalar
+. Configure o canal de atualização 
+** O canal atual mais recente é beta, mas pode ser movido para estável no futuro 
+** Selecione estável se disponível
+. Configure o modo de instalação e o namespace instalado 
+** Selecione um namespace específico no cluster 
+** Selecione neuvector como namespace instalado 
+** Configure a estratégia de aprovação
+. Confirme a instalação
+. Prepare os valores de configuração YAML para a instalação {product-name} conforme mostrado na captura de tela abaixo. O YAML apresentado no Console OpenShift fornece todas as opções de configuração disponíveis e seus valores padrão. 
++
+image:operator_cert.png[]
+. Quando o operador estiver instalado e pronto para uso, uma instância {product-name} pode ser instalada. 
+** Clique em Ver operador (após a instalação do operador) ou selecione o Operador {product-name} na visualização de operadores instalados 
+** Clique em Criar instância 
+** Selecione Configurar via Visualização YAML 
+** Cole os valores de configuração YAML preparados 
+** Clique em Criar
+. Verifique a instalação da instância {product-name} 
+** Navegue até os Detalhes do Operador {product-name} 
+** Abra a guia {product-name} 
+** Selecione a instância neuvector-default 
+** Abra a guia Recursos 
+** Verifique se os recursos estão com status Criado ou Em execução
+
+Após implantar com sucesso a Plataforma {product-name} em seu cluster, faça login no console {product-name} em `https://neuvector-route-webui-neuvector.(OC_INGRESS)`. 
+* Faça login com o nome de usuário inicial admin e a senha admin. 
+* Aceite os termos de licença {product-name}. 
+* Altere a senha do usuário admin. Opcionalmente, você também pode criar usuários adicionais no menu Configurações -> Usuários e Funções. Agora você está pronto para navegar no console {product-name} para iniciar a varredura de vulnerabilidades, observar os pods de aplicação em execução e aplicar proteções de segurança aos contêineres.
+
+*Fazendo upgrade {product-name}*
+
+Faça upgrade da versão {product-name} atualizando a versão do Operador associada à versão desejada {product-name}.
+======
+
+.Implantar Usando o Operador da Comunidade
+[%collapsible]
+======
+*Implantar Usando o {product-name} Operador da Comunidade do Operator Hub*
+
+*Notas técnicas*
+
+* As imagens de contêiner {product-name} são puxadas do Docker Hub da conta {product-name}. 
+* A interface do usuário do gerenciador {product-name} é tipicamente exposta através de uma rota de passthrough do OpenShift em um domínio. Por exemplo, no IBM Cloud neuvector-route-webui-neuvector.(nome_do_cluster)-(hash_aleatório)-0000.(região).containers.appdomain.cloud. Ela também pode ser exposta como o serviço neuvector-service-webui através de um endereço de porta de nó ou IP público. 
+* Versão do OpenShift 4.6+ 
+* É recomendado revisar e modificar a configuração de instalação do {product-name} alterando os valores yaml antes de criar a instância {product-name}. Os exemplos incluem nome de imagePullSecrets, versão da tag, acesso ingress/console, federação multi-cluster, PVC de volume persistente, etc. Por favor, consulte as instruções do Helm em https://github.com/neuvector/neuvector-helm para os valores que podem ser modificados durante a instalação.
+
+. Crie o projeto neuvector
++
+--
+[,shell]
+----
+oc new-project neuvector
+----
+--
+. Instale o {product-name} Operador da Comunidade do Operator Hub 
+** Na interface do usuário do Console do OpenShift, navegue até o OperatorHub 
+** Pesquise pelo Operador {product-name} e selecione a listagem com o selo da comunidade 
+** Clique em Instalar 
+** Configure o canal de atualização. O canal atual mais recente é beta, mas pode ser movido para estável no futuro. Selecione estável se disponível. 
+** Configure o modo de instalação e o namespace instalado 
+** Selecione um namespace específico no cluster 
+** Selecione neuvector como namespace instalado 
+** Configure a estratégia de aprovação 
+** Confirme a instalação
+. Baixe o manifesto secreto do Kubernetes que contém as credenciais para acessar o registro de contêiner {product-name}. Salve o arquivo de manifesto YAML em ./neuvector-secret-registry.yaml.
+. Aplique o manifesto secreto do Kubernetes contendo as credenciais do registro.
++
+--
+[,shell]
+----
+kubectl apply -n neuvector -f ./neuvector-secret-registry.yaml
+----
+--
+. Prepare os valores de configuração YAML para a instalação do {product-name} começando pelo seguinte trecho YAML. Certifique-se de especificar a versão desejada {product-name} no valor 'tag'. Verifique a referência de valores no gráfico Helm {product-name} para obter opções de configuração disponíveis. Existem outros valores possíveis do Helm que podem ser configurados no YAML, como se você irá configurar o cluster para permitir gerenciamento multi-cluster expondo os serviços do Master (Master Federado) ou remotos (Trabalhador Federado).
++
+--
+[,yaml]
+----
+apiVersion: apm.neuvector.com/v1alpha1
+kind: Neuvector
+metadata:
+  name: neuvector-default
+  namespace: neuvector
+spec:
+  openshift: true
+  tag: 4.3.0
+  registry: docker.io
+  exporter:
+    image:
+      repository: prometheus-exporter
+      tag: 0.9.0
+  manager:
+    enabled: true
+    env:
+      ssl: true
+    image:
+      repository: manager
+    svc:
+      type: ClusterIP
+      route:
+        enabled: true
+        termination: passthrough
+  enforcer:
+    enabled: true
+    image:
+      repository: enforcer
+  cve:
+    updater:
+      enabled: true
+      image:
+        repository: updater
+        tag: latest
+      schedule: 0 0 * * *
+    scanner:
+      enabled: true
+      replicas: 3
+      image:
+        repository: scanner
+        tag: latest
+  controller:
+    enabled: true
+    image:
+      repository: controller
+    replicas: 3
+----
+--
+. Quando o operador estiver instalado e pronto para uso, uma instância {product-name} pode ser instalada. 
+** Clique em Ver operador (após a instalação do operador) ou selecione o Operador {product-name} na visualização de operadores instalados 
+** Clique em Criar instância 
+** Selecione Configurar via Visualização YAML 
+** Cole os valores de configuração YAML preparados 
+** Clique em Criar
+. Verifique a instalação da instância {product-name}. 
+** Navegue até os Detalhes do Operador {product-name} 
+** Abra a guia {product-name} 
+** Selecione a instância neuvector-default 
+** Abra a guia Recursos 
+** Verifique se os recursos estão com status Criado ou Em execução
+. Após implantar com sucesso a Plataforma {product-name} em seu cluster, faça login no console {product-name} em `https://neuvector-route-webui-neuvector.(INGRESS_DOMAIN)`. 
+** Faça login com o nome de usuário inicial admin e a senha admin. 
+** Aceite os termos de licença {product-name}. 
+** Altere a senha do usuário admin. 
+** Opcionalmente, você também pode criar usuários adicionais no menu Configurações -> Usuários e Funções.
+
+Agora você está pronto para navegar no console {product-name} para iniciar a varredura de vulnerabilidades, observar os pods de aplicação em execução e aplicar proteções de segurança aos contêineres.
+
+*Fazendo upgrade {product-name}*
+
+. De Operadores > Operadores Instalados > {product-name} Operador 
++
+image:1_Installed.png[]
+. Clique em {product-name} para listar instâncias 
++
+image:2_Instance.png[]
+. Clique em YAML para editar parâmetros 
++
+image:3_YAML.png[]
+. Atualizar Tag e clicar em Salvar 
++
+image:4_tag_save.png[]
+======
+
+=== Solução de problemas
+
+* Verifique os valores de implantação do Operador no arquivo yaml implantado
+* Verifique se a restrição de contexto de segurança (SCC) para {product-name} na etapa 2 foi adicionada com sucesso
+* Revise e verifique os {product-name} valores do Helm chart
+* Certifique-se de que o caminho do registro e a tag de versão estão configurados corretamente (operador comunitário; os operadores certificados usarão os padrões)
+* Certifique-se de que a rota para o {product-name} serviço de gerenciamento neuvector-route-webui está configurada

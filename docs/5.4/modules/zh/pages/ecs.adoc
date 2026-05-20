@@ -1,0 +1,349 @@
+= Amazon ECS
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/09.ecs/09.ecs.md
+:page-opendocs-slug: /deploying/ecs
+
+== 重要说明：在 Amazon ECS 上的部署不再受支持
+
+下面的参考部分不再维护。然而，它可能在理解如何在 ECS 上部署 Allinone 时提供一些帮助。
+
+== 使用 ECS 在 AWS 上部署
+
+这是如何使用 ECS 部署 {product-name} 的示例。
+
+[NOTE]
+====
+请参阅 EKS 的 Kubernetes 示例。
+====
+
+. 准备几个内置 Docker 引擎和 ECS 代理容器的 Amazon ECS 实例。选择一个节点作为管理控制台。然后定义安全组规则，允许客户端浏览器访问入站 TCP 端口 8443（{product-name} 的默认管理控制台端口）。
+. 定义一个安全组，允许 TCP 和 UDP 端口 18300、18301、18400、18401。这用于 {product-name} 执法者与控制器/Allinone 之间的通信。将此安全组应用于所有将部署 {product-name} 执法者和控制器/Allinone 的 ECS 实例。
+. 在您想要部署 {product-name} Allinone 或控制器容器的节点上设置一个属性。例如，如果您想以控制器 HA 模式运行 {product-name}，建议选择至少 3 个节点，然后将属性添加到这 3 个节点上。
++
+--
+这是如何向您的 ECS 实例添加属性：
+
+选择实例，然后从操作下拉菜单中选择 "`View/Edit Attributes`"。
+
+image:1viewattributes.png[属性]
+
+然后添加一个新属性。例如 "`allinone-node`"，值为 "`true`"。
+
+image:2addattribute.png[添加属性]
+--
+. 创建 Allinone 任务定义。为 Allinone 容器创建一个新的任务定义。您可以使用 ECS 界面手动创建它，或粘贴示例 JSON 文件（请参见下面的示例）。请参考这些文档的第 "`1. Deploying {product-name}`" 节，了解如何配置 Allinone。
++
+--
+输入放置约束。例如，如果您使用了上面的属性标记，则在约束中输入此内容。
+
+[,json]
+----
+attribute:allinone-node=~true
+----
+
+image:3taskdef.png[Allinone任务]
+
+[NOTE]
+====
+如果您现在检查更新后的 JSON 文件，您会看到添加的放置约束。
+====
+--
+. 为 Allinone 任务创建一个新服务。将 "`Placement Templates`" 设置为 "`One Task Per Host`"，以便任何主机上只能运行一个 Allinone/Controller。您还会看到约束将被使用 "`memberOf(attribute:allinone-node=~true)"，这要求节点具有该属性。
++
+--
+image:3taskplacement.png[AllinonePlace]
+--
+. 现在您可以部署 Allinone 服务。将 "`Number of tasks`" 设置为所需的 Allinone/Controller 数量。现在 {product-name} 个 Allinone 或 Controller 容器将在所选节点上开始运行。在 Allinone 开始运行后，您应该能够通过 HTTPS 在 8443 端口连接到 {product-name} 控制台。
+. 创建执法者任务定义。这与 Allinone 任务类似。通过ECS控制台手动配置或使用下面的JSON示例。
++
+--
+对于执法者的放置约束，您需要确保执法者与 Allinone 不在同一节点上。
+
+[,json]
+----
+attribute:allinone-node!~true
+----
+
+image:4enforcertask.png[EnforcerTask]
+--
+. 为执法者任务创建一个新服务。再次，将任务放置设置为"`One Task Per Host`"，以便每个主机上只部署一个执法者。还要注意，额外的约束应显示它防止在 Allinone 节点上部署。
++
+--
+image:5taskplacement.png[执法者放置]
+
+在"`Number of tasks`"中以所需数量的执法者节点部署此服务。很快，所有执法者将启动并运行。从{product-name}控制台，您将能够看到所有被检测到的节点及其执法者。
+--
+
+== 示例ECS JSON任务定义
+
+您可以使用以下示例作为配置{product-name}容器任务定义的起点。
+
+创建一个新的任务定义，然后点击底部的通过JSON配置。在粘贴下面的JSON之前，请替换IP地址和镜像路径（在示例中查找REPLACE）。通常，IP地址是运行 Allinone 的 AWS 实例的私有 IP 地址。您还可以指定与my-allinone/my-enforcer不同的家族名称（在JSON底部）。
+
+示例Allinone JSON文件：
+
+.点击这里查看详细信息
+[%collapsible]
+====
+[,json]
+----
+{
+    "networkMode": "bridge",
+    "taskRoleArn": null,
+    "pidMode": "host",
+    "containerDefinitions": [
+        {
+            "volumesFrom": [],
+            "memory": null,
+            "extraHosts": null,
+            "dnsServers": null,
+            "disableNetworking": null,
+            "dnsSearchDomains": null,
+            "portMappings": [
+                {
+                    "hostPort": 18300,
+                    "containerPort": 18300,
+                    "protocol": "tcp"
+                },
+                {
+                    "hostPort": 18301,
+                    "containerPort": 18301,
+                    "protocol": "tcp"
+                },
+                {
+                    "hostPort": 18400,
+                    "containerPort": 18400,
+                    "protocol": "tcp"
+                },
+                {
+                    "hostPort": 18401,
+                    "containerPort": 18401,
+                    "protocol": "tcp"
+                },
+                {
+                    "hostPort": 18301,
+                    "containerPort": 18301,
+                    "protocol": "udp"
+                },
+                {
+                    "hostPort": 8443,
+                    "containerPort": 8443,
+                    "protocol": "tcp"
+                },
+                {
+                    "hostPort": 1443,
+                    "containerPort": 10443,
+                    "protocol": "tcp"
+                }
+            ],
+            "hostname": null,
+            "essential": true,
+            "entryPoint": null,
+            "mountPoints": [
+                {
+                    "containerPath": "/lib/modules",
+                    "sourceVolume": "modules",
+                    "readOnly": null
+                },
+                {
+                    "containerPath": "/var/run/docker.sock",
+                    "sourceVolume": "dockersock",
+                    "readOnly": null
+                },
+                {
+                    "containerPath": "/host/proc",
+                    "sourceVolume": "proc",
+                    "readOnly": true
+                },
+                {
+                    "containerPath": "/host/cgroup",
+                    "sourceVolume": "cgroup",
+                    "readOnly": true
+                }
+            ],
+            "name": "allinone",
+            "ulimits": null,
+            "dockerSecurityOptions": null,
+            "environment": [
+                {
+                    "name": "CLUSTER_JOIN_ADDR",
+                    "value": "REPLACE: Private IP"
+                }
+            ],
+            "links": null,
+            "workingDirectory": null,
+            "readonlyRootFilesystem": false,
+            "image": "REPLACE: Image Path/Name",
+            "command": null,
+            "user": null,
+            "dockerLabels": {
+                "com.myself.name": "neuvector"
+            },
+            "logConfiguration": null,
+            "cpu": 0,
+            "privileged": true,
+            "memoryReservation": 768
+        }
+    ],
+    "volumes": [
+        {
+            "host": {
+                "sourcePath": "/lib/modules"
+            },
+            "name": "modules"
+        },
+        {
+            "host": {
+                "sourcePath": "/var/run/docker.sock"
+            },
+            "name": "dockersock"
+        },
+        {
+            "host": {
+                "sourcePath": "/proc"
+            },
+            "name": "proc"
+        },
+        {
+            "host": {
+                "sourcePath": "/sys/fs/cgroup"
+            },
+            "name": "cgroup"
+        }
+    ],
+    "family": "my-allinone",
+    "placementConstraints": []
+}
+----
+====
+
+示例执法者JSON文件：
+
+.点击这里查看详细信息
+[%collapsible]
+====
+[,json]
+----
+{
+    "networkMode": "bridge",
+    "taskRoleArn": null,
+    "pidMode": "host",
+    "containerDefinitions": [
+        {
+            "volumesFrom": [],
+            "memory": null,
+            "extraHosts": null,
+            "dnsServers": null,
+            "disableNetworking": null,
+            "dnsSearchDomains": null,
+            "portMappings": [
+                {
+                    "hostPort": 18301,
+                    "containerPort": 18301,
+                    "protocol": "tcp"
+                },
+                {
+                    "hostPort": 18401,
+                    "containerPort": 18401,
+                    "protocol": "tcp"
+                },
+                {
+                    "hostPort": 18301,
+                    "containerPort": 18301,
+                    "protocol": "udp"
+                }
+            ],
+            "hostname": null,
+            "essential": true,
+            "entryPoint": null,
+            "mountPoints": [
+                {
+                    "containerPath": "/lib/modules",
+                    "sourceVolume": "modules",
+                    "readOnly": null
+                },
+                {
+                    "containerPath": "/var/run/docker.sock",
+                    "sourceVolume": "dockersock",
+                    "readOnly": null
+                },
+                {
+                    "containerPath": "/host/proc",
+                    "sourceVolume": "proc",
+                    "readOnly": true
+                },
+                {
+                    "containerPath": "/host/cgroup",
+                    "sourceVolume": "cgroup",
+                    "readOnly": true
+                }
+            ],
+            "name": "enforcer",
+            "ulimits": null,
+            "dockerSecurityOptions": null,
+            "environment": [
+                {
+                    "name": "CLUSTER_JOIN_ADDR",
+                    "value": "REPLACE: Private IP"
+                }
+            ],
+            "links": null,
+            "workingDirectory": null,
+            "readonlyRootFilesystem": false,
+            "image": "REPLACE: Image Path/Name",
+            "command": null,
+            "user": null,
+            "dockerLabels": {
+                "com.myself.name": "neuvector"
+            },
+            "logConfiguration": null,
+            "cpu": 0,
+            "privileged": true,
+            "memoryReservation": 512
+        }
+    ],
+    "volumes": [
+        {
+            "host": {
+                "sourcePath": "/lib/modules"
+            },
+            "name": "modules"
+        },
+        {
+            "host": {
+                "sourcePath": "/var/run/docker.sock"
+            },
+            "name": "dockersock"
+        },
+        {
+            "host": {
+                "sourcePath": "/proc"
+            },
+            "name": "proc"
+        },
+        {
+            "host": {
+                "sourcePath": "/sys/fs/cgroup"
+            },
+            "name": "cgroup"
+        }
+    ],
+    "family": "my-enforcer",
+    "placementConstraints": []
+}
+----
+====
+
+== 实时更新{product-name}
+
+您可以在ECS中对{product-name}容器进行实时更新，而不会中断服务。{product-name}的服务可以轻松更新或升级，而不会中断任何正在运行的服务。在 Amazon ECS 中执行此操作：
+
+. 如果您有多个控制器或 Allinone 部署为集群，请忽略此步骤。如果系统中只有一个 Allinone/控制器，请找到一个新的 ECS 实例，并在其上部署第二个 Allinone/控制器容器（按照 {product-name} Allinone/控制器 ECS 部署步骤进行）。部署后，在 {product-name} 管理控制台中，您将看到这个新的控制器正在运行（在资源 > 控制器下）。这是必需的，以便在控制器之间复制所有有状态数据。
+. 在 ECS 服务中，重置并删除旧的 Allinone/控制器服务。手动拉取更新 {product-name} 镜像，或触发 AWS ECS 从 Dockerhub 或您的私有注册表拉取 Allinone/控制器容器的新版本。
+. 创建 Allinone/控制器任务的新修订版，将 "`CLUSTER_JOIN_ADDR`" 更新为第二个 Allinone/控制器的私有节点 IP 地址。
+. 创建一个新服务以部署这个新任务（按照相同的步骤在 ECS 上进行部署）。完成后，新的 Allinone/控制器版本应该已启动并正在运行。从 {product-name} 管理控制台，所有日志和策略应该仍然存在。可选地，您现在可以关闭第二个 Allinone/控制器容器，因为现在应该在原始节点上已经启动了一个 Allinone/控制器。
+. 在 ECS 服务中，关闭并更新执法者。手动或自动触发拉取新的执法者镜像。然后在所有节点上重新启动或更新执法者。从 {product-name} 控制台，您将看到所有执法者都是最新的。
+. 如果您使用的是单独的管理器容器而不是 Allinone（它已经包含管理器），只需关闭并删除旧的管理器容器。然后拉取新的管理器版本，并部署它，将 CLUSTER_JOIN_ADDR 指向控制器的 IP 地址。
+
+所有 {product-name} 容器现在已实时更新。所有策略、日志和配置均未受到影响。一旦容器之间有新的实时流量，实时图表视图将会自动重新生成。

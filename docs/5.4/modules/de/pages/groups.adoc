@@ -1,0 +1,172 @@
+= Gruppen
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/04.groups/04.groups.md
+:page-opendocs-slug:  /policy/groups
+
+== Richtlinie: Gruppen
+
+Dieses Menü ist der zentrale Bereich, um Sicherheitsregeln anzuzeigen und zu verwalten sowie Gruppen für die Verwendung in Regeln anzupassen. Es wird auch verwendet, um die Modi der Gruppen zwischen Entdecken, Überwachen und Schützen zu wechseln. Containergruppen können Prozess-/Dateiregeln in einem anderen Modus als Netzwerkregeln haben, wie xref:modes.adoc#_network_service_policy_mode[hier] beschrieben. Bitte sehen Sie sich die folgenden einzelnen Abschnitte für Erklärungen zu benutzerdefinierten Compliance-Prüfungen, Netzwerkregeln, Prozess- und Dateizugriffsregeln sowie DLP/WAF-Erkennung an. Hinweis: Netzwerkregeln können im Gruppenmenü für jede Gruppe angezeigt werden, müssen jedoch separat im xref:networkrules.adoc[Netzwerkregeln] Menü bearbeitet werden.
+
+{product-name} erstellt automatisch Gruppen aus Ihren laufenden Anwendungen. Diese Gruppen beginnen mit dem Präfix 'nv.'. Sie können sie auch manuell mit einer CRD oder der REST-API hinzufügen und sie können in jedem Modus erstellt werden: Entdecken, Überwachen oder Schützen. Netzwerk- und Reaktionsregeln erfordern diese Gruppendefinitionen. Für automatisch erstellte Gruppen ('gelernt' Gruppen, die mit 'nv' beginnen) wird {product-name} die Netzwerk- und Prozessregeln erlernen und sie im Entdecken-Modus hinzufügen. Benutzerdefinierte Gruppen lernen nicht automatisch und fügen keine Regeln hinzu. Hinweis: 'nv.' Gruppen haben standardmäßig xref:processrules.adoc#_zero_drift_process_protection[zero drift] für Prozess-/Dateischutz aktiviert.
+
+image:5_groups.png[Gruppen]
+
+Es ist praktisch, Gruppen von Containern zu sehen und Regeln auf jede Gruppe anzuwenden. {product-name} erstellt eine Liste von Gruppen basierend auf den Container-Images. Zum Beispiel werden alle Container, die aus einem Wordpress-Image gestartet wurden, in derselben Gruppe sein. Regeln werden automatisch erstellt und auf die Gruppe von Containern angewendet.
+
+Der Bildschirm Gruppen zeigt auch ein 'Bewertbar'-Symbol in der oberen rechten Ecke an, und eine gelernte Gruppe kann ausgewählt werden, wobei das Bewertbar-Checkbox aktiviert oder deaktiviert werden kann. Dies steuert, welche Container zur Berechnung des Sicherheitsrisikowertes im Dashboard verwendet werden. Siehe xref:improve-score.adoc#_improving_the_security_risk_score[Verbessern Sie den Sicherheitsrisikowert] für weitere Details.
+
+Der Bildschirm Gruppen ist auch der Ort, an dem die CRD-YAML-Datei für 'Sicherheitsrichtlinie als Code' importiert und exportiert werden kann. Wählen Sie eine oder mehrere Gruppen aus und klicken Sie auf die Schaltfläche Gruppenrichtlinie exportieren, um die YAML-Datei herunterzuladen. Siehe den Abschnitt xref:usingcrd.adoc[CRD] für weitere Details zur Verwendung von CRDs. Wichtig: Jede ausgewählte Gruppe UND alle über Netzwerkregeln verknüpften Gruppen werden exportiert (d.h. die Gruppe und jede andere Gruppe, mit der sie über die Whitelist-Netzwerkregeln verbunden ist).
+
+=== Automatische Löschung ungenutzter Gruppen
+
+Gelernte Gruppen (nicht reservierte oder benutzerdefinierte Gruppen) können automatisch von {product-name} gelöscht werden, wenn keine Mitglieder (Container) in der Gruppe vorhanden sind. Der Zeitraum dafür ist in den Einstellungen -> Konfiguration konfigurierbar.
+
+=== Host Protection – die Gruppe 'nodes'
+
+{product-name} erstellt automatisch eine Gruppe namens 'nodes', die jeden Node (Host) im Cluster repräsentiert. {product-name} bietet automatisierte grundlegende Überwachung von Hosts auf verdächtige Prozesse (wie Portscans, Reverse Shells usw.) und Privilegieneskalationen. Darüber hinaus wird {product-name} das Prozessverhalten jedes Nodes im Entdecken-Modus erlernen, um diese Prozesse auf die Whitelist zu setzen, ähnlich wie es bei Container-Prozessen geschieht.  Die Regelauflistung der 'lokalen' (gelernten) Prozesse ist eine Kombination aller Prozesse von allen Nodes im Cluster im Entdecken-Modus.
+
+Die Nodes können dann in den Monitor- oder Protect-Modus versetzt werden, wobei {product-name} alarmiert, wenn ein Prozess im Monitor-Modus gestartet wird, und diesen Prozess im Protect-Modus blockiert.
+
+image:host_protection.png[nodeGroup]
+
+Um den Hostschutz mit Prozessprofilregeln zu aktivieren, wählen Sie die Gruppe 'nodes' aus und überprüfen Sie die gelernten Prozesse auf dem Node. Passen Sie bei Bedarf an, indem Sie Prozessregeln hinzufügen, löschen oder bearbeiten. Wechseln Sie dann den Modus zu Monitor oder Protect.
+
+[NOTE]
+====
+Netzwerkverbindungsverstöße gegen die in den Netzwerkregeln für Nodes angezeigten Regeln werden niemals blockiert, selbst im Protect-Modus. Nur Prozessverstöße werden im Protect-Modus auf Nodes blockiert.
+====
+
+=== Benutzerdefinierte Gruppen
+
+Gruppen können manuell hinzugefügt werden, indem die Kriterien für die Gruppe eingegeben werden. Hinweis: Benutzerdefinierte Gruppen haben keinen Schutzmodus. Das liegt daran, dass sie Container aus verschiedenen zugrunde liegenden Gruppen enthalten können, von denen jede in einem anderen Modus sein kann, was zu Verwirrung über das Verhalten führt.
+
+Gruppen können erstellt werden durch:
+
+* *Images*
++
+____
+Wählen Sie Container anhand ihrer Image-Namen aus. Beispiele: image=wordpress, image@redis
+____
+
+* *Knoten*
++
+____
+Wählen Sie Container nach den Nodes aus, auf denen sie ausgeführt werden. Beispiele: node=ip-12-34-56-78.us-west-2
+____
+
+* *Einzelne Container*
++
+____
+Wählen Sie Container nach ihren Instanznamen aus. Beispiele: container=nodejs_1, container@nodejs
+____
+
+* *Services*
++
+____
+Wählen Sie Container nach ihren Diensten aus. Wenn ein Container von Docker Compose bereitgestellt wird, hat sein Dienst-Tag-Wert den Wert "projekt_name:dienst_name"; wenn ein Container von einem Docker-Swarm-Modusdienst bereitgestellt wird, hat sein Dienst-Tag-Wert den Namen des Swarm-Dienstes.
+____
+
+* *Labels*
++
+____
+Wählen Sie Container nach ihren Labels aus. Beispiele: com.docker.compose.project=wordpress, location@us-west
+____
+
+* *Adressen*
++
+____
+Erstellen Sie eine Gruppe nach DNS-Namen oder IP-Adressbereichen. Beispiele: address=www.google.com, address=10.1.0.1, address=10.1.0.0/24, address=10.1.0.1-10.1.0.25. Der DNS-Name kann jeder auflösbare Name sein. Adresskriterien akzeptieren den != Operator nicht. Siehe unten für spezielle virtuelle Host-Adressen 'vh' Gruppen.
+____
+
+Eine Gruppe kann mit gemischten Kriterienarten erstellt werden, mit Ausnahme des Typs 'Adresse', der nicht zusammen mit anderen Kriterien verwendet werden kann. Gemischte Kriterien erzwingen eine '`AND`' Operation zwischen den Kriterien, zum Beispiel label service_type=data UND image=mysql. Mehrere Einträge für ein oder mehrere Kriterien werden als ODER behandelt, zum Beispiel address=google.com ODER address=yahoo.com. Hinweis: Um bei der Analyse von Eingangs-/Ausgangsverbindungen zu helfen, kann eine Liste von Eingangs- und Ausgangs-IPs aus dem Dashboard -> Abschnitt Eingangs-/Ausgangsdetails als Exposure Report heruntergeladen werden.
+
+Teilweise Übereinstimmungen werden für die Kriterien Image, Node, Container, Service und Label unterstützt. Zum Beispiel wählt image@redis Container aus, deren Image-Namen den Teilstring 'redis' enthalten; image{caret}redis wählt Container aus, deren Image-Namen mit 'redis' beginnen.
+
+Es wird nicht empfohlen, Adresskriterien zu verwenden, um interne IPs oder Subnetze abzugleichen, insbesondere solche, die durch Enforcer geschützt sind; stattdessen wird empfohlen, deren Metadaten wie Image, Service oder Labels zu verwenden. Die typischen Anwendungsfälle für Adressgruppen bestehen darin, Richtlinien zwischen verwalteten Containern und externen IP-Subnetzen zu definieren, zum Beispiel Dienste, die im Internet oder in einem anderen Rechenzentrum laufen. Adressgruppen haben keine Gruppenmitglieder.
+
+Platzhalter '_' können in Kriterien verwendet werden, zum Beispiel 'address=_.google.com'. Für flexiblere Übereinstimmungen verwenden Sie die Tilde '~', um anzuzeigen, dass ein Regex-Abgleich gewünscht ist. Zum Beispiel, um Labels 'policy~public.*-ext1' für das Label Richtlinie abzugleichen.
+
+[NOTE]
+====
+Sonderzeichen, die nach einem Gleichheitszeichen '=' in Kriterien verwendet werden, stimmen möglicherweise nicht richtig überein. Zum Beispiel der Punkt '.' In 'Richtlinie=public._' wird nicht richtig übereinstimmen, und stattdessen sollte ein Regex-Abgleich verwendet werden, wie 'Richtlinie~public._'
+====
+
+Nach dem Speichern einer neuen Gruppe wird {product-name} die Mitglieder in dieser Gruppe anzeigen. Regeln können dann unter Verwendung dieser Gruppen erstellt werden.
+
+==== Netzwerkrichtlinie basierend auf virtuellem Host ('vh')
+
+Benutzerdefinierte Gruppen können adressbasierte Gruppen für virtuelle Hosts unterstützen. Dies ermöglicht einen Anwendungsfall, bei dem zwei verschiedene FQDN-Adressen auf dieselbe IP-Adresse aufgelöst werden, aber unterschiedliche Regeln für jeden FQDN durchgesetzt werden sollten. Eine neue benutzerdefinierte Gruppe mit '`address=vh:xxx.yyy`' kann unter Verwendung des '`vh:`' Indikators erstellt werden, um diesen Schutz zu aktivieren. Eine Netzwerkregel kann dann die benutzerdefinierte Gruppe als '`From`' Quelle basierend auf dem virtuellen Hostnamen (anstatt der aufgelösten IP-Adresse) verwenden, um unterschiedliche Regeln für virtuelle Hosts durchzusetzen.
+
+== Beispiele für benutzerdefinierte Gruppen
+
+=== Allgemeine Kriterien
+
+* Um alle Container auszuwählen (beide Beispiele unten funktionieren)
++
+____
+container=&lowast;
+service=&lowast;
+____
+
+* Um alle Container im Namespace 'default' auszuwählen (Namespace wird ab v2.2 unterstützt)
++
+____
+namespace=default
+____
+
+* Um alle Container auszuwählen, deren Dienstname mit 'nginx' beginnt
++
+____
+service=nginx&lowast;
+____
+
+* Um alle Container auszuwählen, deren Dienstname 'etcd' enthält
++
+____
+service=&lowast;etcd&lowast;
+____
+
+* Um alle Container im Namespace 'apache1' oder 'apache2' auszuwählen (drücken Sie nach jedem Eintrag die Eingabetaste)
++
+____
+namespace=apache1 namespace=apache2
+____
+
+* Um alle Container auszuwählen, die nicht im Namespace 'apache1' oder 'apache2' sind (drücken Sie nach jedem Eintrag die Eingabetaste)
++
+____
+namespace!=apache1 namespace!=apache2
+____
+
+* Um alle Container im Namespace 'apache1~9' auszuwählen
++
+____
+namespace~apache[1-9]
+____
+
+=== IP-Adresskriterien
+
+* Alle externen IP-Adressen
++
+____
+Bitte verwenden Sie die Standardgruppe '`external`' in den Regeln
+____
+
+* IP-Subnetz 10.0.0.0/8
++
+____
+address=10.0.0.0/8
+____
+
+* IP-Bereich
++
+____
+address=10.0.0.0-10.0.0.15
+____
+
+* dropbox.com und dessen Subdomains (drücken Sie nach jedem Eintrag die Eingabetaste)
++
+____
+address=dropbox.com address=*.dropbox.com
+____

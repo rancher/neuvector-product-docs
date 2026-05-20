@@ -1,0 +1,644 @@
+= Configuração de Escaneamento de Registro
+:revdate: 2025-06-25
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/02.registry/02.registry.md
+:page-opendocs-slug:  /scanning/registry
+
+O escaneamento de registro requer que o contêiner {product-name} Allinone ou Controller seja implantado em um host/nó. Consulte a seção xref:installation.adoc[Instalação/Implantação] para saber como implantar os contêineres {product-name}. Configure o escaneamento de registro a partir do console {product-name} após fazer login no gerenciador.
+
+Além disso, certifique-se de que há um contêiner {product-name} scanner implantado e configurado para se conectar ao Allinone ou Controller. Na versão 4.0 e posteriores, o contêiner neuvector/scanner deve ser implantado separado do Allinone ou Controller.
+
+[NOTE]
+====
+O escaneamento de imagem de registro é realizado pelo scanner e a imagem é puxada e expandida na memória. Se tamanhos de imagem expandidos maiores que 500MB forem esperados, considere aumentar a memória do scanner para 1.5GB ou mais para fornecer capacidade e margem para o scanner.
+====
+
+Para aumentar o desempenho e a escalabilidade do escaneamento de registro, múltiplos pods de scanner podem ser implantados em diferentes nós para distribuir as tarefas de escaneamento entre vários scanners. Veja a seção xref:scanners.adoc[Múltiplos Scanners Paralelos] para mais detalhes.
+
+Para ambientes de múltiplos clusters (federados), o cluster primário (mestre) pode escanear um registro/repo designado como um registro federado. Os resultados do escaneamento desses registros serão sincronizados com todos os clusters gerenciados (remotos). Isso permite a exibição dos resultados do escaneamento no console do cluster gerenciado, bem como o uso dos resultados nas regras de controle de admissão do cluster gerenciado. Os registros precisam ser escaneados apenas uma vez, em vez de por cada cluster, reduzindo o uso de CPU/memória e largura de banda de rede. Veja a seção xref:multicluster.adoc[multi-cluster] para mais detalhes.
+
+== Configurar Escaneamento de Registro
+
+Para configurar registros e repositórios para escaneamento, vá ao menu Ativos -> Registros no console {product-name}. Adicione ou edite registros a serem escaneados. Use o Filtro para definir repositórios ou subconjuntos de imagens a serem escaneados. Se o seu registro exigir acesso através de um proxy, isso pode ser configurado em Configurações -> Configuração.
+
+image:registry-scan.png[Registro]
+
+O registro será escaneado de acordo com um cronograma, que é configurável. Por padrão, apenas novas ou imagens atualizadas serão escaneadas. Se você quiser reanalisar todas as imagens aplicáveis sempre que o banco de dados CVE for atualizado, selecione o botão Reanalisar Após Atualização do Banco de Dados CVE ao configurar o registro. Você também pode selecionar Escaneamento em Camadas para mostrar vulnerabilidades por cada camada na imagem (observação: escaneamentos em camadas podem levar mais tempo e consumir mais recursos para serem concluídos).
+
+Após a conclusão do escaneamento, você verá os resultados abaixo. Clique no repositório/tag para ver vulnerabilidades e clique na vulnerabilidade para ver mais informações. Você também pode baixar o relatório em um arquivo CSV ou ver os resultados nos logs de eventos.
+
+image:image_scan_4.png[Em Camadas]
+
+A NeuVector fornece uma opção **"Ver todas as imagens escaneadas"**. Os usuários não precisam procurar em um registro para ver uma imagem específica. Em vez disso, os usuários podem clicar na última linha para listar todas as imagens escaneadas.
+
+image:view-all-scanned-images.png[Registro]
+
+Os usuários também podem acessar a página **Registros** e abrir imagens específicas a partir do hyperlink da página **Contêineres**. Se o nome da imagem não for clicável, isso significa que a imagem ainda não foi escaneada.
+
+image:link-to-image-scan-result.png[Contêiner]
+
+Os resultados do escaneamento incluem vulnerabilidades por camada de imagem, se essa opção foi selecionada durante a configuração do registro/repositório, assim como os resultados das verificações de conformidade. Clique na aba de conformidade ao visualizar os resultados do escaneamento para a imagem para ver as verificações de conformidade.
+
+O escaneamento também descobrirá e listará todos os Módulos (ou seja, um inventário) na imagem, conforme mostrado abaixo. Ele também resumirá o risco de vulnerabilidade por módulo e listará todas as vulnerabilidades para cada módulo.
+
+image:Image_Modules.png[Módulos]
+
+O escaneamento é suportado para imagens em registros Docker públicos e privados que são baseados em Docker Nativo, Amazon ECR, Redhat/Openshift, jFrog, Microsoft ACR, Sonatype Nexus, Harbor, Google Cloud e outros registros.  O relatório do escaneamento para a imagem compreende o status de vulnerabilidade de vários pacotes e binários na imagem. O breve resumo do relatório do escaneamento pode ser enviado via webhook usando a configuração da regra de Resposta na Política -> Regras de Resposta, ou por Syslog configurando um servidor syslog em Configurações -> Configuração. Os resultados também podem ser visualizados nos logs de eventos.
+
+Pelo menos um filtro de repositório é necessário (não pode ser deixado em branco).
+
+=== Exemplos de filtro de repositório
+
+image:1-filter-examples.png[filtros]
+
+[NOTE]
+====
+. Para escanear todas as tags de imagem, adicione o filtro como &#42; ou &#42;:&#42;. Isso funciona em todos os tipos de registro, exceto no registro docker público.
+. O repositório deve ser o nome completo se a organização for nula para o registro docker público ou adicione a biblioteca antes do repositório como dado acima.
+. Crie um repositório virtual e adicione todos os repositórios locais a ele para escanear todas as tags em um registro JFrog com o método de acesso ao subdomínio docker.
+. Expressões regulares podem ser usadas em um filtro. Por exemplo, alpine:3.[8|9].* escaneará todas as imagens e tags 3.8.x e 3.9.x no docker hub.
+====
+
+=== Opções de escaneamento de registro
+
+* Escaneamento de Camadas:
+** Fornece resultado do escaneamento de vulnerabilidade para cada camada de imagem separadamente.
+** Fornece informações sobre comandos executados, pacotes adicionados na camada
+** Tamanho das imagens de cada camada
+* Escaneamento Automático:
+** O escaneamento automático é suportado apenas com a integração do imagestream do OpenShift. A vinculação de função adequada deve ser configurada com antecedência.
+** Quando o escaneamento automático está habilitado, assim que uma imagem é enviada para o registro, o escaneamento da imagem será agendado.
+* Escaneamento Periódico:
+** Habilite o escaneamento periódico para escanear periodicamente.
+** O intervalo de escaneamento pode ser definido entre 5 minutos a cada 7 dias.
+** Como muitas verificações de Controle de Admissão dependem do resultado do escaneamento da imagem, habilitar o escaneamento periódico ajuda a garantir que o Controle de Admissão tenha informações atualizadas sobre as imagens.
+** Observe que {product-name} irá escanear imagens em um registro que são novas ou alteradas desde o escaneamento anterior.
+* Reescaneie após a atualização do banco de dados CVE
+** Habilite esta opção para reescanear todas as imagens após a atualização do banco de dados de vulnerabilidades.
+
+=== Configurando o servidor Proxy para o Registro
+
+Por favor, vá para Configurações -> Configuração para configurar as definições de proxy para o escaneamento do registro.
+
+=== Registro Docker nativo (também Quay e Harbor)
+
+==== Adicionar registro Docker nativo
+
+* Escolha o registro Docker como tipo
+* Dê um nome único ao registro
+* Digite a URL do registro com a porta
+* Forneça nome de usuário e senha, se necessário pelo registro
+* Adicione repositório como filtro no formato abaixo
+** Organização/repositório:tag
+** O repositório pode ter um curinga com string inicial
+** Exemplo neuvector/all&#42;:2&#42;
+
+Adicionando registro docker privado com nome de usuário/senha, camadas de escaneamento habilitadas, escaneamento periódico a cada 30 minutos habilitado e * como filtro para escanear todas as tags de todos os repositórios.
+
+image:2-dockerprivate.png[docker]
+
+Adicionando registro docker público para escaneamento sem nome de usuário/senha e 2 repositórios com curinga, camadas de escaneamento habilitadas e escaneamento periódico habilitado.
+
+image:3-dockerpublic.png[docker3]
+
+Adicionando registro docker público para escaneamento com nome de usuário/senha, repositório curinga, camadas de escaneamento habilitadas e escaneamento periódico habilitado.
+
+image:4-dockerpub-wild.png[docker4]
+
+[NOTE]
+.Registro Quay
+====
+* Insira a URL de nível superior para seu registro Quay; não insira nenhum diretório no caminho.
+* Você precisará gerar uma senha criptografada em seu servidor/conta Quay e usar essas credenciais aqui.  Em seguida, passe o(s) filtro(s) conforme descrito acima.
+
+image:https://user-images.githubusercontent.com/13239496/218163999-9b281bd9-d049-49f6-85cd-395d7c20c481.png[4 1-quay]
+====
+
+==== Comece a escanear o registro Docker
+
+* Selecione o registro a ser escaneado
+* Clique no botão iniciar para escanear
+* Aguarde até que o status mude de escaneando para ocioso
+** O tempo de escaneamento varia dependendo do tamanho do repositório
+
+image:5-scandocker.png[scandocker]
+
+==== Veja o resultado do escaneamento
+
+* Clique em uma imagem do painel de imagens para ver o resultado do escaneamento para a imagem.
+* Acesse o resultado do escaneamento para encontrar o status de vulnerabilidade da imagem.
+* Clique no botão de download para baixar o resultado do escaneamento da imagem, se necessário.
+* Mova o mouse entre os detalhes do CVE e as imagens para voltar ao resumo.
+
+Mostrando as imagens escaneadas para o registro selecionado.
+
+image:6-imagescan.png[escaneado]
+
+Exemplo mostrando o resultado do escaneamento de camadas de uma imagem, que mostra as vulnerabilidades de cada camada, o tamanho da camada e os comandos executados em cada camada. Além disso, há uma aba de Conformidade que mostra os resultados dos testes de conformidade para a imagem.
+
+image:image_scan_4.png[em camadas]
+
+=== Registro Amazon ECR
+
+Ref:  https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
+
+==== Adicionar registro Amazon ECR
+
+* Escolher registro Amazon como tipo
+* Dê um nome único ao registro
+* A URL do registro é encontrada automaticamente com outras informações.
+* Forneça as informações abaixo para o registro. Consulte o link da Amazon acima para obter as informações abaixo.
+** ID do registro
+** Região
+** ID da chave de acesso
+** Chave de acesso secreta
+* Adicionar repositório como filtro no seguinte formato
+** Organização/repositório:tag
+** O repositório pode ter um curinga com string inicial
+** Exemplo neuvector/all&#42;:2&#42;
+** A organização pode estar vazia se tal imagem estiver disponível no registro.
+** &#42; para escanear todas as tags de imagem
+
+image:9-aws.png[aws]
+
+=== registro Red Hat
+
+Ref:  https://access.redhat.com/containers
+
+==== Adicionar registro Red Hat
+
+* Escolher registro Red Hat como tipo
+* Dê um nome único ao registro
+* Digite a URL do registro https://registry.connect.redhat.com/
+* Forneça o nome de usuário e a senha da conta usada para gerenciar o registro
+* Adicione o repositório como filtro no formato abaixo
+** Organização/repositório:tag
+** O repositório pode ter um curinga com string inicial
+** Exemplo neuvector/all&#42;:2&#42;
+** &#42; para escanear todas as tags de imagem
+
+image:10-redhat.png[Red Hat]
+
+=== registro Openshift
+
+==== Adicionar registro OpenShift com nome de usuário e senha
+
+* Escolher registro OpenShift como tipo
+* Dê um nome único ao registro
+* Digite a URL do registro (obtenha a partir da saída do comando "oc get is" na rede OpenShift se for diferente do padrão)
+** URL do registro padrão `https://docker-registry.default.svc:5000/`
+* Forneça o nome de usuário e a senha da conta usada para gerenciar o registro
+* Adicione o repositório como filtro no formato abaixo
+** Organização/repositório:tag
+** Exemplo openshift/htt&#42;:&#42;
+** &#42; para escanear todas as tags de imagem
+* Ativar escaneamento automático para iniciar a varredura assim que a imagem for atualizada no stream de imagens do OpenShift.
+
+image:1a_openshift.png[openshift]
+
+==== Adicionar registro OpenShift com token
+
+* Escolher registro OpenShift como tipo
+* Dê um nome único ao registro
+* Digite a URL do registro (obtenha a partir da saída do comando "oc get is" na rede OpenShift se for diferente do padrão)
+** URL do registro padrão `https://docker-registry.default.svc:5000/`
+* Forneça o token da conta de serviço que tem acesso a todos os namespaces
+** Verifique a nota abaixo para criar a conta de serviço e obter o token.
+** Criar conta de serviço
+*** oc project default
+*** oc create sa nvqa
+*** oc get sa
+** Atribuir função de administrador de cluster à conta de serviço para ler todo o registro
+*** oc adm policy add-cluster-role-to-user cluster-admin system:serviceaccount:default:nvqa
+** Obter token para a conta de serviço
+*** oc sa obter-token nvqa
+* Adicione o repositório como filtro no formato abaixo
+** Organização/repositório:tag
+** Exemplo OpenShift/htt&#42;:&#42;
+** &#42; para escanear todas as tags de imagem
+* Ativar escaneamento automático para iniciar o escaneamento assim que a imagem for atualizada no stream de imagens do OpenShift.
+
+image:1a_openshift_token.png[openshift]
+
+==== Problemas de estabilidade no registro OpenShift 3.7
+
+No OpenShift 3.7, chamadas de API para puxar metadados de imagem de contêiner ou para baixar uma imagem podem falhar aleatoriamente. Também pode falhar em imagens aleatórias em diferentes execuções de verificação. Você pode ver listas de imagens incompletas ou as verificações podem falhar em algumas imagens quando isso acontece. Se isso ocorrer, o repositório pode ser reanalisado.
+
+=== JFrog Artifactory
+
+Adicionando registro do JFrog Artifactory (Método de Acesso Docker -- Caminho do Repositório)
+Página de gerenciamento do JFrog admin->Configuração HTTP mostrando método de acesso Docker - Caminho do Repositório
+
+image:12-jfrog.png[jfrog]
+
+==== Adicionar registro do JFrog Artifactory (Método de Acesso Docker -- Caminho do Repositório)
+
+* Escolha JFrog Artifactory como tipo
+* Dê um nome único ao registro
+** Digite a URL do registro com a porta, por exemplo `http://10.1.7.122:8081/`
+* Forneça um nome de usuário e senha, se necessário, pelo registro
+* Adicione o repositório como um filtro no formato abaixo
+** Organização/repositório:tag
+** O repositório ou tag pode ter curingas no final, como abc/&#42;, abc/n&#42;
+** Para escanear todas as tags de um repositório, por exemplo, alpine, use alpine:&#42;
+** O curinga deve ser precedido pelo nome completo, caminho ou string inicial
+** &#42; para escanear todas as tags
+
+==== Adicionar registro JFrog Artifactory (Método de Acesso Docker -- Subdomínio)
+
+Página de gerenciamento do JFrog admin->Configuração HTTP mostrando método de acesso Docker --Subdomínio
+
+image:14-artifact.png[Artifactory]
+
+Adicionar registro JFrog Artifactory (Método de Acesso Docker -- Subdomínio)
+
+* Escolha JFrog Artifactory como tipo
+* Dê um nome único ao registro
+* Digite a URL do registro com a porta, por exemplo `http://10.1.7.122:8081/`
+* Escolha Subdomínio como Método de Acesso Docker JFrog
+* Forneça um nome de usuário e senha, se necessário, pelo registro
+* Adicione o repositório como um filtro no formato abaixo
+** Subdomínio/repositório:tag
+** O repositório ou tag pode ter curingas no final, como abc/&#42;, abc/n&#42;
+** Para escanear todas as tags de um repositório, por exemplo, alpine, use alpine:&#42;
+** O curinga deve ser precedido pelo nome completo, caminho ou string inicial
+** &#42; para escanear todas as tags de todos os subdomínios
+
+[NOTE]
+====
+Crie um repositório virtual e adicione todos os repositórios locais e remotos a ele. Especifique este repositório virtual na seção de filtro para escanear todas as tags do repositório local e do repositório remoto.
+====
+
+Adicionar registro JFrog baseado em subdomínio para escanear imagens do subdomínio docker-local
+
+image:jfrog_sub_local.png[local]
+
+Adicionar registro JFrog baseado em subdomínio para escanear todas as tags de todos os subdomínios
+
+image:jfrog_all_subs.png[all]
+
+==== Adicionar registro JFrog Artifactory (Método de Acesso Docker -- Porta)
+
+Página de administração do JFrog->Configuração HTTP mostrando o método de acesso Docker - Porta
+
+image:jfrogport1.png[jfrogport]
+
+Página de administração do JFrog->Registro Local->registro docker-local->Avançado - mostrando a URL do registro e a porta do registro 8181
+
+image:jfrogport2.png[jfrogport]
+
+Página de administração do JFrog->Registro Local->registro guo->Avançado - mostrando a URL do registro e a porta do registro 8182
+
+image:jfrogport3.png[jfrogport]
+
+* Escolha JFrog Artifactory como tipo
+* Dê um nome único ao registro
+* Digite a URL do registro com a porta, por exemplo `http://10.1.7.122:8181/`
+** Cada nome de registro tem uma porta única
+* Escolha a Porta como Método de Acesso do Docker JFrog
+* Forneça um nome de usuário e senha, se necessário, pelo registro
+* Adicione o repositório como um filtro no formato abaixo
+** Organização/repositório:tag
+** O repositório ou tag pode ter curingas no final, como abc/_, abc/n_
+** Para escanear todas as tags de um repositório, por exemplo alpine, use alpine:*
+** O curinga deve ser precedido pelo nome completo, caminho ou string inicial
+** &#42; para escanear todas as tags
+
+Adicionar registro JFrog para método de acesso por porta para o registro docker-local com porta 8181
+
+image:jfrog104.png[jfrogport]
+
+Adicionar registro JFrog para método de acesso por porta para o registro com porta 8182
+
+image:jfrog105.png[jfrogport]
+
+Adicionar registro JFrog para método de acesso por porta para o registro virtual com porta 8188, que tem todos os registros locais adicionados a ele.
+
+image:jfrog106.png[jfrogport]
+
+Mostrando resultado escaneado para o registro docker-local
+
+image:jfrogport6.png[jfrogport]
+
+==== Adicionar registro SaaS JFrog Artifactory (Método de Acesso Docker -- Porta)
+
+Escolha JFrog Artifactory como tipo
+
+* Dê um nome único ao registro
+* Digite a URL do registro, por exemplo https://jfrogtraining-docker-nv-virtual.jfrog.io
+* Escolha a Porta como Método de Acesso do Docker JFrog
+* Forneça um nome de usuário e senha, se necessário, pelo registro
+* Adicione o repositório como um filtro no formato abaixo
+** Organização/repositório:tag
+** &#42; para escanear todas as tags de todos os repositórios
+
+image:jfrog_saas.png[jfrogsaas]
+
+==== Iniciar escaneamento de um registro JFrog Artifactory
+
+* Selecione o registro a ser escaneado
+* Clique no botão iniciar para escanear
+* Aguarde até que o status mude de escaneando para ocioso
+** O tempo de escaneamento varia dependendo do tamanho do repositório
+
+==== Escaneamento do registro NeuVector com o registro JFrog
+
+
+Para escaneamento do registro NeuVector com um registro JFrog em modo subdomínio, o subdomínio é tipicamente o prefixo da URL do registro JFrog.
+
+**Exemplo de Subdomínio Padrão do JFrog**
+
+URL do registro JFrog: `https://mysubdomain.myhost.com`
+
+* **meusubdominio**: subdomínio
+* **myhost.com**: nome do host do registro JFrog
+
+Exemplo de filtro de registro: `mysubdomain/docker-service-broker-tmp-local/devop/test/joe/*`
+
+**Quando o JFrog Usa um Subdomínio Modificado**
+
+Quando você usa um subdomínio modificado na URL do registro.
+
+URL do registro JFrog: `https://artifact-mysubdomain.myhost.com`
+
+* **artifact-meusubdominio**: subdomínio modificado usado apenas na URL do registro
+* **meusubdominio**: subdomínio real no servidor JFrog
+* **myhost.com**: nome do host do registro JFrog
+
+Exemplo de filtro de registro: `myrepo/docker-service-broker-tmp-local/devop/test/joe/*`
+
+[NOTE]
+====
+A NeuVector anteriormente suportava esses ambientes. No entanto, o suporte foi interrompido após a atualização para versões mais novas do servidor JFrog, pois a NeuVector não consegue determinar se o verdadeiro valor do subdomínio vem da URL ou do filtro (por exemplo, artifact-meusubdominio vs. meusubdominio).
+====
+
+**Correção Necessária**
+
+Se o subdomínio não for o prefixo da URL do servidor de registro JFrog, você deve configurar o filtro de registro usando este formato:
+
+URL do registro JFrog: `https://artifact-mysubdomain.myhost.com`
+
+Filtro de registro: `<mysubdomain>/docker-service-broker-tmp-local/devop/test/joe/*` 
+
+[NOTE]
+====
+O formato necessário: `<actual-subdomain>/...`
+====
+
+Ao especificar o filtro neste formato, a NeuVector pode identificar corretamente o subdomínio real usado para comunicação com o servidor JFrog no modo subdomínio.
+
+=== Google Container Registry
+
+Ref:
+https://cloud.google.com/container-registry/docs/advanced-authentication
+https://cloud.google.com/container-registry/docs/advanced-authentication#json_key_file
+
+==== Ative a API do Cloud Resource Manager para o projeto
+
+Google Cloud Platform->Escolher Projeto->API e Serviços->Ativar APIs e Serviços->Pesquisar "`Cloud Resource Manager API`"->Ativar API
+https://console.cloud.google.com/apis/library?project=nvtest-219600&q=Cloud%20Resource%20Manager%20API   (alterar nome do projeto)
+
+image:17-gcp.png[gcp]
+
+==== Criar chave para conta de serviço de contêiner
+
+Google Cloud Platform->IAM->Conta de Serviço->conta com registro de contêiner->CriarChave(ação)
+
+image:18-gcpiam.png[gcpiam]
+
+==== Copiar arquivo json para a máquina do cliente
+
+==== Adicionar Google Container Registry pela interface {product-name}
+
+* Escolher registro do Google como tipo
+* Dê um nome único ao registro
+* Digite a URL do registro. Exemplo https://gcr.io/ (isso também pode ser us.gcr.io, eu.gcr.io etc)
+* Cole todo o conteúdo acima do arquivo json capturado na chave JSON.
+* Adicione o repositório como filtro no formato abaixo
+** ID do projeto/repositório:tag
+** Exemplo nvtestid-1/neuvector&#42;:&#42;
+** &#42; para escanear todas as tags de imagem
+
+image:19-gcpscan.png[gcpscan]
+
+==== Iniciar a varredura de um Google Container Registry
+
+* Selecione o registro a ser escaneado
+* Clique no botão iniciar para escanear
+* Aguarde até que o status mude de escaneando para ocioso
+** O tempo de escaneamento varia dependendo do tamanho do repositório
+
+=== Registro de Contêiner do Azure
+
+Ref:
+https://azure.microsoft.com/en-us/services/container-registry/
+
+==== Obter nome de usuário e senha do contêiner do Azure conforme mostrado abaixo
+
+Registro de Contêiner do Azure -> usuário-> chaves de acesso->senha
+
+Mostrando nome de usuário e senha do portal do Azure para acesso ao Registro de Contêiner
+
+image:20-azure.png[azure]
+
+==== Adicionar o Registro de Contêiner do Azure pela GUI {product-name}
+
+* Escolher registro do Azure como tipo
+* Dê um nome único ao registro
+* Digite a URL do registro. Exemplo `https://neuvector.azure.io` (obter do portal do Azure)
+** Registro de contêiner->usuário->Visão Geral->Servidor de Login
+* Adicionar nome de usuário e senha
+** Registro de Contêiner do Azure -> usuário-> chaves de acesso->senha
+* Adicione repositório como filtro no formato abaixo
+** repositório:tag
+** exemplo alpine:&#42;
+** &#42; para escanear todas as tags de imagem
+
+Mostrando o servidor de login do portal do Azure para o Registro de Contêiner do Azure
+
+image:21-azurereg.png[azure]
+
+Adicionando o Registro de Contêiner do Azure para escanear todas as tags
+
+image:22-azureadd.png[azureadd]
+
+==== Iniciar a varredura de um Registro de Contêiner do Azure
+
+* Selecione o registro a ser escaneado
+* Clique no botão iniciar para escanear
+* Aguarde até que o status mude de escaneando para ocioso
+** O tempo de escaneamento varia dependendo do tamanho do repositório
+
+=== Registro Docker do Sonatype Nexus
+
+Ref:
+https://help.sonatype.com/repomanager3/private-registry-for-docker
+https://hub.docker.com/r/sonatype/nexus3/
+
+==== Adicionar Registro Docker do Sonatype Nexus
+
+* Escolher Sonatype Nexus como tipo
+* Dê um nome único ao registro
+* Digite a URL do registro com a porta
+* Forneça nome de usuário e senha, se necessário pelo registro
+* Adicione repositório como filtro no formato abaixo
+** Organização/repositório:tag
+** O repositório pode ter um curinga com string inicial
+** Exemplo neuvector/all&#42;:2&#42;
+** &#42; para escanear todas as tags de imagem
+
+Adicionando o registro Docker do Sonatype Nexus com nome de usuário/senha e repositório &#42;:&#42; para escaneamento
+
+image:23-sonatype.png[sonatype]
+
+==== Iniciar a varredura do Registro Docker do Sonatype Nexus
+
+* Selecione o registro a ser escaneado
+* Clique no botão iniciar para escanear
+* Aguarde até que o status mude de escaneando para ocioso
+** O tempo de escaneamento varia dependendo do tamanho do repositório
+
+=== Registro de Contêiner do GitLab
+
+==== Exemplo de Configuração de Ambiente do GitLab
+
+[,bash]
+----
+sudo docker run --detach \
+  --hostname gitlab \
+  --env GITLAB_OMNIBUS_CONFIG="external_url 'http://10.1.7.73:9096'; gitlab_rails['lfs_enabled'] = true;" \
+  --publish 10.1.7.73:9095:9095 --publish 10.1.7.73:9096:9096 --publish 10.1.7.73:6222:22 \
+  --name gitlab \
+  --restart always \
+  --volume /srv/gitlab/config:/etc/gitlab \
+  --volume /srv/gitlab/logs:/var/log/gitlab \
+  --volume /srv/gitlab/data:/var/opt/gitlab \
+gitlab/gitlab-ce:latest
+External_URL:  http://10.1.7.73:9096
+Registry_URL: https://10.1.7.73:9095
+----
+
+==== Obter token privado do GitLab conforme mostrado abaixo
+
+* Navegue até a página de configurações pelo ícone localizado no canto superior direito da página de login do GitLab, conforme ilustrado abaixo:
+
+image:gitlabsettings.png[gitlab]
+
+* Navegue até a página de Access_Tokens conforme mostrado abaixo a partir da página de User_Settings:
+
+image:gitlabusersettings.png[gitlab]
+
+* Preencha todos os campos aplicáveis e clique em "`Create personal access token`" quando estiver pronto para gerar o token de acesso:
+
+image:gitlabpersonaltoken_new.png[gitlab]
+
+* O token de acesso não estará mais disponível uma vez que o usuário tenha navegado para fora da página do token gerado.  Portanto, é altamente recomendável fazer uma cópia do token de acesso antes de navegar ou fechar a seguinte página:
+
+image:gitlabaccesstoken.png[gitlab]
+
+==== Obtendo URLs Externas e de Registro
+
+URL Externa:   A URL externa é a URL do servidor API. +
+URL do Registro:  Isso pode ser obtido na página do Container Registry do console web do GitLab.  Uma maneira de chegar a esta página é navegando pelo console web do GitLab em Projetos > Seus Projetos > Administrador / ... > Painel Esquerdo (Container Registry) > Passar o mouse sobre (root/.../)
+
+A seguir está uma captura de tela de exemplo da página que revela tanto a URL Externa quanto a URL do Registro:
+
+image:gitlabexternalurl.png[gitlab]
+
+==== Adicionar Registro do Gitlab a partir do Console {product-name}
+
+* Escolha Gitlab como o tipo de registro
+* Dê um nome único ao registro
+* Digite a URL do registro com a porta
+* Forneça nome de usuário e senha, se necessário pelo registro
+* Forneça a URL externa do Gitlab e o token privado obtido na seção anterior
+
+image:gitlabregistryscan.png[gitlab]
+
+[NOTE]
+====
+A URL do Registro é usada para puxar imagens para a plataforma de scanner {product-name} do GitLab para realizar a varredura de registro.  Enquanto a URL Externa é usada para recuperar uma lista de imagens, registros e metadados utilizados pela funcionalidade de varredura de registro.
+====
+
+=== Registro de Contêiner do IBM Cloud
+
+Ref:  https://www.ibm.com/cloud/container-registry
+
+==== Adicionar Registro do IBM Container
+
+* Escolha o Registro de Contêiner do IBM Cloud como tipo
+* Dê um nome único ao registro
+* Digite a URL do registro https://us.icr.io/
+* Forneça iamapikey como nome de usuário e o apikey abaixo como senha
+** Crie apikey a partir da CLI
+*** ibmcloud iam api-key-create atibmKey
+** Crie apikey a partir da GUI
+*** IBM Cloud->Gerenciar-Acesso(IAM)-Chaves de API do IBM Cloud
+* Forneça a Conta do IBM Cloud
+** Obtenha a conta do IBM Cloud a partir da CLI
+*** Ibmcloud cr info
+* Adicione repositório como filtro no formato abaixo
+** Organização/repositório:tag
+** O repositório pode ter um curinga com string inicial
+** Exemplo neuvector/all__:2__
+** {blank}
+*** para escanear todas as tags de imagem
+* Ative outros parâmetros se necessário
+
+image:ibm-1.png[ibm]
+
+[NOTE]
+====
+O nome de usuário para a autenticação do registro deve ser 'iamapikey'
+====
+
+=== Registro Harbor
+
+Use as mesmas instruções que o registro Docker Nativo, escolhendo **Registro Harbor** como o registro.
+
+image::https://github.com/user-attachments/assets/9d382fde-7be4-423d-8401-c1034a9e4c2f[Harbor]
+
+O campo de filtro não pode ficar em branco. Insira um filtro de repositório ou adicione o filtro como * para escanear todos os repositórios.
+
+=== Registro de Contêiner do GitHub
+
+Disponível no NeuVector v5.4.3 e versões posteriores, a verificação de imagens agora é suportada a partir do https://ghcr.io[Registro de Contêiner do GitHub (GHCR)], permitindo que os usuários incluam imagens armazenadas no GitHub em seus fluxos de trabalho de segurança e conformidade.
+
+==== Adicionar o Registro de Contêiner do GitHub
+
+Para configurar o GHCR no NeuVector, vá para **Adicionar Registro** e selecione **Registro de Contêiner do GitHub** no menu suspenso de tipo de registro.
+
+|===
+| Campo | Descrição
+
+| **Nome**
+| Um nome para identificar esta configuração de registro.
+
+| **Registro**
+| A URL do registro GHCR. Exemplo: `https://ghcr.io/`.
+
+| **Nome de usuário**
+| Seu nome de usuário do GitHub.
+
+| **Token**
+| Um https://github.com/settings/tokens[token de acesso pessoal do GitHub] com permissão `read:packages` (e `repo` se for acessar imagens privadas).
+
+| **Filter**
+| Especifique o namespace a ser escaneado (por exemplo, `github_user/hello-world:*` ou `repo/package_name:version`).
+|===
+
+==== Permissões do Token
+
+Para acessar o GHCR, você deve gerar um token do GitHub com os seguintes escopos:
+
+* `read:packages` (obrigatório)
+* `repo` (caso acesse repositórios privados)
+
+Você pode criar um token https://github.com/settings/tokens[aqui].
+
+==== Solução de problemas
+
+Se você encontrar problemas como `403 Forbidden` ou `invalid credentials`, por favor, verifique:
+
+* Seu token tem os escopos corretos.
+* A URL do registro está formatada corretamente (por exemplo, `\https://ghcr.io/`).

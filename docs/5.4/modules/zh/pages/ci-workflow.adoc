@@ -1,0 +1,25 @@
+= {product-name} 工作流程
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /11.automation/01.ci_workflow/01.ci_workflow.md
+:page-opendocs-slug:  /automation/ci_workflow
+
+== {product-name} 集成到 CI/CD 工作流程
+
+{product-name} 支持整个 CI/CD 流程，并能轻松集成到工作流程中，从而在整个开发和部署过程中提供安全性。
+
+=== 开发和持续集成工作流程
+
+{product-name} 可以集成到开发和持续集成流程中，以自动化漏洞扫描。使用 {product-name} Jenkins 插件和注册表扫描功能可以在此阶段进行镜像扫描。
+
+image:ci_workflow.png[集成]
+
+此外，{product-name} 可以在自动化应用程序测试期间用于分析网络连接和容器行为，以预见预发布或生产中的任何问题。
+
+=== 持续部署和生产工作流程
+
+{product-name} 可以在生产前及生产过程中进行部署前合规性测试和安全审计。
+
+image:cd_workflow.png[生产]
+
+多向安全平台能够结合网络安全、容器检查和主机安全，在运行时保护容器。

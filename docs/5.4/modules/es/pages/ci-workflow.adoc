@@ -1,0 +1,25 @@
+= {product-name} Flujo de trabajo
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /11.automation/01.ci_workflow/01.ci_workflow.md
+:page-opendocs-slug:  /automation/ci_workflow
+
+== {product-name} Integración en el flujo de trabajo de CI/CD
+
+{product-name} soporta todo el proceso de CI/CD y se puede integrar fácilmente en el flujo de trabajo para proporcionar seguridad a lo largo del proceso de desarrollo y ampliación.
+
+=== Flujo de trabajo de Dev y de Integración Continua
+
+{product-name} se puede integrar en los procesos de Dev y CI para automatizar el escaneo de vulnerabilidades. El uso del complemento {product-name} Jenkins y las funciones de escaneo de Registro permiten el escaneo de imágenes durante esta fase.
+
+image:ci_workflow.png[integración]
+
+Además, {product-name} se puede utilizar durante las pruebas automatizadas de la aplicación para analizar conexiones de red y el comportamiento de los contenedores para anticipar cualquier problema en el entorno de pruebas o producción.
+
+=== Flujo de trabajo de Distribución Continua y Producción
+
+{product-name} puede realizar pruebas de cumplimiento previas a la ampliación y auditorías de seguridad antes de la producción, así como en producción.
+
+image:cd_workflow.png[producción]
+
+La plataforma de seguridad multivectorial es capaz de combinar la seguridad de red, inspecciones de contenedores y seguridad de host para proteger los contenedores en tiempo de ejecución.

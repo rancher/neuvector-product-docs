@@ -1,0 +1,143 @@
+= Substituindo Certificado Autoassinado
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /03.configuration/01.console/01.replacecert/01.replacecert.md
+:page-opendocs-slug: /configuration/console/replacecert
+
+== Substituindo o Certificado Autoassinado pelo Certificado PKCS para Acesso Externo
+
+O certificado autoassinado incorporado usado para acesso externo de um navegador ao Gerenciador ou para a API REST ao Controlador pode ser substituído por um certificado PKCS suportado. Esses devem ser substituídos tanto nas implantações do Gerenciador quanto do Controlador. Nota: Para substituir os certificados incluídos para comunicação interna entre o Controlador, Aplicador e Scanner, consulte xref:internal.adoc[esta seção].
+
+O console web {product-name} suporta 2 tipos diferentes de certificados autoassinados, especificamente, o PKCS8 (Padrão de Sintaxe de Informação de Chave Privada) e PKCS1 (Padrão de Criptografia RSA).  O certificado autoassinado pode ser substituído por qualquer um desses tipos PKCS.
+
+Os passos para gerar o segredo que será consumido pelo console web de {product-name}, originado da chave e do certificado usando qualquer um dos métodos PKCS, serão ilustrados abaixo.  A nota importante aqui é que, com o uso do curinga para o DNS como parte do parâmetro de nome-alternativo durante a criação da chave e do certificado, isso permite que o nome de sua escolha seja mapeado para o endereço IP do console de Gerenciamento sem restringir a um CN específico.
+
+=== Gerar e Usar Certificado Autoassinado PKCS8 ou PKCS1
+
+. Criar uma chave e um certificado
++
+--
+[tabs]
+======
+PKCS8::
++
+====
+[,shell]
+----
+openssl req -x509 -nodes -days 730 -newkey rsa:2048 -keyout tls.key -out tls.pem -config ca.cfg -extensions 'v3_req'
+Sample ca.cfg
+[req]
+distinguished_name = req_distinguished_name
+x509_extensions = v3_req
+prompt = no
+[req_distinguished_name]
+C = US
+ST = California
+L = San Jose
+O = {product-name} Inc.
+OU = Neuvector
+CN = Neuvector
+[v3_req]
+keyUsage = keyEncipherment, dataEncipherment
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = *
+----
+====
+
+PKCS1::
++
+====
+[,shell]
+----
+openssl genrsa -out tls.key 2048
+openssl req -x509 -nodes -days 730 -config openssl.cnf  -new -key tls.key -out tls.pem
+Sample openssl.cnf
+[req]
+distinguished_name = req_distinguished_name
+x509_extensions = v3_req
+prompt = no
+[req_distinguished_name]
+C = US
+ST = California
+L = San Jose
+O = {product-name} Inc.
+OU = Neuvector
+CN = Neuvector(PKCS#1)
+[v3_req]
+keyUsage = keyEncipherment, dataEncipherment
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = *
+----
+====
+======
+--
+. Criar o segredo a partir dos arquivos de chave e certificado gerados acima
++
+--
+[,shell]
+----
+kubectl create secret generic https-cert -n neuvector --from-file=tls.key --from-file=tls.pem
+----
+--
+. Editar o yaml diretamente para as implantações do Gerenciador e Controlador para adicionar as montagens
++
+--
+[,yaml]
+----
+spec:
+  template:
+    spec:
+      containers:
+        volumeMounts:
+        - mountPath: /etc/neuvector/certs/ssl-cert.key
+          name: cert
+          readOnly: true
+          subPath: tls.key
+        - mountPath: /etc/neuvector/certs/ssl-cert.pem
+          name: cert
+          readOnly: true
+          subPath: tls.pem
+      volumes:
+      - name: cert
+        secret:
+          defaultMode: 420
+          secretName: https-cert
+----
+
+Ou atualizar com o helm chart com um values.yaml semelhante
+
+[,yaml]
+----
+manager:
+  certificate:
+    secret: https-cert
+    keyFile: tls.key
+    pemFile: tls.pem
+  ingress:
+    enabled: true
+    host:  %CHANGE_HOST_NAME%
+    ingressClassName: ""
+    path: "/"  # or this could be "/api", but might need "rewrite-target" annotation
+    annotations:
+      ingress.kubernetes.io/protocol: https
+    tls: true
+    secretName: https-cert
+controller:
+  certificate:
+    secret: https-cert
+    keyFile: tls.key
+    pemFile: tls.pem
+----
+
+Então atualize com `helm upgrade -i neuvector ...`. Para referência, aqui estão todos os valores https://github.com/neuvector/neuvector-helm/tree/master/charts/core.
+--
+
+=== Suporte a certificados encadeados
+
+Para suportar TLS de ponta a ponta, alguns ingressos/Gateways de Aplicação só suportarão servidores de backend que podem ser confiáveis. {product-name} adicionou suporte a certificados encadeados na versão 3.2.2.  O Gateway de Aplicativo da Microsoft é um exemplo de um Gateway de Aplicativo que requer um certificado encadeado ao usar uma CA não bem conhecida.
+
+Para adicionar um certificado encadeado, o arquivo de exemplo tls.pem deve ser uma concatenação dos certificados.

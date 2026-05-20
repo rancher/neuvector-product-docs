@@ -1,0 +1,47 @@
+= 使用 IAM 角色进行 ECR 扫描
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/02.registry/02.ecr-iam/02.ecr-iam.md
+:page-opendocs-slug:  /scanning/registry/ecr-iam
+
+== AWS ECR - IAM 角色
+
+当 {product-name} 容器部署在 AWS 中，并且 EC2 实例被分配了 "`EC2 Container Registry`" 读取权限时，可以在不使用访问密钥和秘密密钥的情况下扫描 AWS ECR 注册表。
+
+以下是如何创建 AWS 角色并将其分配给节点。
+
+=== 选择实例
+
+请注意，IAM 角色要么为空，要么不包括 ECR 角色
+
+image:ecr1.png[awsrole]
+
+=== 附加角色
+
+选择操作 -> 实例设置 -> 附加/替换 IAM 角色
+
+image:ecr2.png[awsrole]
+
+如果您之前没有创建 ECR 角色，请点击创建新 IAM 角色。输入角色名称。
+
+image:ecr3.png[attachrole]
+
+=== 选择 AWS 服务
+
+image:ecr4.png[select]
+
+=== 角色列表
+
+image:ecr5.png[awsroles]
+
+=== 将 ECR 读取权限附加到角色
+
+image:ecr6.png[permissions]
+
+=== 检查您的设置
+
+image:ecr7.png[review]
+
+=== 检查实例是否分配了 IAM 角色
+
+image:ecr9.png[实例]

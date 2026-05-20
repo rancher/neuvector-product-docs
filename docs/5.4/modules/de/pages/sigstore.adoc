@@ -1,0 +1,50 @@
+= Sigstore Cosign Signaturprüfer
+:revdate: 2025-05-08
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/03.admission/01.sigstore/01.sigstore.md
+:page-opendocs-slug:  /policy/admission/sigstore
+
+== Konfiguration von Sigstore/Cosign Prüfern zur Anforderung der Bildsignierung
+
+{product-name} ermöglicht es einem Benutzer, die Logik zur Signaturprüfung zu implementieren, indem Bildsignaturen integriert werden, die mit dem Cosign-Tool von Sigstore erstellt wurden.
+
+[NOTE]
+====
+NeuVector unterstützt derzeit nur das Scannen von Bildsignaturen, die mit Cosign v2 erstellt wurden. Signaturen, die mit Cosign v3 erstellt wurden, lösen keine Sigstore-Überprüfung aus.
+====
+
+Das folgende Beispiel zeigt eine Konfiguration zur Zulassungssteuerung, die erfordert, dass das Bild eines Deployments von einem geeigneten Schlüssel oder einer Identität signiert wird.
+
+Zuerst konfigurieren Sie einen Vertrauensanker. Dies kann entweder ein öffentlicher oder privater Vertrauensanker sein, abhängig von der Sigstore-Implementierung, die zur Erstellung der Signaturen verwendet wurde. Wenn Sie Ihre eigenen Instanzen der Sigstore-Dienste bereitgestellt haben, wählen Sie die Option für den privaten Vertrauensanker.
+
+Ein öffentlicher Vertrauensanker benötigt keine zusätzliche Konfiguration, außer dass ihm ein leicht referenzierbarer Name gegeben wird.
+
+image:1configure-public-root-of-trust.png[sigstore]
+
+Ein privater Vertrauensanker erfordert die Schlüssel und/oder Zertifikate von Ihren privat bereitgestellten Instanzen der Sigstore-Dienste.
+
+image:2configure-private-root-of-trust.png[sigstore]
+
+Als nächstes konfigurieren Sie für einen gegebenen Vertrauensanker jeden der Prüfer, den Sie während der Zulassungssteuerung verwenden möchten. Es gibt zwei Arten von Prüfern: Keypair-Prüfer und schlüssellose Prüfer. Ein Keypair-Prüfer würde verwendet werden, wenn versucht wird, ein Bild zu überprüfen, das mit einem benutzerdefinierten privaten Schlüssel signiert wurde. Ein schlüsselloser Prüfer würde verwendet werden, wenn eine Signatur überprüft wird, die mit dem schlüssellosen Schema von Sigstore erstellt wurde. Weitere Informationen zu den Signaturmethoden von Sigstore finden Sie in der https://docs.sigstore.dev/quickstart/quickstart-cosign/[Sigstore Signing Overview] Dokumentation.
+
+Um einen Keypair-Prüfer zu konfigurieren, geben Sie einen Namen und einen öffentlichen Schlüssel an, der zu einem Ziel-Privatschlüssel gehört.
+
+image:3add-keypair-verifier-for-public-root-of-trust.png[sigstore]
+
+Um einen schlüssellosen Prüfer zu konfigurieren, geben Sie den OIDC-Aussteller und die Identität an, die während der Signierung verwendet wurde.
+
+image:4add-keyless-verifier-for-public-root-of-trust.png[sigstore]
+
+Beachten Sie, dass nach der Konfiguration des Vertrauensankers und der Prüfer ein Bild gescannt werden muss, um zu bestimmen, welche Prüfer die Signaturen des gegebenen Bildes erfüllen.
+
+Die konfigurierten Prüfer, die ein Bild erfüllt, können im oberen rechten Bereich der Scanergebnisse eines gegebenen Bildes in Assets->Registries angezeigt werden. Wenn ein Bild nicht von einem Prüfer signiert ist, wird es nicht in seinen Scanergebnissen angezeigt.
+
+image:6new_show_verifiers.scanresults.png[sigstore]
+
+Um einen bestimmten Vertrauensanker und einen Prüfer in einer Zulassungsregel zu referenzieren, verbinden Sie die beiden Namen mit einem Schrägstrich wie folgt: `my-root-of-trust/my-verifier`.
+
+image:5new_admission_rule_signature.png[sigstore]
+
+Um zu verlangen, dass ein Image in einer Zulassungsregel signiert wird, setzen Sie den True/False-Wert für das Kriterium „Image signiert“.
+
+image:7image_signed.png[sigstore]

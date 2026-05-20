@@ -1,0 +1,35 @@
+= セキュリティ状況の監視概要
+:page-opendocs-origin: /15.ui_extension/01.dashboard/01.dashboard.md
+:page-opendocs-slug:  /ui_extension/dashboard
+
+RancherポータルのUI拡張機能では、**NeuVector Dashboard**はスタンドアロンページと同様に機能します。クラスターのセキュリティ状況をユーザーに知らせるためのセキュリティリスクスコア要因を提供します。下部パネルには、異なるカテゴリを監視するためにチャートを切り替える4つのタブがあります。
+
+**Security Events**タブでは、ラインチャートがタイムラインに基づくイベント数を表示します。上部のセキュリティイベント棒グラフは、上位5つの送信元および宛先エンドポイントを表示します。
+
+image:dashboard_security_events.png[ダッシュボード]
+
+**Ingress and Egress Exposure**タブでは、積み上げ棒グラフがアクションによる露出エンドポイントの量を示します。右側には、スキャン情報を持つエグレスおよびイングレスエンドポイントサービスを示す露出テーブルがあります。
+
+image:dashboard_exposure.png[ダッシュボード]
+
+エグレス/イングレステーブルの行をクリックすると、特定のサービスに関する会話が表示されます。FQDN名/IPアドレスは、**External Host**フィールドに地理的位置に基づく国旗と共に表示されます。
+
+image:dashboard_conversations.png[ダッシュボード]
+
+**External Host**をクリックすると、whois.comにリダイレクトされ、IPアドレスの詳細情報が表示されます。
+
+image:whois.png[ダッシュボード]
+
+**Policy Mode**タブでは、円グラフが異なるポリシーモードの下でのポッド/サービスの比率と数を示します。
+
+image:dashboard_policy_mode.png[ダッシュボード]
+
+**Top Vulnerable Assets**タブでは、高または中程度の深刻度の脆弱性を含む上位5つのポッド/ノードを示す棒グラフがあります。
+
+image:dashboard_top_vul_assets.png[ダッシュボード]
+
+== NeuVectorスタンドアロンページと比較して含まれない機能
+
+* スコア改善ダイアログ。
+* レイヤー7ネットワークルールによって検出され、保護されたアプリケーションプロトコル。
+* ネームスペースに基づくPDFレポート。

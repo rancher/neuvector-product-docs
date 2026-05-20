@@ -1,0 +1,120 @@
+= Gerenciamento Multi-Cluster Empresarial
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /04.navigation/02.multicluster/02.multicluster.md
+:page-opendocs-slug:  /navegação/multicluster
+
+== Console Empresarial
+
+O {product-name} console pode ser usado para gerenciar grandes implantações multi-cluster e multi-nuvem empresariais. Um cluster deve ser selecionado como o cluster Primário, e outros clusters Remotos poderão então se juntar ao Primário. Uma vez conectado, o cluster Primário pode enviar regras Federadas para cada cluster remoto, que aparecem como regras Federadas nos consoles de cada cluster remoto. Os registros Federados escaneados também sincronizarão os resultados da varredura com os clusters remotos. Apenas usuários locais e usuários do Rancher que têm permissão de administrador podem promover um cluster para se tornar o cluster primário.
+
+Além da política Federada, o gerenciamento multi-cluster suporta o monitoramento de cada cluster remoto em uma página de resumo, conforme mostrado abaixo.
+
+image:multicluster_summary.png[Resumo]
+
+DEVE haver conectividade de rede entre os controladores em cada cluster nas portas necessárias. O controlador é exposto externamente ao seu cluster por meio de um serviço primário ou remoto, como pode ser visto no arquivo yaml de implantação de exemplo {product-name}.
+
+== Configurando os Clusters Primário e Remoto
+
+Faça login no console do cluster que será o cluster Primário. No menu suspenso no canto superior direito, selecione Múltiplos Clusters e depois Promover para configurar o Primário. Nota: Apenas usuários locais e usuários do Rancher que têm permissão de administrador podem promover um cluster para se tornar o cluster primário. Atualmente, usuários SSO/LDAP/OIDC com função de administrador não têm permissão para promover um cluster para se tornar o cluster primário.image:master1.png[MestreConfig]
+
+Insira o IP público e a porta do serviço fed-master. Você pode encontrar isso executando
+
+[,shell]
+----
+kubectl get svc -n neuvector
+----
+
+A saída será parecida com:
+
+[,shell]
+----
+NAME                                      TYPE           CLUSTER-IP      EXTERNAL-IP      PORT(S)                         AGE
+neuvector-service-controller-fed-master   LoadBalancer   10.27.249.147   35.238.131.23    11443:31878/TCP                 17d
+neuvector-service-controller-fed-worker   LoadBalancer   10.27.251.1     35.226.199.111   10443:32736/TCP                 17d
+----
+
+No exemplo acima, o nome de host/IP do controlador principal é 35.238.131.23 e a porta é 11443. Nota: Certifique-se de que este endereço IP e porta sejam acessíveis externamente (a partir dos clusters remotos). Nota: Os relógios do sistema (hora) devem ser os mesmos para cada cluster primário e remoto para funcionar corretamente.
+
+Após fazer login novamente no console, selecione Múltiplos Clusters novamente no menu superior direito e clique no ícone para gerar um token necessário para conectar os clusters remotos. Copie o token para uso na próxima etapa. O token é válido por cerca de 1 hora e, se expirar, deve ser gerado novamente para conectar futuros clusters remotos.
+
+image:master_token.png[Token]
+
+Para juntar um cluster remoto ao primário, faça login no console do cluster remoto como um administrador. Selecione Múltiplos Clusters no menu suspenso superior direito e clique em Juntar. Digite o IP do controlador ou o nome do host para o cluster remoto, bem como a porta. Novamente, você pode recuperar essas informações do cluster remoto fazendo:
+
+[,shell]
+----
+kubectl get svc -n neuvector
+----
+
+Use a saída do fed-worker do cluster remoto para configurar o endereço IP e a porta. Em seguida, insira o token copiado do primário. Observe que, após inserir o token, o endereço IP e a porta para o primário serão preenchidos automaticamente, mas isso pode ser editado ou inserido manualmente.
+
+image:join_remote.png[JoinRemote]
+
+Desconecte-se do cluster remoto e faça login novamente no primário. Ou, se já estiver conectado, clique em Atualizar e o cluster remoto será listado no menu Múltiplos Clusters.
+
+image:fed_master_list.png[FedMaster]
+
+Você pode clicar no ícone de gerenciar na lista ou usar o menu suspenso de Múltiplos Clusters na parte superior para alternar entre clusters a qualquer momento. Uma vez que você tenha mudado para um cluster remoto, todos os itens do menu à esquerda agora se aplicam ao cluster remoto.
+
+== Solução de problemas
+
+Para garantir que os serviços estejam respondendo conforme o esperado, você pode executar os testes de fora dos clusters ou, se necessário, a partir dos pods de teste nos clusters `fed-master` e `fed-managed` para garantir que a conexão de rede seja permitida entre os clusters.
+
+=== Verifique o serviço fed-master
+
+A porta do serviço do cluster `11443` só é acessível após habilitar o serviço `fed-master`. O comando abaixo retorna um código de erro quando o serviço `fed-master` responde indicando que o recurso solicitado está indisponível.
+
+.Exemplo de saída
+[,shell]
+----
+{"code":1,"error":"URL not found","message":"URL not found"}
+----
+
+[IMPORTANT]
+====
+A URL para o comando `curl` depende de como os serviços `fed-master` são expostos. Se um serviço `ingress` estiver configurado, não é necessário especificar uma porta.
+====
+
+[,shell]
+----
+curl -v https://<fed-master>[:<port>]/v1/eula
+----
+
+=== Verifique o serviço fed-managed
+
+A porta do serviço do cluster `10443` é compartilhada entre `REST API` e o serviço `fed-managed`. O comando abaixo retorna um código de sucesso quando o serviço `fed-managed` responde indicando que está disponível.
+
+.Exemplo de saída
+[,shell]
+----
+{"eula":{"accepted":true}})
+----
+
+[IMPORTANT]
+====
+A URL para o comando `curl` depende de como os serviços `fed-managed` são expostos. Se um serviço `ingress` estiver configurado, não é necessário especificar uma porta.
+====
+
+[,shell]
+----
+curl -v https://<fed-managed>[:<port>]/v1/eula
+----
+
+== Política Federada
+
+Por favor, consulte a seção 'Política Federada' em Política -> para instruções sobre como criar regras federadas que serão enviadas para cada cluster.
+
+== Registros Federados para Resultados de Escaneamento de Imagens Distribuídas
+
+O cluster primário (mestre) pode escanear um registro/repositório designado como um registro federado. Os resultados de escaneamento desses registros serão sincronizados para todos os clusters gerenciados (remotos). Isso permite a exibição dos resultados de escaneamento no console do cluster gerenciado, bem como o uso dos resultados nas regras de controle de admissão do cluster gerenciado. Os registros só precisam ser escaneados uma vez, em vez de por cada cluster, reduzindo o uso de CPU/memória e largura de banda de rede.
+
+Registros federados só podem ser configurados por um administrador federado no cluster primário em Ativos -> Registros. Após adicionar e escanear um repositório federado, os resultados de varredura serão sincronizados para todos os clusters gerenciados. As regras de controle de admissão em cada cluster gerenciado que requerem escaneamento de imagens (por exemplo, CVE, regras baseadas em conformidade) usarão automaticamente tanto os resultados de escaneamento federados quanto os resultados de escaneamento de registros configurados localmente.
+
+=== Federando Resultados de Scanners de CI/CD (Opcional)
+
+Os resultados de varredura do registro federado são sempre sincronizados com os clusters gerenciados, conforme descrito acima. O cluster primário também pode receber resultados de varredura xref:scanners.adoc#_standalone_scanner_for_local_scanning[de varreduras de scanner autônomo] ou plug-ins de scanner invocados a partir de um pipeline de CI/CD de build. Para permitir que os resultados de varredura do repositório da fase de build (CI/CD) também sejam sincronizados com os clusters gerenciados, primeiro ative essa opção editando as configurações do cluster primário (mestre) conforme mostrado abaixo.
+
+image:fed_primary_config.png[master_settings]
+
+image:fed_reg_sync.png[fed_sync]

@@ -1,0 +1,173 @@
+= 环境变量详细信息
+:revdate: 2024-12-03
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/01.production/03.details/03.details.md
+:page-opendocs-slug: /deploying/production/details
+
+== 环境变量
+
+=== 适用于控制器（All-in-One）和执行器
+
+* CLUSTER_JOIN_ADDR
++
+____
+将变量设置为第一个控制器的主机 IP；对于其他控制器和执行器，将其设置为主控制器的主机 IP。对于基于 Kubernetes 的部署，不必设置此 IP，只需使用示例文件。
+____
+
+* CLUSTER_LAN_PORT
++
+____
+（可选）集群 Serf LAN 端口。TCP 和 UDP 端口必须直接映射到主机。如果主机上没有端口冲突，则为可选。默认 `18301`
+____
+
+* DOCKER_URL
++
+____
+（可选）如果主机上的 Docker 引擎未绑定到正常的 Unix 套接字，请使用此变量指定 TCP 连接点，格式为 `tcp://10.0.0.1:2376`。
+____
+
+* NV_PLATFORM_INFO
++
+____
+（可选）对于 Docker Swarm/EE 部署，使用值 platform=Docker，或对于 GKE 使用 platform=Kubernetes:GKE（以运行 GKE CIS 基准）。
+____
+
+* CUSTOM_CHECK_CONTROL
++
+____
+（可选）用于启用/禁用在容器/主机中创建自定义合规脚本的能力。值为 "disable"（默认，不允许）、"strict"（仅限管理员角色）或 "loose"（管理员、合规和运行时策略角色）。
+____
+
+* AUTO_PROFILE_COLLECT
++
+____
+（可选）将值设置为 1 以启用内存配置文件数据的收集，以帮助调查内存压力问题。
+____
+
+=== 控制器
+
+* CTRL_PERSIST_CONFIG
++
+____
+（可选）备份配置文件并从持久卷中恢复它们。将此添加到 yaml 以启用；去除以禁用。
+____
+
+* CLUSTER_RPC_PORT
++
+____
+（可选）集群服务器 RPC 端口。必须直接映射到主机。如果主机上没有端口冲突，则环境变量是可选的。默认 `18300`
+____
+
+* CTRL_SERVER_PORT
++
+____
+（可选）REST 服务器应监听的 HTTPS 端口。默认值为 `10443`。通常可以保持默认，并使用 docker 端口选项将端口映射到主机上。
+____
+
+* DISABLE_PACKET_CAPTURE
++
+____
+（可选）将此添加到 yaml 中以禁用数据包捕获；删除以重新启用（默认）。
+____
+
+* NO_DEFAULT_ADMIN
++
+____
+（可选）启用时不会在本地群集中创建 'admin' 用户。这用于 Rancher SSO 集成作为默认设置。如果未启用，持续警告用户并记录事件以更改默认管理员密码（如果未更改）。
+____
+
+* CTRL_EN_ICMP_POLICY
++
+____
+（可选）启用时（值=1），可以在发现模式下学习 icmp 流量，并生成策略。如果组中没有监视或保护模式的网络策略，将为 icmp 流量生成隐式违规。
+____
+
+=== 经理
+
+* CTRL_SERVER_IP
++
+____
+（适用于 All-in-One 的可选项）控制器 REST 服务器 IP 地址。默认值为 `127.0.0.1`。对于 All-in-One 容器，保持默认。如果管理器单独运行，管理器必须指定此 IP 以连接到控制器。
+____
+
+* CTRL_SERVER_PORT
++
+____
+（适用于 All-in-One 的可选项）控制器 REST 服务器端口。默认值为 `10443`。对于 All-in-One 容器，保持默认。如果管理器单独运行，管理器应指定此变量以连接到控制器。
+____
+
+* MANAGER_SERVER_PORT
++
+____
+（可选）管理器 UI 端口。默认值为 `8443`。除非管理器以主机模式运行，否则保持不变，并使用 docker 端口选项将端口映射到主机上。
+____
+
+* MANAGER_SSL
++
+____
+（可选）管理器默认使用 HTTPS/SSL 连接。将值设置为 "`off`" 以使用 HTTP。
+____
++
+[IMPORTANT]
+====
+此环境变量仅适用于独立的 NeuVector 产品。如果使用 Rancher SSO，请将变量设置为 "on"，否则保持未设置，因为 NeuVector 默认使用 HTTPS。
+====
+
+=== Enforcer
+
+* CONTAINER_NET_TYPE
++
+____
+（可选）要支持特殊网络插件，请将值设置为 "macvlan`"。
+____
+
+* ENF_NO_SECRET_SCANS
++
+____
+（可选）将值设置为 "`1`" 以禁用对文件中秘密的扫描（提高性能）。
+____
+
+* ENF_NO_AUTO_BENCHMARK
++
+____
+（可选）将值设置为 "`1`" 以禁用主机和容器上的 CIS 基准（提高性能）。
+____
+
+* ENF_NO_SYSTEM_PROFILES
++
+____
+（可选）将值设置为 "1" 以禁用进程和文件监视器。将不会执行学习过程、控制文件模式、进程/文件（软件包）事件以及文件活动监视。这将减少 CPU/内存资源使用和文件操作。
+____
+
+* ENF_NETPOLICY_PULL_INTERVAL
++
+____
+（可选）以秒为单位的值（推荐值 60），以减少由于策略更新/重新计算而导致的 Enforcer 网络流量和资源消耗，适用于节点数量或工作负载较高的集群。默认值为零，意味着更新 Enforcer 策略时没有延迟。
+____
+
+* THRT_SSL_TLS_1DOT0
++
+____
+（可选）将值设置为 "`1`" 以启用对 TLS 版本 1.0 的检测（已弃用）。
+____
+
+* THRT_SSL_TLS_1DOT1
++
+____
+（可选）将值设置为 "`1`" 以启用对 TLS 版本 1.1 的检测（已弃用）。
+____
+
+* NV_SYSTEM_GROUPS
++
+____
+（可选）指定 {product-name} 认为是 '系统容器' 的组或名称空间，以分号分隔。例如，对于基于 Rancher 的应用和默认命名空间，NV_SYSTEM_GROUPS=__cattle-system;__default。这些值在正则表达式中被翻译。系统容器（还包括 {product-name} 和 Kubernetes 系统容器）仅在监视模式下运行（仅警报），即使组设置为保护模式。
+____
+
+== 打开端口
+
+* CLUSTER_RPC_PORT - 在控制器和一体机上。默认值 18300。
+* CLUSTER_LAN_PORT - 在控制器、执行器和一体机上。默认值为 18301。
+* MANAGER_SERVER_PORT - 在管理器或一体机上。默认值为 8443。
+* CTRL_SERVER_PORT - 在控制器上。默认值为 10443。
+
+请参阅 xref:installation.adoc[部署准备] 部分，以获取 {product-name} 容器的端口通信要求的完整描述。

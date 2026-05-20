@@ -1,0 +1,55 @@
+= CircleCI
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/03.build/03.circleci/03.circleci.md
+:page-opendocs-slug:  /scanning/build/circleci
+
+== Escanear por vulnerabilidades no pipeline de build do CircleCI
+
+O {product-name} CircleCI ORB aciona um escaneamento de vulnerabilidade em uma imagem no pipeline do CircleCI. O ORB está disponível no https://circleci.com/orbs/registry/orb/neuvector/neuvector-orb[catálogo do CircleCI] e também está documentado na https://github.com/neuvector/circleci-orb[{product-name} página do GitHub].
+
+Implantar o contêiner {product-name} Allinone ou Controller se você ainda não o fez em um host acessível pelo ORB do CircleCI. Anote o endereço IP do host onde o Allinone ou Controller está em execução.
+
+O ORB suporta dois casos de uso:
+
+. Acionar o escaneamento a ser realizado fora da infraestrutura do CircleCI. O ORB contata o {product-name} scanner, que então puxa a imagem de um registro para ser escaneada. Certifique-se de que o ORB tenha conectividade de rede com o host onde o {product-name} Controller/Allinone está em execução.
+. Lançando dinamicamente um {product-name} controller e scanner em uma VM temporária em execução na plataforma CircleCI. Após o lançamento e a auto-configuração, o escaneamento pode ser feito na imagem no build, e após a conclusão, o {product-name} implantação é parado e removido.  Para este caso de uso, consulte a documentação no https://circleci.com/orbs/registry/orb/neuvector/neuvector-orb[CircleCI ORB para {product-name}].
+
+Além disso, certifique-se de que há um contêiner {product-name} scanner implantado e configurado para se conectar ao Allinone ou Controller. Na versão 4.0 e posteriores, o contêiner neuvector/scanner deve ser implantado separado do allinone ou controller.
+
+=== Crie um Contexto em seu app CircleCI
+
+image:context.png[context]
+
+=== Configurar Configurações
+
+Configurar as Variáveis de Ambiente para Conectar e Autenticar
+
+image:circleci_settings.png[settings]
+
+Adicione o {product-name} orb à sua configuração de build config.yaml
+
+[,yaml]
+----
+version: 2.1
+orbs:
+  neuvector: neuvector/neuvector-orb@1.0.0
+workflows:
+  scan-image:
+    jobs:
+      - neuvector/scan-image:
+          context: myContext
+          registry_url: https://registry.hub.docker.com
+          repository: alpine
+          tag: "3.4"
+          scan_layers: false
+          high_vul_to_fail: 0
+          medium_vul_to_fail: 3
+----
+
+O registry_url é o local para encontrar a imagem a ser escaneada. Configure o nome do repositório, a tag e se um escaneamento em camadas deve ser realizado. Adicione critérios para que a tarefa de build falhe com base no número de vulnerabilidades altas ou médias detectadas.
+
+=== Revise os Resultados
+
+A tarefa de build será aprovada ou reprovada com base nos critérios definidos. Em qualquer caso, você pode revisar o relatório completo da análise.
+image:circleci_fail.png[falhar]

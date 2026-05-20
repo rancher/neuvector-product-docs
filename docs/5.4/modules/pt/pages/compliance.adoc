@@ -1,0 +1,111 @@
+= Conformidade e CIS Benchmarks
+:revdate: 2025-01-16
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/01.scanning/02.compliance/02.compliance.md
+:page-opendocs-slug:  /scanning/scanning/conformidade
+
+== Gerenciando Conformidade e CIS Benchmarks
+
+A auditoria de conformidade com {product-name} inclui CIS Benchmarks, verificações personalizadas, auditoria de segredos e modelos padrão da indústria para PCI, GDPR e outras regulamentações.
+
+CIS Benchmarks executados automaticamente por {product-name} incluem:
+
+* Kubernetes
+* Docker
+* Red Hat OpenShift rascunho de benchmarks 'Inspirado por CIS'
+* Google GKE
+
+Os resultados da varredura de conformidade podem ser vistos para Ativos individuais nos menus de Registros (para Imagens), Nós e Contêineres, selecionando o ativo relevante e clicando na aba de Conformidade.
+
+O menu de Conformidade de Riscos de Segurança -> permite relatórios de conformidade consolidados, semelhante ao funcionamento do menu de Vulnerabilidades.
+
+=== Riscos de Segurança - Conformidade e Perfil de Conformidade
+
+Os resultados de conformidade são exibidos na lista por Categoria e Nome. As categorias incluem Docker, Kubernetes, OpenShift e Personalizado. Os nomes de cada item correspondem ao benchmark CIS. Por exemplo, K.4.2.3 corresponde ao benchmark CIS do Kubernetes 4.2.3. Os benchmarks Docker são precedidos por 'D', com exceção dos benchmarks relacionados a Imagens, que são precedidos por 'I'.
+
+Use o filtro Avançado para selecionar verificações de conformidade com base na plataforma, host, namespace ou padrão da indústria, conforme mostrado abaixo.
+
+image:compliance_4.png[conformidade]
+
+Após aplicar o filtro, apenas os benchmarks CIS relevantes e verificações personalizadas serão exibidos, e um relatório pode ser gerado e baixado. É assim que relatórios para padrões como PCI, HIPAA, GDPR e outros padrões podem ser gerados.
+
+A captura de tela a seguir mostra um exemplo de um segredo encontrado em uma varredura de imagem.
+
+image:secret_compliance_4.png[segredos]
+
+=== Personalizando Modelos de Conformidade para PCI, GDPR, HIPAA, NIST, PCIv4 e DISA STIG
+
+O menu de perfil de conformidade permite a personalização dos modelos incorporados para padrões da indústria, como PCI, GDPR, HIPAA, NIST, PCIv4 e DISA STIG. Esses relatórios podem ser gerados a partir do menu de Conformidade de Riscos de Segurança -> selecionando um dos padrões para filtrar e, em seguida, exportando. O perfil NIST é para https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-190.pdf[NIST SP 800-190].
+
+Para personalizar qualquer perfil de conformidade, selecione o padrão da indústria (por exemplo, PCI) e, em seguida, ative ou desative verificações específicas para esse padrão. Pense nisso como 'tags' de conformidade que são aplicadas a cada verificação para gerar um relatório de conformidade para esse padrão da indústria.
+
+Use o botão Ação para adicionar ou remover qualquer tag de conformidade dessa verificação.
+
+image:compliance_profile_4.png[perfil]
+
+Além disso, você pode selecionar quais 'Ativos' são considerados parte dos relatórios de conformidade clicando na aba Ativos. Por padrão, todos os modelos de conformidade são aplicados a Imagens, Nós e Contêineres.
+
+image:profile_assets_4.png[compliance_assets]
+
+Use o botão Ação para adicionar ou remover modelos de conformidade para ativos.
+
+* Imagens. Selecione o(s) padrão(s) a serem relatados para Imagens.
+* Nós. Selecione o(s) padrão(s) a serem relatados para Nós (hosts).
+* Contêineres. Selecione o(s) padrão(s) a serem relatados para Contêineres.
+
+Alternativamente, em vez de restringir pelos critérios acima, os modelos de conformidade podem ser restritos a certos namespaces. Se esta caixa estiver marcada e o(s) namespace(s) adicionados, relatórios serão gerados para todos os ativos que se aplicam a esses namespaces. Isso pode ser útil se, por exemplo, o modelo PCI deve relatar apenas ativos para namespaces que contêm cargas de trabalho aplicáveis ao PCI.
+
+image:DocheckASSETSEnableNS.png[namespace]
+
+Após os modelos e ativos serem personalizados (se desejado) no menu Perfis de Conformidade de Riscos de Segurança ->, relatórios podem ser gerados no menu de Conformidade de Riscos de Segurança -> abrindo o filtro avançado e selecionando o modelo de conformidade desejado. Por exemplo, selecionar GDPR filtrará a exibição e os relatórios apenas para o perfil GDPR.
+
+=== Instalação de Exemplo do Helm com Conformidade Primária
+
+A seguir está um comando de instalação de exemplo do Helm para instalar o SUSE Security 5.4.0 com conformidade primária. Os usuários podem modificar a versão de instalação para 5.4.0 ou posterior, pois a conformidade primária começa com 5.4.0. Após a instalação, os usuários Prime podem verificar as regulamentações disponíveis na visualização da aba **Conformidade > Regulamentações** da interface web do SUSE Security.
+
+[,shell]
+----
+helm install neuvector -n neuvector ./ --set controller.prime.enabled=true --set
+controller.prime.image.repository=nvlab/compliance_config,controller.prime.image.tag=1.
+0.0 --set
+tag=5.4.0-b2,controller.image.repository=nvpublic/co,enforcer.image.repository=nvpublic/
+en,manager.image.repository=nvpublic/ma
+----
+
+=== Auditoria de Segredos
+
+{product-name} verifica mais de 40 tipos comuns de segredos como parte das varreduras de conformidade de imagem e varreduras em tempo de execução. Além disso, xref:customcompliance.adoc[scripts de conformidade personalizados] podem ser configurados para contêineres ou hosts, e o recurso xref:dlp.adoc[inspeção de pacotes DLP] pode ser usado para verificar segredos em cargas de rede.
+
+Os resultados da auditoria de segredos podem ser encontrados na seção de Conformidade das varreduras de imagem (Ativos -> Registros), contêineres (Ativos -> Contêineres), nós (Ativos -> Nós) e no menu de gerenciamento de conformidade (Riscos de Segurança -> Conformidade).
+
+A seguir está um exemplo de como os segredos detectados em uma varredura de imagem serão exibidos.
+
+image:secrets_image_4.png[segredos]
+
+Aqui está uma lista dos tipos de segredos que estão sendo detectados.
+
+* Chaves Privadas Gerais
+* Detecção geral de credenciais incluindo 'apikey', 'api_key', 'password', 'secret', 'passwd' etc.
+* Senhas gerais em arquivos yaml incluindo 'password', 'passwd', 'api_token' etc.
+* Chaves de segredos gerais em pares chave/valor
+* Chave privada do Putty
+* Chave privada XML
+* Credenciais AWS https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html[IAM]
+* Segredo do cliente do Facebook
+* Segredo do endpoint do Facebook
+* Segredo do aplicativo do Facebook
+* ID do cliente do Twitter
+* Chave secreta do Twitter
+* Segredo do GitHub
+* ID do produto do Square
+* Chave de acesso do Stripe
+* Token da API do Slack
+* Webhooks do Slack
+* ID do cliente do LinkedIn
+* Chave secreta do LinkedIn
+* Chave da API do Google
+* Chave da API do SendGrid
+* Chave da API do Twilio
+* Chave da API do Heroku
+* Chave da API do MailChimp
+* Chave da API do MailGun

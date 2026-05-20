@@ -1,0 +1,41 @@
+= 资产安全扫描结果
+:page-opendocs-origin: /15.ui_extension/02.runtime_security/02.runtime_security.md
+:page-opendocs-slug:  /ui_extension/runtime_security
+
+由于Rancher Manager有自己的**节点**和**工作负载**选项卡来管理和监控资产状态，NeuVector注入组件以显示其运行时扫描结果。
+
+== 节点
+
+在**节点**选项卡的表格视图中，注入了**漏洞**列，以显示每个节点按高/中严重性检测到的漏洞数量。
+
+image:nodes.png[节点]
+
+点击**漏洞**单元格将弹出一个新页面以显示扫描结果详细信息。扫描器同时显示其数据库版本和可过滤的漏洞列表。
+
+image:nodes_vul.png[节点]
+
+在**节点**表中点击**名称**单元格将重定向到节点详细信息页面。NeuVector注入了一个**漏洞**选项卡，以显示列出漏洞的表格。
+
+image:node_detail_vul.png[节点]
+
+点击**漏洞**表中**名称**单元格中的CVE链接将弹出一个窗口，显示CVE描述，并在标题中提供指向SUSE CVE信息网站的外部链接。
+
+image:node_detail_vul_cve.png[节点]
+
+image:suse_cve.png[SUSE]
+
+在**漏洞**表上方提供了CSV文件下载按钮。文件数据包括表中所有字段。
+
+image:download_vul.png[CSV]
+
+image:cve_csv.png[CSV]
+
+== 工作负载
+
+暂时，由于潜在的性能问题考虑，v5.4版本的**工作负载**表中不会注入**漏洞**列。NeuVector团队将与Rancher团队合作，尽快进行集成。
+
+在**Pods**表中点击**名称**将重定向到Pod详细信息页面。NeuVector注入了一个**漏洞**选项卡，以显示列出漏洞的表格。
+
+image:pods.png[Pods]
+
+image:pod_detail_vul.png[Pod_Detail]

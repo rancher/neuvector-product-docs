@@ -1,0 +1,218 @@
+= システム要件
+:revdate: 2025-06-02
+:page-revdate: {revdate}
+:page-opendocs-origin: /01.basics/02.requirements/02.requirements.md
+:page-opendocs-slug: /basics/requirements
+
+== システム要件
+
+[cols="1,1,1,1,4", options="header"]
+|===
+| コンポーネント | インスタンスの数 | 推奨vCPU | 最小メモリ | 備考
+
+| コントローラ
+| 最小1 +
+HAのために3（奇数のみ）
+| 1
+| 1GB
+| vCPUコアは共有される場合があります
+
+| Enforcer
+| ノード/VMごとに1
+| 1+
+| 1GB
+| 保護モードでのネットワークスループットを向上させるために、1つ以上の専用vCPUが必要です。
+
+| Scanner (スキャナ)
+| 最小1 +
+HA/パフォーマンスのために2以上
+| 1
+| 1GB
+| 標準ワークロードのためにCPUコアは共有される場合があります。 +
+高ボリューム（10k以上）の画像スキャンのために1つ以上のCPUを専用にしてください。 +
+レジストリ画像スキャンは、スキャナーによって実行され、コントローラーによって管理され、画像はスキャナーによって取得され、メモリ上で展開されます。 +
+最小メモリの推奨は、スキャンされる画像が0.5GBを超えないことを前提としています。 +
+1GBを超える画像をスキャンする場合、スキャナーのメモリは最大画像サイズに0.5GBを加算して計算する必要があります。 +
+例 - 最大画像サイズ = 1.3GB、スキャナーコンテナのメモリは1.8GBであるべきです。
+
+| マネージャ
+| 最小1 +
+HAのために2以上
+| 1
+| 1GB
+| vCPUは共有される場合があります。
+|===
+
+* 構成のバックアップ/HAには、1Gi以上のRWX PVCが必要です。詳細については、xref:production.adoc#_backups_and_persistent_data[バックアップと永続データのセクション]をご覧ください。
+* 推奨ブラウザ：パフォーマンス向上のためにChromeを使用してください。
+
+== サポートされているプラットフォーム
+
+* 公式にサポートされているLinux配布パッケージは、SUSE Linux、Ubuntu、CentOS/Red Hat (RHEL)、Debian、CoreOS、AWS Bottlerocket、Photonです。
+* AMD64およびArmアーキテクチャ。
+* CoreOSは、RedHatが提供するRHELマッピングテーブルを通じてCVEスキャンのためにサポートされています（2023年11月）。RedHatがCoreOSの公式フィードを公開した場合、それはサポートされます。
+* 公式にサポートされているKubernetesおよびDocker準拠のコンテナ管理システム。以下のプラットフォームは、{product-name}の各リリースでテストされています：Kubernetes 1.19-1.32、SUSE Rancher (RKE、RKE2、K3sなど)、RedHat OpenShift 4.6-4.16（{product-name} 5.2.x以前は3.xから4.12までサポート）、Google GKE、Amazon EKS、Microsoft Azure AKS、IBM IKS、ネイティブDocker、Docker Swarm。以下のKubernetesおよびDocker準拠のプラットフォームはサポートされており、{product-name}で動作することが確認されています：VMware PhotonおよびTanzu、SUSE CaaS、Oracle OKE、Mirantis Kubernetes Engine、Nutanix Kubernetes Engine、Docker UCP/DataCenter、Docker Cloud。
+* Dockerランタイムバージョン：1.9.0以上；Docker APIバージョン：1.21、CEおよびEE。
+* ContainerdおよびCRI-Oランタイム（サンプルYAMLのボリュームパスに変更が必要です）。KubernetesデプロイメントセクションのContainerdに必要な変更と、OpenShiftデプロイメントセクションのCRI-Oに必要な変更を参照してください。
+* {product-name}は、商業的にサポートされているほとんどのCNIと互換性があります。公式にテストされ、サポートされているのは、OpenShift OVS（サブネット/マルチテナント）、Calico、Flannel、Cilium、Antrea、およびパブリッククラウド（GKE、AKS、IKS、EKS）です。Multusのサポートはv5.4.0で追加されました。
+* コンソール:ChromeまたはFirefoxブラウザを推奨します。IE 11はパフォーマンスの問題によりサポートされていません。
+* Minikubeは簡単な初期評価にはサポートされていますが、完全な概念実証にはサポートされていません。Minikubeで実行するために必要なAllinone YAMLの変更については、以下を参照してください。
+
+AWS Bottlerocketの注意事項：Bottlerocketに特有のcontainerdソケットのパスを変更する必要があります。詳細についてはKubernetesデプロイメントセクションを参照してください。
+
+== サポート対象外
+
+* GKEオートパイロット。
+* AWS ECSはもはやサポートされていません。注意:ECSデプロイメントで{product-name}を操作するために、積極的に削除された機能はありません。ただし、ECSでのテストはもはやSUSEによって行われていません。ECSワークロードを{product-name}で保護することは期待通りに機能する可能性がありますが、問題は調査されません。
+* Mac上のDocker
+* Windows上のDocker
+* CoreOSのRkt（コンテナLinux）
+* K3S / SLES環境でのAppArmor。特定の設定は{product-name}と衝突し、スキャナーエラーを引き起こす可能性があります。{product-name}をデプロイする際にはAppArmorを無効にする必要があります。
+* IPv6はサポートされていません。
+* VMWare統合コンテナ（VIC）は、ネストモードを除きます。
+* CloudFoundry
+* コンソール:IE 11はパフォーマンスの問題によりサポートされていません。
+* コンテナ内のツールを使用したネストされたコンテナホストは、簡単なテストのためのものです。例えば、'kind' https://kind.sigs.k8s.io/docs/user/configuration/.を使用したKubernetesクラスターのデプロイメント。
+
+[NOTE]
+====
+PKSはフィールドテスト済みで、プラン/タイルに特権コンテナを有効にし、Allinone、Controller、EnforcerのためにyamlのhostPathを次のように変更する必要があります。
+
+[,yaml]
+----
+            hostPath:
+            path: /var/vcap/sys/run/docker/docker.sock
+----
+====
+
+[NOTE]
+====
+{product-name}は、Vagrant、VirtualBox、VMwareまたは他の仮想化環境を使用して、Mac/Windows上のLinuxベースのVMでの実行をサポートしています。
+====
+
+
+== Minikube
+
+Allinoneデプロイメントyamlに次の変更を加えてください。
+
+[,yaml]
+----
+apiVersion: apps/v1 <<-- required for k8s 1.19
+kind: DaemonSet
+metadata:
+ name: neuvector-allinone-pod
+ namespace: neuvector
+spec:
+ selector: <-- Added
+ matchLabels: <-- Added
+ app: neuvector-allinone-pod <-- Added
+ minReadySeconds: 60
+...
+ nodeSelector: <-- DELETE THIS LINE
+ nvallinone: "true" <-- DELETE THIS LINE
+apiVersion: apps/v1 <<-- required for k8s 1.19
+kind: DaemonSet
+metadata:
+ name: neuvector-enforcer-pod
+ namespace: neuvector
+spec:
+ selector: <-- Added
+ matchLabels: <-- Added
+ app: neuvector-enforcer-pod <-- Added
+----
+
+== パフォーマンスとスケーリング
+
+常に、{product-name}コンテナのパフォーマンス計画は、以下を含むいくつかの要因に依存します：
+
+* （Controller & Scanner）最初にスキャンされるレジストリ内の画像の数とサイズ（Scannerによって）
+* （Enforcer）サービスモード（Discover、Monitor、Protect）、Protectモードはインラインファイアウォールとして実行されます。
+* （Enforcer）Protectモードでのワークロードのネットワーク接続の種類
+
+Monitorモード（ミラー/タップに似たネットワークフィルタリング）では、パフォーマンスへの影響はなく、Enforcerはラインスピードでトラフィックを処理し、必要に応じてアラートを生成します。Protectモード（インラインファイアウォール）では、Enforcerは深いパケット検査で接続をフィルタリングし、それらがブロック/ドロップされるべきかを判断するためにCPUとメモリを必要とします。一般的に、1GBのメモリと共有CPUで、EnforcerはProtectモードでほとんどの環境を処理できるはずです。
+
+スループットまたはレイテンシに敏感な環境では、追加のメモリおよび/または専用のCPUコアを{product-name} Enforcerコンテナに割り当てることができます。
+
+レジストリスキャンのためのControllerとScannerのパフォーマンス調整については、上記のシステム要件を参照してください。
+
+パフォーマンスとサイズに関する追加のアドバイスについては、xref:production.adoc#_best_practices_tips_qa_for_deploying_and_managing_suse_security[オンボーディング/ベストプラクティスセクション]を参照してください。
+
+=== スループット
+
+以下のチャートが示すように、基本的なスループットベンチマークテストでは、4つのCPUコアを持つ小さなパブリッククラウドインスタンスで、ノードあたり最大1.3 Gbpsのスループットが示されました。例えば、10ノードのクラスターは、Protectモードのサービス全体で最大13 Gbpsのスループットを処理できるようになります。
+
+image:throughput.png[スループット]
+
+このスループットは、専用のCPUがEnforcerに割り当てられるか、CPUの速度が変わる場合、または追加のメモリが割り当てられる場合にスケールアップすると予測されます。再度、スケーリングはワークロードのネットワーク/アプリケーショントラフィックの種類に依存します。
+
+=== 遅延
+
+レイテンシは、ネットワーク接続の種類に依存する別のパフォーマンス指標です。スループットと同様に、レイテンシはMonitorモードでは影響を受けず、Protect（インラインファイアウォール）モードのサービスにのみ影響します。小さなパケットや単純/高速なサービスは、{product-name}の割合でより高いレイテンシを生成しますが、より大きなパケットや複雑な処理を必要とするサービスは、{product-name} Enforcerによって追加されるレイテンシの割合が低くなります。
+
+以下の表は、Redisベンチマークツールを使用して測定した2～10%パーセンタイルの平均レイテンシを示しています。Redisベンチマークはかなり小さなパケットを使用するため、より大きなパケットの場合、レイテンシが低くなると予想されます。
+
+|===
+| テスト | モニタ | protect | 遅延
+
+| PING_INLINE
+| 34,904
+| 31,603
+| 9.46%
+
+| SET
+| 38,618
+| 36,157
+| 6.37%
+
+| GET
+| 36,055
+| 35,184
+| 2.42%
+
+| LPUSH
+| 39,853
+| 35,994
+| 9.68%
+
+| RPUSH
+| 37,685
+| 36,010
+| 4.45%
+
+| LPUSH (LRANGE ベンチマーク)
+| 37,399
+| 35,220
+| 5.83%
+
+| LRANGE_100
+| 25,539
+| 23,906
+| 6.39%
+
+| LRANGE_300
+| 13,082
+| 12,277
+| 6.15%
+|===
+
+上記のベンチマークは、保護モードとモニターモードの平均TPSを示しており、いくつかのテストにおける保護モードによる追加の遅延も示しています。保護モードでの実際の遅延（マイクロ秒）を低下させる主な方法は、より高速なCPUを搭載したシステムで実行することです。このオープンソースのRedisベンチマークツールの詳細は https://redis.io/topics/benchmarks.で確認できます。
+
+=== 大規模ワークロード環境のためのスケーリング制約の追加
+
+NeuVectorのインストール中に、ホストオペレーティングシステムに大量のワークロードがある場合、NeuVector Enforcerポッドは、ポッドのホスト監視のために大量のファイルを開こうとすると起動に失敗することがあります。これにより、大量のオープンファイルのためにRKE2サーバーでエラーが発生することもあります。
+
+大規模ワークロード環境の回避策として、`example-fs-max.conf`のようなファイルを`/etc/sysctl.d/`の場所に作成し、次の構成でスケーリング制約を追加する必要があります：
+
+[,shell]
+----
+fs.inotify.max_user_instances=8192
+fs.inotify.max_user_watches=524288
+fs.filemax=5000
+----
+
+次に、以下のコマンドで再起動して構成が適用されることを確認してください。
+
+[,shell]
+----
+systemctl restart systemd-sysctl
+----

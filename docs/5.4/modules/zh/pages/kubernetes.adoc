@@ -1,0 +1,1191 @@
+= Kubernetes
+:revdate: 2025-06-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/02.kubernetes/02.kubernetes.md
+:page-opendocs-slug: /deploying/kubernetes
+
+== 使用 Kubernetes 部署
+
+您可以使用 Kubernetes 部署单独的管理器、控制器和执行器容器，并确保所有新节点都部署了执行器。{product-name} 需要并支持 Kubernetes 网络插件，如 flannel、weave 或 calico。
+
+示例文件将部署一个管理器和三个控制器。它将在每个节点上以 DaemonSet 的形式部署执行器。默认情况下，下面的示例也将部署到主节点。
+
+请参见底部部分以使用节点标签指定专用的管理器或控制器节点。
+
+[NOTE]
+====
+不建议在负载均衡器后面部署（扩展）多个管理器，因为可能会出现会话状态问题。如果您计划使用持久卷声明来存储 {product-name} 配置文件的备份，请参阅 xref:production.adoc#_backups_and_persistent_data[部署 {product-name}] 概述中的一般备份/持久数据部分。
+====
+
+如果您的部署支持集成负载均衡器，请在下面的 yaml 文件中将类型从 NodePort 更改为 LoadBalancer。
+
+{product-name} 支持基于 Helm 的部署，Helm 图表位于 https://github.com/neuvector/neuvector-helm.。
+
+有一个单独的部分用于 OpenShift 指令，Docker EE 在 Kubernetes 上有一些特殊步骤在 Docker 部分中描述。
+
+=== {product-name} 在 Docker Hub 上的镜像
+
+这些镜像位于 {product-name} Docker Hub 注册表中。请为管理器、控制器、执行器使用适当的版本标签，并将扫描器和更新器的版本保留为 'latest'。例如：
+
+* neuvector/manager:5.4.3
+* neuvector/controller:5.4.3
+* neuvector/enforcer:5.4.3
+* neuvector/scanner:latest
+* neuvector/updater:latest
+
+请确保在适当的 yaml 文件中更新镜像引用。
+
+如果使用当前的 {product-name} Helm 图表 (v1.8.9+)，应对 values.yml 进行以下更改：
+
+* 将注册表更新为 docker.io
+* 将镜像名称/标签更新为 Docker Hub 上的当前版本，如上所示
+* 将 imagePullSecrets 保持为空
+
+[NOTE]
+====
+如果从 Rancher Manager 2.6.5+ {product-name} 图表进行部署，镜像将自动从 Rancher Registry 镜像库中拉取，并部署到 cattle-neuvector-system 命名空间。
+====
+
+
+== 部署 {product-name}
+
+. 创建 {product-name} 命名空间和所需的服务账户：
++
+--
+[,shell]
+----
+kubectl create namespace neuvector
+kubectl create sa controller -n neuvector
+kubectl create sa enforcer -n neuvector
+kubectl create sa basic -n neuvector
+kubectl create sa updater -n neuvector
+kubectl create sa scanner -n neuvector
+kubectl create sa registry-adapter -n neuvector
+kubectl create sa cert-upgrader -n neuvector
+----
+--
+. (*可选*) 创建 {product-name} Pod 安全准入 (PSA) 或 Pod 安全策略 (PSP)。如果您在 Kubernetes 1.25+ 中启用了 Pod 安全准入（即 Pod 安全标准），或在 Kubernetes 集群中使用了 Pod 安全策略（在 1.25 之前），请为 {product-name} 添加以下内容（例如，nv_psp.yaml）。
++
+[NOTE]
+====
+* PSP 在 Kubernetes 1.21 中已被弃用，并将在 1.25 中完全移除。
+* 管理器和扫描器 Pod 以无 uid 运行。如果您的 PSP 有规则 `Run As User: Rule: MustRunAsNonRoot`，请将以下内容添加到下面的示例 yaml 中（并为 `###` 提供适当的值）：
+====
++
+--
+[,yaml]
+----
+securityContext:
+    runAsUser: ###
+----
+
+在 Kubernetes 1.25+ 中，对于 PSA，请为在启用 PSA 的集群上部署的 {product-name} 命名空间标记特权配置文件。
+[,shell]
+----
+kubectl label namespace neuvector "pod-security.kubernetes.io/enforce=privileged" 
+----
+--
+. 为 {product-name} 安全规则创建自定义资源（CRD）。对于 Kubernetes 1.19+：
++
+[NOTE]
+====
+如果您使用 YAML 升级到版本 `5.4.6`，必须部署 `responserules-crd-k8s.yaml` 文件。如果您使用 Helm 图表，此步骤会自动处理，无需采取任何操作。
+====
++
+--
+[,shell]
+----
+kubectl apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.4.0/crd-k8s-1.19.yaml
+kubectl apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.4.0/waf-crd-k8s-1.19.yaml
+kubectl apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.4.0/dlp-crd-k8s-1.19.yaml
+kubectl apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.4.0/com-crd-k8s-1.19.yaml
+kubectl apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.4.0/vul-crd-k8s-1.19.yaml
+kubectl apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.4.0/admission-crd-k8s-1.19.yaml
+kubectl apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.4.0/5.4.3_group-definition-k8s.yaml
+kubectl apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.4.0/5.4.3_group-definition-k8s
+kubectl apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.4.0/responserules-crd-k8s.yaml
+----
+--
+. 添加读取权限以访问 Kubernetes API。
++
+[IMPORTANT]
+====
+标准 {product-name} 5.2+ 部署使用最小特权服务账户，而不是默认服务账户。如果从 5.3 之前的版本升级，请参见下文。
+====
++
+[WARNING]
+====
+如果您升级到 5.3.0+，请根据当前版本运行以下命令：
+====
++
+--
+[tabs]
+======
+版本 5.2.0::
++
+====
+[,shell]
+----
+kubectl delete clusterrole neuvector-binding-nvsecurityrules neuvector-binding-nvadmissioncontrolsecurityrules neuvector-binding-nvdlpsecurityrules neuvector-binding-nvwafsecurityrules 
+----
+====
+
+版本低于 5.2.0::
++
+====
+[source,shell]
+----
+kubectl delete clusterrolebinding neuvector-binding-app neuvector-binding-rbac neuvector-binding-admission neuvector-binding-customresourcedefinition neuvector-binding-nvsecurityrules neuvector-binding-view neuvector-binding-nvwafsecurityrules neuvector-binding-nvadmissioncontrolsecurityrules neuvector-binding-nvdlpsecurityrules
+kubectl delete rolebinding neuvector-admin -n neuvector 
+----
+====
+======
+
+通过以下 "create clusterrole" 命令应用读取权限：
+
+[source,shell]
+----
+kubectl create clusterrole neuvector-binding-app --verb=get,list,watch,update --resource=nodes,pods,services,namespaces
+kubectl create clusterrole neuvector-binding-rbac --verb=get,list,watch --resource=rolebindings.rbac.authorization.k8s.io,roles.rbac.authorization.k8s.io,clusterrolebindings.rbac.authorization.k8s.io,clusterroles.rbac.authorization.k8s.io
+kubectl create clusterrolebinding neuvector-binding-app --clusterrole=neuvector-binding-app --serviceaccount=neuvector:controller
+kubectl create clusterrolebinding neuvector-binding-rbac --clusterrole=neuvector-binding-rbac --serviceaccount=neuvector:controller
+kubectl create clusterrole neuvector-binding-admission --verb=get,list,watch,create,update,delete --resource=validatingwebhookconfigurations,mutatingwebhookconfigurations
+kubectl create clusterrolebinding neuvector-binding-admission --clusterrole=neuvector-binding-admission --serviceaccount=neuvector:controller
+kubectl create clusterrole neuvector-binding-customresourcedefinition --verb=watch,create,get,update --resource=customresourcedefinitions
+kubectl create clusterrolebinding neuvector-binding-customresourcedefinition --clusterrole=neuvector-binding-customresourcedefinition --serviceaccount=neuvector:controller
+kubectl create clusterrole neuvector-binding-nvsecurityrules --verb=get,list,delete --resource=nvsecurityrules,nvclustersecurityrules
+kubectl create clusterrole neuvector-binding-nvadmissioncontrolsecurityrules --verb=get,list,delete --resource=nvadmissioncontrolsecurityrules
+kubectl create clusterrole neuvector-binding-nvdlpsecurityrules --verb=get,list,delete --resource=nvdlpsecurityrules
+kubectl create clusterrole neuvector-binding-nvwafsecurityrules --verb=get,list,delete --resource=nvwafsecurityrules
+kubectl create clusterrolebinding neuvector-binding-nvsecurityrules --clusterrole=neuvector-binding-nvsecurityrules --serviceaccount=neuvector:controller
+kubectl create clusterrolebinding neuvector-binding-view --clusterrole=view --serviceaccount=neuvector:controller
+kubectl create clusterrolebinding neuvector-binding-nvwafsecurityrules --clusterrole=neuvector-binding-nvwafsecurityrules --serviceaccount=neuvector:controller
+kubectl create clusterrolebinding neuvector-binding-nvadmissioncontrolsecurityrules --clusterrole=neuvector-binding-nvadmissioncontrolsecurityrules --serviceaccount=neuvector:controller
+kubectl create clusterrolebinding neuvector-binding-nvdlpsecurityrules --clusterrole=neuvector-binding-nvdlpsecurityrules --serviceaccount=neuvector:controller
+kubectl create role neuvector-binding-scanner --verb=get,patch,update,watch --resource=deployments -n neuvector
+kubectl create rolebinding neuvector-binding-scanner --role=neuvector-binding-scanner --serviceaccount=neuvector:updater --serviceaccount=neuvector:controller -n neuvector
+kubectl create role neuvector-binding-secret --verb=get --resource=secrets -n neuvector
+kubectl create rolebinding neuvector-binding-secret --role=neuvector-binding-secret --serviceaccount=neuvector:controller -n neuvector
+kubectl create role neuvector-binding-secret --verb=get,list,watch --resource=secrets -n neuvector
+kubectl create rolebinding neuvector-binding-secret --role=neuvector-binding-secret --serviceaccount=neuvector:controller --serviceaccount=neuvector:enforcer --serviceaccount=neuvector:scanner --serviceaccount=neuvector:registry-adapter -n neuvector
+kubectl create clusterrole neuvector-binding-nvcomplianceprofiles --verb=get,list,delete --resource=nvcomplianceprofiles
+kubectl create clusterrolebinding neuvector-binding-nvcomplianceprofiles --clusterrole=neuvector-binding-nvcomplianceprofiles --serviceaccount=neuvector:controller
+kubectl create clusterrole neuvector-binding-nvvulnerabilityprofiles --verb=get,list,delete --resource=nvvulnerabilityprofiles
+kubectl create clusterrolebinding neuvector-binding-nvvulnerabilityprofiles --clusterrole=neuvector-binding-nvvulnerabilityprofiles --serviceaccount=neuvector:controller 
+kubectl apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.4.0/neuvector-roles-k8s.yaml
+kubectl create role neuvector-binding-lease --verb=create,get,update --resource=leases -n neuvector
+kubectl create rolebinding neuvector-binding-cert-upgrader --role=neuvector-binding-cert-upgrader --serviceaccount=neuvector:cert-upgrader -n neuvector
+kubectl create rolebinding neuvector-binding-job-creation --role=neuvector-binding-job-creation --serviceaccount=neuvector:controller -n neuvector
+kubectl create rolebinding neuvector-binding-lease --role=neuvector-binding-lease --serviceaccount=neuvector:controller --serviceaccount=neuvector:cert-upgrader -n neuvector
+kubectl create clusterrole neuvector-binding-nvgroupdefinitions --verb=list,get,delete --resource=nvgroupdefinitions
+kubectl create clusterrolebinding neuvector-binding-nvgroupdefinitions --clusterrole=neuvector-binding-nvgroupdefinitions --serviceaccount=neuvector:controller
+kubectl create role neuvector-binding-secret-controller --verb=create,patch,update --resource=secrets -n neuvector
+kubectl create rolebinding neuvector-binding-secret-controller --role=neuvector-binding-secret-controller --serviceaccount=neuvector:controller --serviceaccount=neuvector:default -n neuvector
+kubectl create clusterrole neuvector-binding-nvresponserulesecurityrules --verb=get,list,delete --resource=nvresponserulesecurityrules
+kubectl create clusterrolebinding neuvector-binding-nvresponserulesecurityrules --clusterrole=neuvector-binding-nvresponserulesecurityrules --serviceaccount=neuvector:controller
+----
+--
+. 运行以下命令以检查 neuvector/controller 和 neuvector/updater 服务账户是否已成功添加。
++
+--
+[source,shell]
+----
+kubectl get ClusterRoleBinding neuvector-binding-app neuvector-binding-rbac neuvector-binding-admission neuvector-binding-customresourcedefinition neuvector-binding-nvsecurityrules neuvector-binding-view neuvector-binding-nvwafsecurityrules neuvector-binding-nvadmissioncontrolsecurityrules neuvector-binding-nvdlpsecurityrules neuvector-binding-nvgroupdefinitions neuvector-binding-nvresponserulesecurityrules -o wide
+----
+
+示例输出：
+
+[source,shell]
+----
+NAME                                                ROLE                                                            AGE   USERS   GROUPS   SERVICEACCOUNTS
+neuvector-binding-app                               ClusterRole/neuvector-binding-app                               66d                    neuvector/controller
+neuvector-binding-rbac                              ClusterRole/neuvector-binding-rbac                              66d                    neuvector/controller
+neuvector-binding-admission                         ClusterRole/neuvector-binding-admission                         66d                    neuvector/controller
+neuvector-binding-customresourcedefinition          ClusterRole/neuvector-binding-customresourcedefinition          66d                    neuvector/controller
+neuvector-binding-nvsecurityrules                   ClusterRole/neuvector-binding-nvsecurityrules                   66d                    neuvector/controller
+neuvector-binding-view                              ClusterRole/view                                                66d                    neuvector/controller
+neuvector-binding-nvwafsecurityrules                ClusterRole/neuvector-binding-nvwafsecurityrules                66d                    neuvector/controller
+neuvector-binding-nvadmissioncontrolsecurityrules   ClusterRole/neuvector-binding-nvadmissioncontrolsecurityrules   66d                    neuvector/controller
+neuvector-binding-nvdlpsecurityrules                ClusterRole/neuvector-binding-nvdlpsecurityrules                66d                    neuvector/controller
+neuvector-binding-nvgroupdefinitions                ClusterRole/neuvector-binding-nvgroupdefinitions                66d                    neuvector/controller
+----
+
+还有这个命令：
+
+[,shell]
+----
+kubectl get RoleBinding neuvector-binding-scanner neuvector-binding-cert-upgrader neuvector-binding-job-creation neuvector-binding-lease neuvector-binding-secret -n neuvector -o wide
+----
+
+示例输出：
+
+[,shell]
+----
+NAME                              ROLE                                   AGE    USERS   GROUPS   SERVICEACCOUNTS
+neuvector-binding-scanner         Role/neuvector-binding-scanner         8m8s                    neuvector/controller, neuvector/updater
+neuvector-binding-cert-upgrader   Role/neuvector-binding-cert-upgrader   8m8s                    neuvector/cert-upgrader
+neuvector-binding-job-creation    Role/neuvector-binding-job-creation    8m8s                    neuvector/controller
+neuvector-binding-lease           Role/neuvector-binding-lease           8m8s                    neuvector/controller, neuvector/cert-upgrader
+neuvector-binding-secret          Role/neuvector-binding-secret          8m8s                    neuvector/controller, neuvector/enforcer, neuvector/scanner, neuvector/registry-adapter
+----
+--
+. (*可选*) 创建联邦主控和/或远程多集群管理服务。如果您计划在 {product-name} 中使用多集群管理功能，则必须在一个集群中部署联邦主控服务，并且每个远程集群必须部署联邦工作者服务。为了灵活性，您可以选择在每个集群上部署主控和工作者服务，以便任何集群都可以作为主控或远程。联邦集群管理 
++
+--
+[,yaml]
+----
+apiVersion: v1
+kind: Service
+metadata:
+  name: neuvector-service-controller-fed-master
+  namespace: neuvector
+spec:
+  ports:
+  - port: 11443
+    name: fed
+    protocol: TCP
+  type: LoadBalancer
+  selector:
+    app: neuvector-controller-pod
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: neuvector-service-controller-fed-worker
+  namespace: neuvector
+spec:
+  ports:
+  - port: 10443
+    name: fed
+    protocol: TCP
+  type: LoadBalancer
+  selector:
+    app: neuvector-controller-pod
+----
+
+然后创建适当的服务：
+
+[,shell]
+----
+kubectl create -f nv_master_worker.yaml 
+----
+--
+. 使用预设版本命令创建主要 {product-name} 服务和 Pod，或修改下方的示例 yaml。预设版本为 {product-name} 控制台调用一个负载均衡器。如果使用下方的示例 yaml 文件，请替换 yaml 文件中管理器、控制器和执行器镜像引用的镜像名称和 <version> 标签。还请根据您的部署环境进行其他必要的修改（如用于管理器访问的负载均衡器/节点端口/入口等）。如果从 v5.4.2 或更高版本部署，则下方的 YAML 需要更改以适应内部证书变更。请参考此 <<_kubernetes_deployment_yaml_for_v5_4_2_onwards,YAML>>。
++
+--
+[,shell]
+----
+kubectl apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.4.0/neuvector-k8s.yaml 
+----
+
+或者，如果修改上述任何 yaml 或下方的示例：
+
+[,shell]
+----
+kubectl create -f neuvector.yaml 
+----
+
+就这样！您应该能够连接到 {product-name} 控制台，并使用 admin:admin 登录，例如 `https://<public-ip>:8443`。
+--
+
+[NOTE]
+====
+在 neuvector.yaml 文件中指定的节点端口服务将在所有 Kubernetes 节点上为 {product-name} 管理 Web 控制台端口开放一个随机端口。或者，您可以使用负载均衡器或入口，使用公网 IP 和默认端口 8443。对于节点端口，请确保在需要时通过防火墙开放该端口的访问权限。如果您想查看主机节点上哪个端口是开放的，请执行以下命令：
+
+[,shell]
+----
+kubectl get svc -n neuvector
+----
+
+您将看到类似于：
+
+[,shell]
+----
+NAME                          CLUSTER-IP      EXTERNAL-IP   PORT(S)                                          AGE
+neuvector-service-webui     10.100.195.99     <nodes>       8443:30257/TCP                                   15m
+----
+====
+
+*PKS 变更*
+
+[NOTE]
+====
+PKS 经过现场测试，需要在计划/图块中启用特权容器，并将 yaml 的 hostPath 更改如下，以适应 Allinone、Controller 和 Enforcer：
+
+[,yaml]
+----
+      hostPath:
+            path: /var/vcap/sys/run/docker/docker.sock
+----
+====
+
+*主节点污点和容忍度*
+
+所有污点信息必须匹配，才能在节点上调度执行器。要检查节点（例如主节点）上的污点信息：
+
+[,shell]
+----
+kubectl get node taintnodename -o yaml
+----
+
+示例输出：
+
+[,yaml]
+----
+spec:
+  taints:
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/master
+  # there may be an extra info for taint as below
+  - effect: NoSchedule
+    key: mykey
+    value: myvalue
+----
+
+如果有额外的污点如上所述，请将这些添加到示例 yaml 的容忍度部分：
+
+[,yaml]
+----
+spec:
+  template:
+    spec:
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+        # if there is an extra info for taints as above, please add it here. This is required to match all the taint info defined on the taint node. Otherwise, the Enforcer won't deploy on the taint node
+        - effect: NoSchedule
+          key: mykey
+          value: myvalue
+----
+
+== 为管理器和控制器节点使用节点标签
+
+要控制管理器和控制器部署在哪些节点上，请为每个节点打标签。将nodename替换为适当的节点名称（'`kubectl get nodes`'）。注意：默认情况下，Kubernetes 不会在主节点上调度 Pod。
+
+[,shell]
+----
+kubectl label nodes nodename nvcontroller=true
+----
+
+然后在管理器和控制器部署部分的yaml文件中添加nodeSelector。例如：
+
+[,yaml]
+----
+          - mountPath: /host/cgroup
+              name: cgroup-vol
+              readOnly: true
+      nodeSelector:
+        nvcontroller: "true"
+      restartPolicy: Always
+----
+
+为了防止在控制器节点上部署执行器，如果它是一个专用的管理节点（没有需要监控的应用容器），请在执行器的 yaml 部分添加 nodeAffinity。例如：
+
+[,yaml]
+----
+  app: neuvector-enforcer-pod
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: nvcontroller
+                  operator: NotIn
+                  values: ["true"]
+      imagePullSecrets:
+----
+
+== 滚动更新
+
+Kubernetes、RedHat OpenShift和Rancher等编排工具支持具有可配置策略的滚动更新。您可以使用此功能来更新{product-name}容器。最重要的是确保至少有一个控制器（或Allinone）在运行，以便不会丢失策略、日志和连接数据。确保在容器更新之间至少有120秒的间隔，以便可以选举出新的领导者并在控制器之间同步数据。
+
+提供的示例部署yaml已经配置了滚动更新策略。如果您通过 {product-name} Helm 图表进行更新，请拉取最新的图表以正确配置新功能，例如准入控制，并删除 {product-name} 的旧集群角色和集群角色绑定。如果您通过 Kubernetes 进行更新，可以使用下面的示例命令手动更新到新版本。
+
+=== Kubernetes 滚动更新示例
+
+对于只需更新到新镜像版本的升级，您可以使用这种简单的方法。
+
+如果您的 Deployment 或 Daemonset 已经在运行，您可以将 yaml 文件更改为新版本，然后应用更新：
+
+[,shell]
+----
+kubectl apply -f <yaml file>
+----
+
+从命令行更新到 {product-name} 的新版本。
+
+作为部署的控制器（也适用于管理器）
+
+[,shell]
+----
+kubectl set image deployment/neuvector-controller-pod neuvector-controller-pod=neuvector/controller:<version> -n neuvector
+----
+
+作为 DaemonSet 的任何容器：
+
+[,shell]
+----
+kubectl set image -n neuvector ds/neuvector-enforcer-pod neuvector-enforcer-pod=neuvector/enforcer:<version>
+----
+
+检查滚动更新的状态：
+
+[,shell]
+----
+kubectl rollout status -n neuvector ds/neuvector-enforcer-pod
+kubectl rollout status -n neuvector deployment/neuvector-controller-pod
+----
+
+回滚更新：
+
+[,shell]
+----
+kubectl rollout undo -n neuvector ds/neuvector-enforcer-pod
+kubectl rollout undo -n neuvector deployment/neuvector-controller-pod
+----
+
+== 在 Kubernetes 中暴露 REST API
+
+要暴露 REST API 以便从 Kubernetes 集群外部访问，这里是一个示例 yaml 文件：
+
+[,yaml]
+----
+apiVersion: v1
+kind: Service
+metadata:
+  name: neuvector-service-rest
+  namespace: neuvector
+spec:
+  ports:
+    - port: 10443
+      name: controller
+      protocol: TCP
+  type: LoadBalancer
+  selector:
+    app: neuvector-controller-pod
+----
+
+有关 REST API 的更多信息，请参见自动化部分。
+
+== Kubernetes 非特权模式下的部署
+
+以下说明可用于在不使用特权模式容器的情况下部署 {product-name}。控制器已经处于非特权模式，而执行器部署应进行更改，下面的摘录片段中显示了这一点。
+
+Enforcer:
+
+[,yaml]
+----
+spec:
+  template:
+    metadata:
+      annotations:
+        container.apparmor.security.beta.kubernetes.io/neuvector-enforcer-pod: unconfined
+        # this line is required to be added if k8s version is pre-v1.19
+        # container.seccomp.security.alpha.kubernetes.io/neuvector-enforcer-pod: unconfined
+    spec:
+      containers:
+          securityContext:
+            # the following two lines are required for k8s v1.19+. pls comment out both lines if version is pre-1.19. Otherwise, a validating data error message will show
+            seccompProfile:
+              type: Unconfined
+            capabilities:
+              add:
+              - SYS_ADMIN
+              - NET_ADMIN
+              - SYS_PTRACE
+              - IPC_LOCK
+----
+
+== 适用于 v5.4.2 及之后版本的 Kubernetes 部署 YAML
+
+以下示例 YAML 适用于 5.4.2 及之后的版本，我们需要在 Controller、Enforcer 和 Scanner pod 上挂载内部证书，因为我们不再支持硬编码证书。在部署前，请从给定链接创建 internal-certificate secret：xref:internal.adoc[替换内部证书]。
+
+.点击这里查看详细信息
+[%collapsible]
+====
+[,yaml]
+----
+apiVersion: v1
+kind: Service
+metadata:
+  name: neuvector-svc-crd-webhook
+  namespace: neuvector
+spec:
+  ports:
+  - port: 443
+    targetPort: 30443
+    protocol: TCP
+    name: crd-webhook
+  type: ClusterIP
+  selector:
+    app: neuvector-controller-pod
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: neuvector-svc-admission-webhook
+  namespace: neuvector
+spec:
+  ports:
+  - port: 443
+    targetPort: 20443
+    protocol: TCP
+    name: admission-webhook
+  type: ClusterIP
+  selector:
+    app: neuvector-controller-pod
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: neuvector-service-webui
+  namespace: neuvector
+spec:
+  ports:
+    - port: 8443
+      name: manager
+      protocol: TCP
+  type: LoadBalancer
+  selector:
+    app: neuvector-manager-pod
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: neuvector-svc-controller
+  namespace: neuvector
+spec:
+  ports:
+  - port: 18300
+    protocol: "TCP"
+    name: "cluster-tcp-18300"
+  - port: 18301
+    protocol: "TCP"
+    name: "cluster-tcp-18301"
+  - port: 18301
+    protocol: "UDP"
+    name: "cluster-udp-18301"
+  clusterIP: None
+  selector:
+    app: neuvector-controller-pod
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neuvector-manager-pod
+  namespace: neuvector
+spec:
+  selector:
+    matchLabels:
+      app: neuvector-manager-pod
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: neuvector-manager-pod
+    spec:
+      serviceAccountName: basic
+      serviceAccount: basic
+      containers:
+        - name: neuvector-manager-pod
+          image: neuvector/manager:5.4.3
+          env:
+            - name: CTRL_SERVER_IP
+              value: neuvector-svc-controller.neuvector
+      restartPolicy: Always
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neuvector-controller-pod
+  namespace: neuvector
+spec:
+  selector:
+    matchLabels:
+      app: neuvector-controller-pod
+  minReadySeconds: 60
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: neuvector-controller-pod
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - neuvector-controller-pod
+              topologyKey: "kubernetes.io/hostname"
+      serviceAccountName: controller
+      serviceAccount: controller
+      containers:
+        - name: neuvector-controller-pod
+          image: neuvector/controller:5.4.3
+          securityContext:
+            runAsUser: 0
+          readinessProbe:
+            exec:
+              command:
+              - cat
+              - /tmp/ready
+            failureThreshold: 3
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          env:
+            - name: CLUSTER_JOIN_ADDR
+              value: neuvector-svc-controller.neuvector
+            - name: CLUSTER_ADVERTISED_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: CLUSTER_BIND_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          volumeMounts:
+            - mountPath: /etc/config
+              name: config-volume
+              readOnly: true
+            - mountPath: /etc/neuvector/certs/internal/cert.key
+              name: internal-cert
+              readOnly: true
+              subPath: tls.key
+            - mountPath: /etc/neuvector/certs/internal/cert.pem
+              name: internal-cert
+              readOnly: true
+              subPath: tls.crt
+            - mountPath: /etc/neuvector/certs/internal/ca.cert
+              name: internal-cert
+              readOnly: true
+              subPath: ca.crt
+      terminationGracePeriodSeconds: 300
+      restartPolicy: Always
+      volumes:
+        - name: config-volume
+          projected:
+            sources:
+              - configMap:
+                  name: neuvector-init
+                  optional: true
+              - secret:
+                  name: neuvector-init
+                  optional: true
+              - secret:
+                  name: neuvector-secret
+                  optional: true
+        - name: internal-cert
+          secret:
+            defaultMode: 420
+            secretName: internal-cert
+
+---
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: neuvector-enforcer-pod
+  namespace: neuvector
+spec:
+  selector:
+    matchLabels:
+      app: neuvector-enforcer-pod
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: neuvector-enforcer-pod
+    spec:
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+      hostPID: true
+      serviceAccountName: enforcer
+      serviceAccount: enforcer
+      containers:
+        - name: neuvector-enforcer-pod
+          image: neuvector/enforcer:5.4.3
+          securityContext:
+            privileged: true
+          env:
+            - name: CLUSTER_JOIN_ADDR
+              value: neuvector-svc-controller.neuvector
+            - name: CLUSTER_ADVERTISED_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: CLUSTER_BIND_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          volumeMounts:
+            - mountPath: /lib/modules
+              name: modules-vol
+              readOnly: true
+            - mountPath: /var/nv_debug
+              name: nv-debug
+              readOnly: false
+            - mountPath: /etc/neuvector/certs/internal/cert.key
+              name: internal-cert
+              readOnly: true
+              subPath: tls.key
+            - mountPath: /etc/neuvector/certs/internal/cert.pem
+              name: internal-cert
+              readOnly: true
+              subPath: tls.crt
+            - mountPath: /etc/neuvector/certs/internal/ca.cert
+              name: internal-cert
+              readOnly: true
+              subPath: ca.crt
+      terminationGracePeriodSeconds: 1200
+      restartPolicy: Always
+      volumes:
+        - name: modules-vol
+          hostPath:
+            path: /lib/modules
+        - name: nv-debug
+          hostPath:
+            path: /var/nv_debug
+        - name: internal-cert
+          secret:
+            defaultMode: 420
+            secretName: internal-cert
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neuvector-scanner-pod
+  namespace: neuvector
+spec:
+  selector:
+    matchLabels:
+      app: neuvector-scanner-pod
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: neuvector-scanner-pod
+    spec:
+      serviceAccountName: scanner
+      serviceAccount: scanner
+      containers:
+        - name: neuvector-scanner-pod
+          image: neuvector/scanner:latest
+          imagePullPolicy: Always
+          env:
+            - name: CLUSTER_JOIN_ADDR
+              value: neuvector-svc-controller.neuvector
+          volumeMounts:
+            - mountPath: /etc/neuvector/certs/internal/cert.key
+              name: internal-cert
+              readOnly: true
+              subPath: tls.key
+            - mountPath: /etc/neuvector/certs/internal/cert.pem
+              name: internal-cert
+              readOnly: true
+              subPath: tls.crt
+            - mountPath: /etc/neuvector/certs/internal/ca.cert
+              name: internal-cert
+              readOnly: true
+              subPath: ca.crt
+      restartPolicy: Always
+      volumes:
+        - name: internal-cert
+          secret:
+            defaultMode: 420
+            secretName: internal-cert
+---
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: neuvector-updater-pod
+  namespace: neuvector
+spec:
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: neuvector-updater-pod
+        spec:
+          serviceAccountName: updater
+          serviceAccount: updater
+          containers:
+          - name: neuvector-updater-pod
+            image: neuvector/updater:latest
+            imagePullPolicy: Always
+            command:
+            - /bin/sh
+            - -c
+            - TOKEN=`cat /var/run/secrets/kubernetes.io/serviceaccount/token`; /usr/bin/curl -kv -X PATCH -H "Authorization:Bearer $TOKEN" -H "Content-Type:application/strategic-merge-patch+json" -d '{"spec":{"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt":"'`date +%Y-%m-%dT%H:%M:%S%z`'"}}}}}' 'https://kubernetes.default/apis/apps/v1/namespaces/neuvector/deployments/neuvector-scanner-pod'
+          restartPolicy: Never
+----
+====
+
+以下示例是完整的部署参考（Kubernetes 1.19+）。
+
+.点击这里查看详细信息
+[%collapsible]
+====
+[,yaml]
+----
+apiVersion: v1
+kind: Service
+metadata:
+  name: neuvector-svc-crd-webhook
+  namespace: neuvector
+spec:
+  ports:
+  - port: 443
+    targetPort: 30443
+    protocol: TCP
+    name: crd-webhook
+  type: ClusterIP
+  selector:
+    app: neuvector-controller-pod
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: neuvector-svc-admission-webhook
+  namespace: neuvector
+spec:
+  ports:
+  - port: 443
+    targetPort: 20443
+    protocol: TCP
+    name: admission-webhook
+  type: ClusterIP
+  selector:
+    app: neuvector-controller-pod
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: neuvector-service-webui
+  namespace: neuvector
+spec:
+  ports:
+    - port: 8443
+      name: manager
+      protocol: TCP
+  type: LoadBalancer
+  selector:
+    app: neuvector-manager-pod
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: neuvector-svc-controller
+  namespace: neuvector
+spec:
+  ports:
+  - port: 18300
+    protocol: "TCP"
+    name: "cluster-tcp-18300"
+  - port: 18301
+    protocol: "TCP"
+    name: "cluster-tcp-18301"
+  - port: 18301
+    protocol: "UDP"
+    name: "cluster-udp-18301"
+  clusterIP: None
+  selector:
+    app: neuvector-controller-pod
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neuvector-manager-pod
+  namespace: neuvector
+spec:
+  selector:
+    matchLabels:
+      app: neuvector-manager-pod
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: neuvector-manager-pod
+    spec:
+      serviceAccountName: basic
+      serviceAccount: basic
+      containers:
+        - name: neuvector-manager-pod
+          image: neuvector/manager:5.4.3
+          env:
+            - name: CTRL_SERVER_IP
+              value: neuvector-svc-controller.neuvector
+      restartPolicy: Always
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neuvector-controller-pod
+  namespace: neuvector
+spec:
+  selector:
+    matchLabels:
+      app: neuvector-controller-pod
+  minReadySeconds: 60
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: neuvector-controller-pod
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - neuvector-controller-pod
+              topologyKey: "kubernetes.io/hostname"
+      serviceAccountName: controller
+      serviceAccount: controller
+      containers:
+        - name: neuvector-controller-pod
+          image: neuvector/controller:5.4.3
+          securityContext:
+            runAsUser: 0
+          readinessProbe:
+            exec:
+              command:
+              - cat
+              - /tmp/ready
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          env:
+            - name: CLUSTER_JOIN_ADDR
+              value: neuvector-svc-controller.neuvector
+            - name: CLUSTER_ADVERTISED_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: CLUSTER_BIND_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          volumeMounts:
+            - mountPath: /etc/config
+              name: config-volume
+              readOnly: true
+      terminationGracePeriodSeconds: 300
+      restartPolicy: Always
+      volumes:
+        - name: config-volume
+          projected:
+            sources:
+              - configMap:
+                  name: neuvector-init
+                  optional: true
+              - secret:
+                  name: neuvector-init
+                  optional: true
+              - secret:
+                  name: neuvector-secret
+                  optional: true
+
+---
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: neuvector-enforcer-pod
+  namespace: neuvector
+spec:
+  selector:
+    matchLabels:
+      app: neuvector-enforcer-pod
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: neuvector-enforcer-pod
+      annotations:
+        container.apparmor.security.beta.kubernetes.io/neuvector-enforcer-pod: unconfined
+      # Add the following for pre-v1.19
+      # container.seccomp.security.alpha.kubernetes.io/neuvector-enforcer-pod: unconfined
+    spec:
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+      hostPID: true
+      serviceAccountName: enforcer
+      serviceAccount: enforcer
+      containers:
+        - name: neuvector-enforcer-pod
+          image: neuvector/enforcer:5.4.3
+          securityContext:
+            # the following two lines are required for k8s v1.19+. pls comment out both lines if version is pre-1.19. Otherwise, a validating data error message will show
+            seccompProfile:
+              type: Unconfined
+            capabilities:
+              add:
+              - SYS_ADMIN
+              - NET_ADMIN
+              - SYS_PTRACE
+              - IPC_LOCK
+          env:
+            - name: CLUSTER_JOIN_ADDR
+              value: neuvector-svc-controller.neuvector
+            - name: CLUSTER_ADVERTISED_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: CLUSTER_BIND_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          volumeMounts:
+            - mountPath: /lib/modules
+              name: modules-vol
+              readOnly: true
+            - mountPath: /var/nv_debug
+              name: nv-debug
+              readOnly: false
+      terminationGracePeriodSeconds: 1200
+      restartPolicy: Always
+      volumes:
+        - name: modules-vol
+          hostPath:
+            path: /lib/modules
+        - name: nv-debug
+          hostPath:
+            path: /var/nv_debug
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neuvector-scanner-pod
+  namespace: neuvector
+spec:
+  selector:
+    matchLabels:
+      app: neuvector-scanner-pod
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: neuvector-scanner-pod
+    spec:
+      serviceAccountName: scanner
+      serviceAccount: scanner
+      containers:
+        - name: neuvector-scanner-pod
+          image: neuvector/scanner:latest
+          imagePullPolicy: Always
+          env:
+            - name: CLUSTER_JOIN_ADDR
+              value: neuvector-svc-controller.neuvector
+      restartPolicy: Always
+
+---
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: neuvector-updater-pod
+  namespace: neuvector
+spec:
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: neuvector-updater-pod
+        spec:
+          serviceAccountName: updater
+          serviceAccount: updater
+          containers:
+          - name: neuvector-updater-pod
+            image: neuvector/updater:latest
+            imagePullPolicy: Always
+            command:
+            - TOKEN=`cat /var/run/secrets/kubernetes.io/serviceaccount/token`; /usr/bin/curl -kv -X PATCH -H "Authorization:Bearer $TOKEN" -H "Content-Type:application/strategic-merge-patch+json" -d '{"spec":{"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt":"'`date +%Y-%m-%dT%H:%M:%S%z`'"}}}}}' 'https://kubernetes.default/apis/apps/v1/namespaces/neuvector/deployments/neuvector-scanner-pod'
+          restartPolicy: Never
+----
+====
+
+== PKS 变更
+
+[NOTE]
+====
+PKS 已经过实地测试，需要在 plan/tile 中启用特权容器，并将 YAML 的 hostPath 更改如下，适用于 Allinone 和 Enforcer：
+
+[,yaml]
+----
+      hostPath:
+            path: /var/vcap/sys/run/docker/docker.sock
+----
+====

@@ -1,0 +1,159 @@
+= Mirantis Kubernetes Engine
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /13.special/02.docker/02.docker.md
+:page-opendocs-slug:  /special/docker
+
+== Implantar no Cluster Swarm
+
+Para implantar {product-name} usando um cluster Swarm, primeiro puxe as imagens {product-name} usando o Docker UCP no menu Imagens. Você pode precisar adicionar um número de versão para obter a versão mais recente no Docker Hub.
+
+Atualmente, o Swarm/UCP não suporta as capacidades seccomp (opções cap_add) ou implantações em '`privileged mode`', então os contêineres {product-name} precisarão ser implantados a partir da linha de comando usando docker-compose ou run. Veja os arquivos de compose de exemplo para o All-in-One e enforcer abaixo.
+
+O serviço HRM do Docker UCP usa a porta padrão 8443, que conflita com a porta do console {product-name}. Se estiver usando a porta padrão do HRM, então altere o mapeamento da porta {product-name}, por exemplo 9443:8443 para o contêiner All-in-One nos exemplos abaixo. Após o aplicativo {product-name} ser implantado com sucesso, faça login no console na porta 9443 do host All-in-One.
+
+== Implantar no Docker Swarm Usando Modo Privilegiado
+
+O seguinte é um exemplo do arquivo docker-compose para implantar o contêiner All-in-One no primeiro nó. Como o contêiner All-in-One possui um módulo enforcer dentro, os contêineres de aplicação no mesmo nó podem ser protegidos. Tanto a implantação greenfield quanto a brownfield são suportadas.
+
+Implantar All-in-One usando docker-compose (modo privilegiado):
+
+[,yaml]
+----
+allinone:
+    pid: host
+    image: neuvector/allinone:<version>
+    container_name: allinone
+    privileged: true
+    environment:
+        - CLUSTER_JOIN_ADDR=node_ip
+    ports:
+        - 18300:18300
+        - 18301:18301
+        - 18400:18400
+        - 18401:18401
+        - 18301:18301/udp
+        - 9443:8443
+    volumes:
+        - /lib/modules:/lib/modules
+        - /var/neuvector:/var/neuvector
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup:/host/cgroup:ro
+----
+
+A variável de ambiente mais importante é *CLUSTER_JOIN_ADDR*. É o endereço IP ao qual outros enforcers se conectam. Normalmente, deve ser definido como o endereço IP do nó onde o contêiner All-in-One está em execução.
+
+As portas 18300 e 18301 são portas padrão para comunicação entre clusters. Eles devem ser idênticos para todos os controladores e enforcers no cluster. Por favor, consulte a seção _"Detalhes do Docker-compose"_ para saber como alterar as portas padrão.
+
+Adicione um contêiner enforcer usando docker-compose (modo privilegiado)
+
+Este é um exemplo de arquivo docker-compose para juntar um enforcer ao cluster. Tanto a implantação greenfield quanto a brownfield são suportadas.
+
+[,yaml]
+----
+enforcer:
+    pid: host
+    image: neuvector/enforcer:<version>
+    container_name: enforcer
+    privileged: true
+    environment:
+        - CLUSTER_JOIN_ADDR=controller_node_ip
+    ports:
+        - 18301:18301
+        - 18401:18401
+        - 18301:18301/udp
+    volumes:
+        - /lib/modules:/lib/modules
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup/:/host/cgroup/:ro
+----
+
+A variável de ambiente mais importante é *CLUSTER_JOIN_ADDR*. Para enforcers, substitua `<controller_node_ip>` pelo endereço IP do nó do controlador. Normalmente, *CLUSTER_JOIN_ADDR* no arquivo docker-compose do controlador/All-in-One e no arquivo docker-compose do enforcer têm o mesmo valor.
+
+A partir de {product-name} 4.0+, um contêiner scanner separado deve ser implantado para realizar a varredura de vulnerabilidades.
+
+Exemplo de docker-compose para o Scanner:
+
+[,yaml]
+----
+Scanner:
+   image: neuvector/scanner
+   container_name: scanner
+   environment:
+     - SCANNER_DOCKER_URL=tcp://192.168.1.10:2376
+     - CLUSTER_JOIN_ADDR=controller_node_ip
+   ports:
+     - 18402:18402
+   volumes:
+     - /var/run/docker.sock:/var/run/docker.sock:ro
+----
+
+== Implantação sem usar o modo privilegiado
+
+Para algumas configurações de plataforma, é possível implantar os contêineres {product-name} sem que eles precisem ser executados em modo privilegiado. A configuração deve suportar a capacidade de adicionar capacidades e definir o arquivo de controle do AppArmor. Observe que o Docker DataCenter/UCP e o Swarm atualmente não suportam isso, mas ainda é possível implantar {product-name} manualmente usando Compose ou Run.
+
+Implantar All-in-One (SEM modo privilegiado) com docker-compose
+
+[,yaml]
+----
+allinone:
+    pid: host
+    image: neuvector/allinone
+    container_name: neuvector.allinone
+    cap_add:
+        - SYS_ADMIN
+        - NET_ADMIN
+        - SYS_PTRACE
+        - IPC_LOCK
+    security_opt:
+        - apparmor=unconfined
+        - seccomp=unconfined
+        - label=disable
+    environment:
+        - CLUSTER_JOIN_ADDR=[AllInOne Node IP Address]
+    ports:
+        - 18300:18300
+        - 18301:18301
+        - 18400:18400
+        - 18401:18401
+        - 18301:18301/udp
+        - 9443:8443
+    volumes:
+        - /lib/modules:/lib/modules
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup:/host/cgroup:ro
+        - /var/neuvector:/var/neuvector
+----
+
+Implantar enforcer (SEM modo privilegiado) com docker-compose
+
+[,yaml]
+----
+enforcer:
+    pid: host
+    image: neuvector/enforcer
+    container_name: neuvector.enforcer
+    cap_add:
+        - SYS_ADMIN
+        - NET_ADMIN
+        - SYS_PTRACE
+        - IPC_LOCK
+    security_opt:
+        - apparmor=unconfined
+        - seccomp=unconfined
+        - label=disable
+    environment:
+        - CLUSTER_JOIN_ADDR=[AllInOne Node IP Address]
+    ports:
+        - 18301:18301
+        - 18401:18401
+        - 18301:18301/udp
+    volumes:
+        - /lib/modules:/lib/modules
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup/:/host/cgroup/:ro
+----

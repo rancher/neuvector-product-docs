@@ -1,0 +1,89 @@
+= Helmを使用してデプロイする
+:revdate: 2026-03-24
+:page-revdate: {revdate}
+:chart-version: 108.0.2+up2.8.11
+:chart-version-url: https://github.com/rancher/charts/blob/release-v2.13/charts/neuvector/108.0.2%2Bup2.8.11/
+
+これは、{neuvector-product-name}をHelm経由でデプロイし、 https://documentation.suse.com/cloudnative/rancher-manager/latest/en/installation-and-upgrade/installation-and-upgrade.html[SUSE Rancherインストール]と一緒に使用するためのハウツーガイドの一例です。{neuvector-product-name}のデプロイメント方法に関する詳細情報は、xref:production.adoc#_planning_deployments[デプロイメントの計画]を参照してください。
+
+== 前提条件
+
+* 稼働中のSUSE Rancherクラスター。
+* Helm CLIを使用するには、 https://helm.sh/docs/intro/quickstart/#install-helm[Helm]がインストールされていることを確認してください。
+* https://kubernetes.io/docs/tasks/tools/#kubectl[Kubectl]コマンドラインツールが、クラスターと通信できるように設定されていること。
+
+SUSE Rancherのバージョンと互換性のある{neuvector-product-name}チャートバージョンを選択してください。最新の互換性のあるチャートについては、SUSE Rancherサポートマトリックスの https://www.suse.com/suse-rancher/support-matrix/all-supported-versions/rancher-v2-13-3/#:~:text=Rancher%20Apps%20/%20Cluster%20Tools[Rancher Apps / Cluster Tools]セクションにある`NeuVector`機能を参照してください。すべての{neuvector-product-name} 5.xバージョンは、サポートされているすべての https://www.suse.com/suse-neuvector/support-matrix/all-supported-versions/neuvector-v-all-versions/[Rancherバージョン]に適用できることに注意してください。
+
+この例では、Rancher v2.13.xリリースライン向けに{neuvector-product-name} v5.4.9チャート（{chart-version-url}[`{chart-version}`]）をデプロイします。
+
+== インストール
+
+. Helmリポジトリを追加し、最新のチャートを取得するために更新します。
++
+[source,shell]
+----
+helm repo add rancher-charts https://charts.rancher.io/
+helm repo update
+----
+
+. `neuvector-crd`チャートをインストールします。
++
+[source,shell]
+----
+helm install neuvector-crd --namespace cattle-neuvector-system --create-namespace rancher-charts/neuvector-crd --version={chart-version}
+----
++
+.. クラスターにPod Security Admission（PSA）が有効になっている場合、特権コンテナを許可するためにネームスペースにラベルを付ける必要があります。
++
+[source,shell]
+----
+kubectl label namespace cattle-neuvector-system pod-security.kubernetes.io/enforce=privileged
+----
+
+. すでにカスタム`values.yaml`ファイルをお持ちの場合は、次の値が設定されていることを確認してください。必要に応じて、次の{chart-version-url}values.yaml[`release-v2.13`チャート]にある`values.yaml`ファイルをテンプレートとして使用できます。
+.. `global.cattle.url`は、`https://your-rancher-url.com`のような形式でRancherのURLに設定されています。
+.. `controller.federation.managedsvc.type`の値が`NodePort`に設定されていることを確認してください。
+.. `global.cattle.systemDefaultRegistry`は`<Prime-Registry-URL>`に設定されています。
++
+[NOTE]
+====
+Prime Registry URLの詳細については、 https://scc.suse.com/rancher-docs/rancherprime/latest/en/reference-guide.html#prime-registry-url[Prime専用ドキュメント]をご覧ください。認証が必要です。 https://scc.suse.com/[SUSEカスタマーセンター（SCC）]の資格情報を使用してログインしてください。
+====
++
+[source,yaml]
+.Example: values.yaml
+----
+...
+global: # required for Rancher authentication (https://<Rancher_URL>/)
+  cattle:
+    url: https://your-rancher-url.com # Update with your Rancher URL
+    systemDefaultRegistry: <Prime-Registry-URL>
+...
+controller:
+  federation:
+    managedsvc:
+      type: NodePort
+  prime:
+    enabled: true # Activates Prime features in v5.4.6+
+----
+
+. メインチャートをインストールします。
++
+[source,shell]
+----
+helm install neuvector --namespace cattle-neuvector-system --create-namespace rancher-charts/neuvector --version={chart-version} -f values.yaml
+----
+
+. `NodePort`を見つけて{neuvector-product-name} UIにアクセスするには、次のコマンドを実行してください。指定された`NodePort`の下にある結果は`30101`です。
++
+[source,shell]
+----
+kubectl get svc --namespace cattle-neuvector-system neuvector-service-webui
+
+NAME                      TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+neuvector-service-webui   NodePort   10.43.207.222   <none>        8443:30101/TCP   21m
+----
+
+== インストール後
+
+{neuvector-product-name} UIのデフォルトのログイン資格情報は、ユーザー名とパスワードが`admin` / `admin`です。初回ログイン時にこれを変更するよう求められます。

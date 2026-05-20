@@ -1,0 +1,211 @@
+= {product-name}の更新
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /10.updating/01.updating/01.updating.md
+:page-opendocs-slug:  /更新/更新
+
+== {product-name} コンポーネントを更新する
+
+{product-name} コンテナを更新するのは非常に簡単です。新しいリリースが利用可能な場合は、Docker Hub から取得してください。更新中は、常に少なくとも1つの Allinone または Controller コンテナが稼働しているように、'`rolling update`' 戦略を使用することをお勧めします。
+
+[IMPORTANT]
+====
+ホスト OS の更新、再起動、およびオーケストレーターの更新により、ポッドが追い出されたり停止されたりすることがあります。Controller に影響がある場合、状態を維持するために他の Controller がアクティブでないと、新しい Controller が起動され、リーダーを持つクラスターが形成され、構成の永続的なストレージバックアップにアクセスしようとする間、Controller が一時的に利用可能になることがあります。ホストまたはオーケストレーターの更新や再起動をスケジュールする際は、常に利用可能な Controller の数に影響を与える可能性があるため、注意してください。これを軽減するための可能な方法については、以下のポッド中断予算を参照してください。
+
+{product-name} Helm チャートを使用してデプロイメントが行われた場合、更新は追加のサービス、ロールバインディング、またはその他のアップグレード要件を処理します。
+
+手動で更新が行われる場合や、稼働中の Allinone または Controller が1つだけの場合、現在のネットワーク接続データは保存されず、{product-name} コンテナが停止されると失われることに注意してください。
+
+{product-name} は {product-name} ポリシーと構成のための永続データをサポートしています。これは、/var/neuvector/ にボリュームをマウントするためのリアルタイムバックアップを構成します。主なユースケースは、永続ボリュームがマウントされているときに、実行時に構成とポリシーが永続ボリュームに保存されることです。クラスター全体が障害に陥った場合は、新しいクラスターが作成されると構成が自動的に復元されます。構成とポリシーは、/var/neuvector/ ボリュームから手動で復元または削除することもできます。
+====
+
+[IMPORTANT]
+====
+永続ボリュームがマウントされていない場合、{product-name} は構成やポリシーを永続データとして保存しません。Allinone または Controller コンテナを停止する前に、Controller の構成とポリシーをバックアップしてください。これは、設定 -> 構成で行うことができます。また、Controller は、3 または 5 の Controller が稼働する HA 構成でデプロイすることもでき、その場合、ポリシーは他の Controller とともに保持され、一方が更新されている間に持続します。
+====
+
+docker-composeを使用して{product-name}を手動で更新するには:
+
+[,shell]
+----
+sudo docker-compose -f <filename> down
+----
+
+[TIP]
+====
+ファイル名が指定されていない場合、docker-compose.ymlファイルが使用されます。
+====
+
+必要に応じて、docker-compose.ymlまたは他の適切なファイルが希望のイメージバージョンで編集されていることを確認してください。
+
+[,shell]
+----
+$sudo docker-compose -f <filename> up -d
+----
+
+[NOTE]
+====
+すべての{product-name} コンポーネントを同時に最新バージョンに更新することをお勧めします。後方互換性は、少なくとも1つのマイナーバージョンまでサポートされています。ほとんどの古いバージョンは後方互換性がありますが、予期しない動作を引き起こす例外があるかもしれません。
+====
+
+== ローリングアップデート
+
+Kubernetes、RedHat OpenShift、Rancherなどのオーケストレーションツールは、設定可能なポリシーでローリングアップデートをサポートしています。この機能を使用して{product-name} コンテナを更新することができます。最も重要なのは、ポリシー、ログ、および接続データが失われないように、少なくとも1つの Allinone/Controller が実行されていることを確認することです。新しいリーダーが選出され、Controller間でデータが同期されるように、コンテナの更新間に最低30秒の間隔を確保してください。
+
+=== サンプルKubernetesローリングアップデート
+
+デプロイメントまたはデーモンセットがすでに実行中の場合、yamlファイルを新しいバージョンに変更し、更新を適用できます:
+
+[,shell]
+----
+kubectl apply -f <yaml file>
+----
+
+コマンドラインから{product-name}の新しいバージョンに更新するには。
+
+[,shell]
+----
+kubectl set image deployment/neuvector-controller-pod neuvector-controller-pod=neuvector/controller:4.2.2 -n neuvector
+kubectl set image deployment/neuvector-manager-pod neuvector-manager-pod=neuvector/manager:4.2.2 -n neuvector
+kubectl set image DaemonSet/neuvector-enforcer-pod neuvector-enforcer-pod=neuvector/enforcer:4.2.2 -n neuvector
+----
+
+ローリングアップデートのステータスを確認するには:
+
+[,shell]
+----
+kubectl rollout status -n neuvector ds/neuvector-enforcer-pod
+kubectl rollout status -n neuvector deployment/neuvector-controller-pod  # same for manager, scanner etc
+----
+
+更新をロールバックするには:
+
+[,shell]
+----
+kubectl rollout undo -n neuvector ds/neuvector-enforcer-pod
+kubectl rollout undo -n neuvector deployment/neuvector-controller-pod  # same for manager, scanner etc
+----
+
+== 脆弱性CVEデータベースを更新する
+
+{product-name} スキャナーイメージは、'latest' タグを使用して、新しいCVEデータベースの更新で neuvector 上で定期的に更新されます。
+
+デフォルトの{product-name} デプロイメントには、スキャナーポッドのデプロイメントと、毎日スキャナーを更新するための Updater cron ジョブが含まれています。
+
+詳細については、セクションxref:updating.adoc[脆弱性CVEデータベースの更新]を参照してください。
+
+CVEデータベースのバージョンは、脆弱性タブのコンソールで確認できます。アップデーターコンテナイメージも確認できます。最新のデータベースバージョン番号は、 https://raw.githubusercontent.com/neuvector/manifests/main/versions/scanner[こちら]にリストされています。
+
+[,shell]
+----
+docker inspect neuvector/updater
+----
+
+[,json]
+----
+"Labels": {
+                "neuvector.image": "neuvector/updater",
+                "neuvector.role": "updater",
+                "neuvector.vuln_db": "1.255"
+            }
+----
+
+Controller/Allinone のログで「バージョン」を確認することもできます。例えば、Kubernetesでは：
+
+[,bash]
+----
+kubectl logs neuvector-controller-pod-777fdc5668-4jkjn -n neuvector | grep version
+----
+
+[,shell]
+----
+2019-07-29T17:04:02.43 |DEBU|SCN|main.dbUpdate: New DB found - create=2019-07-24T11:59:13Z version=1.576
+2019-07-29T17:04:02.454|DEBU|SCN|memdb.ReadCveDb: New DB found - update=2019-07-24T11:59:13Z version=1.576
+2019-07-29T17:04:12.224|DEBU|SCN|main.scannerRegister: - version=1.576
+----
+
+== ポッド中断予算
+
+Kubernetesの機能により、常に最低限の Controller が稼働していることを保証できます。これは、ノードの排出や Controllerポッドを削除する可能性のある他のメンテナンス作業に役立ちます。例えば、以下のファイル nv_pdb.yaml を作成して適用し、常に少なくとも2つの Controller が稼働していることを確認してください。
+
+[,yaml]
+----
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: neuvector-controller-pdb
+  namespace: neuvector
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: neuvector-controller-pod
+----
+
+== {product-name} 4.xから5.1.xへのアップグレード
+
+まず5.1.xリリース（例：5.1.3）にアップグレードし、その後xref:kubernetes.adoc[Kubernetesデプロイメントセクション]を参照して、サービスアカウントとバインディングに関する重要な変更のために5.2.x+に更新するにはどうすればよいか確認してください。
+
+Helmユーザーの場合、{product-name} Helmチャート2.0.0以降（{product-name} 5.2.0以前）に更新してください。OpenShiftでオペレーターまたはHelmインストールを更新する場合は、以下の注意事項を参照してください。
+
+. 古いneuvector-binding-customresourcedefinitionクラスター役割を削除してください。
++
+[,shell]
+----
+kubectl delete clusterrole neuvector-binding-customresourcedefinition
+----
+
+. neuvector-binding-customresourcedefinitionクラスター役割の新しい更新動詞を適用してください。
++
+[,shell]
+----
+kubectl create clusterrole neuvector-binding-customresourcedefinition --verb=watch,create,get,update --resource=customresourcedefinitions
+----
+
+. Kubernetes 1.19+の古いcrdスキーマを削除してください。
++
+[,shell]
+----
+kubectl delete -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/crd-k8s-1.19.yaml
+----
+
+. Kubernetes 1.19+の新しいcrdスキーマを作成してください。
++
+[,shell]
+----
+kubectl apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.0.0/crd-k8s-1.19.yaml
+kubectl apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.0.0/waf-crd-k8s-1.19.yaml
+kubectl apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.0.0/dlp-crd-k8s-1.19.yaml
+kubectl apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.0.0/admission-crd-k8s-1.19.yaml
+----
+
+. 新しいDLP、WAP、Admissionクラスター役割とクラスター役割バインディングを作成してください。
++
+[,shell]
+----
+kubectl create clusterrole neuvector-binding-nvwafsecurityrules --verb=list,delete --resource=nvwafsecurityrules
+kubectl create clusterrolebinding neuvector-binding-nvwafsecurityrules --clusterrole=neuvector-binding-nvwafsecurityrules --serviceaccount=neuvector:default
+kubectl create clusterrole neuvector-binding-nvadmissioncontrolsecurityrules --verb=list,delete --resource=nvadmissioncontrolsecurityrules
+kubectl create clusterrolebinding neuvector-binding-nvadmissioncontrolsecurityrules --clusterrole=neuvector-binding-nvadmissioncontrolsecurityrules --serviceaccount=neuvector:default
+kubectl create clusterrole neuvector-binding-nvdlpsecurityrules --verb=list,delete --resource=nvdlpsecurityrules
+kubectl create clusterrolebinding neuvector-binding-nvdlpsecurityrules --clusterrole=neuvector-binding-nvdlpsecurityrules --serviceaccount=neuvector:default
+----
+
+. Docker hub（docker.io）から{product-name} イメージをプルするためのイメージ名とパスを更新してください。
+イメージは{product-name} Docker Hub レジストリにあります。マネージャー、Controller、Enforcer には適切なバージョンタグを使用し、Scanner と Updater のバージョンは「latest」としてください。次に例を示します。
+* neuvector/manager:5.1.3
+* neuvector/controller:5.1.3
+* neuvector/enforcer:5.1.3
+* neuvector/scanner:latest
+* neuvector/updater:latest
+
+任意で、Helmチャート、デプロイメント yaml、ConfigMap、スクリプトなどにおける{product-name} ライセンスおよびシークレットへの参照を削除することができます。これらはもはやイメージをプルしたり、{product-name} の使用を開始するために必要ありません。
+
+=== SCCおよびOperator/Helmによるアップグレードに関する注意事項
+
+特権SCCは、新しいデプロイメントにおいてOperatorバージョン1.3.4以上によってデプロイメントyamlで指定されたサービスアカウントに追加されます。{product-name} Operatorを以前のバージョンから1.3.4にアップグレードする場合や、Helmを2.0.0にアップグレードする場合は、アップグレード前に特権SCCを削除してください。
+
+[,shell]
+----
+oc delete rolebinding -n neuvector system:openshift:scc:privileged
+----

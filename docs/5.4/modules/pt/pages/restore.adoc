@@ -1,0 +1,98 @@
+= Restaurando {product-name} a configuração
+:revdate: 2024-12-08
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/11.restore/11.restore.md
+:page-opendocs-slug: /deploying/restore
+
+== Restaurando {product-name} a configuração
+
+Você pode restaurar uma {product-name} configuração anterior aplicando um arquivo de backup de configuração. Você pode gerar um backup manualmente ou exportar um da {product-name} console navegando até *Configurações > Configuração* e selecionando uma das seguintes opções:
+
+* *Todas as configurações*: Inclui configurações de registro, integrações, configurações do sistema e políticas.
+* *Apenas política*: Inclui regras e políticas de segurança.
+
+Você também pode automatizar backups usando a API REST. Para um exemplo, veja xref:automation.adoc#export-import-configuration-file[Exportar e importar arquivos de configuração].
+
+Se todos os controladores pararem de funcionar e o estado da configuração em tempo real for perdido, {product-name} pode restaurar automaticamente a configuração quando xref:production.adoc#_backups_and_persistent_data[armazenamento persistente] estiver devidamente configurado.
+
+[WARNING]
+====
+A partir de *{product-name} v5.4.7*, dados de configuração sensíveis são criptografados usando um Secret do Kubernetes chamado `neuvector-store-secret` no namespace `neuvector`.
+
+As versões *5.3.0 até 5.4.6* usavam uma chave de criptografia fixa e codificada. Durante um upgrade ou restauração, {product-name} detecta automaticamente dados criptografados com a chave legada e os recriptografa usando uma nova chave derivada de `neuvector-store-secret`.
+
+Sempre faça upgrade para *v5.4.7 ou posterior* antes de restaurar dados de configuração.
+
+Para mais detalhes, veja o aviso de segurança: https://github.com/neuvector/neuvector/security/advisories/GHSA-h773-7gf7-9m2x
+====
+
+[NOTE]
+====
+{product-name} não suporta restaurações parciais (por exemplo, restaurar apenas regras de rede) ou restaurações em um ponto no tempo. Use scripts de automação para fazer backup de arquivos de configuração regularmente e gerenciar backups com timestamp.
+
+Para mais informações, consulte
+xref:automation.adoc#export-import-configuration-file[Exportar e importar arquivos de configuração].
+====
+
+[WARNING]
+====
+Não modifique os arquivos de configuração de backup. Editar um arquivo de backup após a exportação pode causar falhas na restauração ou resultar em um estado de sistema imprevisível.
+====
+
+[CAUTION]
+====
+Use os arquivos de configuração de backup apenas para restaurar {product-name} no mesmo cluster de onde foram exportados. Restaurar um backup em um cluster diferente pode resultar em comportamento imprevisível.
+====
+
+== Gerenciamento de Chaves de Criptografia
+
+O `neuvector-store-secret` contém a *Chave de Criptografia de Chave (KEK)*. {product-name} usa a KEK para gerar *Chaves de Criptografia de Dados (DEKs)*, que criptografam dados de configuração sensíveis.
+
+Comportamento da chave:
+
+* Você deve manter e fazer backup do `neuvector-store-secret`.
+* Se o segredo estiver ausente ou o valor da chave não atender aos requisitos de comprimento, {product-name} cria ou atualiza automaticamente.
+* Quando {product-name} cria ou atualiza o segredo, ele gera um alerta lembrando você de fazer o backup.
+* Se a KEK mudar ou for perdida, os dados criptografados anteriormente não poderão ser descriptografados.
+
+Durante upgrades em andamento ou restaurações:
+
+. Os dados criptografados com a chave legada codificada são recriptografados usando uma DEK derivada da KEK.
+. Os dados criptografados com uma DEK derivada da KEK podem ser descriptografados apenas por {product-name} usando a mesma KEK.
+
+image:rolling-upgrade-event.png[Evento de recriptografia durante upgrade em andamento]
+
+Quando a recriptografia ocorre, {product-name} registra a ação e gera um evento.
+
+== Dados Sensíveis Protegidos por Criptografia
+
+{product-name} criptografa dados sensíveis armazenados nos seguintes caminhos de chave-valor:
+
+* `object/config/server/ldap1`
+* `object/config/server/oidc1`
+* `object/config/server/saml1`
+* `object/config/system`
+* `object/config/registry`
+* `object/config/federation/membership`
+* `object/config/federation/clusters/...`
+* `object/cert/...`
+
+image:neuvector-store-secret.png[Segredo do NeuVector]
+
+[NOTE]
+====
+Sempre faça backup do `neuvector-store-secret` junto com os dados de configuração do {product-name}.
+
+Ao restaurar o {product-name} após perda de dados ou para um novo cluster, você deve restaurar o *mesmo segredo*. Backups de configuração sem o segredo correspondente não podem ser descriptografados.
+====
+
+== Configurações de Alta Disponibilidade Recomendadas
+
+O backup e a restauração manuais devem ser tratados como uma opção de recuperação de último recurso. Para alta disponibilidade, siga estas recomendações:
+
+. Implante o {product-name} usando o Helm com um ConfigMap para configuração inicial.
+. Use CRDs para definir políticas como regras de rede, arquivos de controle de processo, controle de admissão e outras políticas.
+. Execute múltiplos controladores (um mínimo de três) para sincronizar a configuração entre os pods e agende-os em diferentes hosts.
+. Configure o armazenamento persistente para se recuperar de falhas em todo o cluster, onde todos os controladores param de funcionar.
+. Faça backup regularmente da configuração em arquivos de backup com timestamp.
+. Restaure a configuração do {product-name} a partir de um arquivo de backup apenas como último recurso e reaplique quaisquer CRDs que mudaram após a criação do backup.

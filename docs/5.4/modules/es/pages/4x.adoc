@@ -1,0 +1,496 @@
+= Notas de la versión 4.x
+:revdate: 2025-02-19
+:page-revdate: {revdate}
+:page-opendocs-origin: /14.releasenotes/03.4x/03.4x.md
+:page-opendocs-slug:  /releasenotes/4x
+
+== Notas de la versión 4.x
+
+=== Parche de seguridad de abril de 2022 para la versión 4.4.4-s3
+
+* Actualizar todas las imágenes para remediar la alta https://nvd.nist.gov/vuln/detail/CVE-2022-28391[CVE-2022-28391] en busybox (alpine).
+
+=== Parche de seguridad de marzo de 2022 para la versión 4.4.4-s2
+
+* Actualizar para remediar CVE-2022-0778, una vulnerabilidad de OpenSSL encontrada en la imagen base de Alpine utilizada por las imágenes de {product-name}. Descripción breve: Es posible provocar un bucle infinito al crear un certificado que tenga parámetros de curva elíptica inválidos. Dado que el análisis del certificado ocurre antes de la verificación de la firma del certificado, cualquier proceso que analice un certificado proporcionado externamente puede estar sujeto a un ataque de denegación de servicio. Más detalles se pueden encontrar en los siguientes enlaces.
+ ** https://security.alpinelinux.org/vuln/CVE-2022-0778
+ ** https://www.suse.com/security/cve/CVE-2022-0778.html
+ ** https://nvd.nist.gov/vuln/detail/CVE-2022-0778
+
+=== Parche de seguridad de febrero de 2022 para la versión 4.4.4-s1
+
+* Actualizar alpine en el Gestor para eliminar CVEs recientes, incluyendo las calificaciones altas CVE-2022-25235, CVE-2022-25236 y CVE-2022-25314
+* NOTA: También se han publicado CVEs recientes en el módulo CLI del Gestor relacionados con el paquete de python. El paquete de python será reemplazado en la versión 5.0 por python3 para eliminar cualquier CVE. Esto está programado actualmente para GA en mayo de 2022. El CLI no es accesible de forma remota y no se puede acceder a través de la GUI, por lo que los RBACs de Kubernetes adecuados para restringir los comandos 'kubectl exec' en el pod del Gestor protegerán contra explotaciones.
+* Lista de CVEs del gestor 4.4.4
+ ** alpine:3.15.0    Alto    CVE-2022-25235    https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-25235    expat
+ ** alpine:3.15.0    Alto    CVE-2022-25236    https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-25236    expat
+ ** alpine:3.15.0    Medio    CVE-2022-25313    https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-25313    expat
+ ** alpine:3.15.0    Alto    CVE-2022-25314    https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-25314    expat
+ ** alpine:3.15.0    Alto    CVE-2022-25315   https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-25315    expat
+ ** alpine:3.15.0    Medio    CVE-2020-26137    https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-26137    usr/lib/python2.7/site-packages/urllib3-1.25.3
+ ** alpine:3.15.0    Alto    CVE-2020-7212    https://github.com/advisories/GHSA-hmv2-79q8-fv6g    usr/lib/python2.7/site-packages/urllib3-1.25.3
+ ** alpine:3.15.0    Alto    CVE-2021-33503    https://github.com/advisories/GHSA-q2q7-5pp4-w6pg    usr/lib/python2.7/site-packages/urllib3-1.25.3
+ ** alpine:3.15.0    Medio    CVE-2021-3572    https://github.com/advisories/GHSA-5xp3-jfq3-5q8x    usr/lib/python2.7/site-packages/pip-20.3.4
+
+=== Otras actualizaciones de febrero de 2022
+
+* Actualizar el chart de Helm a 1.9.1. Permitir a los usuarios especificar un hash SHA de imagen diferente en lugar de etiquetas, añadir soporte para k3s en la interfaz de Rancher.
+* El Operador de la Comunidad se actualiza a 1.3.5 para soportar 4.4.4.
+* El Operador Certificado se actualiza a 1.3.2 para soportar 4.4.4.
+
+=== 4.4.4, febrero de 2022
+
+==== Mejoras
+
+* Añadir variable de entorno para el Enforcer para desactivar el escaneo de secretos, que en algunos entornos puede consumir recursos. Establecer ENF_NO_SECRET_SCANS=1
+* En Explorador de Vulnerabilidades > descarga CSV, mostrar contenedores afectados en múltiples filas en lugar de en la misma celda.
+
+==== Correcciones de errores de programas
+
+* Reducir el escaneo de secretos por parte del Enforcer para evitar la posibilidad de tareas de escaneo prolongadas que pueden consumir memoria. Esto puede ser causado por un registro de imágenes grande o un escaneo de base de datos local.
+* Corregir el error al intentar exportar CSV para los CVE encontrados en el explorador de vulnerabilidades Riesgos de Seguridad -> Vulnerabilidades sin usar filtro, el archivo CSV está vacío.
+* Corregir el problema de sincronización al actualizar desde 4.2.2, lo que puede resultar en un denegado implícito para todo el tráfico. La corrección más reciente está relacionada con la configuración de XFF durante las actualizaciones continuas.
+
+==== Otros
+
+* Permitir a los usuarios especificar un hash SHA de imagen diferente en lugar de etiquetas https://github.com/neuvector/neuvector-helm/pull/140. Se propagará al Operador.
+
+=== 4.4.3, enero de 2022
+
+==== Mejoras
+
+* Reemplazar el certificado autofirmado para el Administrador que está expirando el 23 de enero de 2022 por uno nuevo que expira en enero de 2024.
+* Mejorar la capacidad de mostrar cargas de trabajo no gestionadas en el mapa de Actividad de Red que no son relevantes.
+
+==== Correcciones de errores de programas
+
+* Corregir los bloqueos del Controlador al escanear el registro de GitLab.
+* El control de admisión no bloquea algunas imágenes. Esto se debe a que una vulnerabilidad encontrada en múltiples paquetes se trata como 1 vulnerabilidad en el control de admisión del Controlador y se corrige.
+* Actualizar de 4.2.2 a 4.3.2 resulta en un denegado implícito para todo el tráfico si hay alto tráfico durante la actualización continua.
+
+==== Otros
+
+* El gráfico de Helm v1.8.9 se publica para ampliaciones 5.0.0.
+
+=== 4.4.2, diciembre de 2021
+
+==== Mejoras
+
+* Agregar soporte para escanear archivos java jar incrustados y jar sin archivo Maven, por ejemplo log4j-core-2.5.jar, cuando no existe pom.xml.
+* Agregar fuente de base de datos CVE de https://github.com/advisories?query=maven[avisos de GitHub para Maven], comenzando con la versión 2.531 de la base de datos del escáner/CVE.
+* La API Rest xref:automation.adoc#_rest_api[documento de referencia] se actualiza a 4.4.1 y 4.4.2.
+
+==== Correcciones de errores de programas
+
+* Corregir la fuga de memoria detectada en el Enforcer.
+
+=== 4.4.1, diciembre de 2021
+
+==== Mejoras
+
+* Agregar soporte para cgroup v2, que es necesario para algunos entornos como SUSE Linux Enterprise Server 15 SP3.
+
+==== Correcciones de errores de programas
+
+* Corregir el problema donde el Enforcer no puede detectar CVE-2021-44228 en contenedores en ejecución.
+* Reducir/arreglar el alto uso de memoria por parte de Enforcer en algunos entornos.
+* Arreglar un problema con la importación/exportación de la política de grupo nv.ip.
+* Arreglar el problema de eliminar un grupo sin miembros de contenedor.
+* Arreglar el problema de no poder iniciar sesión utilizando neuvector-prometheus-exporter de forma intermitente.
+* Arreglar el problema con el endpoint de la API REST /v1/response/rule?scope=local que no elimina todas las reglas de respuesta.
+
+==== Actualización del Helm Chart 1.8.7
+
+* Soporte para la personalización de afinidad y tolerancia para el controlador, escáner y gestor.
+* Añadir soporte de nodeSelector para los pods del Controlador, Gestor, Escáner y Actualizador.
+* Soporte para variables de entorno definidas por el usuario para el contenedor del controlador.
+
+==== Aplicación de Splunk publicada
+
+* Nueva aplicación de Splunk para {product-name} publicada en https://splunkbase.splunk.com/app/6205/
+
+=== 4.4.0, diciembre de 2021
+
+==== Mejoras
+
+* Añadir la capacidad de 'Aceptar' una vulnerabilidad (CVE) para excluirla de informes, vistas, puntuación de riesgo, etc. Se puede seleccionar una vulnerabilidad y hacer clic en el botón Aceptar desde varias pantallas como Riesgos de Seguridad -> Vulnerabilidades, Activos -> Contenedores, etc. Una vez aceptada, se añade a la lista del Perfil de Vulnerabilidad de Riesgos de Seguridad ->. Se puede ver, exportar y editar aquí. Tenga en cuenta que esta función de Aceptar puede limitarse a las Imágenes y/o Espacios de Nombres listados. Nuevas entradas también se pueden añadir manualmente a esta lista desde esta pantalla.
+* Habilitar una Evaluación de Configuración de un archivo yaml de ampliación de kubernetes. Subir un archivo yaml desde la Política -> Control de Admisión y será revisado contra todas las reglas de Control de Admisión para ver si coincide con alguna regla. Se puede descargar un informe de la evaluación desde esta ventana.
+
+==== Correcciones de errores de programas
+
+* La captura de paquetes fija no está disponible para el pod con el proxy sidecar de Istio.
+* Eliminar la escritura de Allinone a /dev/null.json
+
+=== 4.3.2-s1, noviembre de 2021
+
+* Publicación de parche de seguridad que aborda vulnerabilidades en las bibliotecas relacionadas con 'curl' descubiertas en la versión 4.3.2. Los CVE descubiertos son CVE-2021-22945, CVE-2021-22946 y CVE-2021-22947.
+
+=== 4.3.2, septiembre de 2021
+
+==== Mejoras
+
+* Soporte para el benchmark de Openshift CIS 1.0.0 y 1.1.0.
+* Soporte para la opción de ejecución en seco del control de admisión.
+* Mejorar la descripción de la fuente de los criterios de control de admisión. Mejorar los criterios de etiquetas en el control de admisión para añadir otros criterios.
+* Soporte para el escaneo del registro en la nube de GitLab (SaaS).
+* Soporte para el escaneo de imágenes de múltiples arquitecturas.
+* Opción de anulación de ConfigMap para restablecer la configuración cada vez que se inicie el controlador. El 'always_reload: true' se puede usar en cualquier archivo yaml de ConfigMap para forzar la recarga de ese yaml cada vez que se inicie el controlador.
+* Incluir reglas de control de admisión de mejores prácticas de PSP preconstruidas.
+* Probar el soporte para el perfil de AppArmor para ejecutar {product-name} como contenedores no privilegiados.
+* Permitir a los usuarios hacer clic en el nombre del grupo en la lista de eventos de seguridad para ir a la selección de -> Grupos de directiva.
+
+==== Correcciones de errores de programas
+
+* Añadir un indicador para el criterio de control de admisión para determinar si se requiere el resultado del escaneo.
+* Advertencia si todos los {product-name} componentes no están ejecutando la misma versión.
+* Mostrar la plataforma Docker Swarm/Mirantis en la Vista de Actividad de Red -> Mostrar Sistema ->. Esto se habilita añadiendo la variable de entorno para el Enforcer NV_SYSTEM_GROUPS.
+
+==== Otros
+
+* Actualizar la versión del Cron (daemon) en el gráfico de Helm (v. 1.8.3).
+* Soportar la configuración maestro-esclavo de Jenkins en el complemento de Jenkins.
+
+=== 4.3.1 Agosto 2021.
+
+==== Mejoras
+
+* Mostrar etiquetas de nodo bajo Activos -> Nodos.
+* Mostrar estadísticas para el Controlador en Activos -> Componentes del Sistema
+* Informar si se detecta una vulnerabilidad en las capas de la imagen base durante el escaneo de imágenes al utilizar la API REST para escanear imágenes. La imagen base debe ser identificada en la llamada a la API, como en el ejemplo a continuación.
+
+[,shell]
+----
+curl -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"request": {"registry": "https://registry.hub.docker.com/", "repository": "garricktam/debian", "tag": "latest", "scan_layers": false, "base_image": "2244...../nodejs:3.2......"}}' "https://$RESTURL/v1/scan/repository"
+{noformat}
+----
+
+Limitaciones:
+Si la imagen a escanear es una imagen remota, con "registro" especificado, la imagen base también debe ser una imagen remota, y el nombre debe comenzar con http o https. Si la imagen a escanear es una imagen local, entonces la imagen base también debe ser una imagen local.
+Por ejemplo,
+
+[,shell]
+----
+{"request": {"repository": "neuvector/manager", "tag": "4.0.2", "scan_layers": true, "base_image": "alpine:3.12.0"}}
+{"request": {"registry": "https://10.1.127.12:5000/", "repository": "neuvector/manager", "tag": "4.0.0", "scan_layers": true, "base_image": "https://registry.hub.docker.com/alpine:3.12.0"}}
+{"request": {"repository": "neuvector/manager", "tag": "4.0.2", "scan_layers": true, "base_image": "10.1.127.12:5000/neuvector/manager:4.0.2”}}
+----
+
+==== Correcciones de errores de programas
+
+* Hacer que la altura de la lista del enforcer sea ajustable.
+* Sanitizar todos los campos mostrados para prevenir ataques XSS.
+
+=== 4.3 Julio 2021.
+
+==== Mejoras
+
+* La nueva visualización de Actividad de Red en la consola mejoró el rendimiento y el diseño del icono del objeto. El nuevo marco de interfaz de usuario mejora drásticamente los tiempos de carga para miles de objetos a mostrar. Los filtros de sesión se mantienen hasta el cierre de sesión en Actividad de Red, Riesgos de Seguridad y otros menús. La aceleración por GPU está habilitada, la cual puede ser deshabilitada si esto causa problemas de visualización. Nota: Problema conocido con ciertos PCs con Windows con GPU habilitada.
+* Agregar la capacidad de importar Política de Grupo (archivo CRD en formato yaml) desde la consola para soportar entornos no-Kubernetes. Importante: Los CRD importados desde la consola NO se clasifican ni se muestran como reglas de CRD. Se pueden editar a través de la consola, a diferencia de los CRD aplicados a través de Kubernetes.
+* Soporte para múltiples puntos finales de web hook. En Configuración -> de Ajustes, se pueden añadir múltiples puntos finales de web hook. En Reglas de Respuesta, crear una regla permite al usuario seleccionar qué punto(s) final(es) notificar mediante web hook.
+* Soporte para la configuración (múltiples web hook) en reglas federadas.
+* Soporte para el formato JSON para web hooks. Ahora se puede configurar JSON, pares clave-valor o Slack como formatos de web hook al crear un web hook.
+* Soporte para roles de usuario personalizados para mapear a un usuario de espacio de nombres. El soporte de integración de directorios permite mapear grupos a roles, con el rol pudiendo limitarse a espacio(s) de nombres. Limitación: Si el usuario pertenece a varios grupos, se asignará el rol del primer grupo coincidente. Por favor, siga el orden de la configuración para un comportamiento adecuado.
+* Descargar lista de IPs externas para conexiones de salida. Se añadió la capacidad de descargar informe/CSV desde la página del Dashboard en la sección de Exposición de Ingress y Egress.
+* Soporte para criterios de cve-medio en Reglas de Respuesta.
+* Añadir regla de Mejores Prácticas PSP preconfigurada a las reglas de Control de Admisión. Por ejemplo, los siguientes criterios preestablecidos pueden alertar/bloquear un despliegue: Ejecutar como Privilegiado, Ejecutar como Root, Compartir los Espacios de Nombres IPC del host = verdadero, Compartir la Red del host = verdadero, Compartir los Espacios de Nombres PIC del host = verdadero.
+* Soporte para usar Espacio de Nombres en Filtro Avanzado para Riesgos de Seguridad, Vulnerabilidades y Cumplimiento en el informe de Activos en PDF.
+* Soporte para criterios de regla de Control de Admisión basados en la puntuación CVE.
+* Añadir un botón de Registro de Prueba al configurar el escaneo de registros para registros que soportan esta función, como docker y JFrog.
+* Mejorar la descarga del registro de soporte y los ajustes de depuración del controlador. Habilitar configuraciones de descarga como cPath y qué registros de componentes se descargan.
+* Añadir soporte para Kubernetes 1.21.
+
+==== Correcciones de errores de programas
+
+* Soportar Kubernetes 1.21 con containerd 1.4.4. El tiempo de ejecución de containerd v1.4.4 cambia sus representaciones de cgroup.
+* El escáner identifica el sistema operativo como ol:7.9 con falsos positivos de CVEs.
+* Soportar el despliegue del escáner independiente en la extensión de Azure DevOps.
+
+==== Otros Cambios
+
+* El Helm Chart v1.8.0 se actualiza para que por defecto apunte a registry.neuvector.com como el registro predeterminado. NOTA: Se debe especificar la etiqueta de versión manualmente.
+* Añadir parámetros configurables como anotaciones de la API del controlador en el Helm chart. Disponible desde la versión 1.7.6+.
+* El Community Operator 1.2.6 y el Certified Operator 1.2.7 se actualizan para reflejar las actualizaciones del Helm chart, incluyendo la adición de la ruta de OpenShift cuando se habilita controller.apisvc.type. El Certified Operator 1.2.7 despliega {product-name} versión 4.2.2.
+* Añadir formato de salida HTML para los resultados del escaneo en los resultados de escaneo de la tubería de Jenkins.
+* Añadir el espacio de nombres de la carga de trabajo afectada en las alertas del exportador de Prometheus. Ahora soportado en neuvector/prometheus-exporter:4.2.2 y versiones posteriores.
+
+=== 4.2.2 abril 2021
+
+==== Mejoras
+
+* Habilitar la aplicación de una directiva de contraseñas. Si esta función está habilitada, las contraseñas deben cumplir con los requisitos mínimos de seguridad configurados. Ve a Configuración - Usuario/Roles para establecer la directiva de contraseñas, incluyendo caracteres mínimos, mayúsculas, numéricos y caracteres especiales requeridos. También se evita que se adivinen las contraseñas y su reutilización.
+* Permitir la barra en clave/valor en la definición del grupo CRD.
+* Mejorar SAML para soportar la autenticación CAC. Método de autenticación SAML AFDS Tarjeta de Acceso Común (CAC).
+* Verificar la compatibilidad con OpenShift 4.7.
+
+==== Correcciones de errores de programas
+
+* Corregir la condición donde el Enforcer está retrasando el reinicio del nodo hasta 20 minutos en la actualización de OpenShift.
+* Corregir la terminología de nodo No Gestionado a 'nodos'.
+* La importación de CRD produjo resultados inesperados. Hay una herramienta de conversión disponible desde {product-name} para ayudar a convertir desde el formato CRD de versiones anteriores.
+* En AKS, los certificados de webhook se crearon sin SAN para k8s v1.19+.
+* La directiva federada funciona de manera inconsistente y no como se esperaba. Mejorar la lógica de IP de carga de trabajo no gestionada para reducir violaciones innecesarias.
+
+=== 4.2.1 Marzo 2021.
+
+==== Correcciones de errores de programas
+
+* Las reglas de Acceso a Archivos predefinidas no se muestran en la consola.
+* Los encabezados de columna son incorrectos en varias vistas de consola como Activos->Registro->Resultados de Escaneo de Módulo. Algunos informes PDF también se vieron afectados y han sido corregidos. Otras áreas, principalmente en la construcción de Sonatype, han sido corregidas.
+
+=== 4.2 Marzo 2021.
+
+==== Mejoras
+
+* Monitoreo de múltiples clústeres. Visibilidad centralizada de la postura de seguridad de todos los clústeres downstream, mostrando la puntuación de riesgo y el resumen del clúster para cada uno en la página de gestión de múltiples clústeres. Nota: la federación de múltiples clústeres requiere una licencia separada.
+* Añadir soporte para la facturación basada en el uso integrada de IBM Cloud.
+* Mejorar el informe de cumplimiento de PCI para mostrar la vista de activos, listando las vulnerabilidades por servicio.
+* Añadir un resumen del resultado del escaneo antes de listar la vulnerabilidad.
+* Soporte para la base de datos OVAL2 de Red Hat requerida para la certificación del escáner de vulnerabilidades de Red Hat.
+* Soporte para la versión beta de OpenShift de Red Hat de los benchmarks de CIS ('inspirado por CIS'). Esto se finalizará cuando CIS.org publique la versión oficial. Esta función es compatible con ampliaciones de OpenShift versión 4.3 o superior.
+* Permitir el filtrado de consultas API para comprobar condiciones como imágenes permitidas o denegadas mediante llamadas API.
+* Añadir soporte para el benchmark de CIS Kubernetes 1.6.0.
+* Informar y mostrar los Módulos de Imagen detectados durante el escaneo en los resultados del escaneo. Esto se muestra en una pestaña en los resultados del Escaneo de Imágenes, e incluidos en los resultados del escaneo desde la API REST.
+* Permitir la edición de filtros en la configuración de registro, grupo y reglas de respuesta a través de la consola.
+* Actualizar ConfigMap para añadir group_claim en oidcinitcfg.yaml y samlinitcfg.yaml, y Xff_Enabled en sysinitcfg.yaml.
+* El yaml de la API se actualiza para 4.2 en xref:automation.adoc#_rest_api[Sección de Automatización].
+
+==== Correcciones de errores de programas
+
+* El Enforcer no puede unirse al clúster existente, a veces tardando 10 minutos en casos donde hay demasiados enforcers registrados. Esto ocurre cuando los enforcers se terminan de forma abrupta pero siguen registrados para la comprobación de licencias, impidiendo que otros enforcers se unan al alcanzar el límite de licencias.
+* Corregido: tráfico DNS comodín bloqueado. Mejorada la caché de resultados DNS que coinciden con el grupo de direcciones DNS comodín.
+* Corregir una rara condición en la que los certificados de CRD se desincronizan para el webhook y el controlador.
+* Corregir la leyenda en la pantalla de Actividad de Red de 'No gestionado' a 'Nodos'.
+* Nodos detectados como carga de trabajo resultando en violaciones implícitas.
+
+==== Otros
+
+* Mejoras en el complemento de Jenkins:
+ ** Sobrescribir la gravedad de la vulnerabilidad por puntuación.
+ ** Añadir mensajes de error a las excepciones JAVA hudson.AbortException.
+* Actualizar el gráfico de Helm a 1.7.1.
+
+Por favor, consulte la sección de notas de la versión xref:other.adoc[Integraciones y Otros Componentes] para más detalles.
+
+=== 4.1.2 Febrero 2021
+
+==== Mejoras
+
+* Habilitar el cambio para el reenvío XFF para desactivar la directiva {product-name} de usarlo, que está habilitada por defecto. Esto está relacionado con una función añadida en 4.1.1 para añadir soporte para los encabezados x-forwarded-*. Para desactivarlo, vaya a Configuración -> Configuración. IMPORTANTE: Ver la descripción detallada del comportamiento de XFF-FORWARDED-FOR a continuación.
+
+==== Correcciones de errores de programas
+
+* Corregido el problema por el cual CVE-2020-1938 no se detecta.
+* Corregir el error del Gestor: "Error al exportar las configuraciones de la sección {policy, user, config}."
+* Corregir el fallo por el que el filtro del gráfico de Actividad de Red no funciona.
+* Mejorar el consumo de CPU y memoria del controlador.
+
+==== Otros
+
+* Complemento de Jenkins actualizado para soportar escáner independiente.  Por favor, consulte la sección de notas de la versión xref:other.adoc[Integraciones y Otros Componentes] para más detalles.
+
+==== Detalles del Comportamiento de XFF-FORWARDED-FOR
+
+En un clúster de Kubernetes, una aplicación puede exponerse al exterior del clúster mediante un NodePort, un LoadBalancer o un servicio Ingress. Estos servicios suelen reemplazar la IP de origen mientras realizan el NAT de origen (SNAT) en los paquetes. Como la IP de origen original está enmascarada, esto impide que {product-name} reconozca que la conexión proviene en realidad del 'externo'.
+
+Para preservar la dirección IP de origen original, el usuario necesita añadir la siguiente línea a los servicios expuestos, en la sección 'spec' del balanceador de carga o del controlador de ingreso de cara al exterior. (Ref: https://kubernetes.io/docs/tutorials/services/source-ip/))
+
+"externalTrafficPolicy":"Local"
+
+Muchas implementaciones de servicios LoadBalancer y controladores de ingreso añadirán la línea X-FORWARDED-FOR al encabezado de la solicitud HTTP para comunicar la verdadera IP de origen a las aplicaciones de backend. En la versión 4.1.0, añadimos una función para reconocer este conjunto de encabezados HTTP, identificar la IP de origen original y hacer cumplir la directiva de acuerdo con ello.
+
+Esta mejora creó algunos problemas inesperados en alguna configuración. Si la línea anterior ha sido añadida a los servicios expuestos y las políticas de red de {product-name} han sido creadas de tal manera que esperan que las conexiones de red provengan de servicios de proxy/ingreso internos, dado que ahora identificamos que las conexiones son de "externo" al clúster, el tráfico normal de la aplicación podría activar alertas o ser bloqueado si las aplicaciones están en modo "Proteger".
+
+En 4.1.2, se añadió un interruptor para desactivar esta función. Desactivarlo indica a {product-name} que no identifique que la conexión es de "externo" utilizando encabezados X-FORWARDED-FOR. Por defecto, esto está habilitado, y el encabezado X-FORWARDED-FOR se utiliza en la aplicación de directivas. Para desactivarlo, ve a Configuración -> Configuración, y desactiva la opción "Coincidencia de directivas basada en X-Forwarded-For".
+
+image:xff.png[xff_behavior]
+
+=== 4.1.1 enero 2021
+
+==== Correcciones de errores de programas
+
+* Añadir soporte para AWS EKS AMI Release v20210112 para solucionar problemas de ulimit.
+
+=== 4.1 diciembre 2020
+
+==== Mejoras
+
+* Permitir a los usuarios cambiar el modo de directiva al exportar CRD.
+* Soporte para claims de OIDC desde el endpoint /oauth/userinfo.
+* Soporte para la actualización de nodos del clúster, que permite un soporte temporal para el crecimiento de los nodos y la migración de pods entre ellos.
+* Generar un informe de uso para su descarga desde la página de Configuración ->.
+* Soporte de comodines en el espacio de nombres al asignar roles de usuario a dicho espacio.
+* Mejorar la lógica de eliminación de grupos/directivas. Parámetro configurable para el momento en que se elimina un grupo no utilizado, basado en el tiempo transcurrido desde su último uso.
+* Permitir al usuario configurar la duración de la captura de paquetes.
+* Añadir soporte para el rol de lector de gestión de múltiples clústeres.
+* El escáner independiente ahora envía el resultado del escaneo utilizando la API REST. Véase a continuación los detalles del escáner.
+* Detectar y bloquear el ataque de Man-in-the-middle reportado en CVE-2020-8554.
+* Añadir soporte para modelos de licencias medidos (basados en uso).
+* Eliminar el paso para la creación de CRD (por ejemplo, NvSecurityRule) de los archivos yaml de ampliación de muestra para Kubernetes y Openshift. Esto no es necesario (el controlador creará estos automáticamente). La implementación de Helm también se encargará de estos.
+
+==== Correcciones de errores de programas
+
+* Mejorar el alto uso de memoria en el controlador y enforcers.
+* Error devuelto al intentar configurar un filtro de registro. Permitir que se utilice un comodín en cualquier lugar del filtro de repositorio/etiqueta.
+* La directiva de bloqueo no funciona como se esperaba. Añadir soporte para encabezados x-forwarded-*. IMPORTANTE: Véase la descripción detallada del comportamiento de XFF-FORWARDED-FOR arriba, como parte de las notas de la versión 4.1.2.
+* Error en el gráfico de Helm al establecer el ingreso del controlador en verdadero.
+* No se puede crear, añadir y guardar la regla de red, debido a un tiempo de espera del gateway.
+* Faltan ejemplos de Configmap en el campo Group_Claim. Añadido a xref:configmap.adoc[documentación de configmap].
+* Violación del perfil de proceso al terminar el pod del controlador.
+
+==== Detalles del Escáner
+
+Se añaden dos variables de entorno adicionales para iniciar sesión en la API REST del controlador. Los usuarios con el rol de integración CICD pueden enviar los resultados.
+
+Nuevas Variables de Entorno: SCANNER_CTRL_API_USERNAME, SCANNER_CTRL_API_PASSWORD
+
+Ejemplo de Uso
+
+[,shell]
+----
+docker run --name neuvector.scanner --rm -e SCANNER_REPOSITORY=ubuntu -e SCANNER_TAG=16.04 -e SCANNER_LICENSE=$license -e CLUSTER_JOIN_ADDR=10.1.2.3 CLUSTER_JOIN_PORT=32368 -e SCANNER_CTRL_API_USERNAME=username -e SCANNER_CTRL_API_PASSWORD=secret -v /var/run/docker.sock:/var/run/docker.sock -v /var/neuvector:/var/neuvector neuvector/scanner
+----
+
+==== Kubernetes 1.19+ y Exportaciones de CRD
+
+[IMPORTANT]
+====
+Para usar un CRD exportado con Kubernetes 1.19+, por favor, elimina 'version: v1' de cada sección. Esto se puede encontrar al final o cerca del final de cada sección en un CRD de directiva de grupo exportado.
+====
+
+[,yaml]
+----
+    version: v1
+----
+
+=== 4.0.3 diciembre 2020
+
+==== Correcciones de errores de programas
+
+* Se produce una violación del perfil al terminar el pod del Controlador.
+* Violaciones implícitas para grupos de direcciones creados por el usuario que utilizan comodines en los nombres de host.
+
+==== Cambios en el Helm Chart
+
+* Permitir al usuario personalizar el PriorityClass de la ampliación del gestor/controlador/enforcer/escáner. Sugerimos otorgar a los contenedores de {product-name} una prioridad superior para asegurar que se apliquen las políticas de seguridad cuando los recursos del nodo estén bajo presión o durante un proceso de actualización del clúster.
+* Crear un chart separado para CRD. Esto permite que las directivas de CRD se creen antes de que se desplieguen los servicios del kernel {product-name}. Si se utiliza el nuevo chart, los recursos CRD en el chart principal, mantenidos por compatibilidad hacia atrás, deben desactivarse con crdwebhook.enabled=false.
+* Permitir al usuario especificar la cuenta de servicio para la ampliación de {product-name}. Anteriormente, se utilizaba la cuenta de servicio 'default' del espacio de nombres. En el caso de que {product-name} se despliegue junto a otras aplicaciones en un espacio de nombres, no es recomendable utilizar la cuenta de servicio predeterminada del espacio de nombres para ciertos usuarios.
+
+=== 4.0.2 diciembre 2020
+
+==== Mejoras
+
+* Consola - en la página de lista de contenedores de Assets ->, se debe permitir arrastrar los separadores de ventana para redimensionar los contenedores.
+* Agregar controles de admisión para los pods que comparten los espacios de nombres del host. Permitir al usuario elegir evitar que el pod comparta la red, el IPC y los espacios de nombres de PID del host. Vea a continuación para más detalles.
+* Capacidad para exportar la lista de contenedores que se ejecutan en modo privilegiado o 'runasroot'.
+* En Notificaciones -> Eventos de Seguridad, habilitar la visualización de información sobre los atributos del evento fácilmente sin cambiar de pantalla.
+
+==== Correcciones de errores de programas
+
+* Problema con los jumbo frames (habilitados en algunas nubes públicas). Síntoma: la URI principal de la aplicación prometheus /graph se vuelve inaccesible cuando el grupo prometheus se coloca en modo de protección.
+* Falta la opción de espacio de nombres en el filtro de vulnerabilidades. Permitir a los usuarios seleccionar/escribir el espacio de nombres donde {product-name} está instalado como entrada de filtro.
+* Falso positivo en OpenSSL versión 1.1.1c-1 afectado por CVE-2020-1967.
+* Violaciones de denegación implícita inesperadas para el grupo de direcciones creado por el usuario utilizando nombres de host comodín. Problemas con el uso del nombre DNS (con comodines) para el tráfico del firewall.
+* Mejorar la detección para eliminar el falso positivo de Inyección SQL.
+
+==== Control de Admisión para Compartición de Pods
+
+. HostPID - Controla si los contenedores del pod pueden compartir el espacio de nombres del ID de proceso del host. Ten en cuenta que, cuando se combina con ptrace, esto puede utilizarse para escalar privilegios fuera del contenedor (ptrace está prohibido por defecto).
+. HostIPC - Controla si los contenedores del pod pueden compartir el espacio de nombres IPC del host.
+. HostNetwork - Controla si el pod puede utilizar el espacio de nombres de red del nodo. Hacer esto le da al pod acceso al dispositivo de retrobucle, a los servicios que escuchan en localhost y podría utilizarse para espiar la actividad de red de otros pods en el mismo nodo.
+
+=== 4.0.1 Noviembre 2020
+
+[IMPORTANT]
+====
+Cambios en la Estructura del Helm Chart
+
+El directorio para el chart {product-name} ha cambiado de ./neuvector-helm/ a ./neuvector-helm/charts/core/
+
+Si utilizas Helm para actualizar, por favor actualiza la ubicación a la vía indicada arriba.
+====
+
+==== Mejoras
+
+* Añadir soporte para el escaneo de imágenes sin distribución.
+* Añadir la capacidad de activar un escaneo de imagen único desde el registro con resultados disponibles para el control de admisión.
+* Actualizar la integración de JFrog Xray a los nuevos requisitos de API / autenticación de la plataforma JFrog.
+* Añadir información sobre los escáneres en el Gestor, como la versión y las estadísticas del escáner.
+* Añadir un filtro rápido para excluir eventos de seguridad (similar a grep -v).
+* Actualizar la Severidad de CVE para alinearse con las calificaciones de severidad de vulnerabilidad de NVD. Utilizando el mayor de los puntajes CVSS v2 y v3, las calificaciones son Altas para >=7, Medianas para >=4.
+* Soporte para implementaciones de escáner independiente para escaneo de imágenes locales (no requiere controlador). Añade nuevas variables de entorno SCANNER_LICENSE, SCANNER_REGISTRY, SCANNER_REPOSITORY, SCANNER_TAG, SCANNER_REGISTRY_USERNAME, SCANNER_REGISTRY_PASSWORD, SCANNER_SCAN_LAYERS, CLUSTER_JOIN_ADDR, CLUSTER_JOIN_PORT.
+* Soporte para autocompletar espacios de nombres para la creación de usuarios de espacio de nombres en Configuración -> Usuarios.
+* Añadir la capacidad de ingresar CVEs exentos en el complemento de escáner de Jenkins.
+* Añadir criterios de control de admisión para poder bloquear imágenes para las cuales el escaneo no pudo detectar el sistema operativo (por ejemplo, imágenes de archlinux) y, por lo tanto, no se encontraron vulnerabilidades. Se añade un nuevo criterio "Imagen sin información del SO", que al establecerse en verdadero, significa que el SO base de la imagen no está disponible.
+
+==== Correcciones de errores de programas
+
+* Mejorar (disminuir) el uso de memoria del controlador.
+* Habilitar soporte para funciones de webhook como control de admisión y CRD en Kubernetes 1.19.
+* Añadir soporte para ampliaciones apiextensions.k8s.io/v1 según lo requerido para Kubernetes 1.19 (y soportado en k8s 1.18).
+* Violación inesperada de la regla del perfil de proceso resultante del script de shell padre para el proceso en la lista permitida.
+* Añadir soporte para filtros comodín en el registro de Harbor (configurado utilizando la configuración del registro de Docker).
+* Mejorar el manejo de configmap para recargar si la contraseña de administrador se revierte a la predeterminada. Esto es para prevenir el acceso inseguro cuando el sistema se recupera de una falla de almacenamiento a nivel de clúster.
+
+=== 4.0.0.s1 Octubre 2020
+
+==== Parche de seguridad para {product-name} contenedores
+
+* Esta versión de seguridad es para el gestor {product-name} y los contenedores Allinone para abordar la alta vulnerabilidad https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-14363[CVE-2020-14363] encontrada en la capa base de Alpine en el paquete libx11.  Como parte de la actualización, también se aborda la vulnerabilidad media CVE-2020-8927. Este problema, aunque poco probable que pueda ser explotado, afecta a la consola del gestor para {product-name} y no afecta a las operaciones de los contenedores del Controlador o del Enforcer.
+
+=== 4.0 Septiembre 2020
+
+==== Mejoras
+
+* Plantillas de cumplimiento personalizables. Plantillas preestablecidas para PCI, GDPR, HIPAA, NIST. Cada referencia de CIS y verificación personalizada puede ser etiquetada con una o más regulaciones de cumplimiento. Los informes pueden generarse entonces para cada uno. Riesgos de seguridad -> Perfil de cumplimiento.
+* Soporte para el flujo de trabajo de gestión de vulnerabilidades. Rastrear el estado de las vulnerabilidades y crear políticas basadas en las fechas de descubrimiento de vulnerabilidades y otros criterios. Riesgos de seguridad -> Vulnerabilidades (Filtro Avanzado) y reglas de Control de Admisión.
+* Auditoría de secretos. Más de 20 comprobaciones de secretos incluidas, y se ejecutan automáticamente en escaneos de imágenes y archivos yaml de recursos. Los resultados mostrarán aprobado/advertencia en los informes de cumplimiento sobre vulnerabilidades de imágenes en Activos -> Registros y Riesgos de Seguridad -> Cumplimiento.
+* RBAC granular para {product-name} Usuarios. Crear roles personalizados con permisos de lectura-escritura granulares para {product-name} funciones. Asignar usuarios a roles. Configuración -> Usuarios/Roles.
+* Pods de escáner escalables y separados. Los pods de escáner pueden ser escalados hacia arriba o hacia abajo para escanear miles de imágenes. El controlador asigna tareas de escaneo a cada pod de escáner disponible. Importante: el Controlador ya no contiene una función de escáner, por lo que se requiere desplegar un mínimo de un pod de escáner. Además, los escáneres 4.x NO son compatibles con versiones anteriores con controladores 3.x, las implementaciones 3.x de escáneres externos deben actualizarse a neuvector/scanner:3.
+* Escaneo sin servidor y evaluación de riesgos para AWS Lambda. Escanear funciones de AWS Lambda en busca de vulnerabilidades con el complemento Serverless IDE o en cuentas de AWS. Los lenguajes soportados incluyen Java, Python, Ruby, node.js. Realizar evaluación de riesgos evaluando los permisos de roles IAM para funciones Lambda y alertar si se habilitan permisos innecesarios. Nota: La seguridad sin servidor requiere una {product-name} licencia separada.
+* Realiza comprobaciones de cumplimiento durante el escaneo de imágenes. También archivo de ampliación YAML. Esto incluye setuid, setgid, CIS (ejecutándose como root, etc.), más de 20 comprobaciones de secretos.
+* Mejora la puntuación de riesgo de seguridad en el panel con la capacidad de habilitar/deshabilitar qué Grupos contribuyen a la puntuación de riesgo. Directiva -> Grupos -> casilla de verificación puntuable. Esto incluye la capacidad de deshabilitar contenedores del sistema de la puntuación de riesgo.
+* Se añadió soporte para que un usuario restringido por espacio de nombres tenga acceso a los registros asignados.
+* Desglosa las notificaciones de syslog de escaneo en eventos syslog CVE individuales.
+* Permite que un usuario restringido por espacio de nombres pueda crear registros que solo sean visibles para los usuarios que tienen acceso a ese espacio de nombres (incluidos los usuarios globales).
+* Descarga informes PDF desde el panel por espacio de nombres. Selecciona un espacio de nombres para filtrar el informe PDF del panel.
+* El comportamiento de importación de CRD se ha cambiado para ignorar el PolicyMode de cualquier grupo 'enlazado', dejando el modo de directiva sin cambios si el grupo enlazado ya existe. Si el grupo enlazado no existe, se creará automáticamente y se establecerá en el modo de servicios nuevos predeterminado en Configuración ->. Un grupo 'enlazado' es aquel que no ha sido seleccionado para exportación pero es referido por una regla de red, y por lo tanto ha sido exportado junto con el/los grupo(s) seleccionado(s).
+
+==== Correcciones de errores de programas
+
+* La validación de URL del registro permite URL sin prefijo de esquema de protocolo. Se añadió validación del esquema de protocolo.
+* Los escaneos de contenedores fallaron - No se pueden leer archivos en algunas situaciones. Corrige el error "No se pudo leer el archivo - error=<nil>."
+* La columna de miembros del grupo es inexacta para el grupo especial "nodos."
+* Descuenta (reduce) los Controles de Admisión (4 puntos) de la Puntuación de Riesgo General para la Plataforma Docker EE ya que no es aplicable.
+* Un controlador solo para escáner puede tardar de 15 a 20 minutos en estar listo.
+* Los riesgos de seguridad > La distribución del título de "Severidad" está mal etiquetada como Urgencia.
+* La fuente de eventos de seguridad: la regla de carga de trabajo: ingreso no coincide. Violación implícita inesperada de la carga de trabajo: Ingress en la plataforma OpenShift 3.11. La lógica de subred interna se ha mejorado para manejar un amplio rango de IP.
+* El Enforcer informa de un error al intentar conectarse a /var/run/docker.sock. Añadir recuperación si se pierde la conexión.
+
+==== Resumen de los principales cambios operativos.
+
+* El escáner 4.x NO es compatible con los controladores 3.2.0, 3.2.1, 3.2.2. Si has desplegado escáneres externos 3.x y deseas que sigan funcionando, asegúrate de ACTUALIZAR el despliegue del escáner con una etiqueta de versión 3, por ejemplo, neuvector/scanner:3. Alternativamente, puedes actualizar a 3.2.3+.
+* Se requiere licencia para habilitar la seguridad sin servidor.
+* Se han añadido nuevos clusterrolebinding y clusterrole para Kubernetes y OpenShift.
+* El controlador ya no tiene un escáner integrado. Debes desplegar al menos 1 pod de escáner.
+* Cambios en el archivo YAML en las muestras de despliegue principal:
+ ** Se ha añadido el despliegue para pods de escáner (2 por defecto).
+ ** El despliegue del pod de escáner tiene una sección comentada para casos de escaneo local.
+ ** Se ha añadido un trabajo de Cron (daemon) para el pod de actualizador para actualizaciones de la base de datos CVE de los escáneres.
+
+==== Actualizando versión de 3.x a 4.0.
+
+Para las implementaciones de Helm, actualiza el Helm chart a la nueva versión 1.6.0. Luego, una actualización de versión estándar a 4.0.0 es todo lo que se requiere (por ejemplo, helm upgrade my-release --set imagePullSecrets=regsecret-neuvector,tag=4.0.0 ./neuvector-helm/).
+
+[TIP]
+====
+Kubernetes (para OpenShift utiliza los comandos oc equivalentes)
+====
+
+* Realiza una copia de seguridad de la configuración desde Configuración -> Configuración
+* Crea los dos nuevos bindings
+ ** kubectl create clusterrolebinding neuvector-binding-view --clusterrole=view --serviceaccount=neuvector:default
+ ** kubectl create rolebinding neuvector-admin --clusterrole=admin --serviceaccount=neuvector:default -n neuvector
+* Establece las etiquetas de versión a 4.0.0 para los yaml de Controller, Manager y Enforcer y aplica la actualización.
+* Crea los xref:scanners.adoc#_manual_deployment_of_multiple_scanners_on_kubernetes[pods de escáner]
+* Crea o actualiza el xref:scanners.adoc#_manual_deployment_of_multiple_scanners_on_kubernetes[trabajo de Cron (daemon) de escáner]
+* Espera unos minutos para que se complete la actualización progresiva de los controladores y verifica todas las configuraciones después de iniciar sesión...

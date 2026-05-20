@@ -1,0 +1,159 @@
+= Mirantis Kubernetes Engine
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /13.special/02.docker/02.docker.md
+:page-opendocs-slug:  /special/docker
+
+== Swarmクラスターにデプロイ
+
+Swarmクラスターを使用して{product-name}をデプロイするには、まずImagesメニューのDocker UCPを使用して{product-name}イメージをプルします。最新バージョンをDocker Hubから取得するには、バージョン番号を追加する必要があるかもしれません。
+
+現在、Swarm/UCPはseccomp機能（cap_addオプション）をサポートしておらず、'`privileged mode`'にデプロイすることができないため、{product-name}コンテナはdocker-composeまたはrunを使用してコマンドラインからデプロイする必要があります。以下のAll-in-Oneおよびエンフォーサーのサンプルコンポーズファイルを参照してください。
+
+Docker UCP HRMサービスはデフォルトポート8443を使用しており、これは{product-name}コンソールポートと競合します。デフォルトのHRMポートを使用している場合は、{product-name}ポートマッピングを変更してください。例えば、以下の例のAll-in-Oneコンテナに対して9443:8443のようにします。{product-name}アプリケーションが正常にデプロイされた後、All-in-Oneホストのポート9443でコンソールにログインします。
+
+== 特権モードを使用してDocker Swarmにデプロイ
+
+以下は、最初のノードにAll-in-Oneコンテナをデプロイするためのdocker-composeファイルの例です。All-in-Oneコンテナにはエンフォーサーモジュールが含まれているため、同じノード上のアプリケーションコンテナを保護できます。グリーンフィールドとブラウンフィールドの両方のデプロイメントがサポートされています。
+
+docker-composeを使用してAll-in-Oneをデプロイ（特権モード）：
+
+[,yaml]
+----
+allinone:
+    pid: host
+    image: neuvector/allinone:<version>
+    container_name: allinone
+    privileged: true
+    environment:
+        - CLUSTER_JOIN_ADDR=node_ip
+    ports:
+        - 18300:18300
+        - 18301:18301
+        - 18400:18400
+        - 18401:18401
+        - 18301:18301/udp
+        - 9443:8443
+    volumes:
+        - /lib/modules:/lib/modules
+        - /var/neuvector:/var/neuvector
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup:/host/cgroup:ro
+----
+
+最も重要な環境変数は*CLUSTER_JOIN_ADDR*です。これは他のエンフォーサーが接続するIPアドレスです。通常、これはAll-in-Oneコンテナが実行されているノードのIPアドレスに設定する必要があります。
+
+ポート18300および18301はクラスター通信のデフォルトポートです。これらはクラスター内のすべてのコントローラーとエンフォーサーで同一でなければなりません。デフォルトのポートを変更する方法については、_"Docker-composeの詳細"_セクションを参照してください。
+
+docker-composeを使用してエンフォーサーコンテナを追加します（特権モード）。
+
+これは、エンフォーサーをクラスターに参加させるためのdocker-composeファイルの例です。グリーンフィールドとブラウンフィールドの両方のデプロイメントがサポートされています。
+
+[,yaml]
+----
+enforcer:
+    pid: host
+    image: neuvector/enforcer:<version>
+    container_name: enforcer
+    privileged: true
+    environment:
+        - CLUSTER_JOIN_ADDR=controller_node_ip
+    ports:
+        - 18301:18301
+        - 18401:18401
+        - 18301:18301/udp
+    volumes:
+        - /lib/modules:/lib/modules
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup/:/host/cgroup/:ro
+----
+
+最も重要な環境変数は*CLUSTER_JOIN_ADDR*です。エンフォーサーの場合、`<controller_node_ip>`をコントローラーのノードIPアドレスに置き換えてください。通常、コントローラー/オールインワンのdocker-composeファイルとエンフォーサーのdocker-composeファイルの*CLUSTER_JOIN_ADDR*は同じ値を持っています。
+
+{product-name} 4.0以降、脆弱性スキャンを実行するために別のスキャナーコンテナをデプロイする必要があります。
+
+スキャナー用のサンプルdocker-compose：
+
+[,yaml]
+----
+Scanner:
+   image: neuvector/scanner
+   container_name: scanner
+   environment:
+     - SCANNER_DOCKER_URL=tcp://192.168.1.10:2376
+     - CLUSTER_JOIN_ADDR=controller_node_ip
+   ports:
+     - 18402:18402
+   volumes:
+     - /var/run/docker.sock:/var/run/docker.sock:ro
+----
+
+== 特権モードを使用しないデプロイメント
+
+一部のプラットフォーム構成では、{product-name}コンテナを特権モードで実行することなくデプロイすることが可能です。構成は、機能を追加し、アプリアーマープロファイルを設定する能力をサポートする必要があります。Docker DataCenter/UCPおよびSwarmは現在これをサポートしていないことに注意してください。ただし、ComposeまたはRunを使用して{product-name}を手動でデプロイすることは依然として可能です。
+
+docker-composeを使用してAll-in-One（特権モードなし）をデプロイします。
+
+[,yaml]
+----
+allinone:
+    pid: host
+    image: neuvector/allinone
+    container_name: neuvector.allinone
+    cap_add:
+        - SYS_ADMIN
+        - NET_ADMIN
+        - SYS_PTRACE
+        - IPC_LOCK
+    security_opt:
+        - apparmor=unconfined
+        - seccomp=unconfined
+        - label=disable
+    environment:
+        - CLUSTER_JOIN_ADDR=[AllInOne Node IP Address]
+    ports:
+        - 18300:18300
+        - 18301:18301
+        - 18400:18400
+        - 18401:18401
+        - 18301:18301/udp
+        - 9443:8443
+    volumes:
+        - /lib/modules:/lib/modules
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup:/host/cgroup:ro
+        - /var/neuvector:/var/neuvector
+----
+
+docker-composeを使用してエンフォーサー（特権モードなし）をデプロイします。
+
+[,yaml]
+----
+enforcer:
+    pid: host
+    image: neuvector/enforcer
+    container_name: neuvector.enforcer
+    cap_add:
+        - SYS_ADMIN
+        - NET_ADMIN
+        - SYS_PTRACE
+        - IPC_LOCK
+    security_opt:
+        - apparmor=unconfined
+        - seccomp=unconfined
+        - label=disable
+    environment:
+        - CLUSTER_JOIN_ADDR=[AllInOne Node IP Address]
+    ports:
+        - 18301:18301
+        - 18401:18401
+        - 18301:18301/udp
+    volumes:
+        - /lib/modules:/lib/modules
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup/:/host/cgroup/:ro
+----

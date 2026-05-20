@@ -1,0 +1,28 @@
+= 从控制台导入CRD
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/13.usingcrd/1.import/1.import.md
+:page-opendocs-slug:  /policy/usingcrd/import
+
+== 从控制台或API导入CRD格式文件
+
+{product-name}支持从控制台导入CRD格式文件。然而，这与在Kubernetes中作为自定义资源定义（CRD）应用它并不相同。
+
+可以通过控制台导入{product-name} CRD格式的文件，以设置文件中指定的安全策略（规则）。这些规则不会作为'CRD'指定的规则导入，而是作为常规的'用户创建'规则。这意味着这些规则可以像其他规则一样，从控制台或通过API进行修改或删除。它们不像CRD规则那样受到保护，可以被修改。
+
+要从控制台导入，请转到策略->组并选择导入策略组。
+
+image:4-3_Import_Policy.png[导入]
+
+[IMPORTANT]
+====
+导入的规则将覆盖该组的任何现有规则。
+====
+
+使用Kubernetes CRD功能设置的规则，例如通过'kubectl apply my_crd.yaml'创建的CRD类型规则在{product-name}中，无法通过控制台或API进行修改。这些只能通过更新CRD文件并通过Kubernetes应用更改来修改。
+
+从控制台导入规则文件的可能用例包括：
+
+* 为一个组或多个组进行初始（一次性）规则配置
+* 将规则从一个环境迁移到另一个环境
+* 需要允许从控制台或API进行修改的规则创建。

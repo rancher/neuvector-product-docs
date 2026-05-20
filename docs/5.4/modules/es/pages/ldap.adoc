@@ -1,0 +1,21 @@
+= LDAP
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/02.ldap/02.ldap.md
+:page-opendocs-slug:  /integration/ldap
+
+== LDAP
+
+Configura los campos requeridos para conectarte a tu servidor LDAP.
+
+image:ldap-ad.png[LDAPAD]
+
+. Puerto. El puerto por defecto es 389 para SSL desactivado y 636 para SSL activado.
+. Nombre de usuario (opcional). Utilizamos este nombre de usuario administrador para realizar el bind al servidor LDAP en cada consulta.
+. DN base. Este debería ser un nodo raíz en el servidor LDAP para buscar al usuario y grupo LDAP.
+. Rol por defecto. Este es el rol que un usuario asumirá si la asignación de grupos de rol (más abajo) falla. Si se encuentra el atributo de grupo del usuario que se puede mapear a un rol, entonces no se utilizará el rol por defecto. Si no se encuentra un atributo de grupo coincidente, se tomará el rol por defecto. Si el rol por defecto es Ninguno en este caso, el inicio de sesión del usuario fallará. El botón '`test connection`' comprobará si un nombre de usuario/contraseña puede ser autenticado por el servidor LDAP configurado.
+. Asignación de roles de Administrador y Lector. Esto define cómo mapear la pertenencia al grupo LDAP de un usuario al rol de usuario en {product-name}. Añade la lista de grupos LDAP a los roles correspondientes. Al buscar la pertenencia al grupo de un usuario en el esquema LDAP, asumimos que el atributo miembro del grupo se llama "`memberUid`".
+
+=== Asignación de Grupos a Roles y espacios de nombres
+
+Por favor, consulta la sección xref:users.adoc#_mapping_groups_to_roles_and_namespaces[Usuarios y Roles] para saber cómo asignar grupos a roles predefinidos y personalizados, así como a espacios de nombres en {product-name}.

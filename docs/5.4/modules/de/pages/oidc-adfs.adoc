@@ -1,0 +1,72 @@
+= OpenID Connect (OIDC) für ADFS
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/08.oidc_adfs/08.oidc_adfs.md
+:page-opendocs-slug:  /integration/oidc_adfs
+
+== Integration mit OpenID Connect (OIDC) für ADFS
+
+Klicken Sie im AD FS-Management auf "Anwendungsgruppen" und dann auf "Anwendungsgruppe hinzufügen..."
+
+image:adfs1.png[adfs]
+
+Geben Sie einen Namen ein, wählen Sie "Serveranwendung, die auf eine Web-API zugreift" und klicken Sie dann auf Weiter
+
+image:adfs2.png[adfs]
+
+Geben Sie die Umleitungs-URI aus {product-name} Einstellungen > OpenID Connect-Einstellungsseite ein und klicken Sie dann auf Weiter
+
+image:adfs3.png[adfs]
+
+Aktivieren Sie das Kontrollkästchen "Gemeinsames Geheimnis generieren" und klicken Sie dann auf Weiter
+
+image:adfs4.png[adfs]
+
+Geben Sie die im vorherigen Schritt erstellte Kennung ein und klicken Sie dann auf Weiter
+
+image:adfs5.png[adfs]
+
+image:adfs6.png[adfs]
+
+Aktivieren Sie die Scopes allatclaims, email, openid und Profil und klicken Sie dann auf Weiter
+
+image:adfs7.png[adfs]
+
+image:adfs8.png[adfs]
+
+image:adfs9.png[adfs]
+
+Doppelklicken Sie auf eine Anwendungsgruppe, die Sie zuvor erstellt haben
+
+image:adfs10.png[adfs]
+
+Doppelklicken Sie auf Web-API und klicken Sie dann auf die Registerkarte Ausgabe-Transformationsregeln
+
+image:adfs11.png[adfs]
+
+Klicken Sie auf Regel hinzufügen... und wählen Sie "LDAP-Attribute als Ansprüche senden" und klicken Sie dann auf Weiter
+
+image:adfs12.png[adfs]
+
+Geben Sie einen Namen für die Anspruchsregel ein, wählen Sie Active Directory als Attributspeicher und geben Sie die Zuordnung von LDAP-Attributen zu ausgehenden Anspruchstypen wie unten an
+
+* Token-Gruppen -- Unqualifizierte Namen -> Gruppen
+* Benutzerprinzipalname -> bevorzugter_Benutzername
+* E-Mail-Adresse -> email
+
+image:adfs13.png[adfs]
+
+image:adfs14.png[adfs]
+
+=== {product-name} setup
+
+* Identitätsanbieter-Aussteller: "https://<adfs-fqdn>/adfs"
+* Client-ID: Es ist ein "Client-Identifikator", der im Dialog "Serveranwendung" im "Assistenten zum Hinzufügen von Anwendungsgruppen" angezeigt wird.
+* Client-Geheimnis: Es ist ein Geheimnis, das im Dialog "Anwendungsanmeldeinformationen konfigurieren" im "Assistenten zum Hinzufügen von Anwendungsgruppen" angezeigt wird.
+* Gruppenanspruch: Gruppen
+
+image:adfs15.png[adfs]
+
+image:adfs16.png[adfs]
+
+image:adfs17.png[adfs]

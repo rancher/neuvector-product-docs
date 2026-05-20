@@ -1,0 +1,220 @@
+= マネージャー、REST APIサーバーに接続する
+:revdate: 2025-05-08
+:page-revdate: {revdate}
+:page-opendocs-origin: /03.configuration/01.console/01.console.md
+:page-opendocs-slug: /configuration/console
+
+== UIに接続する
+
+ブラウザウィンドウを開き、HTTPSを使用してマネージャーに接続します。EULAに同意した後、ユーザーはUIにアクセスできるようになります。
+
+[TIP]
+====
+選択したデプロイメント方法に応じて、マネージャーのアドレスは次のようになります
+====
+
+[tabs]
+======
+Docker::
++
+====
+[,shell]
+----
+https://<manager_host_ip>:8443
+----
+==== 
+
+LoadBalancerまたはIngressなしのKubernetes::
++
+====
+[,shell]
+----
+https://<node_host_ip>:<NodePort>
+----
+====
+
+LoadBalancerまたはIngressが構成されている::
++
+====
+[,shell]
+----
+https://<FQDN|IP>/
+---- 
+==== 
+======
+
+image:3_0_Dashboard.png[ナビゲーション]
+
+コンソールまたはREST APIを使用して{product-name}を管理できます。
+
+[NOTE]
+====
+企業のファイアウォールが8443をブロックしている場合は、以下を参照してください。
+====
+
+[NOTE]
+====
+Chromeブラウザが{product-name}の自己署名証明書をブロックする場合は、次のセクションのChrome証明書アップロードを参照してください。
+====
+
+== REST APIサーバーに接続する 
+
+{product-name}内のすべての操作は、コンソールの代わりにREST APIを通じて呼び出すことができます。REST APIサーバーは、Controller/Allinoneコンテナの一部です。REST APIの詳細については、ワークフローとxref:automation.adoc[自動化]のセクションを参照してください。
+
+== デフォルトのユーザ名とパスワード 
+
+**admin:admin**
+
+ログインに成功した後、管理者ユーザーはより安全なパスワードでアカウントを更新する必要があります。
+
+== 追加ユーザーの作成 
+
+新しいユーザーは、設定の->ユーザーと役割メニューから追加できます。{product-name}に事前定義されたグローバルロールがあります。
+
+* 管理連邦ポリシーを除くすべてのアクションを実行できます。
+* 連邦管理者。マスター/リモートクラスターの設定や連邦ポリシー（ルール）を含むすべてのアクションを実行できます。xref:multicluster.adoc[マルチクラスター]が有効な場合のみ表示されます。
+* 表示専用（リーダー）。アクションは許可されず、表示のみです。
+* CI統合（ciops）。イメージスキャンなどのCI/CDスキャン統合タスクを実行できます。このユーザーロールは、Jenkins、BambooなどのビルドフェーズスキャンプラグインやREST API呼び出しでの使用を推奨します。スキャン機能に制限されており、コンソールでのアクションは実行できません。
+
+ユーザーは、詳細設定を使用して1つ以上のネームスペースに制限できます。
+
+カスタムロールの作成と高度なユーザー管理については、xref:users.adoc[ユーザーとロール]のセクションを参照してください。
+
+== 接続タイムアウト設定 
+
+コンソールの右上にあるマイプロファイル->セッションタイムアウトで、コンソールがタイムアウトする秒数を設定できます。デフォルトは5分で、最大は3600秒（1時間）です。
+
+== マネージャーのHTTPを有効にする 
+
+HTTPSを無効にしてHTTPアクセスを有効にするには、環境変数セクション内のマネージャーまたはオールインワンのyamlセクションにこれを追加します。例えば、Kubernetesでは：
+
+[,yaml]
+----
+- name: MANAGER_SSL 
+  value: "off" 
+----
+
+OpenShiftの場合、yamlのRouteセクションからこの設定も削除してください。
+
+[,yaml]
+----
+tls:
+    termination: passthrough 
+----
+
+これは、マネージャーをロードバランサーの背後に置く場合に便利です。
+
+== 8443をブロックする企業ネットワークからのアクセスを有効にする 
+
+企業ネットワークがマネージャーコンソールへのポート8443のアクセスを許可しない場合、イングレスサービスを作成してそれをマッピングし、アクセスを許可することができます。
+
+[NOTE]
+====
+{product-name} UIコンソールはコンテナ内で非ルートユーザとして実行されているため、1024未満のポートでリスンすることはできません。これが、443に変更できない理由です。
+====
+
+企業ネットワークからコンソールにアクセスしようとしている場合。ClusterIPサービスとイングレスHTTPSリダイレクトを使用してそれを実現する方法は次のとおりです。
+
+最初に、HTTPS終了用の証明書を作成します。以下に例を示します。
+
+[,shell]
+----
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN=mycloud.domain.com" kubectl create secret tls neuvector-ingress-tls -n neuvector --key="tls.key" --cert="tls.crt" 
+----
+
+次に、HTTPS接続をマネージャーにリダイレクトする443ポートを公開するために、次のyamlファイルを使用します。
+
+[,yaml]
+----
+apiVersion: v1
+kind: Service
+metadata:
+  name: neuvector-cluster-webui
+  namespace: neuvector
+spec:
+  ports:
+  - port: 443
+    targetPort: 8443
+    protocol: TCP
+  type: ClusterIP
+  selector:
+    app: neuvector-manager-pod
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: neuvector-ingress-webui
+  namespace: neuvector
+  annotations:
+    ingress.mycloud.net/ssl-services: ssl-service=neuvector-cluster-webui
+spec:
+  tls:
+  - hosts:
+    - cloud.neuvector.com
+    secretName: neuvector-ingress-tls
+  rules:
+  - host: cloud.neuvector.com
+    http:
+      paths:
+      - path:
+        backend:
+          serviceName: neuvector-cluster-webui
+          servicePort: 443
+----
+
+イングレスアドレスのアノテーションをingress.mycloud.netから適切なアドレスに変更する必要があります。
+
+この例では、URL cloud.neuvector.comを使用しています。イングレスサービスが作成された後、その外部IPを見つけることができます。次に、hostsファイルを構成してcloud.neuvector.comをそのIPにポイントできます。その後、`https://cloud.neuvector.com`(選択したURL)にアクセスできるはずです。
+
+=== リダイレクトの代わりにSSLパススルーを使用する 
+
+上記のリダイレクト例の代わりにTLS/SSLパススルーを使用するには（nginxなどの一部のイングレスコントローラーでサポートされています）、イングレスコントローラーがパススルー用に適切に構成されていることを確認し、イングレスに適切なアノテーションが追加されていることを確認してください。などです。別の例をあげれば、
+
+[,yaml]
+----
+annotations: 
+  ingress.kubernetes.io/ssl-passthrough: "true" 
+----
+
+== {product-name}自己署名証明書の置き換え 
+
+詳細については、次のセクションxref:replacecert.adoc[自己署名証明書の置き換え]を参照してください。証明書は、マネージャーとコントローラー/オールインワンのyamlの両方で置き換える必要があります。
+
+== 証明書ARNを使用してAWS ALBを構成する 
+
+こちらは、証明書ARN（実際のARNは伏せています）を使用したAWSロードバランサーによるサンプルのイングレス設定です。
+[,yaml]
+----
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    # https://kubernetes-sigs.github.io/aws-alb-ingress-controller/guide/ingress/annotation/#healthcheck-path
+    alb.ingress.kubernetes.io/backend-protocol: HTTPS
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-west-2:596810101010:certificate/380b6abc-1234-408d-axyz-651710101010
+    alb.ingress.kubernetes.io/healthcheck-path: /
+    alb.ingress.kubernetes.io/healthcheck-protocol: HTTPS
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/success-codes: "301"
+    alb.ingress.kubernetes.io/target-type: instance
+    external-dns.alpha.kubernetes.io/hostname: eks.neuvector.com
+    kubernetes.io/ingress.class: alb
+  labels:
+    app: neuvector-webui-ingress
+  name: neuvector-webui-ingress
+  namespace: neuvector
+spec:
+  tls:
+  - hosts:
+    - eks.neuvector.com
+  rules:
+  - http:
+      paths:
+      - backend:
+          serviceName: neuvector-service-webui
+          servicePort: 8443
+        path: /*
+----

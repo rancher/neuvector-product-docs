@@ -1,0 +1,23 @@
+= Azure DevOps
+:revdate: 2025-05-08
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/03.build/04.azuredevops/04.azuredevops.md
+:page-opendocs-slug:  /scanning/build/azuredevops
+
+== Escanear vulnerabilidades no pipeline de build do Azure DevOps
+
+O {product-name} scanner pode ser acionado a partir do pipeline do Azure DevOps usando a {product-name} extensão publicada no Marketplace do Azure DevOps.
+
+image:azure_devops.png[AzureDevOps]
+
+A extensão suporta tanto escaneamento remoto quanto local, onde o {product-name} controlador pode escanear remotamente uma imagem em um registro durante a construção, ou iniciar dinamicamente um controlador local para escanear a imagem na máquina virtual do agente Azure.
+
+Além disso, certifique-se de que há um {product-name} contêiner de scanner implantado e configurado para se conectar ao Allinone ou ao Controlador. Na versão 4.0 e posteriores, o contêiner neuvector/scanner deve ser implantado separadamente do allinone ou do controlador.
+
+* Escanear imagem com a {product-name} tarefa integra o {product-name} scanner de vulnerabilidades em um pipeline do Azure DevOps.
+* Realizar varreduras de vulnerabilidades de uma imagem de contêiner após a construção da imagem em uma instância de {product-name} controlador externa ou em uma instância de {product-name} controlador local que está sendo executada em um contêiner de serviço dentro de um pipeline.
+* Defina limites para falhas de builds com base no número de vulnerabilidades detectadas de diferentes severidades.
+* Forneça um relatório detalhado de um escaneamento de imagem para análise na guia Resumo do build.
+* Instâncias de controladores {product-name} externas são definidas como pontos de extremidade de serviço para desacoplar definições do pipeline de build dos parâmetros de conexão e credenciais.
+
+Uma visão geral com telas de exemplo pode ser encontrada em https://marketplace.visualstudio.com/items?itemName=NeuVector.neuvector-vsts.

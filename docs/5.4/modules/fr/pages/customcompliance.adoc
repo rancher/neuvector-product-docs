@@ -1,0 +1,117 @@
+= Vérifications de conformité personnalisées
+:revdate: 2024-09-25
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/11.customcompliance/11.customcompliance.md
+:page-opendocs-slug:  /policy/customcompliance
+
+== Création de scripts personnalisés pour les vérifications de conformité
+
+Des scripts personnalisés peuvent être exécutés sur des conteneurs et des hôtes pour être utilisés dans des vérifications de conformité et d'autres évaluations. La vérification de conformité personnalisée est un script bash qui peut être exécuté sur n'importe quel conteneur pour valider une condition et rapporter le résultat dans la section conformité du conteneur ou du nœud.
+
+[NOTE]
+====
+La possibilité de créer des scripts personnalisés est désactivée par défaut pour protéger contre les abus. Cela peut être activé en définissant xref:details.adoc#_environment_variables[CUSTOM_CHECK_CONTROL, la variable d'environnement] dans le Contrôleur et l'Enforceur. Les valeurs sont "désactiver" (par défaut, non autorisé), "strict" (rôle administrateur uniquement) ou "souple" (rôles administrateur, conformité et politique d'exécution).
+====
+
+[CAUTION]
+====
+Les scripts personnalisés doivent être utilisés avec une extrême prudence. Le script personnalisé peut exécuter n'importe quel exécutable dans l'espace de noms du conteneur avec les privilèges du conteneur. Les exécutables peuvent être très destructeurs, tels que rm, format, fdisk, etc. Cette prudence s'applique également aux hôtes/nœuds. Les scripts de vérification personnalisés sur les hôtes peuvent être encore plus destructeurs s'ils peuvent accéder au nœud maître dans le cluster.
+====
+
+* Un script personnalisé est contrôlé par l'autorisation de la stratégie du composant d'exécution avec RBAC dans l'espace de noms{nbsp}; les utilisateurs doivent configurer correctement les rôles d'utilisateur Kubernetes.
+* Les scripts personnalisés sont exécutés avec les mêmes privilèges que le conteneur en cours d'exécution.
+* Le résultat de conformité est supprimé une fois qu'un script personnalisé est supprimé.
+* Les vérifications de conformité personnalisées doivent suivre un format afin de rapporter le résultat correctement dans le rapport de conformité pour le conteneur ou le nœud.
+** Le script commence par une instruction 'if' pour vérifier une condition
+** La vérification personnalisée est réussie si le code de sortie est 0
+** La vérification personnalisée échoue si le code de sortie est 1
+
+=== Script d'exemple pour vérifier si le conteneur a un compte root sans mot de passe.
+
+[,bash]
+----
+if [ $(cat /etc/shadow | grep  'root:::0:::::') ]; then
+     DESCRIPTION="CVE-2019-5021 fails."
+     echo $DESCRIPTION;
+     exit 1;
+else
+     echo "CVE-2019-5021 pass";
+     exit 0;
+fi
+----
+
+==== Script d'exemple pour vérifier le fichier dirty cow dans le conteneur.
+
+[,bash]
+----
+if [ $(find . / | grep -w 'cow') ]; then
+     DESCRIPTION="dirty cow seen in the container"
+    echo $DESCRIPTION;
+    exit 1;
+else
+    echo "no dirty cow found pass";
+    exit 0;
+fi
+----
+
+Autres notes
+
+* Les scripts ont un délai d'exécution de 1 minute pour se terminer, sinon ils sont tués et signalés comme une erreur dans le résultat de conformité.
+* Le script peut être exécuté dans les 3 modes de fonctionnement{nbsp}: Découverte, Surveillance et Protection.
+
+== Création d'un script de vérification personnalisé
+
+* Sélectionnez le groupe de services (créé par l'utilisateur ou appris automatiquement) à partir de la stratégie -> Groupe.
+* Cliquez sur l'onglet de vérification personnalisée.
+* Entrez le nom du script. Les espaces ne sont pas autorisés.
+* Copiez et collez le script dans la section du script.
+* Cliquez sur le bouton AJOUTER pour ajouter le script.
+* Plusieurs scripts peuvent être créés et gérés à partir de l'option fournie dans le coin supérieur droit.
+* Les scripts sont exécutés sur les conteneurs couverts par le groupe de services dès qu'un script est créé ainsi que lorsque le script est mis à jour.
+* Voir le résultat du script dans les actifs -> conteneur -> conformité, ou actifs -> nœuds -> conformité.
+
+=== Exemples
+
+Création d'un script de vérification personnalisé sur le groupe de démonstration composé de 3 conteneurs
+
+image:compliance1.png[ConformitéDémonstration]
+
+Affichage des résultats de conformité pour le conteneur nginx, qui a un fichier dirty cow, donc un avertissement est signalé.
+
+image:compliance2.png[ConformitéNginx]
+
+Affichage du résultat de conformité pour le conteneur nodejs, qui n'a pas de fichier dirty cow, donc un succès est rapporté par le script.
+
+image:compliance_nodejs.png[ComplianceNodejs]
+
+Affichage du résultat de conformité pour le conteneur nginx pour un contrôle personnalisé qui a eu un délai d'attente.
+
+image:compliance_timeout.png[ConformitéDélai]
+
+== Création d'une règle de réponse pour le rapport de conformité
+
+Les règles de réponse peuvent être créées dans la stratégie -> Règles de réponse qui sont basées sur les résultats des contrôles de conformité personnalisés. Les résultats font partie de la catégorie Conformité, et des réponses peuvent être créées pour tous les événements d'un certain niveau.
+
+* Choisissez la catégorie conformité
+* Tapez le nom du groupe de services dans l'option de groupe et choisissez le groupe souhaité dans l'option de sélection automatique
+* Tapez le niveau et choisissez le niveau{nbsp}: Avertissement dans l'option de sélection automatique.
+* Activez les actions souhaitées Quarantaine, webhook et/ou suppression de journal
+* Activez le bouton d'état
+* Cliquez sur le bouton Ajouter pour ajouter la règle de réponse
+
+Le prochain événement de conformité avec un résultat d'avertissement déclenchera l'action de la règle de réponse correspondante.
+
+image:compliance_response_1.png[ConformitéRéponse]
+
+Créez une règle de réponse pour le rapport de conformité et le script de contrôle personnalisé par nom{nbsp}:
+
+* Choisissez la catégorie conformité
+* Tapez le nom du groupe de services dans l'option de groupe et choisissez le groupe souhaité parmi les options déroulantes, ou laissez le nom du groupe vide pour appliquer à tous
+* Tapez 'n' et choisissez le nom du script de contrôle personnalisé dans le menu déroulant des options
+* Activez les actions souhaitées Quarantaine, webhook et/ou suppression de journal
+* Activez le bouton d'état
+* Cliquez sur le bouton Ajouter pour ajouter la règle de réponse
+
+Le prochain événement de conformité avec un avertissement déclenchera l'action de la règle de réponse correspondante.
+
+image:compliance_report_2.png[ConformitéRéponse]

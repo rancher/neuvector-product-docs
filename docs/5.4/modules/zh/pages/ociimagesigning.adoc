@@ -1,0 +1,55 @@
+= OCI镜像签名
+:revdate: 2026-02-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/03.admission/01.sigstore/03.ociimagesigning.md
+:page-opendocs-slug:  /policy/admission/ociimagesigning
+
+== 使用Sigstore验证SUSE Rancher应用程序集合镜像
+
+SUSE Rancher应用程序集合使用基于OCI的注册表，所有应用程序均由Sigstore签名。用户可以在{product-name}中使用Sigstore验证器验证应用程序集合中的应用程序。
+
+您需要提前获取SUSE Rancher应用程序集合的cosign公钥，然后可以在{product-name}中配置Sigstore验证器。
+
+image:oci_image_1.png[添加Sigstore验证器]
+
+按照以下步骤为SUSE Rancher应用程序集合中的镜像配置Sigstore验证。
+
+. 按照认证指南创建访问令牌：
++
+https://docs.apps.rancher.io/get-started/authentication/
+
+. 按照签名验证指南获取Cosign公钥（`ap-pubkey.pem`）：
++
+https://docs.apps.rancher.io/howto-guides/verify-signatures-with-cosign/
+
+. 在{product-name}的Web UI中，创建Sigstore信任根。
++
+--
+* 转到*资产* > *Sigstore验证器*。
+* 创建一个新的验证器。
+* 将Cosign公钥添加为密钥对验证器。
+--
+
+. 配置注册表并开始扫描。
++
+--
+* 转到*资产* > *注册表*。
+* 使用以下值创建一个新的注册表：
++
+[source,text]
+----
+Registry: https://dp.apps.rancher.io/
+Filter: containers/openjdk:21.0.4-build7
+Username: <your SUSE username>
+Password: <access token created earlier>
+----
+--
++
+过滤后的镜像是发布在SUSE Rancher应用程序集合中的OCI镜像。
+
+. 查看扫描结果以确认签名验证。
+
+
+image:oci_image_2.png[验证器扫描结果]
+
+扫描完成后，{product-name}在扫描结果中显示Sigstore验证器的详细信息，确认镜像签名已成功验证。

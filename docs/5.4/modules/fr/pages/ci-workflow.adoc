@@ -1,0 +1,25 @@
+= {product-name} Workflow
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /11.automation/01.ci_workflow/01.ci_workflow.md
+:page-opendocs-slug:  /automation/ci_workflow
+
+== {product-name} Intégration dans le flux de travail CI/CD
+
+{product-name} prend en charge l'ensemble du processus CI/CD et peut être facilement intégré dans le flux de travail pour garantir la sécurité tout au long du processus de développement et de déploiement.
+
+=== Flux de travail de développement et d'intégration continue
+
+{product-name} peut être intégré dans les processus de développement et d'intégration continue pour automatiser l'analyse des vulnérabilités. L'utilisation du plug-in {product-name} Jenkins et des fonctions d'analyse du registre permet d'analyser les images durant cette phase.
+
+image:ci_workflow.png[intégration]
+
+De plus, {product-name} peut être utilisé lors des tests automatisés d'application pour analyser les connexions réseau et le comportement des conteneurs afin d'anticiper d'éventuels problèmes en pré-production ou en production.
+
+=== Flux de travail de déploiement continu et de production
+
+{product-name} peut effectuer des tests de conformité avant le déploiement et des audits de sécurité avant la production ainsi qu'en production.
+
+image:cd_workflow.png[production]
+
+La plateforme de sécurité multi-vecteur est capable de combiner la sécurité réseau, les inspections de conteneurs et la sécurité des hôtes pour protéger les conteneurs en temps d'exécution.

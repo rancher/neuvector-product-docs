@@ -1,0 +1,33 @@
+= ネットワーク脅威シグネチャ
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/10.threats/10.threats.md
+:page-opendocs-slug:  /policy/threats
+
+== ネットワーク脅威の検出
+
+{product-name} ディープパケットインスペクションを使用して、OWASPトップ10にある攻撃や、Webアプリケーションファイアウォール（WAF）で一般的に使用される攻撃のために、ネットワークパケットとペイロードを検査することができます。
+
+=== OWASPシグネチャ
+
+DLPセンサーは、以下のパターン例を使用してOWASP攻撃を検出するために作成できます。常に、これらはあなたの環境やアプリケーションに合わせて調整する必要があるかもしれません。
+
+[,shell]
+----
+img src=javascript
+/servlet/.*/org.apache.
+/modules.php?.*name=Wiki.*<script
+/error/500error.jsp.*et=.*<script
+/mailman/.*?.*info=.*<script
+\x0aReferer\x3a res\x3a/C\x3a
+/cgi-bin/cgictl?action=setTaskSettings.*settings={\x22.*taskId=
+/cgi-bin/cgictl.*scriptName=.*[?&]scriptName=[^&]*?([\x22\x27\x3c\x3e\x28\x29]|script|onload|src)
+----
+
+こちらは他の簡単な例です：
+
+image:owasp_top10_dlp.png[owasp]
+
+=== ビルトイン脅威検出
+
+{product-name} には、SQLインジェクション攻撃、DDoS（例：Ping Death）、およびトンネリング攻撃など、他のネットワーク脅威に対するビルトイン検出機能も備わっています。SQLインジェクション攻撃に対して、{product-name} はフロントエンドとSQLデータベースポッド間のネットワーク接続（SQLプロトコル）を検査し、誤検知を減らし、精度を向上させます。

@@ -1,0 +1,141 @@
+= Integraciones y otros componentes
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /14.releasenotes/02.other/02.other.md
+:page-opendocs-slug:  /releasenotes/otros
+
+== Notas de la versión para módulos de integración, complementos y otros componentes
+
+=== Github Actions
+
+* Las acciones de Github para el escaneo de vulnerabilidades ahora se publican en https://github.com/neuvector/neuvector-image-scan-action.
+
+=== Gráfico de Helm 1.8.9
+
+* El gráfico de Helm v1.8.9 se publica para ampliaciones de 5.0.0. Si se utiliza esto con la versión preliminar de 5.0.0, se deben realizar los siguientes cambios en values.yml:
+** Actualizar el registro a docker.io
+** Actualizar los nombres/etiquetas de las imágenes a la versión preliminar en Docker hub
+** Dejar imagePullSecrets vacío
+
+=== Aplicación de Splunk publicada
+
+* La nueva aplicación de Splunk para {product-name} se publica en https://splunkbase.splunk.com/app/6205/
+
+=== Actualización del gráfico de Helm 1.8.7
+
+* Soporte para la personalización de afinidad y tolerancia para el controlador, escáner y gestor.
+* Agregar soporte de nodeSelector para los pods de Controlador, Gestor, Escáner y actualizador.
+* Soporte para variables de entorno definidas por el usuario para el contenedor del controlador.
+
+=== Operador comunitario v1.2.7 para el gráfico de Helm 1.8.2
+
+* Permitir a los usuarios especificar la versión de lanzamiento {product-name}
+* Despliega la última versión de la base de datos de CVE del escáner
+* La ubicación de la imagen del operador de contenedor se ha movido a registry.neuvector.com/public
+* El nombre de la instancia {product-name} por defecto es neuvector (antes era example-neuvector)
+* Documento readme actualizado en la página de instalación y se añadió un enlace a las notas de la versión
+
+=== Gráfico de Helm 1.8.2
+
+* Añadir opciones de host de ingreso y ruta del controlador.
+
+=== Operador Certificado v1.2.8 para {product-name} v4.3.1
+
+* Soporta la versión 1.8.2 del gráfico de Helm
+* Despliega la versión 4.3.1 de {product-name}
+* Despliega la versión 2.360 de la base de datos del escáner
+* otros cambios de la versión anterior 1.2.7
+** El nombre de la instancia neuvector por defecto es neuvector, antes era example-neuvector
+** documento readme actualizado en la página de instalación
+** se corrigió el problema de visualización del logo {product-name}
+* Problemas conocidos
+** Actualizar de 1.2.7 a 1.2.8 no actualiza la base de datos del escáner. Solución alternativa: actualizar la imagen del escáner a registry.connect.redhat.com/neuvector/scanner@sha256:a802c012eee80444d9deea8c4402a1d977cf57d7b2b2044f90c9acc0e7ca3e06 en la ampliación del escáner.
+** el documento readme en la página de instalación no está alineado correctamente
+** la base de datos del escáner no se actualiza por el actualizador
+
+=== Actualización del gráfico de Helm 1.8.0 de julio de 2021
+
+* El gráfico de Helm v1.8.0 se actualiza para que por defecto use registry.neuvector.com como el registro predeterminado. NOTA: Debe especificar la etiqueta de versión manualmente.
+* Añadir parámetros configurables como anotaciones de API del controlador en el gráfico de Helm. Disponible desde la versión 1.7.6+.
+* Operador de la comunidad 1.2.6, operador certificado 1.2.7 actualizado para reflejar las actualizaciones del gráfico de Helm, incluyendo la adición de la ruta de OpenShift cuando controller.apisvc.type está habilitado.
+
+=== Otras integraciones de julio de 2021
+
+* Añadir formato de salida HTML para los resultados del escaneo en los resultados de la canalización de Jenkins.
+* Añadir el espacio de nombres de la carga de trabajo afectada en las alertas del exportador de Prometheus. Ahora soportado en neuvector/prometheus-exporter:4.2.2 y versiones posteriores.
+
+=== Actualización del gráfico de Helm 1.7.5 de mayo de 2021
+
+* Se requieren cambios en el soporte para el nuevo registro de imágenes registry.neuvector.com.  Este cambio resultará en rutas de imagen (es decir, eliminar neuvector de la ruta de neuvector/controller a controller).
+
+=== Actualización del gráfico de Helm 1.7.2 de abril de 2021
+
+* Añadir soporte para solicitudes y límites de recursos de componentes separados, p. ej. controlador, solicitudes de CPU y memoria del ejecutor.
+
+=== Actualización del complemento de Jenkins v1.13 de abril de 2021
+
+* Corregir el error de escaneo que existe cuando múltiples escáneres se están ejecutando al mismo tiempo.
+* Mostrar la calificación de vulnerabilidad de Red Hat en el resultado del escaneo para imágenes basadas en Red Hat.
+
+=== Actualizaciones del operador de abril de 2021
+
+* Operador de OpenShift/helm para poder reemplazar certificados autofirmados. El gráfico de Helm es 1.7.1. El operador de la comunidad es 1.2.4, y el operador certificado es 1.2.3.
+
+=== Complemento de Jenkins v1.12 de marzo de 2021
+
+* Sobrescribir la gravedad de la vulnerabilidad por puntuación. Poder editar qué rango de puntuación de vulnerabilidad (CVE) se utiliza para las clasificaciones Alta y Media. Esto permite personalizar qué puntuación se puede utilizar para fallar construcciones en la tubería.
+* Añadir mensajes de error a las excepciones JAVA hudson.AbortException. Habilitar una mejor notificación de mensajes de error desde {product-name} cuando ocurre un error.
+
+=== Actualizar Helm Chart a 1.7.1 de marzo de 2021
+
+* Añadir la dirección IP del balanceador de carga del servicio del gestor y anotaciones.
+* Añadir configuración para establecer la capacidad de pvc.
+* Añadir configuraciones de socket en tiempo de ejecución para k3s y AWS bottlerocket.
+* Añadir configuraciones para reemplazar los certificados del controlador y del gestor.
+
+=== Escáner de febrero de 2021
+
+* Corregir CVE-2020-1938 no descubierto durante el escaneo en versiones del escáner 1.191 y anteriores. Actualizar a la última versión del escáner después de 1.191.
+
+=== Jenkins Plug-In v1.11 de febrero de 2021
+
+==== Mejoras
+
+* Añadir soporte para desplegar el {product-name} escáner independiente. Esto no requiere un controlador y debe ser desplegado en el mismo host que la instalación de Jenkins. Docker también debe estar instalado en el host. Actualmente, solo se admite la versión de Linux de Jenkins (no la versión en contenedor). Además, añadir el usuario _jenkins_ al grupo _docker_.
+
+[,bash]
+----
+sudo usermod -aG docker jenkins
+----
+
+Referencias:
+https://plugins.jenkins.io/neuvector-vulnerability-scanner/
+https://github.com/jenkinsci/neuvector-vulnerability-scanner-plugin/releases/tag/neuvector-vulnerability-scanner-1.11
+
+=== Actualizaciones del Catálogo de Rancher de enero de 2021
+
+* Actualizar {product-name} en el catálogo de Rancher para soportar 4.x
+
+=== Actualizaciones del Helm Chart de enero de 2021
+
+* Crear los {product-name} CRD requeridos al desplegar
+* Corregir el error al establecer el ingreso del controlador en verdadero
+
+=== Actualizaciones del Operador de enero de 2021
+
+* Actualizar los Operadores (comunidad, certificados) para soportar 4.x
+
+=== Cambios en el Helm Chart de diciembre de 2020
+
+* Permitir al usuario personalizar la PriorityClass de la ampliación del manager/controlador/enforcer/scanner. Sugerimos dar a {product-name} los contenedores una mayor prioridad para asegurar que las políticas de seguridad se apliquen cuando los recursos del nodo estén bajo presión o durante un proceso de actualización de versión del clúster.
+
+=== Importante actualización del Helm Chart de noviembre de 2020
+
+[IMPORTANT]
+====
+Cambios en la estructura del Helm Chart
+====
+
+* El directorio para el {product-name} chart ha cambiado de ./neuvector-helm/ a ./neuvector-helm/charts/core/
+
+Si se utiliza Helm para actualizar, por favor actualice la ubicación a la vía anterior.

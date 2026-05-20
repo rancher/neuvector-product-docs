@@ -1,0 +1,193 @@
+= Fehlerbehebung
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /12.troubleshooting/01.troubleshooting/01.troubleshooting.md
+:page-opendocs-slug:  /fehlerbehebung/fehlerbehebung
+
+== Fehlerbehebung {product-name} Implementierungen
+
+Die {product-name} Container werden mit demselben Orchestrierungstool bereitgestellt, verwaltet und aktualisiert, das auch für Anwendungs-Workloads verwendet wird. Bitte überprüfen Sie die Online-Dokumentation für jeden Schritt, der während der Implementierung erforderlich ist. Oft werden Implementierungen versucht, indem einfach die Beispiel-YAML-Dateien kopiert und ohne vorherige Überprüfung der Schritte bereitgestellt werden, wie z. B. die ordnungsgemäße Konfiguration von Registries, Secrets oder RBACs/Rollenbindungen.
+
+=== Erstimplementierung
+
+* Überprüfen Sie, ob die {product-name} Container mit der richtigen Authentifizierung abgerufen werden können. Überprüfen Sie das verwendete Secret und stellen Sie sicher, dass der Cluster auf die entsprechende Registry zugreifen kann.
+* Stellen Sie sicher, dass die erforderlichen Änderungen an der YAML (z. B. NodePort oder LoadBalancer) oder die Helm-Werteinstellungen entsprechend festgelegt sind.
+* Überprüfen Sie die Plattform und die Container-Laufzeit und nehmen Sie bei Bedarf Änderungen vor (z. B. PKS, containerd, CRI-O).
+
+=== Anmeldung und Erstkonfiguration
+
+* Überprüfen Sie, ob der Zugriff auf den Manager (IP-Adresse, Port, Route) durch Firewalls erlaubt ist.
+
+=== Laufender Betrieb
+
+* Verzeichnisintegration. {product-name} unterstützt spezifische Konfigurationen für LDAP/AD und andere Integrationen für Gruppen und Rollen. Kontaktieren Sie {product-name} für zusätzliche Schritte zur Fehlerbehebung und ein Tool zur Fehlerbehebung bei AD.
+* Registry-Scanning. Die meisten Probleme hängen mit Authentifizierungsfehlern bei der Registry oder der Unfähigkeit des Controllers zusammen, von dem Cluster aus auf die Registry zuzugreifen.
+* Bei Leistungsproblemen stellen Sie sicher, dass dem Scanner genügend Speicher für das Scannen großer Images zugewiesen ist. Außerdem können die Mindestanforderungen an CPU und Speicher in der Pod-Richtlinie festgelegt werden, um eine angemessene Leistung im großen Maßstab sicherzustellen.
+* Zulassungskontrolle. Siehe den Abschnitt zur Fehlerbehebung im Abschnitt Sicherheitsrisiken... -> Zulassungskontrollen.
+
+=== Aktualisierung
+
+* Verwenden Sie rollierende Updates für den Controller. Wenn Sie Hosts neu starten, stellen Sie sicher, dass Sie die Controller überwachen, während sie zu anderen Hosts wechseln, oder sie auf den neu gestarteten Hosts neu bereitstellen, um sicherzustellen, dass sie starten, dem Controller-Cluster beitreten und stabilisieren/synchronisieren können. Das gleichzeitige oder zu schnelle Neustarten aller Hosts kann zu unbekannten Zuständen für die Controller führen.
+* Verwenden Sie einen persistenten Volume-Claim, um die {product-name} Konfiguration für den Fall zu speichern, dass alle Controller/Knoten im Cluster ausfallen.
+* Überprüfen Sie beim Aktualisieren auf eine neue Version die Online-Dokumentation, um Änderungen/Ergänzungen zur erforderlichen YAML zu identifizieren, sowie andere Änderungen wie Rollenbindungen oder neue Dienste (z. B. Zulassungssteuerungs-Webhooks, persistente Volume-Claims usw.).
+
+== Debug-Protokolle
+
+Um die Protokolle eines {product-name} Containers, beispielsweise eines Controller-Pods, anzuzeigen.
+
+[,shell]
+----
+kubectl logs neuvector-controller-pod-777fdc5668-4jkjn -n neuvector
+----
+
+Diese Protokolle können Probleme mit der Cluster-Konnektivität, Administratoraktionen, Scanning-Aktivitäten und andere nützliche Einträge zeigen. Wenn mehrere Controller ausgeführt werden, kann es notwendig sein, jeden einzelnen zu überprüfen. Diese Protokolle können in eine Protokolldatei umgeleitet werden, um sie an den {product-name} Support zu senden.
+
+=== Debug-Modus für {product-name} Controller aktivieren
+
+Für Probleme, die eine eingehende Untersuchung erfordern, kann der Debug-Modus für die Controller/All-in-Ones aktiviert werden, der detaillierte Informationen protokolliert. Dies kann die Größe der Protokolldatei erheblich erhöhen, daher wird empfohlen, ihn nach dem Sammeln der Protokolle wieder auszuschalten.
+
+=== Kubernetes, OpenShift und andere Orchestrierungsprotokolle
+
+Es kann hilfreich sein, die Protokolle von Orchestrierungstools zu überprüfen, um alle Bereitstellungsaktivitäten einschließlich der Zeitstempel und Status der Pod-Erstellung, Bereitstellungen, DaemonSets und anderer Verwaltungsaktionen der {product-name} Container, die vom Orchestrierungstool durchgeführt wurden, zu sehen.
+
+[,shell]
+----
+kubectl get events -n neuvector
+----
+
+== Support-Protokoll
+
+Das Support-Protokoll enthält zusätzliche Informationen, die für den {product-name} Support hilfreich sind, einschließlich Systemkonfiguration, Container, Richtlinien, Benachrichtigungen und {product-name} Containerdetails.
+
+Um das Support-Protokoll herunterzuladen, gehen Sie zu Einstellungen -> Konfiguration und wählen Sie Protokoll erfassen.
+
+== Verwendung der CLI, um den Debug-Modus zu aktivieren
+
+Melden Sie sich beim {product-name} Manager-Pod mit Benutzer und Passwort an (empfohlen in einem separaten Terminalfenster).
+
+[,shell]
+----
+kubectl exec -it neuvector-manager-pod-5bb76b6754-rlmnp -n neuvector -- cli
+----
+
+[,shell]
+----
+#neuvector-svc-controller.neuvector> login
+----
+
+Holen Sie sich die Liste der Controller. Finden Sie den Controller mit Leader = True.
+
+[,shell]
+----
+show controller
+----
+
+Aktivieren Sie den Debug-Modus im Leader-Controller mit der ID oder dem Namen des Controllers.
+
+[,shell]
+----
+set controller 4fce427cf963 debug -c all
+----
+
+Um den Debug-Modus auf allen Controllern zu aktivieren
+
+[,shell]
+----
+set system controller_debug -c all
+----
+
+Führen Sie die Aktivität in {product-name} aus, die Sie debuggen möchten. Sehen Sie sich dann die Controller-Protokolle an (in einem separaten Terminalfenster).
+
+[,shell]
+----
+kubectl logs <leader_controller_pod_name> -n neuvector
+----
+
+Falls erforderlich, erfassen Sie die Protokolle und senden Sie sie an {product-name}.
+
+Deaktivieren Sie den Debug-Modus auf dem Controller (zurück im CLI-Fenster).
+
+[,shell]
+----
+set controller 4fce427cf963 debug
+exit
+----
+
+Überprüfen Sie den Debug-Status des Controllers.
+
+[,shell]
+----
+show controller setting 289d67396fcb
+----
+
+== Verwendung der REST-API, um den Debug-Modus zu aktivieren
+
+Setzen Sie das Zugriffstoken (Token) mit Ihrer IP, Benutzer, Passwort:
+
+[,shell]
+----
+_controllerIP_="<your_controller_ip>"
+_controllerRESTAPIPort_="10443"
+_neuvectorUsername_="admin"
+_neuvectorPassword_="admin"
+----
+
+[NOTE]
+====
+Für Kubernetes-basierte Bereitstellungen können Sie die Controller-IP in der folgenden Befehlsausgabe erhalten:
+====
+
+[,shell]
+----
+kubectl get pod -n neuvector -o wide | grep controller
+----
+
+[NOTE]
+====
+Wenn Sie auf die REST-API von außerhalb des Clusters zugreifen, siehe die Anweisungen im Abschnitt Automatisierung.
+====
+
+Holen Sie sich das Authentifizierungs-Token
+
+[,shell]
+----
+curl -k -H "Content-Type: application/json" -d '{"password": {"username": "'$_neuvectorUsername_'", "password": "'$_neuvectorPassword_'"}}' "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/auth" > /dev/null 2>&1 > token.json
+_TOKEN_=`cat token.json | jq -r '.token.token'`
+----
+
+[NOTE]
+====
+Möglicherweise müssen Sie jq installieren ($sudo yum install jq)
+====
+
+Aktivieren Sie den Debug-Modus
+
+[,shell]
+----
+curl -X PATCH -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"config": {"controller_debug": ["cpath", "conn"]}}' "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/system/config"  > /dev/null 2>&1   > set_debug.json
+#debug options - cpath, conn, mutex, scan, cluster , all
+----
+
+Deaktivieren Sie den Debug-Modus auf allen Controllern in einem Cluster.
+
+[,shell]
+----
+curl -X PATCH -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"config": {"controller_debug": []}}' "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/system/config"  > /dev/null 2>&1   > set_debug.json
+----
+
+Überprüfen Sie den Debug-Status des Controllers in einem Cluster
+
+[,bash]
+----
+curl  -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_"  "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/system/config"  > /dev/null 2>&1   > system_setting.json
+
+cat system_setting.json | jq .config.controller_debug
+----
+
+Abmelden
+
+[,shell]
+----
+echo `date +%Y%m%d_%H%M%S` log out
+curl -k -X 'DELETE' -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/auth" > /dev/null 2>&1
+----

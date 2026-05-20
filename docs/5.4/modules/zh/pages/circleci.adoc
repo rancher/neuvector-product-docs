@@ -1,0 +1,54 @@
+= CircleCI
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/03.build/03.circleci/03.circleci.md
+:page-opendocs-slug:  /scanning/build/circleci
+
+== 扫描 CircleCI 构建管道中的漏洞
+
+{product-name} CircleCI ORB 在 CircleCI 管道中的图像上触发漏洞扫描。该 ORB 可在 https://circleci.com/orbs/registry/orb/neuvector/neuvector-orb[CircleCI 目录] 中找到，并且在 https://github.com/neuvector/circleci-orb[{product-name} GitHub 页面] 上也有文档。
+
+如果尚未在 CircleCI ORB 可访问的主机上部署 {product-name} Allinone 或 Controller 容器，请进行部署。记下运行 Allinone 或 Controller 的主机的 IP 地址。
+
+该 ORB 支持两种用例：
+
+. 触发在 CircleCI 基础设施外部执行的扫描。ORB 联系 {product-name} 扫描器，然后从注册表中提取要扫描的图像。确保 ORB 与运行 {product-name} Controller/Allinone 的主机具有网络连接。
+. 在 CircleCI 平台上动态启动一个 {product-name} 控制器和扫描器，运行在临时虚拟机上。启动并自动配置后，可以对构建中的图像进行扫描，完成后 {product-name} 部署将停止并被去除。 有关此用例，请参阅 https://circleci.com/orbs/registry/orb/neuvector/neuvector-orb[CircleCI ORB for {product-name}] 的文档。
+
+此外，请确保已部署并配置一个 {product-name} 扫描器容器，以连接到 Allinone 或 Controller。在 4.0 及更高版本中，NeuVector Scanner 容器必须与 Allinone 或 Controller 分开部署。
+
+=== 在您的 CircleCI APP 中创建一个上下文
+
+image:context.png[context]
+
+=== 配置设置
+
+配置连接和身份验证的环境变量
+
+image:circleci_settings.png[设置]
+
+将 {product-name} orb 添加到您的构建 config.yaml
+
+[,yaml]
+----
+version: 2.1
+orbs:
+  neuvector: neuvector/neuvector-orb@1.0.0
+workflows:
+  scan-image:
+    jobs:
+      - neuvector/scan-image:
+          context: myContext
+          registry_url: https://registry.hub.docker.com
+          repository: alpine
+          tag: "3.4"
+          scan_layers: false
+          high_vul_to_fail: 0
+          medium_vul_to_fail: 3
+----
+
+registry_url是查找要扫描的图像的位置。配置储存库名称、标签，以及是否应执行分层扫描。为构建任务添加标准，以便根据检测到的高或中等漏洞数量决定是否失败。
+
+=== 查看结果
+
+构建任务将根据设定的标准通过或失败。无论哪种情况，您都可以查看完整的扫描报告。image:circleci_fail.png[fail]

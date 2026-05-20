@@ -1,0 +1,111 @@
+= Conformité et CIS Benchmarks
+:revdate: 2025-01-16
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/01.scanning/02.compliance/02.compliance.md
+:page-opendocs-slug:  /scanning/scanning/conformité
+
+== Gestion de la conformité et des CIS Benchmarks
+
+L'audit de conformité avec {product-name} inclut les CIS Benchmarks, des vérifications personnalisées, l'audit des secrets et des modèles standards de l'industrie pour le PCI, le RGPD et d'autres réglementations.
+
+Les CIS Benchmarks exécutés automatiquement par {product-name} incluent{nbsp}:
+
+* Kubernetes
+* Docker
+* Les benchmarks provisoires 'Inspired by CIS' de Red Hat OpenShift
+* Google GKE
+
+Les résultats des scans de conformité peuvent être vus pour des actifs individuels dans les Registres (pour les Images), les Nœuds et les menus Conteneurs en sélectionnant l'actif pertinent et en cliquant sur l'onglet Conformité.
+
+Le menu Conformité des Risques de Sécurité -> permet un reporting de conformité consolidé, similaire à la façon dont fonctionne le menu Vulnérabilités.
+
+=== Risques de Sécurité - Conformité et Profil de Conformité
+
+Les résultats de conformité sont affichés dans la liste par Catégorie et Nom. Les catégories incluent Docker, Kubernetes, OpenShift et Personnalisé. Les noms de chaque élément correspondent au benchmark CIS. Par exemple, K.4.2.3 correspond au benchmark CIS de Kubernetes 4.2.3. Les benchmarks Docker sont précédés de 'D' à l'exception des benchmarks liés aux Images, qui sont précédés de 'I'.
+
+Utilisez le filtre Avancé pour sélectionner des vérifications de conformité en fonction de la plateforme, de l'hôte, de l'espace de noms ou de la norme de l'industrie, comme indiqué ci-dessous.
+
+image:compliance_4.png[conformité]
+
+Après avoir appliqué le filtre, seuls les benchmarks CIS pertinents et les vérifications personnalisées seront affichés, et un rapport pourra être généré et téléchargé. C'est ainsi que des rapports pour des normes telles que PCI, HIPAA, RGPD et d'autres normes peuvent être générés.
+
+La capture d'écran suivante montre un exemple d'un secret trouvé dans un scan d'image.
+
+image:secret_compliance_4.png[secrets]
+
+=== Personnalisation des modèles de conformité pour PCI, GDPR, HIPAA, NIST, PCIv4 et DISA STIG
+
+Le menu Profil de conformité permet de personnaliser les modèles intégrés pour les normes de l'industrie telles que PCI, RGPD, HIPAA, NIST, PCIv4 et DISA STIG. Ces rapports peuvent être générés à partir du menu de conformité des risques de sécurité -> en sélectionnant l'une des normes à filtrer, puis en exportant. Le profil NIST est pour https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-190.pdf[NIST SP 800-190].
+
+Pour personnaliser un profil de conformité, sélectionnez la norme de l'industrie (par exemple, PCI), puis activez ou désactivez des vérifications spécifiques pour cette norme. Considérez cela comme des 'tags' de conformité qui sont appliqués à chaque vérification afin de générer un rapport de conformité pour cette norme industrielle.
+
+Utilisez le bouton Action pour ajouter ou supprimer tout tag de conformité de cette vérification.
+
+image:compliance_profile_4.png[profil]
+
+De plus, vous pouvez sélectionner quels 'Actifs' sont considérés comme faisant partie des rapports de conformité en cliquant sur l'onglet Actifs. Par défaut, tous les modèles de conformité sont appliqués aux Images, Nœuds et Conteneurs.
+
+image:profile_assets_4.png[actifs_conformité]
+
+Utilisez le bouton Action pour ajouter ou supprimer des modèles de conformité pour les actifs.
+
+* Images. Sélectionnez la ou les normes à rapporter pour les Images.
+* Noeud. Sélectionnez la ou les normes à rapporter pour les Nœuds (hôtes).
+* Conteneurs. Sélectionnez la ou les normes à rapporter pour les Conteneurs.
+
+Alternativement, au lieu de restreindre par les critères ci-dessus, les modèles de conformité peuvent être restreints à certains Espaces de noms. Si cette case est cochée et que des espaces de noms sont ajoutés, des rapports seront générés pour tous les actifs qui s'appliquent à ces espaces de noms. Cela peut être utile si, par exemple, le modèle PCI ne doit rapporter que sur les actifs pour les espaces de noms qui contiennent des charges de travail PCI dans le champ d'application (applicables).
+
+image:DocheckASSETSEnableNS.png[namespace]
+
+Après que les modèles et les actifs ont été personnalisés (si désiré) dans le menu Profils de conformité des risques de sécurité ->, des rapports peuvent être générés dans le menu Conformité des risques de sécurité -> en ouvrant le filtre avancé et en sélectionnant le modèle de conformité souhaité. Par exemple, sélectionner le RGPD filtrera l'affichage et les rapports uniquement pour le profil RGPD.
+
+=== Installation Helm d'exemple avec conformité principale
+
+Voici un exemple de commande d'installation Helm pour installer SUSE Security 5.4.0 avec conformité principale. Les utilisateurs peuvent modifier la version d'installation à 5.4.0 ou ultérieure, car la conformité principale commence avec 5.4.0. Après l'installation, les utilisateurs principaux peuvent vérifier les réglementations disponibles depuis l'interface web de SUSE Security dans l'onglet **Conformité > Réglementations**.
+
+[,shell]
+----
+helm install neuvector -n neuvector ./ --set controller.prime.enabled=true --set
+controller.prime.image.repository=nvlab/compliance_config,controller.prime.image.tag=1.
+0.0 --set
+tag=5.4.0-b2,controller.image.repository=nvpublic/co,enforcer.image.repository=nvpublic/
+en,manager.image.repository=nvpublic/ma
+----
+
+=== Audit des secrets
+
+{product-name} vérifie plus de 40 types courants de secrets dans le cadre des analyses de conformité d'image et des analyses en temps réel. De plus, des xref:customcompliance.adoc[scripts de conformité personnalisés] peuvent être configurés pour des conteneurs ou des hôtes, et la fonctionnalité xref:dlp.adoc[inspection de paquets DLP] peut être utilisée pour vérifier les secrets dans les charges utiles réseau.
+
+Les résultats de l'audit des secrets peuvent être trouvés dans la section Conformité des analyses d'image (Actifs -> Registres), des conteneurs (Actifs -> Conteneurs), des nœuds (Actifs -> Nœuds) et le menu de gestion de la conformité (Risques de sécurité -> Conformité).
+
+Voici un exemple de la façon dont les secrets détectés dans une analyse d'image seront affichés.
+
+image:secrets_image_4.png[secrets]
+
+Voici une liste des types de secrets détectés.
+
+* Clés privées générales
+* Détection générale des identifiants incluant 'apikey', 'api_key', 'password', 'secret', 'passwd', etc.
+* Mots de passe généraux dans des fichiers yaml incluant 'password', 'passwd', 'api_token', etc.
+* Clés de secrets générales dans des paires clé/valeur
+* Clé privée Putty
+* Clé privée XML
+* AWS https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html[identifiants / IAM]
+* secret client de Facebook
+* secret de point de terminaison de Facebook
+* secret d'appli Facebook
+* Identifiant client Twitter
+* clé secrète Twitter
+* secret Github
+* Identifiant de produit Square
+* clé d'accès Stripe
+* jeton API Slack
+* webhooks de Slack
+* Identifiant client LinkedIn
+* clé secrète LinkedIn
+* clé API Google
+* clé API SendGrid
+* clé API Twilio
+* clé API Heroku
+* clé API MailChimp
+* clé API MailGun

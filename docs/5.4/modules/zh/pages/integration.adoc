@@ -1,0 +1,126 @@
+= 企业集成
+:revdate: 2025-12-18
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/01.integration/01.integration.md
+:page-opendocs-slug:  /integration/integration
+
+== 集成
+
+{product-name} 提供多种集成选项，包括 REST API、CLI、Syslog、RBAC、SAML、LDAP 和 Webhooks。有关使用 REST API 自动化任务的示例，请参见 xref:automation.adoc[*自动化*] 部分。
+
+{product-name} 还与生态系统合作伙伴集成，如 Sonatype（Nexus Lifecycle）、IBM Cloud（QRadar 和 Security Advisor）以及 Prometheus/Grafana。许多集成可在 https://github.com/neuvector[NeuVector GitHub 储存库] 中获得。
+
+以下集成设置可在 {product-name} 用户界面中的 *设置* 下找到。
+
+=== OpenShift 和 Kubernetes RBAC
+
+如果您使用 Red Hat OpenShift 基于角色的访问控制（RBAC），并希望 {product-name} 自动读取和执行这些权限，请启用此选项。
+
+启用后：
+
+* OpenShift 用户可以使用其 OpenShift 凭据登录 {product-name} 控制台。
+* 用户只能访问其 OpenShift 角色允许的资源（项目、容器、节点等）。
+* 身份验证使用 OAuth 2.0 协议。
+
+image:openshift-rbac.png[OpenShift]
+
+[WARNING]
+====
+请勿使用 OpenShift `AllowAllPasswordIdentityProvider` 设置。此配置允许用户使用任何密码登录，这也允许以只读用户身份访问 {product-name}。它还为每次登录创建一个新的 OpenShift 用户。
+====
+
+[NOTE]
+====
+默认的 {product-name} *管理员* 用户以及在 {product-name} 中直接创建的任何用户在启用 OpenShift RBAC 时仍然有效。
+====
+
+=== 信任 Helm 的外部根 CA
+
+{product-name} 可以信任外部根证书颁发机构（CA），以进行安全连接，如 LDAPS、OpenID Connect（OIDC）和注册表扫描。此功能使与外部身份验证服务和镜像注册表的可信通信成为可能。
+
+当您通过 {product-name} 管理器 UI 配置受信任的根 CA 时，CA 信息会存储在内部数据库中。不会自动创建 Kubernetes Secret 或 ConfigMap。因为 Helm 通过 Kubernetes 资源管理配置，所以默认情况下无法通过 Helm 管理此设置。
+
+要使用 Helm 配置受信任的根 CA，请创建一个自定义 ConfigMap，提供 CA 证书并启用 TLS 验证。
+
+. 创建一个覆盖文件。
++
+创建一个 `override.yaml` 文件，其中包含 CA 证书和 TLS 设置：
++
+[source,yaml]
+----
+controller:
+  configmap:
+    enabled: true
+    data:
+      sysinitcfg.yaml: |
+        cacerts:
+        - -----BEGIN CERTIFICATE-----
+          MIID0zCCArugAwIBAgIU...
+          -----END CERTIFICATE-----
+        enable_tls_verification: true
+----
+
+. 使用 Helm 部署 {product-name}。
++
+通过覆盖文件部署 {product-name}：
++
+[source,bash]
+----
+helm install neuvector neuvector/core \
+  -n neuvector \
+  --set manager.svc.type=NodePort,imagePullSecrets=regsecret \
+  -f override.yaml
+----
++
+部署后，Helm 报告安装成功。
+
+. 验证配置。
++
+通过检查 `neuvector-init` ConfigMap 确认配置已应用：
++
+[source,bash]
+----
+kubectl get cm neuvector-init -o yaml
+----
++
+验证 CA 证书和 `enable_tls_verification` 设置是否出现在输出中。
++
+[NOTE]
+====
+安装后，验证 {product-name} 是否正在运行并可访问：
+
+[source,bash]
+----
+NODE_PORT=$(kubectl get -n neuvector -o jsonpath="{.spec.ports[0].nodePort}" svc neuvector-service-webui)
+NODE_IP=$(kubectl get nodes -o jsonpath="{.items[0].status.addresses[0].address}")
+echo https://$NODE_IP:$NODE_PORT
+----
+
+在浏览器中打开显示的 URL 以访问 {product-name} 管理器 UI。
+====
+
+=== Kubernetes RBAC
+
+要手动为特定名称空间配置 Kubernetes RBAC：
+
+. 转到 *设置* → *用户* → *添加用户*。
+. 打开 *高级设置*。
+. 在 {product-name} 中指定用户可以访问的名称空间。
+
+image:k8s-rbac.png[Kubernetes]
+
+=== Syslog
+
+通过输入 Syslog 服务器地址并选择通知级别来配置 Syslog 集成。您可以使用 IP 地址或 DNS，并选择 UDP 或 TCP。
+
+=== webhook
+
+{product-name} 可以通过使用 Webhooks 向外部端点发送通知。指定Webhook端点URL以接收通知。
+
+您可以在 *策略* → *响应规则* 下为自定义事件配置 Webhook 通知。
+
+=== 目录和SSO集成
+
+{product-name}支持目录和单点登录（SSO）集成，包括LDAP、Microsoft Active Directory、SAML和OpenID Connect。
+
+有关在集成过程中可以映射的预定义和自定义角色的信息，请参见xref:users.adoc#_users[用户和角色]。

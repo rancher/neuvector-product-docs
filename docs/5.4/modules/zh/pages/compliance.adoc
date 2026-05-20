@@ -1,0 +1,111 @@
+= 合规性与CIS基准
+:revdate: 2025-01-16
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/01.scanning/02.compliance/02.compliance.md
+:page-opendocs-slug:  /scanning/scanning/compliance
+
+== 管理合规性和CIS基准
+
+与{product-name}的合规性审计包括CIS基准、自定义检查、秘密审计以及PCI、GDPR和其他法规的行业标准模板。
+
+由{product-name}自动运行的CIS基准包括：
+
+* Kubernetes
+* Docker
+* 红帽OpenShift草案‘受CIS启发’的基准
+* Google GKE
+
+合规性扫描结果可以在注册表（针对镜像）、节点和容器菜单中查看，选择相关资产并点击合规性标签。
+
+安全风险->合规性菜单支持集中合规性报告，类似于漏洞菜单的工作方式。
+
+=== 安全风险 - 合规性和合规性配置文件
+
+合规性结果按类别和名称在列表中显示。类别包括Docker、Kubernetes、OpenShift和自定义。每个项目的名称对应于CIS基准。例如，K.4.2.3对应于Kubernetes CIS基准4.2.3。Docker基准前面加'D'，图像相关基准前面加'I'。
+
+使用高级过滤器根据平台、主机、命名空间或行业标准选择合规性检查，如下所示。
+
+image:compliance_4.png[合规性]
+
+应用过滤器后，仅显示相关的CIS基准和自定义检查，并可以生成和下载报告。这就是如何生成PCI、HIPAA、GDPR和其他标准的报告。
+
+以下截图显示了在镜像扫描中发现的秘密示例。
+
+image:secret_compliance_4.png[secrets]
+
+=== 自定义PCI、GDPR、HIPAA、NIST、PCIv4和DISA STIG的合规性模板
+
+合规性配置文件菜单允许自定义内置模板，以符合PCI、GDPR、HIPAA、NIST、PCIv4和DISA STIG等行业标准。这些报告可以通过在安全风险->合规性菜单中选择一个标准进行过滤，然后导出。NIST合规性配置文件适用于 https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-190.pdf[NIST SP 800-190].
+
+要自定义任何合规性配置文件，请选择行业标准（例如PCI），然后启用或禁用该标准的特定检查。将这些视为应用于每个检查的合规性“标签”，以生成该行业标准的合规性报告。
+
+使用操作按钮添加或移除该检查的任何合规性标签。
+
+image:compliance_profile_4.png[合规性配置文件]
+
+此外，您可以通过单击资产选项卡选择哪些“资产”被视为合规性报告的一部分。默认情况下，所有合规性模板适用于镜像、节点和容器。
+
+image:profile_assets_4.png[compliance_assets]
+
+使用操作按钮为资产添加或移除合规性模板。
+
+* 镜像。选择要报告的镜像标准。
+* 节点。选择要报告的节点（主机）标准（可多选）。
+* 容器。选择要报告的容器标准（可多选）。
+
+或者，除了按照上述条件限制外，合规性模板可以限制于某些名称空间。如果选中此框并添加名称空间，将为所有适用于这些名称空间的资产生成报告。如果PCI模板仅应报告包含PCI范围内（适用）工作负载的名称空间的资产，这将非常有用。
+
+image:DocheckASSETSEnableNS.png[namespace]
+
+在安全风险 -> 合规性配置文件菜单中自定义模板和资产（如有需要）后，可以通过打开高级过滤器并选择所需的合规性模板，在安全风险 -> 合规性菜单中生成报告。例如，选择GDPR将仅过滤GDPR配置文件的显示和报告。
+
+=== 带有主要合规性的示例Helm安装
+
+以下是安装SUSE Security 5.4.0及主要合规性的示例Helm安装命令。用户可以将安装版本修改为5.4.0或更高版本，因为主要合规性从5.4.0开始。安装后，主要用户可以从SUSE Security网页UI **合规性 > 法规** 标签视图中检查可用的法规。
+
+[,shell]
+----
+helm install neuvector -n neuvector ./ --set controller.prime.enabled=true --set
+controller.prime.image.repository=nvlab/compliance_config,controller.prime.image.tag=1.
+0.0 --set
+tag=5.4.0-b2,controller.image.repository=nvpublic/co,enforcer.image.repository=nvpublic/
+en,manager.image.repository=nvpublic/ma
+----
+
+=== 秘密审计
+
+{product-name} 在镜像合规性扫描和运行时扫描中检查超过40种常见类型的秘密。此外，可以为容器或主机配置 xref:customcompliance.adoc[自定义合规性脚本]，并且可以使用 xref:dlp.adoc[DLP数据包检查] 功能检查网络负载中的秘密。
+
+秘密审计的结果可以在镜像扫描（资产 -> 注册表）、容器（资产 -> 容器）、节点（资产 -> 节点）和合规性管理菜单（安全风险 -> 合规性）中的合规性部分找到。
+
+以下是如何在镜像扫描中显示检测到的秘密的示例。
+
+image:secrets_image_4.png[secrets]
+
+以下是检测到的秘密类型的列表。
+
+* 通用私钥
+* 通用凭证检测，包括'apikey'、'api_key'、'password'、'secret'、'passwd'等。
+* yaml文件中的通用密码，包括'password'、'passwd'、'api_token'等。
+* 键/值对中的通用秘密密钥
+* Putty私钥
+* XML私钥
+* AWS https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html[凭证 / IAM]
+* Facebook 客户端密钥
+* Facebook 端点密钥
+* Facebook 应用密钥
+* Twitter 客户端 ID
+* Twitter 密钥
+* Github 密钥
+* Square 产品 ID
+* Stripe 访问密钥
+* Slack API 令牌
+* Slack 网络钩子
+* LinkedIn 客户端 ID
+* LinkedIn 密钥
+* Google API 密钥
+* SendGrid API 密钥
+* Twilio API 密钥
+* Heroku API 密钥
+* MailChimp API 密钥
+* MailGun API 密钥

@@ -1,0 +1,643 @@
+= 注册表扫描配置
+:revdate: 2025-06-25
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/02.registry/02.registry.md
+:page-opendocs-slug:  /scanning/registry
+
+注册表扫描要求在主机/节点上部署 {product-name} Allinone 或控制器容器。请参见 xref:installation.adoc[安装/部署] 部分以了解如何部署 {product-name} 容器。在登录管理器后，从 {product-name} 控制台配置注册表扫描。
+
+此外，请确保部署并配置了一个 {product-name} 扫描器容器，以连接到 Allinone 或控制器。在 4.0 及更高版本中，neuvector/scanner 容器必须与 allinone 或控制器分开部署。
+
+[NOTE]
+====
+注册镜像扫描由扫描器执行，镜像在内存中被拉取和展开。如果预期展开的镜像大小超过 500MB，请考虑将扫描器内存增加到 1.5GB 或更多，以提供容量和余量。
+====
+
+为了提高注册表扫描的性能和可伸缩性，可以在不同节点上部署多个扫描器 Pod，以将扫描任务分配给多个扫描器。有关详细信息，请参见 xref:scanners.adoc[多个并行扫描器] 部分。
+
+对于多集群（联邦）环境，主（主控）集群可以扫描指定为联邦注册表的注册表/储存库。这些注册表的扫描结果将同步到所有受管理（远程）集群。这使得在受管理集群控制台中显示扫描结果成为可能，并且可以在受管理集群的准入控制规则中使用这些结果。注册表只需扫描一次，而不是每个集群都扫描，从而减少 CPU/内存和网络带宽的使用。有关更多详细信息，请参见 xref:multicluster.adoc[多集群] 部分。
+
+== 配置注册表扫描
+
+要配置要扫描的注册表和储存库，请在 {product-name} 控制台的资产 -> 注册表菜单中进行。添加或编辑要扫描的注册表。使用过滤器定义要扫描的储存库或镜像子集。如果您的注册表需要通过代理访问，可以在设置 -> 配置中进行配置。
+
+image:registry-scan.png[注册表]
+
+注册表将根据可配置的计划进行扫描。默认情况下，仅会扫描新图像或更新的图像。如果您希望在每次更新CVE数据库时重新扫描所有适用的图像，请在配置注册表时选择“在CVE数据库更新后重新扫描”按钮。您还可以选择分层扫描，以按图像中的每一层显示漏洞（注意：分层扫描可能需要更长时间并消耗更多资源才能完成）。
+
+扫描完成后，您将在其下方看到结果。单击储存库/标签以查看漏洞，单击漏洞以查看更多信息。您还可以下载CSV文件中的报告或在事件日志中查看结果。
+
+image:image_scan_4.png[分层]
+
+NeuVector提供了一个**"查看所有扫描的图像"**选项。用户无需查看注册表即可查看特定镜像。相反，用户可以单击最后一行以列出所有扫描的图像。
+
+image:view-all-scanned-images.png[注册表]
+
+用户还可以访问**注册表**页面，并从**容器**页面的超链接打开特定镜像。如果图像名称不可点击，则表示该图像尚未被扫描。
+
+image:link-to-image-scan-result.png[容器]
+
+扫描结果包括按镜像层显示的漏洞，如果在注册表/储存库配置期间选择了该选项，还包括合规性检查结果。查看图像的扫描结果时，单击合规性选项卡以查看合规性检查。
+
+扫描还将发现并列出图像中的所有模块（即清单），如下所示。它还将按模块总结漏洞风险，并列出每个模块的所有漏洞。
+
+image:Image_Modules.png[模块]
+
+扫描支持对基于原生Docker、Amazon ECR、Redhat/Openshift、jFrog、Microsoft ACR、Sonatype Nexus、Harbor、Google云及其他仓库的公共和私有docker仓库中的镜像进行。 镜像的扫描报告包含镜像中各种软件包和二进制文件的漏洞状态。扫描报告的简要摘要可以通过在策略->响应规则中使用响应规则配置的Webhook发送，或通过在设置->配置中配置Syslog服务器以Syslog方式发送。结果也可以在事件日志中查看。
+
+至少需要一个储存库过滤器（不能为空）。
+
+=== 储存库过滤器示例
+
+image:1-filter-examples.png[filters]
+
+[NOTE]
+====
+. 要扫描所有图像标签，请将过滤器添加为&#42;或&#42;:&#42;。这适用于除公共docker注册表之外的所有注册表类型。
+. 如果公共docker注册表的组织为空，则仓库应为完整名称，或在仓库前添加库，如上所示。
+. 创建一个虚拟储存库并将所有本地储存库添加到其中，以扫描使用子域docker访问方法的JFrog仓库上的所有标签。
+. 可以在过滤器中使用正则表达式。例如alpine:3.[8|9].*将扫描docker hub上的所有3.8.x和3.9.x图像及标签。
+====
+
+=== 注册表扫描选项
+
+* 扫描层：
+** 为每个镜像层提供漏洞扫描结果
+** 提供有关执行的命令、在镜像层中添加的软件包的信息
+** 每层的镜像大小
+* 自动扫描：
+** 自动扫描仅支持与OpenShift imagestream集成。应提前配置适当的角色绑定。
+** 当启用自动扫描时，一旦镜像被推送到注册表，镜像扫描将被安排。
+* 定期扫描：
+** 启用定期扫描以定期进行扫描
+** 扫描间隔可以设置为5分钟到7天之间。
+** 由于许多入场控制检查依赖于镜像扫描结果，启用定期扫描有助于确保入场控制拥有最新的镜像信息。
+** 请注意，{product-name}将扫描注册表中自上次扫描以来新添加或更改的镜像。
+* 在CVE数据库更新后重新扫描
+** 启用此选项以在漏洞数据库更新后重新扫描所有镜像。
+
+=== 为注册表配置代理服务器
+
+请前往设置->配置以配置注册表扫描的代理设置。
+
+=== 原生 Docker 注册表（也包括 Quay 和 Harbor）
+
+==== 添加原生 Docker 注册表
+
+* 选择 Docker 注册表作为类型
+* 为注册表提供唯一名称
+* 输入带端口的注册表URL
+* 如果注册表需要，请提供用户名和密码
+* 以以下格式添加储存库作为过滤器
+** Organization/repository:tag
+** 储存库可以以起始字符串作为通配符
+** 示例 neuvector/all&#42;:2&#42;
+
+添加带有用户名/密码的私有 Docker 注册表，启用层扫描，每 30 分钟进行一次定期扫描，并使用 * 作为过滤器扫描所有储存库的所有标签。
+
+image:2-dockerprivate.png[docker]
+
+添加无需用户名/密码的公共 Docker 注册表进行扫描，并使用通配符的 2 个储存库，启用层扫描并启用定期扫描。
+
+image:3-dockerpublic.png[docker3]
+
+添加带有用户名/密码的公共 Docker 注册表进行扫描，使用通配符储存库，启用层扫描并启用定期扫描。
+
+image:4-dockerpub-wild.png[docker4]
+
+[NOTE]
+.Quay 注册表
+====
+* 输入您的 Quay 注册表的顶级 URL；请勿在路径中输入任何目录。
+* 您需要在您的 Quay 服务器/账户中生成一个加密密码，并在此处使用这些凭据。 然后，传递如上所述的过滤器。
+
+image:https://user-images.githubusercontent.com/13239496/218163999-9b281bd9-d049-49f6-85cd-395d7c20c481.png[4 1-quay]
+====
+
+==== 开始扫描 Docker 注册表
+
+* 选择要扫描的注册表
+* 点击开始按钮进行扫描
+* 等待状态从扫描更改为空闲
+** 扫描时间根据储存库的大小而有所不同
+
+image:5-scandocker.png[scandocker]
+
+==== 查看扫描结果
+
+* 点击镜像窗格中的镜像以查看该镜像的扫描结果。
+* 访问扫描结果以查找该镜像的漏洞状态。
+* 如果需要，请点击下载按钮以下载该镜像的扫描结果
+* 将鼠标移动到CVE详细信息和镜像之间以返回摘要
+
+显示为所选注册表扫描的镜像
+
+image:6-imagescan.png[scanned]
+
+示例显示镜像的层扫描结果，展示每层的漏洞、层大小以及在每层上执行的命令。此外，还有一个合规性选项卡，显示该镜像的合规性测试结果。
+
+image:image_scan_4.png[分层]
+
+=== 亚马逊ECR注册表
+
+参考： https://docs.aws.amazon.com/AmazonECR/latest/userguide/Registries.html
+
+==== 添加亚马逊ECR注册表
+
+* 选择亚马逊注册表作为类型
+* 为注册表提供唯一名称
+* 注册表URL会自动找到其他信息
+* 请提供以下注册表信息。请参考上述亚马逊链接以获取以下信息
+** 注册表ID
+** 区域
+** 访问密钥ID
+** 秘密访问密钥
+* 以以下格式添加储存库作为过滤器
+** Organization/repository:tag
+** 储存库可以以起始字符串作为通配符
+** 示例 neuvector/all&#42;:2&#42;
+** 如果注册表中有此类图像，则组织可以为空
+** &#42;以扫描所有图像标签
+
+image:9-aws.png[aws]
+
+=== Red Hat 注册表
+
+参考： https://access.redhat.com/containers
+
+==== 添加 Red Hat 注册表
+
+* 选择 Red Hat 注册表作为类型
+* 为注册表提供唯一名称
+* 输入注册表 URL https://registry.connect.redhat.com/
+* 提供用于管理注册表的帐户的用户名和密码
+* 以以下格式添加储存库作为过滤器
+** Organization/repository:tag
+** 储存库可以以起始字符串作为通配符
+** 示例 neuvector/all&#42;:2&#42;
+** &#42;以扫描所有图像标签
+
+image:10-redhat.png[redhat]
+
+=== OpenShift 注册表
+
+==== 添加带有用户名和密码的 OpenShift 注册表
+
+* 选择 OpenShift 注册表作为类型
+* 为注册表提供唯一名称
+* 输入注册表 URL（如果与默认值不同，请从 OpenShift 网络中的 "oc get is" 命令的输出中获取）
+** 默认注册表 URL `https://docker-registry.default.svc:5000/`
+* 提供用于管理注册表的帐户的用户名和密码
+* 以以下格式添加储存库作为过滤器
+** Organization/repository:tag
+** 示例 openshift/htt&#42;:&#42;
+** &#42;以扫描所有图像标签
+* 启用自动扫描，以便在 OpenShift 镜像流中更新镜像后立即开始扫描。
+
+image:1a_openshift.png[openshift]
+
+==== 添加带有令牌的 OpenShift 注册表
+
+* 选择 OpenShift 注册表作为类型
+* 为注册表提供唯一名称
+* 输入注册表 URL（如果与默认值不同，请从 OpenShift 网络中的 "oc get is" 命令的输出中获取）
+** 默认注册表 URL `https://docker-registry.default.svc:5000/`
+* 提供具有访问所有命名空间权限的服务帐户的令牌
+** 查看下面的说明以创建服务帐户并获取令牌。
+** 创建服务帐户
+*** oc 项目默认
+*** oc 创建 sa nvqa
+*** oc get sa
+** 将集群管理员角色分配给服务账户以读取所有注册表
+*** oc adm policy add-cluster-role-to-user cluster-admin system:serviceaccount:default:nvqa
+** 获取服务账户的令牌
+*** oc sa get-token nvqa
+* 以以下格式添加储存库作为过滤器
+** Organization/repository:tag
+** 示例 openshift/htt&#42;:&#42;
+** &#42;以扫描所有图像标签
+* 启用自动扫描，以便在OpenShift镜像流中图像更新时立即开始扫描。
+
+image:1a_openshift_token.png[openshift]
+
+==== OpenShift 3.7注册表中的稳定性问题
+
+在OpenShift 3.7中，拉取容器镜像元数据或下载镜像的API调用可能会随机失败。在不同的扫描运行中，它也可能在随机镜像上失败。当这种情况发生时，您可能会看到不完整的镜像列表或某些镜像的扫描可能会失败。如果发生这种情况，可以重新扫描该存储库。
+
+=== JFrog Artifactory
+
+添加JFrog Artifactory注册表（Docker访问方法 -- 储存库路径）JFrog管理页面管理员->HTTP设置显示Docker访问方法 - 储存库路径
+
+image:12-jfrog.png[jfrog]
+
+==== 添加JFrog Artifactory注册表（Docker访问方法 -- 储存库路径）
+
+* 选择JFrog Artifactory作为类型
+* 为注册表提供一个唯一的名称
+** 输入带有端口的注册表URL，例如 `http://10.1.7.122:8081/`
+* 如果注册表需要，请提供用户名和密码
+* 以以下格式将储存库添加为过滤器
+** Organization/repository:tag
+** 储存库或标签可以在末尾使用通配符，例如 abc/&#42;，abc/n&#42;
+** 要扫描储存库的所有标签，例如 alpine，请使用 alpine:&#42;
+** 通配符必须前面有完整名称、路径或起始字符串
+** &#42; 扫描所有标签
+
+==== 添加 JFrog Artifactory 注册表（Docker 访问方法 -- 子域）
+
+JFrog 管理页面 admin->HTTP 设置显示 Docker 访问方法 -- 子域
+
+image:14-artifact.png[artifactory]
+
+添加 JFrog Artifactory 注册表（Docker 访问方法 -- 子域）
+
+* 选择JFrog Artifactory作为类型
+* 为注册表提供一个唯一的名称
+* 输入带有端口的注册表URL，例如 `http://10.1.7.122:8081/`
+* 选择子域作为 JFrog Docker 访问方法
+* 如果注册表需要，请提供用户名和密码
+* 以以下格式将储存库添加为过滤器
+** Subdomain/repository:tag
+** 储存库或标签可以在末尾使用通配符，例如 abc/&#42;，abc/n&#42;
+** 要扫描储存库的所有标签，例如 alpine，请使用 alpine:&#42;
+** 通配符必须前面有完整名称、路径或起始字符串
+** &#42; 用于扫描所有子域的所有标签
+
+[NOTE]
+====
+创建一个虚拟储存库并将所有本地和远程储存库添加到其中。在过滤器部分指定此虚拟储存库，以扫描来自本地和远程储存库的所有标签。
+====
+
+添加基于子域的 JFrog 注册表以扫描来自 docker-local 子域的镜像
+
+image:jfrog_sub_local.png[local]
+
+添加基于子域的 JFrog 注册表以扫描来自所有子域的所有标签
+
+image:jfrog_all_subs.png[all]
+
+==== 添加 JFrog Artifactory 注册表（Docker 访问方法 -- 端口）
+
+JFrog 管理页面 admin->HTTP 设置显示 Docker 访问方法 - 端口
+
+image:jfrogport1.png[jfrogport]
+
+JFrog 管理页面管理员->本地储存库->docker-local 储存库-> 高级 - 显示储存库 URL 和注册表端口 8181
+
+image:jfrogport2.png[jfrogport]
+
+JFrog 管理页面管理员->本地储存库->guo 储存库-> 高级 - 显示储存库 URL 和注册表端口 8182
+
+image:jfrogport3.png[jfrogport]
+
+* 选择JFrog Artifactory作为类型
+* 为注册表提供一个唯一的名称
+* 输入带有端口的注册表URL，例如 `http://10.1.7.122:8181/`
+** 每个注册表名称都有唯一的端口
+* 选择端口作为 JFrog Docker 访问方法
+* 如果注册表需要，请提供用户名和密码
+* 以以下格式将储存库添加为过滤器
+** Organization/repository:tag
+** 储存库或标签可以在末尾使用通配符，例如 abc/_, abc/n_
+** 要扫描某个储存库的所有标签，例如 alpine，请使用 alpine:*
+** 通配符必须前面有完整名称、路径或起始字符串
+** &#42; 用于扫描所有标签
+
+为端口访问方法添加 JFrog 注册表，注册表 docker-local 的端口为 8181
+
+image:jfrog104.png[jfrogport]
+
+为端口访问方法添加 JFrog 注册表，注册表的端口为 8182
+
+image:jfrog105.png[jfrogport]
+
+为虚拟注册表添加 JFrog 注册表的端口访问方法，端口为 8188，该注册表已添加所有本地注册表。
+
+image:jfrog106.png[jfrogport]
+
+显示 docker-local 注册表的扫描结果
+
+image:jfrogport6.png[jfrogport]
+
+==== 添加 SaaS JFrog Artifactory 注册表（Docker 访问方法 -- 端口）
+
+选择JFrog Artifactory作为类型
+
+* 为注册表提供一个唯一的名称
+* 输入注册表 URL，例如 https://jfrogtraining-docker-nv-virtual.jfrog.io
+* 选择端口作为 JFrog Docker 访问方法
+* 如果注册表需要，请提供用户名和密码
+* 以以下格式将储存库添加为过滤器
+** Organization/repository:tag
+** &#42; 扫描所有储存库的所有标签
+
+image:jfrog_saas.png[jfrogsaas]
+
+==== 开始扫描 JFrog Artifactory 注册表
+
+* 选择要扫描的注册表
+* 点击开始按钮进行扫描
+* 等待状态从扫描更改为空闲
+** 扫描时间根据储存库的大小而有所不同
+
+==== 使用 JFrog 注册表扫描 NeuVector 注册表
+
+
+对于在子域模式下使用 JFrog 注册表扫描 NeuVector 注册表，子域通常是 JFrog 注册表 URL 的前缀。
+
+**标准 JFrog 子域示例**
+
+JFrog注册表URL：`https://mysubdomain.myhost.com`
+
+* **mysubdomain**：子域名
+* **myhost.com**：JFrog 注册表主机名
+
+注册表过滤器示例：`mysubdomain/docker-service-broker-tmp-local/devop/test/joe/*`
+
+**当JFrog使用修改过的子域名**
+
+当您在注册表URL中使用修改过的子域名时。
+
+JFrog注册表URL：`https://artifact-mysubdomain.myhost.com`
+
+* **artifact-mysubdomain**：仅在注册表URL中使用的修改过的子域名
+* **mysubdomain**：JFrog服务器中的实际子域名
+* **myhost.com**：JFrog注册表主机名
+
+注册表过滤器示例：`myrepo/docker-service-broker-tmp-local/devop/test/joe/*`
+
+[NOTE]
+====
+NeuVector之前支持这些环境。然而，在升级到新版 JFrog 服务器后，支持出现中断，因为 NeuVector 无法确定真实的子域名值究竟来自 URL 还是过滤器（例如，artifact-mysubdomain 与 mysubdomain）。
+====
+
+**所需修复**
+
+如果子域名不是JFrog注册表服务器URL的前缀，您必须使用以下格式配置注册表过滤器：
+
+JFrog注册表URL：`https://artifact-mysubdomain.myhost.com`
+
+注册表过滤器：`<mysubdomain>/docker-service-broker-tmp-local/devop/test/joe/*`
+
+[NOTE]
+====
+所需格式：`<actual-subdomain>/...`
+====
+
+通过以这种格式指定过滤器，NeuVector可以正确识别在子域名模式下与JFrog服务器通信所使用的实际子域名。
+
+=== Google容器注册表
+
+参考：
+https://cloud.google.com/container-registry/docs/advanced-authentication
+https://cloud.google.com/container-registry/docs/advanced-authentication#json_key_file
+
+==== 为项目启用云资源管理器API
+
+Google云平台->选择项目->API和服务->启用API和服务->搜索 "`Cloud Resource Manager API`"->启用API
+https://console.cloud.google.com/apis/library?project=nvtest-219600&q=Cloud%20Resource%20Manager%20API   （更改项目名称）
+
+image:17-gcp.png[gcp]
+
+==== 为容器服务账户创建密钥
+
+Google Cloud Platform->IAM->服务账户->与容器注册表->创建密钥(操作)
+
+image:18-gcpiam.png[gcpiam]
+
+==== 将json文件复制到客户端机器
+
+==== 从{product-name} GUI添加Google容器注册表
+
+* 选择Google注册表作为类型
+* 为注册表提供唯一名称
+* 输入注册表URL。示例 https://gcr.io/（这也可以是us.gcr.io、eu.gcr.io等）
+* 将上述捕获的json文件的所有内容粘贴到JSON密钥中。
+* 以以下格式添加储存库作为过滤器
+** Project-id/repository:tag
+** 示例 nvtestid-1/neuvector&#42;:&#42;
+** &#42;以扫描所有镜像标签
+
+image:19-gcpscan.png[gcpscan]
+
+==== 开始扫描Google容器注册表
+
+* 选择要扫描的注册表
+* 点击开始按钮进行扫描
+* 等待状态从扫描更改为空闲
+** 扫描时间根据储存库的大小而有所不同
+
+=== Azure容器注册表
+
+参考：
+https://azure.microsoft.com/en-us/services/container-registry/
+
+==== 获取Azure容器用户名和密码，如下所示
+
+Azure容器注册表 -> 用户-> 访问密钥->密码
+
+显示Azure门户用户名和密码以访问容器注册表
+
+image:20-azure.png[azure]
+
+==== 从{product-name} GUI添加Azure容器注册表
+
+* 选择 Azure 注册表作为类型
+* 为注册表提供唯一名称
+* 输入注册表URL。示例 `https://neuvector.azure.io`（从 Azure 门户获取）
+** 容器注册表->用户->概览->登录服务器
+* 添加用户名和密码
+** Azure容器注册表 -> 用户-> 访问密钥->密码
+* 以以下格式添加储存库作为过滤器
+** repository:tag
+** 示例 alpine:&#42;
+** &#42;以扫描所有镜像标签
+
+显示 Azure 门户的 Azure 容器注册表登录服务器
+
+image:21-azurereg.png[azure]
+
+添加 Azure 容器注册表以扫描所有标签
+
+image:22-azureadd.png[azureadd]
+
+==== 开始扫描 Azure 容器注册表
+
+* 选择要扫描的注册表
+* 点击开始按钮进行扫描
+* 等待状态从扫描更改为空闲
+** 扫描时间根据储存库的大小而有所不同
+
+=== Sonatype Nexus Docker 注册表
+
+参考：
+https://help.sonatype.com/repomanager3/private-registry-for-docker
+https://hub.docker.com/r/sonatype/nexus3/
+
+==== 添加 Sonatype Nexus Docker 注册表
+
+* 选择 Sonatype Nexus 作为类型
+* 为注册表提供唯一名称
+* 输入带端口的注册表URL
+* 如果注册表需要，请提供用户名和密码
+* 以以下格式添加储存库作为过滤器
+** Organization/repository:tag
+** 储存库可以以起始字符串作为通配符
+** 示例 neuvector/all&#42;:2&#42;
+** &#42;以扫描所有图像标签
+
+添加 Sonatype Nexus Docker 注册表，使用用户名/密码和储存库 &#42;:&#42; 进行扫描
+
+image:23-sonatype.png[sonatype]
+
+==== 开始扫描 Sonatype Nexus Docker 注册表
+
+* 选择要扫描的注册表
+* 点击开始按钮进行扫描
+* 等待状态从扫描更改为空闲
+** 扫描时间根据储存库的大小而有所不同
+
+=== GitLab 容器注册表
+
+==== 示例 GitLab 环境配置
+
+[,bash]
+----
+sudo docker run --detach \
+  --hostname gitlab \
+  --env GITLAB_OMNIBUS_CONFIG="external_url 'http://10.1.7.73:9096'; gitlab_rails['lfs_enabled'] = true;" \
+  --publish 10.1.7.73:9095:9095 --publish 10.1.7.73:9096:9096 --publish 10.1.7.73:6222:22 \
+  --name gitlab \
+  --restart always \
+  --volume /srv/gitlab/config:/etc/gitlab \
+  --volume /srv/gitlab/logs:/var/log/gitlab \
+  --volume /srv/gitlab/data:/var/opt/gitlab \
+gitlab/gitlab-ce:latest
+External_URL:  http://10.1.7.73:9096
+Registry_URL: https://10.1.7.73:9095
+----
+
+==== 获取 GitLab 私有令牌，如下所示
+
+* 从 GitLab 登录页面右上角的图标导航到设置页面，如下所示：
+
+image:gitlabsettings.png[gitlab]
+
+* 从用户设置页面导航到访问令牌页面，如下所示：
+
+image:gitlabusersettings.png[gitlab]
+
+* 填写所有适用的字段，然后在准备好生成访问令牌时点击"`Create personal access token`"：
+
+image:gitlabpersonaltoken_new.png[gitlab]
+
+* 一旦用户离开生成的令牌页面，访问令牌将不再可用。 因此，强烈建议在导航或关闭以下页面之前先复制访问令牌：
+
+image:gitlabaccesstoken.png[gitlab]
+
+==== 获取外部和注册表 URL
+
+外部 URL：  外部 URL 是 API 服务器的 URL。 +
+注册表 URL： 可以从 GitLab 网络控制台的容器注册表页面获取。 到达此页面的一种方法是从 GitLab 的网络控制台导航到项目 > 您的项目 > 管理员 / ... > 左侧面板（容器注册表） > 鼠标悬停（root/.../）
+
+以下是显示外部 URL 和注册表 URL 的页面的示例屏幕截图：
+
+image:gitlabexternalurl.png[gitlab]
+
+==== 从 {product-name} 控制台添加 GitLab 注册表
+
+* 选择 GitLab 作为注册表类型
+* 为注册表提供唯一名称
+* 输入带端口的注册表URL
+* 如果注册表需要，请提供用户名和密码
+* 提供 GitLab 外部 URL 和从上一部分获得的私有令牌
+
+image:gitlabregistryscan.png[gitlab]
+
+[NOTE]
+====
+注册表 URL 用于将镜像从 GitLab 拉入 {product-name} 扫描平台以进行注册表扫描。 而外部 URL 用于检索镜像、注册表和注册表扫描功能使用的元数据列表。
+====
+
+=== IBM Cloud 容器注册表
+
+参考： https://www.ibm.com/cloud/container-registry
+
+==== 添加 IBM 容器注册表
+
+* 选择 IBM Cloud 容器注册表作为类型
+* 为注册表提供唯一名称
+* 输入注册表 URL https://us.icr.io/
+* 提供 iamapikey 作为用户名，下面的 apikey 作为密码
+** 从 CLI 创建 apikey
+*** 在ibmcloud中创建api密钥atibmKey
+** 通过GUI创建apikey
+*** IBM Cloud->管理访问(IAM)-IBM Cloud API密钥
+* 提供IBM Cloud账户
+** 从CLI获取IBM Cloud账户
+*** Ibmcloud cr信息
+* 以以下格式添加储存库作为过滤器
+** Organization/repository:tag
+** 储存库可以以起始字符串作为通配符
+** 示例 neuvector/all__:2__
+** {blank}
+*** 扫描所有镜像标签
+* 如有需要，请启用其他参数
+
+image:ibm-1.png[ibm]
+
+[NOTE]
+====
+注册表身份验证的用户名必须为'iamapikey'
+====
+
+=== Harbor注册表
+
+使用与本地Docker注册表相同的说明，选择**Harbor注册表**作为注册表。
+
+image::https://github.com/user-attachments/assets/9d382fde-7be4-423d-8401-c1034a9e4c2f[Harbor]
+
+过滤字段不能为空。输入一个储存库过滤器，或添加过滤器为*以扫描所有储存库。
+
+=== GitHub容器注册表
+
+在NeuVector v5.4.3及更高版本中，现已支持从 https://ghcr.io[GitHub容器注册表(GHCR)]进行镜像扫描，使用户能够将存储在GitHub中的镜像纳入其安全和合规工作流程。
+
+==== 添加GitHub容器注册表
+
+要在NeuVector中配置GHCR，请转到**添加注册表**并从注册表类型下拉菜单中选择**GitHub容器注册表**。
+
+|===
+| 字段 | 说明
+
+| **名称**
+| 用于识别此注册表配置的名称。
+
+| **注册表**
+| GHCR 注册表 URL。示例：`https://ghcr.io/`。
+
+| **用户名**
+| 您的 GitHub 用户名。
+
+| **令牌**
+| 一个 https://github.com/settings/tokens[GitHub 个人访问令牌]，具有 `read:packages` 权限（如果访问私有镜像，则需要 `repo`）。
+
+| **过滤器**
+| 指定要扫描的名称空间（例如，`github_user/hello-world:*` 或 `repo/package_name:version`）。
+|===
+
+==== 令牌权限
+
+要访问 GHCR，您必须生成一个具有以下范围的 GitHub 令牌：
+
+* `read:packages`（必需）
+* `repo`（如果访问私有储存库）
+
+您可以在 https://github.com/settings/tokens[这里] 创建一个令牌。
+
+==== 查错
+
+如果您遇到 `403 Forbidden` 或 `invalid credentials` 等问题，请确保：
+
+* 您的令牌具有正确的范围。
+* 注册表 URL 格式正确（例如，`\https://ghcr.io/`）。

@@ -1,0 +1,184 @@
+= 并行和独立扫描器
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/06.scanners/06.scanners.md
+:page-opendocs-slug:  /scanning/scanners
+
+== 通过多个扫描器提高扫描器的可伸缩性
+
+为了提高扫描器的性能和可伸缩性，{product-name} 支持部署多个扫描器实例，这些实例可以并行扫描注册表中的镜像。控制器将扫描任务分配给每个可用的扫描器实例。扫描器实例可以根据需要通过 Kubernetes 轻松实现扩展或缩减。
+
+扫描器实例应部署到不同的节点，以便将工作负载分散到不同的主机资源上。请记住，扫描器需要足够的内存来拉取和展开镜像，因此它应有可用的内存大于要扫描的最大镜像大小。如有必要，可以将扫描器放置在特定节点上，或使用标准的 Kubernetes 节点标签、污点/容忍或节点亲和性配置来避免在一个节点上放置多个实例。
+
+默认情况下，{product-name} 部署2个扫描器实例，作为“部署 {product-name}”部分示例部署的一部分。这些副本集可以根据需要进行扩展或缩减。
+
+扫描器容器包含最新的 CVE 数据库，并由 {product-name} 定期更新（带有 'latest' 标签）。更新程序重新部署扫描器，强制拉取最新的扫描器镜像，以获取最新的 CVE 数据库。有关更新程序的更多详细信息，请参见 xref:updating.adoc[更新 CVE 数据库] 部分。
+
+请注意，在初始版本中，多个扫描器的存在和状态仅在 Kubernetes 中通过 'kubectl get pods -n neuvector' 可见，且不会在 Web 控制台中显示。
+
+所有扫描器的扫描结果显示在资产 -> 注册表菜单中。未来版本将添加额外的扫描器监控功能。
+
+=== 扫描器实例的自动扩展
+
+扫描器实例可以根据某些标准配置为自动扩展。这将确保扫描任务快速高效地处理，特别是当需要扫描或重新扫描数千个镜像时。有三种可能的设置：延迟、立即和禁用。当控制器排队扫描图像时，它会保持一个“任务计数”，以记录队列大小。
+
+* 延迟策略：
+** 当主控制器连续看到“任务计数”> 0超过90秒时，如果尚未达到maxScannerPods，则启动一个新的扫描器实例。
+** 当主控制器连续看到“任务计数”为0超过180秒时，如果尚未达到minScannerPods，则缩减一个扫描器实例。
+* 立即策略：
+** 每当主控制器看到“任务计数”> 0时，如果尚未达到maxScannerPods，则启动一个新的扫描器实例。
+** 当主控制器连续看到“任务计数”为0超过180秒时，如果尚未达到minScannerPods，则缩减一个扫描器实例。
+
+扫描器自动扩展的配置可以在设置 -> 配置中进行调整。minimumScannerPods 参数设置了任何时刻运行的最小扫描器实例数量，而 maxScannerPods 参数则设置了自动扩展策略可扩展到的最大实例数。注意：设置最小值不会调整原始扫描器部署副本集的值。最小值将在第一次扩缩容事件中应用。
+
+[IMPORTANT]
+====
+当扫描器与OpenShift操作员一起部署时，不支持扫描器自动扩展，因为操作员将始终将实例数更改为其配置值。
+====
+
+=== 操作和调试
+
+每个扫描器实例将查询要扫描的注册表，以拉取可用图像和其他数据的完整列表。然后将为每个扫描器实例分配一个镜像，从注册表中拉取并进行扫描。
+
+要检查扫描器的行为，可以使用以下命令查看每个扫描器实例的日志。
+
+[,shell]
+----
+kubectl logs <scanner-pod-name> -n neuvector
+----
+
+== 性能规划
+
+在具有大量图像的注册表上尝试不同数量的扫描器，以观察您环境中的扫描完成时间行为。2-5个扫描器作为副本设置，在大多数情况下应该足够。
+
+当扫描任务分配给扫描器时，它从注册表中拉取图像（在查询注册表以获取可用图像列表后）。拉取图像（下载）通常是最耗时的过程。多个扫描器可以并行从同一个注册表中拉取图像，因此性能可能会受到注册表或网络带宽的限制。
+
+大型图像的拉取时间较长，并且需要展开以进行扫描，消耗更多内存。确保每个扫描器分配的内存足够大，至少比预期最大图像大小多出 10%。
+
+可以将多个扫描器部署到同一个主机/节点，但应确保主机拥有足够的内存、处理器和网络带宽，以最大化扫描器的性能。
+
+== 本地扫描的独立扫描器
+
+{product-name} 支持本地图像扫描的独立扫描器部署（不需要控制器）。在下面的示例 docker 运行中，本地图像将被扫描，结果将存储在本地的 /var/neuvector 中。对于本地扫描，图像必须能够通过挂载的 docker.sock 访问，否则可以指定一个注册表。
+
+[,bash]
+----
+docker run --name neuvector.scanner --rm -e SCANNER_REPOSITORY=ubuntu -e SCANNER_TAG=16.04 -e SCANNER_ON_DEMAND=true -v /var/run/docker.sock:/var/run/docker.sock -v /var/neuvector:/var/neuvector  neuvector/scanner
+----
+
+以下扫描器环境变量可以在 docker 运行命令中使用：
+
+* SCANNER_REGISTRY= 注册表的 URL（可选，替代本地扫描）
+* SCANNER_REPOSITORY= 要扫描的储存库
+* SCANNER_TAG= 版本标签
+* SCANNER_REGISTRY_USERNAME= 用户（可选，替代本地扫描）
+* SCANNER_REGISTRY_PASSWORD= 密码（可选，替代本地扫描）
+* SCANNER_SCAN_LAYERS= true 或 false（返回分层扫描结果）
+* SCANNER_ON_DEMAND=true（必需）
+* CLUSTER_JOIN_ADDR（可选），CLUSTER_JOIN_PORT（可选） - 将结果发送到控制器以用于准入控制规则（Kubernetes 部署的控制器）。
+* CLUSTER_ADVERTISED_ADDR（可选） - 如果扫描器与控制器在不同主机上，将结果发送用于准入控制规则（Kubernetes 部署的控制器）。
+
+=== 独立模式下的主机扫描
+
+使用以下命令扫描主机。
+
+[CAUTION]
+====
+需要特权模式！
+====
+
+
+[,shell]
+----
+docker run --rm --privileged --pid=host neuvector/scanner -n neuvector
+----
+
+=== 在Kubernetes上手动部署多个扫描器
+
+要手动将扫描器作为现有Kubernetes部署的一部分进行部署，请创建一个新的角色绑定：
+
+[,shell]
+----
+kubectl create rolebinding neuvector-admin --clusterrole=admin --serviceaccount=neuvector:default -n neuvector
+----
+
+或者用于OpenShift
+
+[,shell]
+----
+oc adm policy add-role-to-user admin system:serviceaccount:neuvector:default -n neuvector
+----
+
+使用下面的文件来部署多个扫描器。编辑副本以增加或减少并行运行的扫描器数量。
+
+[,yaml]
+----
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neuvector-scanner-pod
+  namespace: neuvector
+spec:
+  selector:
+    matchLabels:
+      app: neuvector-scanner-pod
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: neuvector-scanner-pod
+    spec:
+      containers:
+        - name: neuvector-scanner-pod
+          image: neuvector/scanner
+          imagePullPolicy: Always
+          env:
+            - name: CLUSTER_JOIN_ADDR
+              value: neuvector-svc-controller.neuvector
+# Commented out sections are required only for local build-phase scanning
+#            - name: SCANNER_DOCKER_URL
+#              value: tcp://192.168.1.10:2376
+#          volumeMounts:
+#            - mountPath: /var/run/docker.sock
+#              name: docker-sock
+#              readOnly: true
+#      volumes:
+#        - name: docker-sock
+#          hostPath:
+#            path: /var/run/docker.sock
+      restartPolicy: Always
+----
+
+接下来，创建或更新 CVE 数据库更新 cron 任务。这将每晚更新CVE数据库。
+
+[,yaml]
+----
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: neuvector-updater-pod
+  namespace: neuvector
+spec:
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: neuvector-updater-pod
+        spec:
+          containers:
+          - name: neuvector-updater-pod
+            image: neuvector/updater
+            imagePullPolicy: Always
+            command:
+            - /bin/sh
+            - -c
+            - TOKEN=`cat /var/run/secrets/kubernetes.io/serviceaccount/token`; /usr/bin/curl -kv -X PATCH -H "Authorization:Bearer $TOKEN" -H "Content-Type:application/strategic-merge-patch+json" -d '{"spec":{"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt":"'`date +%Y-%m-%dT%H:%M:%S%z`'"}}}}}' 'https://kubernetes.default/apis/apps/v1/namespaces/neuvector/deployments/neuvector-scanner-pod'
+          restartPolicy: Never
+----

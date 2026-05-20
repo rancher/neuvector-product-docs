@@ -1,0 +1,177 @@
+= Intégration avec Rancher RBAC
+:revdate: 2026-02-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/12.rancher_sso_rbac.md
+:page-opendocs-slug:  /integration/12.rancher_sso_rbac
+
+
+À partir de {product-name} 5.4, la compatibilité complète et l'intégration de {product-name} avec Rancher RBAC ont été incluses. Cela offre aux utilisateurs la possibilité de personnaliser des permissions spécifiques en fonction du profil de l'utilisateur ou du groupe qui doit accéder à {product-name}.
+
+Dans la console Rancher, la page *Utilisateurs & Authentification* -> *Modèles de rôle*, les clients peuvent créer des rôles globaux, de cluster, de projet et d'espace de noms avec des {product-name} verbes, ressources et groupes d'API spécifiques. Lorsqu'un tel rôle Rancher est attribué à un utilisateur Rancher, la session SSO de l'utilisateur {product-name} se voit attribuer différentes {product-name} permissions en conséquence. Cela vise à fournir aux utilisateurs SSO des rôles personnalisés (c'est-à-dire des rôles autres que les rôles réservés admin, lecteur, fedAdmin et fedReader).
+
+== Mappage de rôle personnalisé {product-name} pris en charge dans Rancher SSO
+
+Ci-dessous se trouvent les mappages de rôle pris en charge pour {product-name} Verbes, Ressources et Groupes d'API utilisés dans l'interface utilisateur de Rancher à *Utilisateurs & Authentification* -> *Modèles de Rôle* -> *Créer un Modèle de Rôle Global, de Cluster ou de Projet*.
+
+* Groupe d'API{nbsp}: `permission.neuvector.com`
+
+* Verbes{nbsp}:
+** `get` -> en lecture seule (vue)
+** `*` -> en lecture/écriture (modifier)
+
+* Ressources (portée de cluster){nbsp}:
+** AdmissionControl
+** Authentification
+** Analyse CI
+** Grappe
+** Fédération
+** Vulnérabilité
+
+* Ressources (portée d'espace de noms){nbsp}:
+** Événements d'Audit
+** autorisation
+** Conformité
+** Événements
+** Espace de noms
+** Analyse du registre
+** Stratégie de composant d'exécution
+** RuntimeScan
+** SecurityEvents
+** SystemConfig
+
+=== Affichage des ressources et mappage des noms logiques
+
+Le tableau suivant illustre les noms logiques des ressources.
+
+|===
+| Affichage des ressources | Nom logique
+
+| Toutes les autorisations | nv-perm.toutes-autorisations
+| Contrôle d'admission | nv-perm.ctrl-adm
+| Événements d'audit | nv-perm.audit-events
+| Authentification | nv-perm.authentication
+| autorisation | nv-perm.autorisation
+| Analyse CI | nv-perm.scan-ci
+| Conformité | nv-perm.compliance
+| Événements | nv-perm.evenements
+| Fédération | nv-perm.fed
+| Analyse du registre | nv-perm.scan-registre
+| Stratégie de composant d'exécution | nv-perm.strategie-execution
+| Analyse de composant d'exécution | nv-perm.rt-scan
+| événements de sécurité | nv-perm.security-events
+| Configuration système | nv-perm.config
+| Profil de vulnérabilité | nv-perm.vulnerability
+|===
+
+[NOTE]
+====
+Cette intégration prend en charge les rôles aux niveaux global, cluster, projet et espace de noms. Les utilisateurs doivent personnaliser et créer des règles en fonction de leurs besoins et définir l'étendue des autorisations pour le SSO.
+====
+
+== Définitions et attentes avec les rôles global, cluster et projet/espace de noms
+
+* Ressource de cluster avec le verbe `*` sur un rôle global Rancher{nbsp}:
+** Cartographié au rôle {product-name} `fedAdmin` sur le cluster maître de fédération {product-name} (Les utilisateurs ne peuvent pas cartographier un rôle Global Rancher à un rôle {product-name} `admin` lorsque {product-name} est déployé sur un cluster maître de fédération.)
+** Cartographié au rôle {product-name} `admin` sur les clusters gérés par la fédération {product-name}
+
+* Ressource de cluster avec le verbe `*` sur les rôles de Cluster Rancher{nbsp}:
+** Toujours cartographié au rôle {product-name} `cluster-admin`
+
+* Ressource d'espace de noms avec le verbe `*` sur les rôles de Projet Rancher{nbsp}:
+** Toujours cartographié au rôle {product-name} `namespace-admin`
+
+== Cas d'utilisation et exemples
+
+=== Cas d'utilisation 1
+
+* Utilisez un rôle Global pour exécuter des analyses d'exécution à partir d'une session SSO {product-name} sur tous les clusters gérés par Rancher Manager, sauf la grappe locale. Les utilisateurs doivent créer des rôles de Cluster pour propager le rôle Global à tous les clusters en aval.
+
+** Créer un modèle de rôle de Cluster avec les paramètres suivants{nbsp}:
++
+[source,yaml]
+----
+Verb: *
+Resource: RuntimeScan
+API: permission.neuvector.com
+----
+
+** Créer un rôle de Projet ou d'espace de noms pour permettre l'accès à l'interface utilisateur et activer le SSO. Vous devez ajouter ce rôle au projet pour qu'il fonctionne correctement{nbsp}:
++
+[source,yaml]
+----
+Verb: get, patch, create
+Resource: services/proxy
+API: neuvector.com
+----
+
+** Créer un rôle Global pour hériter du rôle de Cluster à travers les clusters en aval{nbsp}:
++
+[source,yaml]
+----
+apiVersion: management.cattle.io/v3
+kind: GlobalRole
+displayName: All Downstream NV RT scan
+metadata:
+  name: all-downstream-nvrtscan
+inheritedClusterRoles:
+- rt-gpmbs
+----
+
+** Créer un utilisateur standard et attribuer le rôle Global.
+** Créer un lien de rôle de Projet sur tous les clusters en aval pour le projet qui contient l'espace de noms `cattle-neuvector-system`.
+** Connectez-vous à Rancher Manager et lancez {product-name} depuis n'importe quel cluster en aval.
+  L'utilisateur peut effectuer des analyses d'exécution telles que des scans de conteneurs, des scans de nœuds et consulter les pages de vulnérabilité. Cela s'applique également aux clusters nouvellement joints.
+
+=== Cas d'utilisation 2
+
+* Créer un utilisateur FedAdmin. Connectez-vous toujours en tant que FedAdmin via le cluster maître de fédération. Si l'environnement n'est pas fédéré, les rôles sont rétrogradés à Lecteur ou Administrateur.
+
+** Créer un rôle Global{nbsp}:
++
+[source,yaml]
+----
+Verb: *
+Resource: All permissions
+API: nv-perm.all-permissions
+----
+
+** Créer un rôle de Projet ou d'espace de noms pour permettre l'accès à l'interface utilisateur et activer le SSO{nbsp}:
++
+[source,yaml]
+----
+Verb: get, patch, create
+Resource: services/proxy
+API: neuvector.com
+----
+
+** Créer un utilisateur standard et attribuer le rôle Global.
+** Dans l'interface utilisateur de Rancher, allez à *Cluster Maître* -> *Membres du Cluster et du Projet* -> *Adhésion au Projet* -> *Ajouter*.
+   Ajoutez l'utilisateur et attribuez le rôle de projet proxy de l'interface utilisateur.
+** Connectez-vous à Rancher Manager et lancez {product-name} depuis un cluster en aval. {product-name} lit le rôle Global de Rancher et attribue la permission correspondante (FedAdmin).
+
+[NOTE]
+====
+Pour passer de FedAdmin à FedReader, changez le verbe de `*` à `get`. Le verbe `get` fournit un accès en lecture seule.
+====
+
+=== Cas d'utilisation 3
+
+Un utilisateur peut effectuer un ensemble limité de tâches en lecture seule et modifier un ensemble limité de tâches sur un cluster.
+
+=== Cas d'utilisation 4
+
+Un utilisateur peut effectuer des tâches en lecture seule sur des domaines sélectionnés et modifier des tâches sur d'autres domaines au sein d'un cluster.
+
+=== Cas d'utilisation 5
+
+Un utilisateur obtient des autorisations en combinant des rôles Global, de Cluster et de Projet.
+
+== Considérations supplémentaires
+
+* Utilisez cette documentation et ces paramètres comme référence lors de la création de règles SSO et RBAC.
+* Pour les erreurs ou les cas d'utilisation avancés, contactez le support SUSE via SCC.
+* {product-name} 5.4 est rétrocompatible avec les mappages de rôles SSO antérieurs à 5.4. Pour la structure précédente, voir https://github.com/horantj/rancher-nv-rbac.
+
+À partir de {product-name} 5.4, la compatibilité complète et l'intégration de {product-name} avec Rancher RBAC ont été incluses. Cela offre aux utilisateurs la possibilité de personnaliser des permissions spécifiques en fonction du profil de l'utilisateur ou du groupe qui doit accéder à {product-name}.
+
+Dans la console Rancher, la page *Utilisateurs & Authentification* -> *Modèles de rôle*, les clients peuvent créer des rôles globaux, de cluster, de projet et d'espace de noms avec des {product-name} verbes, ressources et groupes d'API spécifiques. Lorsqu'un tel rôle Rancher est attribué à un utilisateur Rancher, la session SSO de l'utilisateur {product-name} se voit attribuer différentes {product-name} permissions en conséquence. Cela vise à fournir aux utilisateurs SSO des rôles personnalisés (c'est-à-dire des rôles autres que les rôles réservés admin, lecteur, fedAdmin et fedReader).

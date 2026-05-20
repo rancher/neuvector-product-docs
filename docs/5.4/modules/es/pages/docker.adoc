@@ -1,0 +1,456 @@
+= Docker y Mirantis Kubernetes Engine
+:revdate: 2025-01-10
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/05.docker/05.docker.md
+:page-opendocs-slug: /deploying/docker
+
+== Despliegue de Kubernetes en Mirantis Kubernetes Engine
+
+Sigue las instrucciones en la xref:kubernetes.adoc[sección de Kubernetes].
+
+[NOTE]
+====
+{product-name} no soporta clústeres mixtos de Kubernetes / Swarm.
+====
+
+== Despliega {product-name} Contenedores Usando Docker Nativo o UCP/Swarm
+
+Ten en cuenta que el despliegue nativo de Docker en Mirantis Kubernetes Engine usando Swarm NO SOPORTA el despliegue de servicios con contenedores en modo privilegiado, o con capacidades de seccomp añadidas. Para desplegar en este entorno, debes usar Docker Compose o Run para desplegar los contenedores {product-name}. Puedes usar el despliegue en host remoto (docker-compose -H HOST) para facilitar esta tarea.
+
+Aquí están los archivos de configuración de docker compose de ejemplo. Ten en cuenta que usar Docker nativo no soporta desplegar el aplicador en el mismo nodo que el controlador, requiriendo el uso del contenedor All-in-One si se desean las funciones de controlador y aplicador en un nodo.
+
+NOTE: La variable de entorno NV_PLATFORM_INFO=platform=Docker se utiliza para notificar a {product-name} que la plataforma es Docker/Swarm, aunque puede haber contenedores de Kubernetes no utilizados detectados por {product-name} en un despliegue de Docker EE. Además, para poder ver estos en la Actividad de Red -> Vista -> Mostrar Sistema, añade la variable de entorno para el aplicador NV_SYSTEM_GROUPS.
+
+=== Despliega All-in-One para alta disponibilidad
+
+Para HA en entornos de producción Docker nativo o EE, despliega el contenedor All-in-One en los primeros tres hosts de producción. Cada All-in-One debe apuntar a las direcciones IP de todos los hosts All-in-One. Por ejemplo, tres contenedores All-in-One son el mínimo para HA, y el CLUSTER_JOIN_ADDR debe listar las tres direcciones IP separadas por comas. Se pueden desplegar All-in-One adicionales en números impares, p. ej. 5, 7. Despliega el aplicador en los hosts restantes en el clúster, en cualquier orden.
+
+=== Despliega All-in-One usando docker-compose (modo privilegiado)
+
+El siguiente es un ejemplo del archivo docker-compose para desplegar el contenedor All-in-One en el primer nodo. Debido a que el contenedor All-in-One tiene un módulo de aplicador interno, los contenedores de aplicación en el mismo nodo pueden ser asegurados. Se admiten tanto despliegues greenfield como brownfield.
+
+[,yaml]
+----
+allinone:
+    pid: host
+    image: neuvector/allinone:<version>
+    container_name: allinone
+    privileged: true
+    environment:
+        - CLUSTER_JOIN_ADDR=node_ip
+        - NV_PLATFORM_INFO=platform=Docker
+    ports:
+        - 18300:18300
+        - 18301:18301
+        - 18400:18400
+        - 18401:18401
+        - 18301:18301/udp
+        - 8443:8443
+    volumes:
+        - /lib/modules:/lib/modules:ro
+        - /var/neuvector:/var/neuvector
+        - /var/run/docker.sock:/var/run/docker.sock:ro
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup:/host/cgroup:ro
+----
+
+La variable de entorno más importante es la *CLUSTER_JOIN_ADDR*. Es la dirección IP a la que se conectan otros aplicadores. Normalmente, debería establecerse en la dirección IP del nodo donde se está ejecutando el contenedor All-in-One.
+
+Los puertos 18300 y 18301 son los puertos predeterminados para la comunicación del clúster. Deben ser idénticos para todos los controladores y aplicadores en el clúster. Por favor, consulta la sección _"Detalles de Docker-compose"_ para saber cómo cambiar los puertos predeterminados.
+
+[NOTE]
+====
+Para exponer la API REST en el All-in-One, añade el mapeo de puerto para 10443, por ejemplo - 10443:10443.
+====
+
+=== Añade un contenedor de aplicador utilizando docker-compose (modo privilegiado)
+
+Este es un ejemplo de archivo docker-compose para unir un aplicador al clúster. Se admiten tanto despliegues greenfield como brownfield.
+
+[,yaml]
+----
+enforcer:
+    pid: host
+    image: neuvector/enforcer:<version>
+    container_name: enforcer
+    privileged: true
+    environment:
+        - CLUSTER_JOIN_ADDR=controller_node_ip
+        - NV_PLATFORM_INFO=platform=Docker
+    ports:
+        - 18301:18301
+        - 18401:18401
+        - 18301:18301/udp
+    volumes:
+        - /lib/modules:/lib/modules:ro
+        - /var/run/docker.sock:/var/run/docker.sock:ro
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup/:/host/cgroup/:ro
+----
+
+La variable de entorno más importante es *CLUSTER_JOIN_ADDR*. Para los aplicadores, reemplaza `<controller_node_ip>` con la dirección IP del nodo del controlador. Típicamente, *CLUSTER_JOIN_ADDR* en el archivo docker-compose del controlador/all-in-one y en el archivo docker-compose del aplicador tienen el mismo valor.
+
+=== Desplegar el {product-name} contenedor del escáner
+
+Desde {product-name} 4.0+, debe desplegarse un contenedor de escáner separado para realizar el escaneo de vulnerabilidades. Importante: Siempre utiliza la etiqueta :latest al descargar y ejecutar la imagen del escáner para asegurar que se despliega la base de datos CVE más reciente.
+
+Ejemplo de docker run para desplegar el escáner en el mismo host que el controlador.
+
+[,shell]
+----
+docker run -td --name scanner -e CLUSTER_JOIN_ADDR=controller_node_ip -p 18402:18402 -v /var/run/docker.sock:/var/run/docker.sock:ro neuvector/scanner:latest
+----
+
+Ejemplo de docker-compose
+
+[,yaml]
+----
+Scanner:
+   image: neuvector/scanner:latest
+   container_name: scanner
+   environment:
+     - CLUSTER_JOIN_ADDR=controller_node_ip
+   ports:
+     - 18402:18402
+   volumes:
+     - /var/run/docker.sock:/var/run/docker.sock:ro
+----
+
+Para desplegar el escáner en un host diferente al controlador, añade la variable de entorno CLUSTER_ADVERTISED_ADDR para que el controlador pueda alcanzar el escáner.
+
+[,shell]
+----
+docker run -td --name scanner -e CLUSTER_JOIN_ADDR=controller_node_ip -e CLUSTER_ADVERTISED_ADDR=scanner_host_ip -p 18402:18402 -v /var/run/docker.sock:/var/run/docker.sock:ro neuvector/scanner:latest
+----
+
+Para desplegar múltiples escáneres en el mismo host que el controlador, elimina el mapeo de puertos y la variable de entorno CLUSTER_ADVERTISED_ADDR.
+
+[,shell]
+----
+docker run -itd --name s1  -e CLUSTER_JOIN_ADDR=controller_node_ip neuvector/scanner:latest
+----
+
+Donde s1 es el escáner 1 (usa s2, s3, etc. para cada escáner adicional).
+
+Para desplegar un escáner independiente (sin controlador/todo en uno), consulta la sección xref:scanners.adoc[Escáneres Paralelos e Independientes].
+
+Para actualizar el Escáner y obtener las últimas actualizaciones de la base de datos CVE de {product-name}, crea un trabajo cron para detener y reiniciar el escáner, obteniendo la última versión. Consulta xref:docker.adoc#_docker_native_updates[esta sección] para más detalles.
+
+=== Despliegue Sin Usar Modo Privilegiado
+
+Para algunas configuraciones de plataforma, es posible desplegar los contenedores {product-name} sin requerir que se ejecuten en modo privilegiado. La configuración debe soportar la capacidad de añadir capacidades y establecer el perfil de apparmor. Ten en cuenta que Docker DataCenter/UCP y Swarm actualmente no soportan esto, pero aún es posible desplegar {product-name} manualmente usando Compose o Run.
+
+=== Despliega All-in-One (SIN modo privilegiado) con docker-compose
+
+[,yaml]
+----
+allinone:
+    pid: host
+    image: neuvector/allinone:<version>
+    container_name: neuvector.allinone
+    cap_add:
+        - SYS_ADMIN
+        - NET_ADMIN
+        - SYS_PTRACE
+        - IPC_LOCK
+    security_opt:
+        - apparmor=unconfined
+        - seccomp=unconfined
+        - label=disable
+    environment:
+        - CLUSTER_JOIN_ADDR=[AllInOne Node IP Address]
+        - NV_PLATFORM_INFO=platform=Docker
+    ports:
+        - 18300:18300
+        - 18301:18301
+        - 18400:18400
+        - 18401:18401
+        - 18301:18301/udp
+        - 8443:8443
+    volumes:
+        - /lib/modules:/lib/modules:ro
+        - /var/run/docker.sock:/var/run/docker.sock:ro
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup:/host/cgroup:ro
+        - /var/neuvector:/var/neuvector
+----
+
+=== Despliega aplicador (SIN modo privilegiado) con docker-compose
+
+[,yaml]
+----
+enforcer:
+    pid: host
+    image: neuvector/enforcer:<version>
+    container_name: neuvector.enforcer
+    cap_add:
+        - SYS_ADMIN
+        - NET_ADMIN
+        - SYS_PTRACE
+        - IPC_LOCK
+    security_opt:
+        - apparmor=unconfined
+        - seccomp=unconfined
+        - label=disable
+    environment:
+        - CLUSTER_JOIN_ADDR=[AllInOne Node IP Address]
+        - NV_PLATFORM_INFO=platform=Docker
+    ports:
+        - 18301:18301
+        - 18401:18401
+        - 18301:18301/udp
+    volumes:
+        - /lib/modules:/lib/modules:ro
+        - /var/run/docker.sock:/var/run/docker.sock:ro
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup/:/host/cgroup/:ro
+----
+
+=== Despliega All-in-One (modo privilegiado) con docker run
+
+Puedes usar docker run en lugar de compose para desplegar. Aquí tienes ejemplos.
+
+[,shell]
+----
+docker run -d --name allinone \
+--pid=host \
+--privileged \
+    -e CLUSTER_JOIN_ADDR=[AllInOne Node IP Address] \
+    -e NV_PLATFORM_INFO=platform=Docker \
+    -p 18300:18300 \
+    -p 18301:18301 \
+    -p 18400:18400 \
+    -p 18401:18401 \
+    -p 18301:18301/udp \
+    -p 8443:8443 \
+    -v /lib/modules:/lib/modules:ro \
+    -v /var/neuvector:/var/neuvector \
+    -v /var/run/docker.sock:/var/run/docker.sock:ro \
+    -v /sys/fs/cgroup:/host/cgroup:ro \
+    -v /proc:/host/proc:ro \
+neuvector/allinone:<version>
+----
+
+=== Despliega el aplicador (modo privilegiado) con docker run
+
+[,shell]
+----
+docker run -d --name enforcer \
+--pid=host \
+--privileged \
+    -e CLUSTER_JOIN_ADDR=[AllInOne Node IP Address] \
+    -e NV_PLATFORM_INFO=platform=Docker \
+    -p 18301:18301 \
+    -p 18401:18401 \
+    -p 18301:18301/udp \
+    -v /lib/modules:/lib/modules:ro \
+    -v /var/run/docker.sock:/var/run/docker.sock:ro \
+    -v /sys/fs/cgroup:/host/cgroup:ro \
+    -v /proc:/host/proc:ro \
+neuvector/enforcer:<version>
+----
+
+=== Despliega All-in-One (SIN modo privilegiado) con docker run
+
+Puedes usar docker run en lugar de compose para desplegar. Aquí tienes ejemplos.
+
+[,shell]
+----
+docker run -d --name allinone \
+--pid=host \
+--cap-add=SYS_ADMIN \
+--cap-add=NET_ADMIN \
+--cap-add=SYS_PTRACE \
+--cap-add=IPC_LOCK \
+--security-opt label=disable \
+--security-opt apparmor=unconfined \
+--security-opt seccomp=unconfined \
+    -e CLUSTER_JOIN_ADDR=[AllInOne Node IP Address] \
+    -e NV_PLATFORM_INFO=platform=Docker \
+    -p 18300:18300 \
+    -p 18301:18301 \
+    -p 18400:18400 \
+    -p 18401:18401 \
+    -p 18301:18301/udp \
+    -p 8443:8443 \
+    -v /lib/modules:/lib/modules:ro \
+    -v /var/neuvector:/var/neuvector \
+    -v /var/run/docker.sock:/var/run/docker.sock:ro \
+    -v /sys/fs/cgroup:/host/cgroup:ro \
+    -v /proc:/host/proc:ro \
+neuvector/allinone:<version>
+----
+
+=== Despliega aplicador (SIN modo privilegiado) con docker run
+
+[,shell]
+----
+docker run -d --name enforcer \
+--pid=host \
+--cap-add=SYS_ADMIN \
+--cap-add=NET_ADMIN \
+--cap-add=SYS_PTRACE \
+--cap-add=IPC_LOCK \
+--security-opt label=disable \
+--security-opt apparmor=unconfined \
+--security-opt seccomp=unconfined \
+    -e CLUSTER_JOIN_ADDR=[AllInOne Node IP Address]  \
+    -e NV_PLATFORM_INFO=platform=Docker \
+    -p 18301:18301 \
+    -p 18401:18401 \
+    -p 18301:18301/udp \
+    -v /lib/modules:/lib/modules:ro \
+    -v /var/run/docker.sock:/var/run/docker.sock:ro \
+    -v /sys/fs/cgroup:/host/cgroup:ro \
+    -v /proc:/host/proc:ro \
+neuvector/enforcer:<version>
+----
+
+== Despliega {product-name} componentes separados en diferentes hosts
+
+Si planeas dedicar un host de docker a un Controlador y/o Gestor (sin aplicador), estos contenedores pueden desplegarse individualmente en lugar del All-in-One. Ten en cuenta que Docker no soporta desplegar el aplicador en el mismo nodo que el controlador como componentes separados, requiriendo el uso del contenedor All-in-One si se desean las funciones de controlador y aplicador en un nodo.
+
+Archivo de composición del controlador (reemplaza [IP del controlador] con la IP del primer nodo controlador)
+
+[,yaml]
+----
+controller:
+    image: neuvector/controller:<version>
+    container_name: controller
+    pid: host
+    privileged: true
+    environment:
+      - CLUSTER_JOIN_ADDR=[controller IP]
+      - NV_PLATFORM_INFO=platform=Docker
+    ports:
+        - 18300:18300
+        - 18301:18301
+        - 18400:18400
+        - 18401:18401
+        - 18301:18301/udp
+        - 10443:10443
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /proc:/host/proc:ro
+      - /sys/fs/cgroup:/host/cgroup:ro
+      - /var/neuvector:/var/neuvector
+----
+
+Docker run también puede utilizarse, por ejemplo
+
+[,shell]
+----
+docker run -itd --privileged --name neuvector.controller -e CLUSTER_JOIN_ADDR=controller_ip -p 18301:18301 -p 18301:18301/udp -p 18300:18300 -p 18400:18400 -p 10443:10443 -v /var/neuvector:/var/neuvector -v /var/run/docker.sock:/var/run/docker.sock:ro -v /proc:/host/proc:ro -v /sys/fs/cgroup/:/host/cgroup/:ro neuvector/controller:<version>
+----
+
+Archivo de composición del gestor (reemplaza [IP del controlador] con la IP del nodo controlador al que conectarse). El servicio HRM de Docker UCP utiliza el puerto por defecto 8443, que entra en conflicto con el puerto de consola {product-name}. Si utilizas el puerto HRM por defecto, entonces cambia el mapeo de puerto {product-name} en el ejemplo a continuación a otro puerto, por ejemplo 9443:8443 para el contenedor gestor como se muestra a continuación.
+
+[,yaml]
+----
+manager:
+    image: neuvector/manager:<version>
+    container_name: nvmanager
+    environment:
+      - CTRL_SERVER_IP=[controller IP]
+    ports:
+      - 9443:8443
+----
+
+El archivo de composición para el aplicador:
+
+[,yaml]
+----
+enforcer:
+    image: neuvector/enforcer:<version>
+    pid: host
+    container_name: enforcer
+    privileged: true
+    environment:
+        - CLUSTER_JOIN_ADDR=controller_node_ip
+        - NV_PLATFORM_INFO=platform=Docker
+    ports:
+        - 18301:18301
+        - 18401:18401
+        - 18301:18301/udp
+    volumes:
+        - /lib/modules:/lib/modules:ro
+        - /var/run/docker.sock:/var/run/docker.sock:ro
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup/:/host/cgroup/:ro
+----
+
+== Monitoreo y reinicio de {product-name}
+
+Dado que los contenedores {product-name} no son desplegados como un servicio de UCP/Swarm, no se inician/reinician automáticamente en los nodos. Deberías configurar alerting a través de tu sistema SIEM para eventos SYSLOG de {product-name} o a través de DataCenter para detectar si un contenedor {product-name} no está en ejecución.
+
+== Desplegando sin modo privilegiado
+
+En general, necesitarás reemplazar la configuración de modo privilegiado por:
+
+[,yaml]
+----
+    cap_add:
+        - SYS_ADMIN
+        - NET_ADMIN
+        - SYS_PTRACE
+        - IPC_LOCK
+    security_opt:
+        - apparmor=unconfined
+        - seccomp=unconfined
+        - label=disable
+----
+
+La sintaxis anterior es para Docker EE v17.06.0+. Las versiones anteriores a esta utilizan : en lugar de =, por ejemplo apparmor:unconfined.
+
+== Actualizaciones nativas de Docker
+
+[CAUTION]
+====
+Siempre utiliza `:latest` la etiqueta al descargar y ejecutar la imagen del escáner para asegurar que se actualiza la base de datos CVE más reciente.
+====
+
+[,shell]
+----
+docker stop scanner
+docker rm <scanner id>
+docker pull neuvector/scanner:latest
+<docker run command from below>
+----
+
+[NOTE]
+====
+`docker rm -f <scanner id>` también puede ser utilizado para forzar la detención y eliminación del escáner en ejecución.
+
+Para docker-compose
+
+[,shell]
+----
+docker-compose -f file.yaml down
+docker-compose -f file.yaml pull        // pre-pull the image before starting the scanner
+docker-compose -f file.yaml up -d
+----
+
+Ejemplo de docker run
+
+[,shell]
+----
+docker run -td --name scanner -e CLUSTER_JOIN_ADDR=controller_node_ip -e CLUSTER_ADVERTISED_ADDR=node_ip -e SCANNER_DOCKER_URL=tcp://192.168.1.10:2376 -p 18402:18402 -v /var/run/docker.sock:/var/run/docker.sock:ro neuvector/scanner:latest
+----
+
+Y ejemplo de docker-compose
+
+[,yaml]
+----
+Scanner:
+   image: neuvector/scanner:latest
+   container_name: scanner
+   environment:
+     - SCANNER_DOCKER_URL=tcp://192.168.1.10:2376
+     - CLUSTER_JOIN_ADDR=controller_node_ip
+     - CLUSTER_ADVERTISED_ADDR=node_ip
+   ports:
+     - 18402:18402
+   volumes:
+     - /var/run/docker.sock:/var/run/docker.sock:ro
+----
+====

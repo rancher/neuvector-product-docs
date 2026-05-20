@@ -1,0 +1,192 @@
+= Règles de profil de processus
+:revdate: 2025-03-31
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/06.processrules/06.processrules.md
+:page-opendocs-slug:  /stratégie/règles de profil de processus
+
+== Stratégie -> Groupes -> Règles de profil de processus
+
+Il existe deux types de protections de processus/fichiers dans {product-name}. L'une est le Zero-drift, où l'activité de processus et de fichiers autorisée est automatiquement déterminée en fonction de l'image du conteneur, et la seconde est basée sur un apprentissage comportemental. Chacune peut être personnalisée (règles ajoutées manuellement) si désiré.
+
+[NOTE]
+====
+Il y a une limitation lors de l'exécution sur des systèmes avec le système de fichiers AUFS, où une condition de concurrence peut être rencontrée et les règles de processus ne sont pas appliquées pour le blocage (mode Protect). Cependant, ces violations sont toujours signalées dans les journaux d'événements de sécurité.
+====
+
+=== Protection de processus Zero-drift
+
+C'est le mode par défaut pour les protections de processus et de fichiers. Le Zero-drift autorise automatiquement uniquement les processus qui proviennent du processus parent qui se trouve dans l'image de conteneur d'origine, et n'autorise pas les mises à jour de fichiers ou l'installation de nouveaux fichiers. En mode Découverte ou Surveillance, le Zero-drift alertera sur toute activité de processus ou de fichier suspecte. En mode Protect, il bloquera une telle activité. Le Zero-drift ne nécessite pas que les processus soient appris ou ajoutés à une liste d'autorisation. Désactiver le Zero-drift pour un groupe entraînera l'application des règles de processus et de fichiers énumérées pour ce groupe.
+
+[NOTE]
+====
+(1) Les règles de processus/fichiers énumérées pour chaque groupe sont toujours appliquées, même lorsque le Zero-drift est activé. Cela offre un moyen d'ajouter des exceptions d'autorisation/refus aux protections de base du Zero-drift. Gardez à l'esprit que si un groupe commence en mode Découverte, des règles de processus/fichiers peuvent être ajoutées automatiquement à la liste, et doivent être examinées et modifiées avant de passer aux modes Surveillance/Protection.
+
+(2) Il est recommandé de définir des espaces de noms de confiance système (de facto) (système et plugin réseau) comme protection de base. Des exemples d'espaces de noms à définir sont "kube-system", "openshift-ovn-kubernetes", "ovn-*" etc. Définir les autres pods d'application en mode Zero-drift.
+====
+
+La possibilité d'activer/désactiver le mode Zero-drift se trouve dans la console dans les groupes de stratégie ->. Plusieurs groupes peuvent être sélectionnés pour activer ou désactiver ce paramètre pour tous les groupes sélectionnés.
+
+=== Protection de processus en mode de base
+
+Le Zero-drift peut être désactivé, passant à la protection de processus de base. La protection de base impose une activité de processus/fichier basée sur les règles de processus et/ou de fichiers énumérées pour chaque groupe. Cela signifie qu'il doit y avoir une liste de règles de processus et/ou de règles de fichiers en place pour que la protection ait lieu. Les règles peuvent être créées automatiquement grâce à l'apprentissage comportemental en mode Découverte, créées manuellement via la console ou l'API REST, ou créées par programmation en appliquant un CRD. Avec la protection de base activée, s'il n'y a pas de règles en place, toute activité sera alertée/bloquée en mode Surveillance ou Protection.
+
+=== Protection de processus basée sur l'apprentissage comportemental
+
+Les règles de profil de processus utilisent l'apprentissage de référence pour profiler les processus qui devraient être autorisés à s'exécuter dans un groupe de conteneurs (c'est-à-dire un groupe). Dans des conditions normales dans un environnement de microservices, pour les conteneurs avec une image particulière, seuls un ensemble limité de processus par des utilisateurs spécifiques s'exécuteraient. Si le conteneur est attaqué, l'attaquant malveillant initiera probablement de nouveaux programmes rarement vus dans ce conteneur. Ces événements anormaux peuvent être détectés par {product-name} et des alertes et actions générées (voir aussi Règles de réponse).
+
+Les informations de référence des processus seront apprises et enregistrées lorsque le groupe de services est en mode Découverte (apprentissage). Lorsqu'il est en mode Surveillance ou Protection, si un processus qui n'a pas été vu auparavant est nouvellement démarré, ou si un ancien processus est démarré par un utilisateur différent de celui d'avant, l'événement sera détecté et alerté comme un processus suspect en mode Surveillance ou alerté et bloqué en mode Protection. Les utilisateurs peuvent modifier le profil appris pour autoriser ou refuser (liste blanche ou liste noire) des processus manuellement si nécessaire.
+
+Notez qu'en plus des processus de référence, {product-name} dispose d'une détection intégrée des processus suspects courants tels que nmap, shell inversé, etc. Ces derniers seront détectés et alertés/bloqués à moins d'être explicitement mis sur liste blanche pour chaque service de conteneur.
+
+[IMPORTANT]
+====
+Les sondes de vivacité Kubernetes sont automatiquement autorisées et ajoutées aux règles de processus apprises même en mode Surveillance/Protection.
+====
+
+=== Règles de processus pour les nœuds
+
+Le groupe spécial réservé 'nœuds' peut être configuré pour appliquer des règles de profil de processus sur chaque nœud (hôte) dans le cluster. Sélectionnez le groupe 'nœuds' et examinez les règles de processus, en les modifiant si nécessaire. Ensuite, passez en mode Surveillance ou Protection. La liste des règles de processus 'locales' (apprises) est une combinaison de tous les processus de tous les nœuds dans le cluster en mode Découverte.
+
+=== Règles de processus pour les groupes personnalisés
+
+Pour les groupes personnalisés définis par l'utilisateur, les règles de processus, si désirées, doivent être ajoutées manuellement. Les groupes personnalisés n'apprennent pas automatiquement les règles de processus.
+
+=== Priorité des règles de processus
+
+Des règles de processus peuvent exister pour les groupes personnalisés définis par l'utilisateur ainsi que pour les groupes appris automatiquement. Les règles créées pour les groupes personnalisés ont la priorité sur les règles des groupes appris automatiquement.
+
+Pour la liste des règles de processus au sein de tout groupe, l'ordre des règles dans la console détermine leur priorité. Les règles les plus hautes listées sont vérifiées en premier avant celles qui se trouvent en dessous.
+
+Les règles de processus avec un nom et un chemin contenant tous deux des caractères génériques ont la priorité sur d'autres règles pour l'action Autoriser. Une action Refuser n'est pas autorisée avec des caractères génériques pour éviter de bloquer tous les processus.
+
+Les règles de processus avec une action Refuser et un caractère générique dans le nom auront la priorité sur les actions Autoriser avec un caractère générique dans le nom.
+
+=== Mode découverte
+
+* Tous les nouveaux processus sont profilés avec l'action autoriser
+* Les utilisateurs peuvent changer l'action en 'refuser' pour générer une alerte ou bloquer lorsque le même nouveau processus est lancé
+* Les utilisateurs peuvent créer un profil pour un processus avec soit « autoriser » soit « refuser ».
+* Les règles de profil de processus peuvent contenir un nom et/ou un chemin
+* Le caractère générique &#42; peut être utilisé pour correspondre à tout pour le nom ou le chemin
+
+[NOTE]
+====
+Un processus suspect (détection intégrée), tel que nmap, ncat, etc., est signalé comme un événement de processus suspect et ne sera PAS appris. Si un service a besoin de ce processus, le processus doit être ajouté avec une règle de profil 'autoriser' explicitement.
+====
+
+=== Mode de surveillance/protection (nouveau conteneur démarré en mode surveillance ou protection)
+
+* Chaque nouveau processus génère une alerte
+* Les règles de profil de processus peuvent contenir un nom et/ou un chemin
+* Le caractère générique &#42; peut être utilisé pour correspondre à tout pour le nom ou le chemin
+
+Si a) le processus correspond à une règle de refus, ou b) le processus n'est pas dans la liste des règles autorisées, alors :
+
+* En mode surveillance, des alertes seront générées
+* En mode protection, les processus seront bloqués et des alertes générées
+
+[NOTE]
+====
+Les plateformes de conteneurs avec le pilote de stockage AUFS introduiront un délai dans le mécanisme de blocage en raison des limitations du pilote.
+====
+
+[NOTE]
+====
+En mode protection, les conteneurs système tels que ceux de Kubernetes ne permettront pas l'action de blocage mais généreront un événement de violation de processus s'il y a une violation de processus.
+====
+
+=== Création de règles de profil de processus
+
+Plusieurs règles peuvent être créées pour le même processus. Les règles sont exécutées séquentiellement et la première règle correspondante sera exécutée.
+
+* Cliquez sur Ajouter une règle (+) dans l'onglet des règles de profil de processus
+* Les règles de profil de processus peuvent contenir un nom et/ou un chemin
+* Le caractère générique &#42; peut être utilisé pour correspondre à tout pour le nom ou le chemin
+
+Exemple :  Pour autoriser le processus ping à s'exécuter depuis n'importe quel répertoire
+
+image:ping.png[pingRule]
+
+Les violations seront enregistrées dans Notifications -> Événements de sécurité.
+
+image:process_event.png[violation]
+
+=== Détection intégrée de processus suspects
+
+Les détections intégrées suivantes sont automatiquement activées dans {product-name}.
+
+|===
+| Processus | Sens | Nom signalé
+
+| nmap
+| sortants
+| analyseur de ports
+
+| nc
+| sortants
+| processus netcat
+
+| ncat
+| sortants
+| processus netcat
+
+| netcat
+| sortants
+| processus netcat
+
+| sshd
+| entrant
+| ssh depuis une machine distante
+
+| ssh
+| sortants
+| ssh vers une machine distante
+
+| scp
+| sortants
+| copie sécurisée
+
+| telnet
+| sortants
+| telnet vers une machine distante
+
+| in.telnetd
+| entrant
+| telnet depuis une machine distante
+
+| iodine
+| sortants
+| tunnel DNS
+
+| iodined
+| entrant
+| tunnel DNS
+
+| dnscat
+| sortants
+| tunnel DNS
+
+| dns2tcpc
+| sortants
+| tunnel DNS
+
+| dns2tcpd
+| entrant
+| tunnel DNS
+
+| socat
+| sortants
+| processus de relais
+|===
+
+De plus, les détections suivantes sont activées :
+
+* docker cp
+* élévation de privilèges root (rôle utilisateur vers rôle root)
+* tunnel{nbsp}: shell inversé (déclenché lorsque stdin et stdout sont redirigés vers le même socket)
+
+Les processus suspects sont signalés lorsqu'ils sont en mode Découverte ou Surveillance, et bloqués lorsqu'ils sont en mode Protection. La détection s'applique aux conteneurs ainsi qu'aux hôtes, à l'exception de 'sshd' qui n'est pas considéré comme suspect sur les hôtes. Les processus énumérés ci-dessus peuvent être ajoutés à la liste d'autorisation pour les conteneurs (Groupes) y compris les hôtes s'ils doivent être autorisés.
+
+== Protections des processus/fichiers en mode fractionné
+
+Les groupes de conteneurs peuvent avoir des règles de processus/fichiers dans un mode différent de celui des règles réseau, comme décrit xref:modes.adoc#_network_service_policy_mode[ici].

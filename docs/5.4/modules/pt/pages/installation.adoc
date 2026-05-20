@@ -1,0 +1,122 @@
+= Preparação para implantação
+:revdate: 2026-02-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /01.basics/03.installation/01.native/01.native.md
+:page-opendocs-slug: /basics/installation
+
+== Entendendo como implantar {product-name}
+
+Implante os contêineres {product-name} usando Kubernetes, OpenShift, Rancher, Docker ou outras plataformas. Cada tipo de contêiner {product-name} tem um propósito único e pode exigir requisitos especiais de desempenho ou seleção de nó para operação ideal.
+
+As imagens de código aberto {product-name} estão hospedadas no Docker Hub em `/neuvector/{image name}`.
+
+Veja a seção xref:production.adoc#_best_practices_tips_qa_for_deploying_and_managing_suse_security[Onboarding/Boas Práticas] para baixar um guia de integração.
+
+=== Implante usando Kubernetes, OpenShift, Rancher ou outras ferramentas baseadas em Kubernetes.
+
+Para implantar {product-name} usando Kubernetes, OpenShift, Rancher ou outras ferramentas de orquestração, veja os passos de preparação e arquivos de exemplo na seção xref:production.adoc#_planning_deployments[Implantando {product-name}]. Isso implanta contêineres de gerenciador, controlador, scanner e Enforcer. Para testes simples usando o contêiner {product-name} Allinone, veja a seção Casos de Uso Especiais com Allinone.
+
+{product-name} suporta implantação baseada em Helm com um gráfico Helm em https://github.com/neuvector/neuvector-helm..
+
+Implantações automatizadas são suportadas usando Helm, Operadores Red Hat/Comunidade, a API REST ou um ConfigMap do Kubernetes. Veja a seção xref:configmap.adoc#_kubernetes_configmap[Implantar Usando ConfigMap] para mais detalhes sobre automação de implantação.
+
+=== Implante usando Docker Nativo.
+
+Antes de você xref:docker.adoc[implantar {product-name}] com docker run ou compose, você DEVE definir o CLUSTER_JOIN_ADDR para o endereço IP apropriado. Encontre o endereço IP do nó, o nome do nó (se estiver usando um servidor de nomes) ou a variável do nó (se estiver usando ferramentas de orquestração) para o allinone (controlador) usar para o "`node IP`" nos arquivos docker-compose tanto para allinone quanto para Enforcer.  Por exemplo:
+
+[,yaml]
+----
+- CLUSTER_JOIN_ADDR=192.168.33.10
+----
+
+Para implantações baseadas em Swarm, adicione também a seguinte variável de ambiente:
+
+[,yaml]
+----
+- NV_PLATFORM_INFO=platform=Docker
+----
+
+Veja a seção Implantando {product-name} -> xref:docker.adoc[Implantação de Produção Docker] para instruções e exemplos.
+
+=== Fazendo backup de arquivos de configuração
+
+Por padrão, {product-name} armazena vários arquivos de configuração em /var/neuvector/config/backup no controlador ou nó Allinone.
+
+Este volume pode ser mapeado para xref:production.adoc#_backups_and_persistent_data[armazenamento persistente] para manter a configuração. Os arquivos na pasta podem precisar ser excluídos para começar do zero.
+
+=== Mapeamento de Volume
+
+Certifique-se de que os volumes estão mapeados corretamente. {product-name} requer isso para operar (/var/neuvector é necessário apenas no controlador/allinone). Por exemplo:
+
+[,yaml]
+----
+volumes:
+        - /lib/modules:/lib/modules:ro
+        - /var/neuvector:/var/neuvector
+        - /var/run/docker.sock:/var/run/docker.sock:ro
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup:/host/cgroup:ro
+----
+
+Além disso, você pode precisar garantir que outras ferramentas não estejam bloqueando o acesso à interface docker.sock.
+
+=== Portas e Mapeamento de Portas
+
+Certifique-se de que as portas necessárias estão mapeadas corretamente e abertas no host. O Gerenciador ou Allinone requer 8443 (se estiver usando o console). O Allinone e o Controlador requerem 18300, 18301, 18400, 18401 e opcionalmente 10443, 11443, 20443, 30443. O Enforcer requer 18301 e 18401.
+
+[NOTE]
+====
+Se estiver implantando docker nativo (incluindo SWARM), certifique-se de que não há nenhum firewall do host bloqueando o acesso às portas necessárias, como firewalld. Se habilitado, a interface docker0 deve ser adicionada como uma zona confiável para os hosts allinone/controlador.
+====
+
+==== Resumo das Portas
+
+A tabela a seguir lista as comunicações de cada contêiner {product-name}. O contêiner Allinone combina os contêineres gerenciador, controlador e Enforcer, portanto, requer as portas listadas para esses contêineres.
+
+image:Communication_Matrix_From_To.png[Portas]
+
+A tabela a seguir resume as portas de escuta para cada contêiner {product-name}.
+
+image:Communication_Matrix_Listening_Ports.png[Escutando]
+
+===== Portas Adicionais
+
+Na versão 5.1, uma nova porta de escuta foi adicionada na 8181 no controlador para comunicação local do controlador apenas.
+
+[,shell]
+----
+tcp        0      0 :::8181                 :::*                    LISTEN      8/opa
+----
+
+=== {product-name} imagens
+
+{product-name} imagens são publicadas no Docker Hub. Use uma tag de versão fixa para componentes principais e a tag `latest` para imagens do scanner e do atualizador.
+
+Use a mesma tag de versão para as imagens do gerenciador, controlador e Enforcer. Use `latest` para as imagens do scanner e do atualizador.
+
+.Exemplos de tags de imagem
+[source,text]
+----
+neuvector/manager:5.4.1
+neuvector/controller:5.4.1
+neuvector/enforcer:5.4.1
+neuvector/scanner:latest
+neuvector/updater:latest
+----
+
+Atualize as referências de imagem em seus manifests do Kubernetes ou no arquivo de valores do Helm para corresponder à versão alvo do NeuVector.
+
+==== Configuração do chart Helm
+
+Ao implantar product-nam usando a versão 1.8.9 ou posterior do chart Helm, atualize as seguintes configurações em `values.yaml`:
+
+* Defina o registro de imagem para `docker.io`
+* Atualize os nomes e tags das imagens para a versão necessária
+* Deixe `imagePullSecrets` vazio
+
+==== Imagens do registro Rancher
+
+{product-name} imagens também são espelhadas para o registro Rancher para implantação gerenciada através do Rancher.
+
+* A disponibilidade da imagem pode atrasar alguns dias após cada lançamento
+* Para detalhes da implantação, consulte a documentação de implantação do Rancher

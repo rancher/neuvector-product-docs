@@ -1,0 +1,111 @@
+= Cumplimiento y CIS Benchmarks
+:revdate: 2025-01-16
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/01.scanning/02.compliance/02.compliance.md
+:page-opendocs-slug:  /scanning/scanning/compliance
+
+== Gestión de Cumplimiento y CIS Benchmarks
+
+La auditoría de cumplimiento con {product-name} incluye CIS Benchmarks, verificaciones personalizadas, auditoría de secretos y plantillas estándar de la industria para PCI, RGPD y otras regulaciones.
+
+Los CIS Benchmarks que se ejecutan automáticamente por {product-name} incluyen:
+
+* Kubernetes
+* Docker
+* Borrador de Red Hat OpenShift 'Inspirado en CIS' Benchmarks
+* Google GKE
+
+Los resultados del escaneo de cumplimiento se pueden ver para activos individuales en los Registros (para Imágenes), Nodos y el menú de Contenedores seleccionando el activo relevante y haciendo clic en la pestaña Cumplimiento.
+
+El menú de Cumplimiento de Riesgos de Seguridad -> permite informes de cumplimiento consolidados, similar a cómo funciona el menú de Vulnerabilidades.
+
+=== Riesgos de Seguridad - Cumplimiento y Perfil de Cumplimiento
+
+Los resultados de cumplimiento se muestran en la lista por Categoría y Nombre. Las categorías incluyen Docker, Kubernetes, OpenShift y Personalizado. Los nombres de cada elemento corresponden al CIS Benchmark. Por ejemplo, K.4.2.3 corresponde al CIS Benchmark de Kubernetes 4.2.3. Los Docker Benchmarks están precedidos por 'D' con la excepción de los Benchmarks relacionados con Imágenes, que están precedidos por 'I'.
+
+Utiliza el filtro Avanzado para seleccionar verificaciones de cumplimiento basadas en plataforma, host, espacio de nombres o estándar de la industria, como se muestra a continuación.
+
+image:compliance_4.png[cumplimiento]
+
+Después de aplicar el filtro, solo se mostrarán los CIS Benchmarks relevantes y las verificaciones personalizadas, y se podrá generar y descargar un informe. Así es como se pueden generar informes para estándares como PCI, HIPAA, RGPD y otros estándares.
+
+La siguiente captura de pantalla muestra un ejemplo de un secreto encontrado en un escaneo de imagen.
+
+image:secret_compliance_4.png[secretos]
+
+=== Personalización de Plantillas de Cumplimiento para PCI, RGPD, HIPAA, NIST, PCIv4 y DISA STIG
+
+El menú de perfil de cumplimiento permite la personalización de las plantillas integradas para estándares de la industria como PCI, RGPD, HIPAA, NIST, PCIv4 y DISA STIG. Estos informes se pueden generar desde el menú de Cumplimiento de Riesgos de Seguridad -> seleccionando uno de los estándares para filtrar y luego exportando. El perfil NIST es para https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-190.pdf[NIST SP 800-190].
+
+Para personalizar cualquier perfil de cumplimiento, selecciona el estándar de la industria (por ejemplo, PCI), luego habilita o deshabilita verificaciones específicas para ese estándar. Piensa en estos como 'etiquetas' de cumplimiento que se aplican a cada verificación para generar un informe de cumplimiento para ese estándar de la industria.
+
+Utiliza el botón de Acción para añadir o eliminar cualquier etiqueta de cumplimiento de esa verificación.
+
+image:compliance_profile_4.png[perfil]
+
+Además, puedes seleccionar qué 'Activos' se consideran parte de los informes de cumplimiento haciendo clic en la pestaña de Activos. Por defecto, todas las plantillas de cumplimiento se aplican a Imágenes, Nodos y Contenedores.
+
+image:profile_assets_4.png[compliance_assets]
+
+Utiliza el botón de Acción para añadir o eliminar plantillas de cumplimiento para activos.
+
+* Imágenes. Selecciona el/los estándar(es) a informar para Imágenes.
+* Nodos. Selecciona el/los estándar(es) a informar para Nodos (hosts).
+* Contenedores. Selecciona el/los estándar(es) a informar para Contenedores.
+
+Alternativamente, en lugar de restringir por los criterios anteriores, las plantillas de cumplimiento pueden restringirse a ciertos espacios de nombres. Si esta casilla está marcada y se añaden espacios de nombres, se generarán informes para todos los activos que apliquen a estos espacios de nombres. Esto puede ser útil si, por ejemplo, la plantilla PCI solo debe informar sobre activos para espacios de nombres que contengan cargas de trabajo aplicables al PCI.
+
+image:DocheckASSETSEnableNS.png[espacio de nombres]
+
+Después de que las plantillas y activos se personalicen (si se desea) en el menú de Perfiles de Cumplimiento de Riesgos de Seguridad ->, se pueden generar informes en el menú de Cumplimiento de Riesgos de Seguridad -> abriendo el filtro avanzado y seleccionando la plantilla de cumplimiento deseada. Por ejemplo, seleccionar GDPR filtrará la visualización e informes solo para el perfil de GDPR.
+
+=== Instalación de Helm de muestra con Cumplimiento Primario
+
+El siguiente es un comando de instalación de Helm de muestra para instalar SUSE Security 5.4.0 con cumplimiento primario. Los usuarios pueden modificar la versión de instalación a 5.4.0 o posterior, ya que el cumplimiento primario comienza con 5.4.0. Después de la instalación, los usuarios primarios pueden consultar las regulaciones disponibles desde la vista de pestaña de la interfaz web de SUSE Security **Cumplimiento > Regulaciones**.
+
+[,shell]
+----
+helm install neuvector -n neuvector ./ --set controller.prime.enabled=true --set
+controller.prime.image.repository=nvlab/compliance_config,controller.prime.image.tag=1.
+0.0 --set
+tag=5.4.0-b2,controller.image.repository=nvpublic/co,enforcer.image.repository=nvpublic/
+en,manager.image.repository=nvpublic/ma
+----
+
+=== Auditoría de Secretos
+
+{product-name} verifica más de 40 tipos comunes de secretos como parte de los escaneos de cumplimiento de imágenes y escaneos en tiempo de ejecución. Además, se pueden configurar xref:customcompliance.adoc[scripts de cumplimiento personalizados] para contenedores o hosts, y se puede utilizar la función de xref:dlp.adoc[inspección de paquetes DLP] para verificar secretos en las cargas útiles de la red.
+
+Los resultados de la auditoría de secretos se pueden encontrar en la sección de Cumplimiento de escaneos de imágenes (Activos -> Registros), contenedores (Activos -> Contenedores), nodos (Activos -> Nodos) y en el menú de gestión de cumplimiento (Riesgos de Seguridad -> Cumplimiento).
+
+El siguiente es un ejemplo de cómo se mostrarán los secretos detectados en un escaneo de imágenes.
+
+image:secrets_image_4.png[secretos]
+
+Aquí hay una lista de los tipos de secretos que se están detectando.
+
+* Claves Privadas Generales
+* Detección general de credenciales incluyendo 'apikey', 'api_key', 'password', 'secret', 'passwd', etc.
+* Contraseñas generales en archivos yaml incluyendo 'password', 'passwd', 'api_token', etc.
+* Claves de secretos generales en pares clave/valor
+* Clave privada de Putty
+* Clave privada XML
+* AWS https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html[credenciales / IAM]
+* Secreto del cliente de Facebook
+* Secreto del endpoint de Facebook
+* Secreto de la app de Facebook
+* Id del cliente de Twitter
+* Clave secreta de Twitter
+* Secreto de GitHub
+* Id del producto de Square
+* Clave de acceso de Stripe
+* Token de API de Slack
+* Web hooks de Slack
+* Id del cliente de LinkedIn
+* Clave secreta de LinkedIn
+* Clave de API de Google
+* Clave de API de SendGrid
+* Clave de API de Twilio
+* Clave de API de Heroku
+* Clave de API de MailChimp
+* Clave de API de MailGun

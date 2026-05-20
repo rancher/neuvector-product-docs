@@ -1,0 +1,55 @@
+= Signature d'image pour l'image OCI
+:revdate: 2026-02-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/03.admission/01.sigstore/03.ociimagesigning.md
+:page-opendocs-slug:  /policy/admission/ociimagesigning
+
+== Vérifiez les images de la collection d'applications SUSE Rancher avec Sigstore
+
+La collection d'applications SUSE Rancher utilise un registre basé sur OCI où toutes les applications sont signées par Sigstore. Les utilisateurs peuvent vérifier les applications de la collection d'applications avec les vérificateurs Sigstore dans {product-name}.
+
+Vous devez d'abord obtenir la clé publique cosign de la collection d'applications SUSE Rancher, puis les vérificateurs Sigstore peuvent être configurés dans {product-name}.
+
+image:oci_image_1.png[Ajouter un vérificateur Sigstore]
+
+Suivez ces étapes pour configurer la vérification Sigstore pour les images dans la collection d'applications SUSE Rancher.
+
+. Créez un jeton d'accès en suivant le guide d'authentification{nbsp}:
++
+https://docs.apps.rancher.io/get-started/authentication/
+
+. Récupérez la clé publique Cosign (`ap-pubkey.pem`) en suivant le guide de vérification de la signature{nbsp}:
++
+https://docs.apps.rancher.io/howto-guides/verify-signatures-with-cosign/
+
+. Dans l'interface web {product-name}, créez une racine de confiance Sigstore.
++
+--
+* Allez à *Assets* > *Vérificateurs Sigstore*.
+* Créez un nouveau vérificateur.
+* Ajoutez la clé publique Cosign en tant que vérificateur de paire de clés.
+--
+
+. Configurez le registre et lancez une analyse.
++
+--
+* Allez à *Assets* > *Registres*.
+* Créez un nouveau registre avec les valeurs suivantes{nbsp}:
++
+[source,text]
+----
+Registry: https://dp.apps.rancher.io/
+Filter: containers/openjdk:21.0.4-build7
+Username: <your SUSE username>
+Password: <access token created earlier>
+----
+--
++
+L'image filtrée est une image OCI publiée dans la collection d'applications SUSE Rancher.
+
+. Examinez les résultats de l'analyse pour confirmer la vérification de la signature.
+
+
+image:oci_image_2.png[Résultat de l'analyse du vérificateur]
+
+Une fois le scan terminé, {product-name} affiche les détails du vérificateur Sigstore dans les résultats du scan, confirmant que la signature de l'image a été validée avec succès.

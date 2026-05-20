@@ -1,0 +1,50 @@
+= Relatório de Eventos
+:page-opendocs-origin: /15.ui_extension/03.notifications/03.notifications.md
+:page-opendocs-slug:  /ui_extension/notifications
+
+== Security Events
+
+Na Extensão de UI no portal do Rancher, a aba **Eventos de Segurança** funciona de maneira semelhante à página autônoma do NeuVector. Os eventos podem ser acionados por vários fatores:
+
+* Conversa perigosa ou transporte de dados perigosos de algum lugar para o endpoint (Nó ou pod).
+* Conexão violada de ponta a ponta contra a política de rede.
+* Operação que violou a regra do arquivo de controle de processo.
+* Operação violada contra a regra de acesso a arquivos.
+
+image:sec_events.png[Eventos de Segurança]
+
+Deslize o ponto para a esquerda ou para a direita no controle deslizante de tempo para filtrar eventos por data.
+
+image:sec_events_time_filter.png[Eventos de Segurança]
+
+Digite palavras-chave na caixa de filtro rápido para filtrar qualquer evento que inclua a palavra-chave.
+
+image:sec_events_quick_filter.png[Eventos de Segurança]
+
+Abra o painel lateral **Filtro Avançado**, e você encontrará várias opções que apoiam sua busca:
+
+* Severidade, Localização e Categoria podem ser filtradas de acordo com as tags no lado direito do título do evento.
+* A lista de autocompletar suporta entradas do usuário para os campos Host, Fonte e Destino e suporta uma caixa de entrada de múltiplas tags para Namespace.
+
+image:sec_events_adv_filter.png[Eventos de Segurança]
+
+Clique em um evento para expandir o painel e exibir mais detalhes. Na caixa de mensagem, você pode ver mais informações.
+
+image:sec_event_detail.png[Eventos de Segurança]
+
+O **nome de host** é clicável e abre o popup de detalhes do host. Os campos **Vulnerabilidades** e **Grupo** têm um link externo para redirecionar para a página SSO do NeuVector.
+
+image:node_detail_open.png[Eventos de Segurança]
+
+O nome do **Workload** é clicável e abre o popup de detalhes do workload. O campo **Grupo** tem um link externo para redirecionar para a página SSO do NeuVector.
+
+image:pod_detail_open.png[Eventos de Segurança]
+
+O campo **Reportado por** na caixa de mensagem é clicável e abre o popup de detalhes do enforcer.
+
+image:enforcer_detail_open.png[Eventos de Segurança]
+
+== Funções não incluídas ao comparar com a página autônoma do NeuVector.
+
+* Revisar / Propor regra.
+* Relatórios em PDF.

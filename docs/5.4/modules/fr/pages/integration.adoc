@@ -1,0 +1,126 @@
+= Intégration d'entreprise
+:revdate: 2025-12-18
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/01.integration/01.integration.md
+:page-opendocs-slug:  /integration/integration
+
+== Intégration
+
+{product-name} offre plusieurs options d'intégration, y compris une API REST, CLI, Syslog, RBAC, SAML, LDAP et webhooks. Pour des exemples d'automatisation des tâches en utilisant l'API REST, voir la section xref:automation.adoc[*Automatisation*].
+
+{product-name} s'intègre également avec des partenaires de l'écosystème tels que Sonatype (Nexus Lifecycle), IBM Cloud (QRadar et Security Advisor) et Prometheus/Grafana. De nombreuses intégrations sont disponibles dans le https://github.com/neuvector[dépôt GitHub de NeuVector].
+
+Les paramètres d'intégration suivants sont disponibles dans l'interface utilisateur de {product-name} sous *Paramètres*.
+
+=== OpenShift et Kubernetes RBAC
+
+Activez cette option si vous utilisez le contrôle d'accès en fonction du rôle (RBAC) de Red Hat OpenShift et souhaitez que {product-name} lise et applique automatiquement ces autorisations.
+
+Lorsqu'il est activé{nbsp}:
+
+* Les utilisateurs d'OpenShift peuvent se connecter à la console de {product-name} en utilisant leurs identifiants OpenShift.
+* Les utilisateurs ne peuvent accéder qu'aux ressources (projets, conteneurs, nœuds, etc.) autorisées par leur rôle OpenShift.
+* L'authentification utilise le protocole OAuth 2.0.
+
+image:openshift-rbac.png[OpenShift]
+
+[WARNING]
+====
+Ne pas utiliser le paramètre `AllowAllPasswordIdentityProvider` d'OpenShift. Cette configuration permet aux utilisateurs de se connecter avec n'importe quel mot de passe, ce qui permet également l'accès à {product-name} en tant qu'utilisateur en lecture seule. Elle crée également un nouvel utilisateur OpenShift pour chaque connexion.
+====
+
+[NOTE]
+====
+L'utilisateur par défaut {product-name} *Admin* et tous les utilisateurs créés directement dans {product-name} restent actifs lorsque le contrôle d'accès en fonction du rôle d'OpenShift est activé.
+====
+
+=== Faire confiance aux CA racines externes avec Helm
+
+{product-name} peut faire confiance aux CA racines externes pour des connexions sécurisées telles que LDAPS, OpenID Connect (OIDC) et l'analyse de registre. Cette capacité permet une communication de confiance avec des services d'authentification externes et des registres d'images.
+
+Lorsque vous configurez des CA racines de confiance via l'interface utilisateur du {product-name} Manager, les informations sur la CA sont stockées dans la base de données interne. Aucun Secret Kubernetes ou ConfigMap n'est créé automatiquement. Parce que Helm gère la configuration via des ressources Kubernetes, ce paramètre ne peut pas être géré par Helm par défaut.
+
+Pour configurer des CA racines de confiance en utilisant Helm, créez un ConfigMap personnalisé qui fournit les certificats CA et active la vérification TLS.
+
+. Créez un fichier de remplacement. 
++
+Créez un fichier `override.yaml` qui inclut le certificat CA et les paramètres TLS{nbsp}:
++
+[source,yaml]
+----
+controller:
+  configmap:
+    enabled: true
+    data:
+      sysinitcfg.yaml: |
+        cacerts:
+        - -----BEGIN CERTIFICATE-----
+          MIID0zCCArugAwIBAgIU...
+          -----END CERTIFICATE-----
+        enable_tls_verification: true
+----
+
+. Déployez {product-name} avec Helm.
++
+Déployez {product-name} en utilisant le fichier de remplacement{nbsp}:
++
+[source,bash]
+----
+helm install neuvector neuvector/core \
+  -n neuvector \
+  --set manager.svc.type=NodePort,imagePullSecrets=regsecret \
+  -f override.yaml
+----
++
+Après le déploiement, Helm signale une installation réussie.
+
+. Vérifiez la configuration.
++
+Confirmez que la configuration est appliquée en inspectant le ConfigMap `neuvector-init`{nbsp}:
++
+[source,bash]
+----
+kubectl get cm neuvector-init -o yaml
+----
++
+Vérifiez que le certificat CA et le paramètre `enable_tls_verification` apparaissent dans la sortie.
++
+[NOTE]
+====
+Après l'installation, vérifiez que {product-name} fonctionne et est accessible{nbsp}:
+
+[source,bash]
+----
+NODE_PORT=$(kubectl get -n neuvector -o jsonpath="{.spec.ports[0].nodePort}" svc neuvector-service-webui)
+NODE_IP=$(kubectl get nodes -o jsonpath="{.items[0].status.addresses[0].address}")
+echo https://$NODE_IP:$NODE_PORT
+----
+
+Ouvrez l'URL affichée dans un navigateur pour accéder à l'interface utilisateur du {product-name} Manager.
+====
+
+=== Kubernetes RBAC
+
+Pour configurer manuellement Kubernetes RBAC pour des espaces de noms spécifiques{nbsp}:
+
+. Allez à *Paramètres* → *Utilisateurs* → *Ajouter un utilisateur*.
+. Ouvrez *Paramètres avancés*.
+. Spécifiez les espaces de noms auxquels l'utilisateur peut accéder dans {product-name}.
+
+image:k8s-rbac.png[Kubernetes]
+
+=== Syslog
+
+Configurez l'intégration Syslog en saisissant l'adresse du serveur Syslog et en sélectionnant le niveau de notification. Vous pouvez utiliser une adresse IP ou un nom DNS et choisir soit UDP soit TCP.
+
+=== Webhooks
+
+{product-name} peut envoyer des notifications à un point de terminaison externe en utilisant des webhooks. Spécifiez l'URL du point de terminaison webhook pour recevoir des notifications.
+
+Vous pouvez configurer des notifications webhook pour des événements personnalisés sous *Stratégie* → *Règles de réponse*.
+
+=== Intégration de répertoire et SSO
+
+{product-name} prend en charge les intégrations de répertoire et de connexion unique (SSO), y compris LDAP, Microsoft Active Directory, SAML et OpenID Connect.
+
+Pour des informations sur les rôles prédéfinis et personnalisés qui peuvent être mappés lors de l'intégration, voir xref:users.adoc#_users[Utilisateurs et rôles].

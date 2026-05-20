@@ -1,0 +1,40 @@
+= IBM安全顾问
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/09.ibmsa/09.ibmsa.md
+:page-opendocs-slug:  /integration/ibmsa
+
+== 与IBM安全顾问集成
+
+{product-name}在IBM Cloud上与IBM安全顾问集成。
+
+要生成所需的注册URL，请以管理员身份登录{product-name}控制台，并转到设置->配置。
+
+. 启用"与IBM安全顾问集成"->提交
+. 点击"获取URL"->复制到剪贴板
+
+image:ibmsa_config_new.png[ibmconfigure]
+
+然后返回IBM安全顾问控制台，在"输入{product-name}设置URL"下，输入"https://{{product-name}控制器主机名/ip}:{port}"并粘贴上面步骤中复制的内容。对于端口，请使用暴露的{product-name} REST API端口（默认是10443）。对于多集群环境，这也是暴露此端口的'fed-worker'服务。
+
+IBM安全顾问将通过提供的主机名或IP与您的{product-name}集群控制器进行通信。注意：这可能需要作为服务暴露，以便从Kubernetes集群外部访问，类似于REST API作为服务暴露的方式。
+
+=== 验证连接
+
+当IBM安全顾问与{product-name}之间成功建立连接时，您将在{product-name}控制台的"与IBM安全顾问集成"旁边看到绿色的"已连接于{date, time}"图标。
+
+image:ibmsa_connected.png[已连接]
+
+=== 在IBM安全顾问中审查安全事件
+
+显示包含安全事件信息的摘要卡。
+
+image:ibm_sa_threat_summary.png[threats]
+
+每个安全事件都可以进行更详细的调查，如下所示：
+
+image:ibm_sa_findings.png[findings]
+
+== 移除集成
+
+如果您在IBM Cloud账户中删除了一个{product-name}集成连接，请记得在设置->配置中也禁用该{product-name}集群的"IBM SA集成"。

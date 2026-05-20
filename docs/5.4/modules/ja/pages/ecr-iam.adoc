@@ -1,0 +1,47 @@
+= IAMロールを使用したECRスキャン
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/02.registry/02.ecr-iam/02.ecr-iam.md
+:page-opendocs-slug:  /scanning/registry/ecr-iam
+
+== AWS ECR - IAMロール
+
+{product-name}コンテナがAWSにデプロイされ、EC2インスタンスに"`EC2 Container Registry`"読み取りアクセス権を持つロールが割り当てられている場合、AWS ECRレジストリはアクセスキーとシークレットキーなしでスキャンできます。
+
+AWSロールを作成し、ノードに割り当てる方法は次のとおりです。
+
+=== インスタンスを選択してください。
+
+IAMロールが空白であるか、ECRロールを含まないことに注意してください。
+
+image:ecr1.png[awsrole]
+
+=== ロールをアタッチ
+
+アクションを選択 -> インスタンス設定 -> IAMロールのアタッチ/置き換え
+
+image:ecr2.png[awsrole]
+
+以前にECRロールを作成していない場合は、「新しいIAMロールを作成」をクリックしてください。ロール名を入力してください。
+
+image:ecr3.png[attachrole]
+
+=== AWSサービスを選択してください。
+
+image:ecr4.png[select]
+
+=== ロールの一覧
+
+image:ecr5.png[awsroles]
+
+=== ECR読み取り権限をロールにアタッチ
+
+image:ecr6.png[permissions]
+
+=== 設定の確認
+
+image:ecr7.png[確認]
+
+=== インスタンスのIAMロールを確認してください
+
+image:ecr9.png[instance]

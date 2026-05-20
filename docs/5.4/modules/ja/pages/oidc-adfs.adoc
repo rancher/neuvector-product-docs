@@ -1,0 +1,72 @@
+= ADFS用OpenID Connect (OIDC)
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/08.oidc_adfs/08.oidc_adfs.md
+:page-opendocs-slug:  /integration/oidc_adfs
+
+== ADFS用OpenID Connect (OIDC)の統合
+
+AD FS管理から「アプリケーショングループ」をクリックし、「アプリケーショングループを追加...」をクリックします。
+
+image:adfs1.png[adfs]
+
+名前を入力し、「Web APIにアクセスするサーバーアプリケーション」を選択して、次へをクリックします。
+
+image:adfs2.png[adfs]
+
+{product-name}の設定 > OpenID Connect設定ページからリダイレクトURIを入力し、次へをクリックします。
+
+image:adfs3.png[adfs]
+
+「共有シークレットを生成する」チェックボックスを有効にし、次へをクリックします。
+
+image:adfs4.png[adfs]
+
+前のステップで作成した識別子を入力し、次へをクリックします。
+
+image:adfs5.png[adfs]
+
+image:adfs6.png[adfs]
+
+allatclaims、email、openid、プロファイルスコープを有効にし、次へをクリックします。
+
+image:adfs7.png[adfs]
+
+image:adfs8.png[adfs]
+
+image:adfs9.png[adfs]
+
+以前に作成したアプリケーショングループをダブルクリックします。
+
+image:adfs10.png[adfs]
+
+Web APIをダブルクリックし、発行変換ルールタブをクリックします。
+
+image:adfs11.png[adfs]
+
+ルールを追加...をクリックし、「LDAP属性をクレームとして送信」を選択して、次へをクリックします。
+
+image:adfs12.png[adfs]
+
+クレームルール名を入力し、属性ストアとしてActive Directoryを選択し、LDAP属性を出力クレームタイプにマッピングします。
+
+* トークングループ -- 無資格名 -> グループ
+* ユーザープリンシパル名 -> preferred_username
+* Eメールアドレス -> email
+
+image:adfs13.png[adfs]
+
+image:adfs14.png[adfs]
+
+=== {product-name} セットアップ
+
+* アイデンティティプロバイダー発行者: "https://<adfs-fqdn>/adfs"
+* クライアントID:「アプリケーショングループウィザードの「サーバーアプリケーション」ダイアログに表示される「クライアント識別子」です。
+* クライアントシークレット:「アプリケーショングループウィザード」の「アプリケーションクレデンシャルの設定」ダイアログに表示されるシークレットです。
+* グループクレーム：グループ
+
+image:adfs15.png[adfs]
+
+image:adfs16.png[adfs]
+
+image:adfs17.png[adfs]

@@ -1,0 +1,228 @@
+= 配備 {product-name}
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/01.production/01.production.md
+:page-opendocs-slug: /デプロイメント/プロダクション
+
+== デプロイメントの計画
+
+デフォルトのデプロイメントに含まれる{product-name}コンテナは、コントローラー、マネージャー、エンフォーサー、スキャナー、およびアップデーターです。これらのコンテナがどのノードにデプロイされるかを考慮し、適切なラベル、テイント、またはトレランスを作成して制御する必要があります。
+
+エンフォーサーは、{product-name}によって監視および保護されるアプリケーションコンテナが実行されるすべてのホスト/ノードにデプロイされるべきです。
+
+コントローラーはエンフォーサーのクラスターを管理し、エンフォーサーと同じノードまたは別の管理ノードにデプロイできます。マネージャーはコントローラーが実行されているノードにデプロイされ、コントローラーへのコンソールアクセスを提供します。マネージャー、スキャナー、アップデーターなどの他の必要な{product-name}コンテナについては、下記に参照されているベストプラクティスガイドで詳細に説明されています。
+
+まだ行っていない場合は、{product-name} Docker Hubからイメージをプルしてください。
+
+イメージは{product-name} Docker Hubレジストリにあります。マネージャー、コントローラー、エンフォーサーには適切なバージョンタグを使用し、スキャナーとアップデーターにはバージョンを「latest」としておきます。次に例を示します。
+
+* neuvector/manager:5.3.2
+* neuvector/controller:5.3.2
+* neuvector/enforcer:5.3.2
+* neuvector/scanner:latest
+* neuvector/updater:latest
+
+適切なyamlファイル内のイメージ参照を必ず更新してください。
+
+現在の{product-name} Helmチャート（v1.8.9+）でデプロイする場合、values.ymlに次の変更を加える必要があります：
+
+* レジストリをdocker.ioに更新してください。
+* イメージ名/タグをDocker Hubの現在のバージョンに更新してください。
+* imagePullSecretsを空のままにしてください
+
+=== {product-name}のデプロイと管理に関するベストプラクティス、ヒント、Q&A
+
+// Download and review xref:attachment$NV_Onboarding_5.0.pdf[Deployment Best Practices document] for tips, such as performance and sizing, best practices, and frequently asked questions about deployments.
+
+== Helmまたはオペレーターを使用したデプロイメント
+
+Helmを使用した自動デプロイメントについては、 https://github.com/neuvector/neuvector-helm.でご確認いただけます。
+
+RedHat認定オペレーターおよびKubernetesコミュニティオペレーターを含むオペレーターを使用したデプロイメントがサポートされており、一般的な説明はxref:operators.adoc[こちら]にあります。{product-name} RedHatオペレーターは https://access.redhat.com/containers/#/registry.connect.redhat.com/neuvector/neuvector-operator,にあり、コミュニティオペレーターは https://operatorhub.io/operator/neuvector-operator.にあります
+
+== ConfigMapを使用したデプロイメント
+
+Kubernetes上での自動デプロイメントはConfigMapを使用してサポートされています。詳細についてはxref:configmap.adoc[ConfigMapを使用したデプロイ]のセクションをご覧ください。
+
+== コントローラーのデプロイ
+
+高可用性（HA）構成のために、複数のコントローラーを実行することをお勧めします。コントローラーは、リーダーを選出するために合意に基づくRAFTプロトコルを使用し、リーダーがダウンした場合には別のリーダーを選出します。このため、アクティブなコントローラーの数は奇数であるべきです。例えば、3、5、7などです。
+
+== コントローラーのHA
+
+コントローラーは、設定、ポリシー、会話、イベント、通知を含むすべてのデータを相互に同期します。
+
+プライマリアクティブなコントローラーがダウンした場合、新しいリーダーが自動的に選出され、引き継ぎます。
+
+ホストOSやオーケストレーションプラットフォームの更新や再起動中は、常に1つのコントローラーが稼働して準備が整っていることを確認するために特別な注意を払ってください。
+
+== バックアップと永続データ
+
+定期的にコンソールから設定ファイルをエクスポートし、バックアップとして保存してください。
+
+HA構成で複数のコントローラーを実行する場合、常に1つのコントローラーが稼働していれば、すべてのデータがコントローラー間で同期されます。
+
+違反、脅威、脆弱性、イベントなどのログを保存したい場合は、設定でSYSLOGサーバーを有効にしてください。
+
+{product-name}は{product-name}ポリシーと設定のための永続データをサポートしています。これは、コントローラーポッドから/var/neuvector/にボリュームをマウントするためのリアルタイムバックアップを構成します。主な使用ケースは、永続ボリュームがマウントされているときに、実行時に設定とポリシーが永続ボリュームに保存されることです。クラスターが完全に故障した場合、新しいクラスターが作成されると設定が自動的に復元されます。設定とポリシーは、/var/neuvector/ボリュームから手動で復元または削除することもできます。
+
+[IMPORTANT]
+====
+永続ボリュームがマウントされていない場合、{product-name}は設定やポリシーを永続データとして保存しません。allinoneまたはコントローラーコンテナを停止する前に、コントローラーの設定とポリシーを必ずバックアップしてください。これは`Settings -> Configuration`で実行できます。また、コントローラーは3または5のコントローラーが稼働するHA構成でデプロイでき、その場合、ポリシーは他のコントローラーとともに保持され、1つが更新されている間も持続します。
+====
+
+=== 永続ボリュームの例
+
+クラスターで定義されたPersistentVolumeは、永続ボリュームのサポートに必要です。{product-name}の要件は、accessModesがReadWriteMany(RWX)である必要があることです。すべてのストレージタイプが RWX アクセスモードをサポートしているわけではありません。例えば、GKEではNFSストレージを使用してRWX永続ボリュームを作成する必要があるかもしれません。
+
+PersistentVolumeが作成されると、コントローラー用に以下のようにPersistentVolumeClaimを作成する必要があります。現在、永続ボリュームはコントローラー内の{product-name}設定のバックアップファイル（ポリシー、ルール、ユーザーデータ、統合など）およびレジストリのスキャン結果のみに使用されています。
+
+[,yaml]
+----
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: neuvector-data
+  namespace: neuvector
+spec:
+  accessModes:
+    - ReadWriteMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 1Gi
+----
+
+IBM Cloudの例は以下の通りです：
+
+[,yaml]
+----
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: neuvector-data
+  namespace: neuvector
+  labels:
+    billingType: "hourly"
+    region: us-south
+    zone: sjc03
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+      iops: "100"
+  storageClassName: ibmc-file-retain-custom
+----
+
+Persistent Volume Claimが作成された後、以下のように{product-name}サンプルyamlファイルを修正してください（古いセクションはコメントアウトされています）：
+
+[,yaml]
+----
+...
+spec:
+  template:
+    spec:
+      volumes:
+        - name: nv-share
+#         hostPath:                        // replaced by persistentVolumeClaim
+#           path: /var/neuvector        // replaced by persistentVolumeClaim
+          persistentVolumeClaim:
+            claimName: neuvector-data
+----
+
+また、永続ボリュームのサポートのために、コントローラーまたはAllinoneサンプルyamlに以下の環境変数を追加してください。これにより、コントローラーは起動時にバックアップ設定を読み取ります。
+
+[,yaml]
+----
+            - name: CTRL_PERSIST_CONFIG
+----
+
+=== ConfigMaps と永続ストレージ
+
+ConfigMaps と永続ストレージのバックアップは、新しい {product-name} クラスターがデプロイされるか、クラスターが失敗して再起動されるときにのみ読み取られます。ロールアップグレード中には使用されません。
+
+永続ストレージの設定バックアップが最初に読み取られ、その後に ConfigMaps が適用されるため、ConfigMap の設定が優先されます。すべてのConfigMap設定（例：更新など）は、永続ストレージにも保存されます。
+
+詳細については、xref:configmap.adoc[ConfigMaps] セクションを参照してください。
+
+== 本番環境での CVE 脆弱性データベースの更新
+
+CVE データベースを最新の状態に保つ方法については、各サンプルセクションを参照してください。
+
+CVE データベースのバージョンは、コンソールの脆弱性タブで確認できます。アップデーターコンテナイメージも確認できます。
+
+[,shell]
+----
+docker inspect neuvector/updater
+----
+
+[,json]
+----
+"Labels": {
+                "neuvector.image": "neuvector/updater",
+                "neuvector.role": "updater",
+                "neuvector.vuln_db": "1.255"
+            }
+----
+
+更新を実行した後、'version' のために controller/allinone ログを確認してください。例えば、Kubernetes では：
+
+[,shell]
+----
+kubectl logs neuvector-controller-pod-777fdc5668-4jkjn -n neuvector | grep version
+
+...
+2019-07-29T17:04:02.43 |DEBU|SCN|main.dbUpdate: New DB found - create=2019-07-24T11:59:13Z version=1.576
+2019-07-29T17:04:02.454|DEBU|SCN|memdb.ReadCveDb: New DB found - update=2019-07-24T11:59:13Z version=1.576
+2019-07-29T17:04:12.224|DEBU|SCN|main.scannerRegister: - version=1.576
+----
+
+== コンソールへのアクセス
+
+デフォルトでは、コンソールはポート 8443 でサービスとして公開されており、各ホストでランダムなポートの nodePort も使用されます。HTTPSをオフにするオプションや、ポート8443を許可しない企業のファイアウォールを経由してコンソールにアクセスする方法については、最初のセクションBasics -> xref:rest-api.adoc[Connect to Manager]を参照してください。
+
+== ポッド中断予算を使用したホストの更新または自動スケーリングノードの管理
+
+メンテナンスやスケーリング活動は、ノード上のコントローラーに影響を与える可能性があります。パブリッククラウドプロバイダーは、ノードの自動スケーリング機能をサポートしており、これにより{product-name}コントローラーを含むポッドを動的に追い出すことができます。コントローラーへの中断を防ぐために、{product-name} ポッド中断予算を作成できます。
+
+例えば、以下のnv_pdb.yamlファイルを作成して、常に少なくとも2つのコントローラーが実行されていることを確認してください。
+
+[,yaml]
+----
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: neuvector-controller-pdb
+  namespace: neuvector
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: neuvector-controller-pod
+----
+
+入力する情報
+
+[,shell]
+----
+kubectl create -f nv_pdb.yaml
+----
+
+詳細については: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+
+== 特権モードなしでデプロイする
+
+一部のシステムでは、特権モードを使用せずに行うデプロイメントがサポートされています。これらのシステムは、seccomp機能とAppArmorプロファイルの設定をサポートしている必要があります。
+
+サンプルコンポーズファイルについては、xref:docker.adoc[Dockerデプロイメント]のセクションを参照してください。
+
+== マルチサイト、マルチクラスターアーキテクチャ
+
+複数の拠点を持つ企業で、各拠点に対して別々の{product-name}クラスターをデプロイできる場合、以下は提案された参照アーキテクチャです。各クラスターは独自のコントローラーセットを持ち、別々に管理されます。
+
+image:multisite.png[マルチサイト]
+
+このファイル内にある >
+xref:attachment$multisite.pdf[{product-name}マルチサイトアーキテクチャ] のセクションで、より詳細な説明を確認してください。

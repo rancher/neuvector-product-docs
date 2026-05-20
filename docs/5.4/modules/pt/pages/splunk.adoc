@@ -1,0 +1,74 @@
+= Splunk
+:revdate: 2025-05-08
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/11.splunk/11.splunk.md
+:page-opendocs-slug:  /integration/splunk
+
+== Integrando com o {product-name} Splunk App
+
+O {product-name} Splunk App pode ser encontrado no catálogo splunkbase https://splunkbase.splunk.com/app/6205/[aqui] ou pesquisando por {product-name}.
+
+O {product-name} painel de segurança ajuda a identificar eventos de segurança, como tentativas de login suspeitas, violações de rede e imagens vulneráveis.
+
+Abaixo estão telas de exemplo exibidas no Splunk app.
+
+=== Vulnerabilidades de Imagem
+
+image:vulnerable_images.png[vulnerabilidades]
+
+=== Controle de Admissão e Eventos de Segurança
+
+image:admission_security_events.png[admissão_seguranca]
+
+=== Violações de Rede por Pod/Serviço (Implantações)
+
+image:network_violations.png[network]
+
+=== Resumo da Conexão de Egress
+
+image:egress_destinations.png[egress]
+
+=== {product-name} Painel de Atividade de Login
+
+image:login_summary.png[logins]
+
+== Instalação e Configuração
+
+=== Obtendo o aplicativo
+
+==== GitHub
+
+Baixe o tarball do aplicativo mais recente (`neuvector_app.tar.gz`) do https://github.com/neuvector/neuvector-splunk-app[repositório neuvector/neuvector-splunk-app].
+
+==== Splunkbase
+
+Baixe o tarball do aplicativo mais recente de https://splunkbase.splunk.com/apps[Splunkbase].
+
+==== Navegador de Aplicativos Splunk
+
+Na interface do Splunk, clique no menu suspenso Apps, clique em "Encontrar Mais Apps", e então pesquise por {product-name} Splunk App.
+
+=== Instalação e configuração
+
+Instale o app fazendo o upload do tarball ou seguindo os prompts do Splunkbase.
+
+==== Configure o syslog {product-name} no console
+
+Vá para Configurações -> Configuração -> Syslog
+
+[loweralpha]
+. defina o valor do servidor como o endereço IP em que o Splunk está rodando
+. escolha TCP como o protocolo
+. defina o número da porta como 10514
+. escolha Nível de Informação
+. clique em ENVIAR para salvar a configuração.
+
+image:syslog-config.png[syslog]
+
+Você pode configurar múltiplos clusters para enviar syslog para sua instância do Splunk e sua instância do Splunk receberá esses syslogs em tempo real.
+
+=== Perguntas Frequentes
+
+==== Qual papel de usuário é necessário?
+
+Qualquer papel de usuário.

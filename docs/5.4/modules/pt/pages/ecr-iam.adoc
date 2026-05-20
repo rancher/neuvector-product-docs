@@ -1,0 +1,47 @@
+= Digitalização ECR usando Funções IAM
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/02.registry/02.ecr-iam/02.ecr-iam.md
+:page-opendocs-slug:  /scanning/registry/ecr-iam
+
+== AWS ECR - Funções IAM
+
+Quando os contêineres {product-name} são implantados na AWS, e uma instância EC2 é atribuída a uma função de "`EC2 Container Registry`" Acesso de Leitura, o registro AWS ECR pode ser digitalizado sem uma Chave de Acesso e Chave Secreta.
+
+Aqui está como criar uma função AWS e atribuí-la ao nó.
+
+=== Selecione a Instância
+
+Observe que a função IAM está em branco ou não inclui a função ECR
+
+image:ecr1.png[awsrole]
+
+=== Anexar uma Função
+
+Selecione Ações -> Configurações da Instância -> Anexar/Substituir Função IAM
+
+image:ecr2.png[awsrole]
+
+Se você não criou anteriormente a função ECR, clique em Criar Nova Função IAM. Digite o nome da função.
+
+image:ecr3.png[attachrole]
+
+=== Selecione o Serviço AWS
+
+image:ecr4.png[select]
+
+=== Lista de Funções
+
+image:ecr5.png[awsroles]
+
+=== Anexar a Permissão de Leitura ECR à Função
+
+image:ecr6.png[permissions]
+
+=== Revise suas configurações
+
+image:ecr7.png[review]
+
+=== Verifique a instância para a função IAM
+
+image:ecr9.png[instância]

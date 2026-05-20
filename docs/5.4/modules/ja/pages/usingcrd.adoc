@@ -1,0 +1,950 @@
+= CRD - カスタムリソース定義
+:revdate: 2025-05-14
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/13.usingcrd/13.usingcrd.md
+:page-opendocs-slug:  /policy/usingcrd
+
+== {product-name} ポリシー・アズ・コード用のCRD
+
+{product-name} カスタムリソース定義（CRD）は、さまざまなチームによって使用され、{product-name} コンテナセキュリティプラットフォームでセキュリティポリシーを自動的に定義することができます。開発者、DevOps、DevSecOps、およびセキュリティチームは、新しいまたは更新されたアプリケーションを本番環境にデプロイするために、セキュリティポリシーを自動化するために協力できます。CRDは、複数のKubernetesクラスターにわたってグローバルなセキュリティポリシーを強制するためにも使用できます。
+
+[NOTE]
+====
+CRDはKubernetes 1.11以降でサポートされています。以前のバージョンに{product-name}セキュリティルールCRDをデプロイしてもエラーは発生しない可能性がありますが、CRDは処理されません。
+====
+
+CRDは多くのユースケースやワークフローをサポートするために使用できます：
+
+* アプリケーション開発中にセキュリティポリシーを定義し、本番環境にプッシュします。
+* {product-name}を使用して動作を学習し、本番環境にプッシュする前にCRDをエクスポートしてレビューします。
+* ステージングから本番クラスターへのセキュリティポリシーを移行します。
+* ハイブリッドまたはマルチクラウドの複製されたクラスター全体でルールを複製します。
+* グローバルなセキュリティポリシーを強制します（下部にこの例を参照してください）。
+
+CRDは多くの利点をもたらします。これには以下が含まれます：
+
+* セキュリティポリシーをコードとして定義/宣言します。
+* アプリケーションデプロイメントマニフェストと同様に、セキュリティポリシーのバージョン管理と追跡を行います。
+* ネットワーク、ファイル、および処理の動作を含む、任意のアプリケーションの許可された動作を定義します。
+
+== サポートされているリソースタイプ
+
+{product-name}は以下のカスタムリソース定義をサポートしています：
+
+* NvAdmissionControlSecurityRule
+* NvClusterSecurityRule
+* NvGroupDefinition
+* NvSecurityRule
+
+=== NvGroupDefinition
+
+`NvGroupDefinition` カスタムリソースは、グループの定義を表し、その説明と基準を含みます。それ自体は、アクティブまたは強制されたグループを表しません。代わりに、NeuVectorシステム内の参照定義として機能します。
+
+NeuVectorは、`NvSecurityRule` または `NvClusterSecurityRule` で `NvGroupDefinition` が参照されるときにのみ、アクティブなグループを作成し適用します。それまでは、`NvGroupDefinition` はKubernetesクラスター内に存在し、強制やランタイム効果はありません。この動作は意図的であり、NeuVectorの設計の一部です。
+
+**まとめ**:
+
+* `NvGroupDefinition` はグループのメタデータと選択基準を定義します。
+* `NvSecurityRule` と `NvClusterSecurityRule` はグループを適用し、アクティブにします。
+* `NvGroupDefinition` の存在は定義が存在することを意味しますが、セキュリティルールによって参照されるときにのみアクティブになります。
+
+すべての `NvGroupDefinition` リソースは `neuvector` ネームスペースの下に作成されます。
+
+==== スキーマ属性: `name_referral`
+
+v5.4.3以降、NeuVectorは、NvSecurityRule/NvClusterSecurityRule CRDスキーマのグループセレクター(`target.selector`, `ingress.items[].selector`, `egress.items[].selector`)の設定として属性 `name_referral` (ブール値) を利用します。この設定は、グループエクスポートダイアログで「名前参照を使用」をチェックすることでUIで有効にできます。
+
+`name_referral` 属性が `true` に設定されている場合、NvSecurityRule/NvClusterSecurityRuleのグループセレクターの `criteria/comment` フィールドはNeuVectorによって無視されます。これは、NeuVectorが参照によってグループの `criteria/comment` を決定しようとすることを意味します。これは、グループを編集する際の変更を支援するために、NvSecurityRule/NvClusterSecurityRule CRDに「グループ参照」を導入します。設定されていない場合、ユーザーは必要に応じてそれぞれのYAMLファイルの定義された場所でグループを更新する必要があります。
+
+=== NvClusterSecurityRule と NvSecurityRule
+
+NvSecurityRule と NvClusterSecurityRule の違いは、スコープの定義によって設定された境界です。NvSecurityRuleリソースは名前空間レベルでスコープされており、NvClusterSecurityRuleはクラスターレベルでスコープされています。リソースタイプはyamlファイルで構成でき、デプロイメント中に作成できます。これは、NeuVectorのデプロイメント手順と例に示されています。
+
+名前空間のスコープを持つNvSecurityRuleリソースタイプの重要性は、ターゲットグループの構成されたドメインの強制にあり、これはNeuVectorのCRDセキュリティポリシーで構成された名前空間と一致しなければなりません。これにより、ターゲットグループポリシールールに影響を与える不要なクロス名前空間ポリシーの作成を防ぐための強制が提供されます。
+
+NvClusterSecurityRuleカスタムリソース定義はクラスターレベルのスコープを持ち、したがって、定義されたターゲットに対して名前空間の境界を強制しません。ただし、CRD-yamlファイルをインポートするために使用されるユーザーコンテキストは、CRD-yamlファイルで構成されたものと同じ名前空間にアクセスまたは存在するために必要な権限を持っていなければならず、そうでなければインポートは拒否されます。
+
+==== CRDサポートの有効化
+
+xref:kubernetes.adoc#_deploy_using_kubernetes[Kubernetes]およびxref:openshift.adoc#_deploy_on_openshift[OpenShift]のデプロイメントセクション（デプロイ{product-name}）に記載されているように、カスタムリソースおよびNvSecurityRulesのための適切なクラスター役割とクラスター役割バインディングを最初に追加する必要があります。
+
+次に、これらのセクションのサンプルyamlを使用してNvSecurityRuleとNvClusterSecurityRuleを作成する必要があります。{product-name} CRDは現在デプロイ可能です。
+
+== サンプル{product-name} CRDの生成
+
+{product-name} CRDのyamlファイル形式がどのように見えるかを確認する最も簡単な方法は、{product-name}コンソールからエクスポートすることです。アプリケーションをテストした後、{product-name}がネットワーク、ファイル、および処理の動作を学習するディスカバーモードにある間に、学習したポリシーをエクスポートできます。
+
+ポリシー->グループメニューに移動し、右上にある「グループポリシーのエクスポート」をクリックしてください。
+
+image:export_crd.png[CRDExport]
+
+次に、上記のデモネームスペースの3つなど、エクスポートしたいグループを選択します。以下に保存されたCRD yamlを確認して、{product-name}のネットワーク、プロセス、およびファイルルールがどのように表現されているかを確認します。
+
+[NOTE]
+====
+選択したグループに加えて、すべての「リンクされた」グループもエクスポートされます。リンクされたグループとは、選択されたグループがネットワークルールによって接続される他のグループのことです。
+====
+
+サンプルエクスポートされたCRD
+
+.詳しくは、ここをクリックしてください。
+[%collapsible]
+====
+[,yaml]
+----
+apiVersion: v1
+items:
+- apiVersion: neuvector.com/v1
+  kind: NvSecurityRule
+  metadata:
+    name: nv.nginx-pod.demo
+    namespace: demo
+  spec:
+    egress:
+    - selector:
+        criteria:
+        - key: service
+          op: =
+          value: node-pod.demo
+        - key: domain
+          op: =
+          value: demo
+        name: nv.node-pod.demo
+      action: allow
+      applications:
+      - HTTP
+      name: nv.node-pod.demo-egress-0
+      ports: any
+    file: []
+    ingress:
+    - selector:
+        criteria:
+        - key: service
+          op: =
+          value: exploit.demo
+        - key: domain
+          op: =
+          value: demo
+        name: nv.exploit.demo
+      action: allow
+      applications:
+      - HTTP
+      name: nv.nginx-pod.demo-ingress-0
+      ports: any
+    process:
+    - action: allow
+      name: nginx
+      path: /usr/sbin/nginx
+    - action: allow
+      name: pause
+      path: /pause
+    - action: allow
+      name: ps
+      path: /bin/ps
+    target:
+      selector:
+        criteria:
+        - key: service
+          op: =
+          value: nginx-pod.demo
+        - key: domain
+          op: =
+          value: demo
+        name: nv.nginx-pod.demo
+      policymode: Monitor
+- apiVersion: neuvector.com/v1
+  kind: NvSecurityRule
+  metadata:
+    name: nv.node-pod.demo
+    namespace: demo
+  spec:
+    egress:
+    - selector:
+        criteria:
+        - key: address
+          op: =
+          value: google.com
+        name: test
+      action: allow
+      applications:
+      - SSL
+      name: test-egress-1
+      ports: any
+    - selector:
+        criteria:
+        - key: service
+          op: =
+          value: redis-pod.demo
+        - key: domain
+          op: =
+          value: demo
+        name: nv.redis-pod.demo
+      action: allow
+      applications:
+      - Redis
+      name: nv.redis-pod.demo-egress-2
+      ports: any
+    - selector:
+        criteria:
+        - key: service
+          op: =
+          value: kube-dns.kube-system
+        - key: domain
+          op: =
+          value: kube-system
+        name: nv.kube-dns.kube-system
+      action: allow
+      applications:
+      - DNS
+      name: nv.kube-dns.kube-system-egress-3
+      ports: any
+    file: []
+    ingress: []
+    process:
+    - action: allow
+      name: curl
+      path: ""
+    - action: allow
+      name: node
+      path: /usr/bin/nodejs
+    - action: allow
+      name: pause
+      path: /pause
+    - action: allow
+      name: ps
+      path: /bin/ps
+    - action: allow
+      name: sh
+      path: /bin/dash
+    - action: allow
+      name: whoami
+      path: /usr/bin/whoami
+    target:
+      selector:
+        criteria:
+        - key: service
+          op: =
+          value: node-pod.demo
+        - key: domain
+          op: =
+          value: demo
+        name: nv.node-pod.demo
+      policymode: Protect
+- apiVersion: neuvector.com/v1
+  kind: NvSecurityRule
+  metadata:
+    name: nv.redis-pod.demo
+    namespace: demo
+  spec:
+    egress: []
+    file: []
+    ingress: []
+    process:
+    - action: allow
+      name: pause
+      path: /pause
+    - action: allow
+      name: redis-server
+      path: /usr/local/bin/redis-server
+    target:
+      selector:
+        criteria:
+        - key: service
+          op: =
+          value: redis-pod.demo
+        - key: domain
+          op: =
+          value: demo
+        name: nv.redis-pod.demo
+      policymode: Monitor
+- apiVersion: neuvector.com/v1
+  kind: NvSecurityRule
+  metadata:
+    name: nv.kube-dns.kube-system
+    namespace: kube-system
+  spec:
+    egress: null
+    file: null
+    ingress: null
+    process: null
+    target:
+      selector:
+        criteria:
+        - key: service
+          op: =
+          value: kube-dns.kube-system
+        - key: domain
+          op: =
+          value: kube-system
+        name: nv.kube-dns.kube-system
+      policymode: Monitor
+- apiVersion: neuvector.com/v1
+  kind: NvSecurityRule
+  metadata:
+    name: nv.exploit.demo
+    namespace: demo
+  spec:
+    egress: null
+    file: null
+    ingress: null
+    process: null
+    target:
+      selector:
+        criteria:
+        - key: service
+          op: =
+          value: exploit.demo
+        - key: domain
+          op: =
+          value: demo
+        name: nv.exploit.demo
+      policymode: Monitor
+kind: List
+metadata: null
+----
+====
+
+次に例を示します。
+
+* これは、NvSecurityRuleの名前空間付きCRDです。
+* nginx-pod.demoは、HTTPを介してnode-pod.demoと通信でき、許可されたプロセスがリストされています。
+* node-pod.demoは、Redisプロトコルを使用してredis-pod.demoと通信できます。
+* サービスのポリシーモードは、モニターモードに設定されています。
+* node-pod.demoは、SSLを使用してgoogle.comにエグレスすることが許可されています。
+* nv.node-pod.demoのようなグループ名は参照されていますが、CRD内で定義されていないため、デプロイ時に既に存在することが期待されています。グループの定義については、以下を参照してください。
+
+== Sample NeuVector CRD - NvAdmissionControlSecurityRule
+
+CRDマニフェストを生成する別の方法は、**ポリシー > アドミッションコントロール**ビューから、**その他の操作**ドロップダウンリストをクリックし、**エクスポート**を選択することです。以下は、サンプルのNvAdmissionControlSecurityRule CRDマニフェストです：
+
+[NOTE]
+====
+NvAdmissionControlSecurityRule `metadata.name`は、将来の拡張性のために常に`local`に設定する必要があります。
+====
+
+.サンプルCRDについては、こちらをクリックしてください。
+[%collapsible]
+====
+[,yaml]
+----
+apiVersion: neuvector.com/v1
+kind: NvAdmissionControlSecurityRule
+metadata:
+  creationTimestamp: null
+  name: local
+spec:
+  config:
+    client_mode: service
+    enable: true
+    mode: monitor
+  rules:
+  - action: deny
+    containers:
+    - containers
+    criteria:
+    - name: namespace
+      op: containsAny
+      path: namespace
+      value: n2,ns1
+    disabled: false
+    rule_mode: ""
+----
+====
+
+上記で生成されたマニフェストを要件に合わせて修正するための https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.3.0/admission-crd-k8s-1.19.yaml[完全なスキーマ]を参照できます。
+
+修正が完了したら、マニフェストをKubernetesクラスターに適用できます。
+
+== ポリシーモードの設定とグループの定義
+
+ポリシーモードの設定とグループの定義は、CRD設定yamlファイル内でサポートされています。yaml設定ファイルにポリシーモードが設定されている場合、そのファイルをインポートすると、CRDインポートのためにターゲットグループがこの値に設定されます。
+
+[IMPORTANT]
+====
+インポートされたターゲットポリシーモードは、{product-name}コンソール（ポリシー->グループ）から変更することはできません。例えば、モードがモニターに設定されると、コンソールを通じてではなく、CRDの修正を通じてのみ変更できます。
+====
+
+[NOTE]
+====
+CRDインポートの動作は、リンクされたグループのポリシーモードを無視し、リンクされたグループが既に存在する場合はポリシーモードを変更しません。リンクされたグループが存在しない場合、自動的に作成され、設定->構成に記載されているデフォルトの新しいサービスモードに設定されます。
+====
+
+=== ポリシーモード設定要件
+
+* モードは設定されたターゲットグループにのみ適用されます
+* ターゲットグループの設定は、nv.SERVICE_NAME.DOMAINの形式でなければなりません。
+** 例: nv.xxx.yyy
+** xxx.yyy=SERVICE
+** yyy=ドメイン
+* サポートされている値は、Discover、Monitor、Protectです
+* ターゲットグループには、キーと値のペア key: service が含まれている必要があります。
+* 構成されたキー: domain は、構成されたサービスのキーと値のペアと一致するサービスドメインサフィックスでなければなりません。
+
+ポリシーモード設定 YAML ファイルの例
+
+[,yaml]
+----
+  target:
+      policymode: Protect
+      selector:
+          name: nv.xxx.yyy
+          criteria:
+          - key: service            #1 of 2 Criteria must exist
+            value: xxx.yyy
+            op: "="
+          - key: domain             #2 of 2 Criteria must exist
+            value: yyy
+            op: "="
+----
+
+== CRD ポリシールールの構文と意味
+
+=== Group Name
+
+* fed.、nv.ip.、host:、または workload: で始まる名前は、フェデレーテッドグループまたは IP ベースのサービス用に予約されているため、使用しないでください。
+* ノード、外部、またはコンテナをグループ名として使用できます。ただし、これは予約されたデフォルトのグループ名と同じになるため、新しいグループは作成されません。CRD 内のグループ定義基準は無視されますが、グループのルールは処理されます。新しいルールはグループ名の下に表示されます。
+* 基準を満たしています: {caret}[a-zA-Z0-9]+[.:a-zA-Z0-9_-]*$
+* fed、workload、または nv.ip で始まってはいけません。
+* 名前が nv.xxx.yyy の形式である場合、一致するサービスとドメインの定義が存在しなければならず、さもなければインポート検証は失敗します。 詳細については、上記のポリシーモード設定を参照してください。
+* インポートされるグループ名が宛先システムに既に存在する場合、インポートされるCRDと宛先システムのものとの間で基準が一致する必要があります。 違いがある場合、CRDのインポートは拒否されます。
+
+=== ポリシー名
+
+* yamlファイル内で一意である必要があります。
+* 空にすることはできません。
+
+=== Ingress
+
+* ターゲットに向かう着信トラフィックです。
+
+=== Egress
+
+* ターゲットから発信されるトラフィックです。
+
+=== 基準
+
+* 名前がノード、外部、またはコンテナでない限り、空にしてはなりません。
+* name - 名前がサービス形式nv.xxx.yyyの場合、上記のポリシーモード設定セクションの詳細を参照してください。
+* key - キーは正規表現パターン{caret}[a-zA-Z0-9]+[.:a-zA-Z0-9_-]*$に準拠しています。
+* op（操作）
+** string = "="
+** string = "!="
+** string = "contains"
+** string = "prefix"
+** string = "regex"
+** string = "!regex"
+* value - 制限のない文字列
+* key - 空であってはなりません。
+* op - 演算子
+** 演算子が等しい (=) または等しくない (!=) の場合、その`' 値は空であってはなりません。
+** 演算子が等しい (=) または等しくない (!=) で、値が (例えば* または ?) の場合、その値は {caret}$ のような正規表現形式を持つことはできません。
+** 例:
+*** キー: サービス
+*** オペレーター:  =
+*** 値: ab?c*e{caret}$  （これは不正です）
+* アクション - 許可または拒否
+* アプリケーション（サポートされている値）
+** ActiveMQ
+** Apache
+** Cassandra
+** Consul
+** Couchbase
+** CouchDB
+** DHCP
+** DNS
+** Echo
+** ElasticSearch
+** etcd
+** GRPC
+** HTTP
+** Jetty
+** Kafka
+** Memcached
+** MongoDB
+** MSSQL
+** MySQL
+** nginx
+** NTP
+** Oracle
+** PostgreSQL
+** RabbitMQ
+** Radius
+** Redis
+** RTSP
+** SIP
+** Spark
+** SSH
+** SSL
+** Syslog
+** TFTP
+** VoltDB
+** Wordpress
+** ZooKeeper
+* ポート - 指定された形式は xxx/yyy です。ここで xxx=プロトコル(tcp, udp)、yyy=ポート番号 (0-65535) です。
+** TCP/123 または TCP/any
+** UDP/123 または UDP/123
+** ICMP
+** 123 = TCP/123
+* プロセス - 各プロセスのアクション、名前、パスのリスト
+** アクション: 許可/拒否  #このアクションはファイルアクセスルールに優先します。 ファイルアクセスルールを有効にする意図がある場合は、これを許可に設定する必要があります。
+** 名前: プロセス名
+** パス: プロセスパス（オプション）
+* ファイル - 定義されたターゲットコンテナグループにのみ適用されるファイルアクセスルールのリスト
+** アプリ: アプリのリスト
+** 動作: アクセスをブロックする / 変更を監視する  #これは以下の定義されたフィルターへのアクセスをブロックします。 変更を監視するが選択された場合、{product-name}のウェブコンソールの通知 > セキュリティイベントページからセキュリティイベントが生成されます。
+** フィルター: パス/ファイル名
+** 再帰的: true/false
+
+== CRDによるRBACサポート
+
+Kubernetesの既存のRBACモデルを利用して、{product-name}はCRD（カスタムリソース定義）を拡張し、NvSecurityRuleリソースタイプを使用する際に、構成されたネームスペース{product-name}に関連付けられたKubernetesのRolebindingを利用してRBACをサポートします。この構成されたネームスペースは、{product-name}セキュリティポリシーで指定されたネームスペース内に存在するターゲットに対して施行されます。定義されたクラスター役割をロールバインディングする際、これをKubernetesユーザーまたはグループにバインドするために使用できます。{product-name}がサポートする2つのクラスター役割リソースタイプは、NvSecurityRuleとNvClusterSecurityRuleです。
+
+=== クラスター役割（NvSecurityRulesおよびNvClusterSecurityRulesリソース）に、異なるネームスペースに属する2人のユーザーをロールバインディングおよびクラスター役割バインディングします。
+
+以下は、2つの異なるユーザーにバインドされる両方のリソース（NvSecurityRulesおよびNvClusterSecurityRules）を含む1つのクラスター役割を作成するシナリオを示しています。
+
+1人のユーザー（user1）はネームスペース（ns1）に属し、もう1人のユーザー（user2）はネームスペース（ns2）に属します。 User1はこの作成されたクラスター役割（nvsecnvclustrole）にロールバインディングされ、User2は同じクラスター役割（nvsecnvclustrole）にクラスター役割バインディングされます。
+
+ここでの重要なポイントは、ロールバインディングを使用するとネームスペースレベルのスコープが適用され、クラスター役割バインディングを使用するとクラスター全体レベルのスコープが適用されることを示す点です。 User1はロールバインディング（ネームスペースレベルのスコープ）され、User2はクラスター役割バインディング（クラスター全体レベルのスコープ）されます。 これは、作成されたユーザーのアクセスを制約するスコープレベルに基づいてRBACが施行される際に最も重要です。
+
+=== 異なる2種類の定義されたyamlファイルを使用した例と、それぞれのユーザーを使用した場合の影響。
+
+. NvSecurityRulesとNvClusterSecurityRulesリソースの両方を含むクラスター役割を作成します。
++
+--
+[NOTE]
+====
+このクラスター役割には、nvsecurityrulesとnvclustersecurityrulesの2つのリソースが構成されていることに注意してください。例（nvsecnvclustroles.yaml）：
+
+[,yaml]
+----
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+   name: nvsecnvclustrole
+rules:
+- apiGroups:
+  - neuvector.com
+  resources:
+  - nvsecurityrules
+  - nvclustersecurityrules
+  verbs:
+  - list
+  - delete
+  - create
+  - get
+  - update
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - get
+  - list
+----
+====
+--
+. 2つのテストyamlファイルを作成します。1つはNvSecurityRules用、もう1つはNvClusterSecurityRulesリソース用です。
++
+--
+サンプル`NvSecurityRules` nvsecurity.yamlファイル：
+
+[,yaml]
+----
+apiVersion: neuvector.com/v1
+kind:     NvSecurityRule
+metadata:
+  name:    ns1crd
+  namespace: ns1
+spec:
+  target:
+      selector:
+          name: nv.nginx-pod.ns1
+          criteria:
+          - key: service
+            value: nginx-pod.ns1
+            op: "="
+          - key: domain
+            value: ns1
+            op: "="
+  ingress:
+      -
+        selector:
+            name: ingress
+            criteria:
+            - key: domain
+              value: demo
+              op: "="
+        ports: "tcp/65535"
+        applications:
+            - SSL
+        action:  allow
+        name:    ingress
+----
+
+サンプル`NvClusterSecurityRules` nvclustersecurity.yamlファイル：
+
+[,yaml]
+----
+apiVersion: neuvector.com/v1
+kind:     NvClusterSecurityRule
+metadata:
+  name:    rbacnvclustmatchnamespacengtargserving
+  namespace: nvclusterspace
+spec:
+  target:
+      policymode: Protect
+      selector:
+          name: nv.nginx-pod.eng
+          criteria:
+          - key: service
+            value: nginx-pod.eng
+            op: "="
+          - key: domain
+            value: eng
+            op: "="
+  ingress:
+      -
+        selector:
+            name: ingress
+            criteria:
+            - key: service
+              value: nginx-pod.demo
+              op: "="
+        ports: "tcp/65535"
+        applications:
+            - SSL
+        action:  allow
+        name:    ingress
+----
+--
+. ユーザーコンテキストをuser1（ns1ネームスペース所属）に切り替えると、NvSecurityRulesリソースにロールバインディングされ、そのリソースはns1ネームスペースにバインドされます。 したがって、テストyamlファイルをインポートすること（kubectl create --f nvsecurity.yaml）は許可されるべきです。このyamlファイルの構成にはNvSecurityRulesリソースと、このユーザーがバウンドしているネームスペースが含まれています。
+
+ただし、テストyamlファイル（nvclustersecurity.yaml）をインポートしようとすると、これは拒否されます。なぜなら、インポートCRD yamlファイルはクラスター・スコープを持つNvClusterSecurityRulesリソースで定義されているのに対し、user1はネームスペース・スコープでロールバインディングされているためです。 ネームスペーススコープはクラスタースコープよりも低い権限を持っています。 したがって、Kubernetes RBACはそのようなリクエストを拒否します。
+
+例エラーメッセージ：
+
+[,shell]
+----
+Error from server (Forbidden): error when creating "rbacnvclustnamespacengtargnvclustingress.yamltmp": nvclustersecurityrules.neuvector.com is forbidden: User "user1" cannot create resource "nvclustersecurityrules" in API group "neuvector.com" at the cluster scope
+----
+
+次に、より広い権限（クラスターレベルスコープ）を持つuser2にユーザーコンテキストを切り替えることができます。 このuser2はネームスペースにバウンドされていないClusterrolebindingを持ち、クラスターレベルスコープの権限を有し、NvClusterSecurityRulesリソースに関連付けられています。
+
+したがって、ユーザー2を使用してyamlファイル（nvsecurity.yamlまたはnvclustersecurity.yaml）をインポートすることが許可されます。このユーザーのClusterrolebindingは、リソースNvSecurityRules（ネームスペーススコープ）またはNvClusterSecurityRules（クラスタースコープ）に制限されていないためです。
+
+== CRDにおけるネットワークルール（Ingress、Egressオブジェクト）の表現
+
+CRDで表現されたネットワークルールには、ワークロード（グループ）への許可された受信および送信接続（プロトコル、ポートなど）を定義するIngressおよび/またはEgressオブジェクトがあります。{product-name}内の各ネットワークルールは、CRD内で一意の名前を持たなければなりません。コンソールでは、ネットワークルールは一意のID番号のみを持つことに注意してください。
+
+ルールの「To」（宛先）が学習された、または発見されたグループである場合、エクスポート時に{product-name}は名前の前に「nv.」識別子を付加します。For example "nv.redis-master.demo-ingress-0".発見されたグループとカスタムグループの両方に対して、{product-name}はルール名「nv.redis-master.demo-ingress-0」に「-ingress-0」のような一意の名前識別子を追加します。CRDルール名には「nv.」識別子は必要なく、明確さのためにエクスポートされたルールに追加されます。次に例を示します。
+
+[,yaml]
+----
+    ingress:
+    - action: allow
+      applications:
+      - Redis
+      name: nv.redis-master.demo-ingress-0
+----
+
+カスタムのユーザー作成グループには「nv.」プレフィックスを持たせることはできません。ドメインおよびサービスオブジェクトを持つ発見された/学習されたグループのみがプレフィックスを持つべきです。次に例を示します。
+
+[,yaml]
+----
+    - action: allow
+      applications:
+      - HTTP
+      name: nv.node-pod.demo-egress-1
+      ports: any
+      priority: 0
+      selector:
+        comment: ""
+        criteria:
+        - key: service
+          op: =
+          value: node-pod.demo
+        - key: domain
+          op: =
+          value: demo
+        name: nv.node-pod.demo
+----
+
+== デプロイされたアプリケーションのカスタマイズされた設定
+
+カスタマイズされたCRD yamlファイルを使用することで、ネットワークセキュリティルール、ファイルアクセスルール、プロセスセキュリティルールをカスタマイズし、すべてを単一の設定ファイルにまとめることができます。 これらのカスタマイズを許可することには多くの利点があります。
+
+* まず、これにより、同じルールを複数のKubernetes環境に適用でき、クラスター間の同期が可能になります。
+* 次に、これにより、アプリケーションがオンラインになる前にルールを事前にデプロイメントでき、積極的かつ効果的なセキュリティルールデプロイメントワークフローを提供します。
+* 第三に、これにより、ポリシーモードを評価モード（DiscoverやMonitorなど）から最終ステージング環境を保護するモードに変更できます。
+
+yamlファイル内のこれらのCRDルールは、'kubectl create --f crd.yaml'のようなKubernetes CLIコマンドを使用して{product-name}セキュリティプラットフォームにインポートできます。 これにより、セキュリティチームはKubernetes環境内のさまざまなコンテナに適用されるセキュリティルールを調整することができます。
+
+例えば、特定のyamlファイルは、ステージングクラスター環境内のnv.alpine.ns1という特定のコンテナをDiscoverまたはMonitorするためにポリシーモードを有効にするように構成できます。 さらに、設定されたターゲットコンテナnv.alpine.ns1へのsshアクセスを別のコンテナnv.redhat.ns2に制限することができます。
+
+必要なテストと評価がすべて正しいと見なされた場合、{product-name}ポリシー移行機能を使用して、アプリケーションのデプロイメントと同時にこれを本番クラスター環境に移行することができます。この機能については、後でこのセクションで説明します。
+
+=== これらの機能を実行するCRD構成の例
+
+以下は、そのような構成のサンプルスニペットです。
+
+[,yaml]
+----
+apiVersion: neuvector.com/v1
+kind:     NvSecurityRule
+metadata:
+  name:    ns1global
+  namespace: ns1              #The target's native namespace
+spec:
+  target:
+      selector:
+          name: nv.alpine.ns1
+          criteria:
+          - key: service
+            value: alpine.ns1   #The source target's running container
+            op: "="
+          - key: domain
+            value: ns1
+            op: "="
+  egress:
+      -
+        selector:
+            name: egress
+            criteria:
+            - key: service
+              value: nv.redhat.ns2      #The destination's running container
+              op: "="
+        ports:   tcp/22                     #Denies ssh to the destination container nv.redhat.ns2
+        applications:
+            - SSH
+        action:  deny
+        name:    egress
+  file:                                       #Applies only to the defined target container group
+  - app:
+    - chmod                              #The application chmod is the only application allowed to access, while all other apps are denied.
+    behavior: block_access      #Supported values are block_access and monitor_change.  This blocks access to the defined filter below.
+    filter: /tmp/passwd.txt
+    recursive: false
+  process:
+  - action: allow                  #This action has precedence over the file access rule.  This should be allowed if the intent is to allow the file access rule to take effect.
+    name: chmod                # This configured should match the application defined under the file section.
+    path: /bin/chmod
+----
+
+上記のスニペットは、ターゲットグループコンテナnv.alpine.ns1からEgressグループnv.redhat.ns2へのSSHアクセスを強制するように設定されています。 さらに、ファイルアクセスと処理ルールの施行が定義され、設定されたターゲットコンテナnv.alpine.ns1に適用されています。 このバンドル構成により、定義されたネットワーク、ファイル、およびプロセスのセキュリティルールが設定されたターゲットグループに作用することが許可されました。
+
+== ポリシーグループとルールの移行サポート
+
+{product-name}は、Kubernetesクラスターからyamlファイルで特定の{product-name}グループタイプをエクスポートし、ネイティブのkubectlコマンドを利用して別のKubernetesクラスターにインポートすることをサポートしています。
+
+=== 移行のユースケース
+
+* ステージングk8sクラスター環境から本番k8sクラスター環境に、"`production ready`"と見なされるテスト済みのCRDグループとセキュリティルールをエクスポートします。
+* ステージングk8s環境から本番k8s環境に移行される学習されたセキュリティルールをエクスポートします。
+* 設定されたターゲットグループのポリシーモードの変更を許可します。たとえば、ステージング環境でのDiscoverまたはMonitorモードから本番環境でのProtectモードに変更します。
+
+=== サポートされているエクスポート条件
+
+* ターゲット、Ingress、Egress、自己学習
+
+=== グループエクスポートの例
+
+* 属性がdomain=xxとして設定されたエクスポートされたグループは、ネームスペースとともにリソースタイプNvsecurityRuleでエクスポートされます。
+
+image:group_crd.png[GroupExport]
+
+=== NvsecurityRuleリソースタイプを持つエクスポートされたグループのyamlファイルの例
+
+[,yaml]
+----
+  kind: NvSecurityRule
+  metadata:
+    name: nv.nginx-pod.neuvector
+    namespace: neuvector
+  spec:
+    egress: []
+    file: []
+    ingress: []
+    process: []
+    target:
+      selector:
+        criteria:
+        - key: service
+          op: =
+          value: nginx-pod.neuvector
+        - key: domain
+          op: =
+          value: neuvector
+        name: nv.nginx-pod.neuvector
+      policymode: Discover
+----
+
+* domain=xx（ネームスペース）として定義された基準がないエクスポートされたグループは、リソースタイプNvClusterSecurityRuleとデフォルトのネームスペースでエクスポートされます。 ネームスペースなしでエクスポートされたグループの例には、外部、コンテナなどがあります。
+
+=== NvClusterSecurityRuleリソースタイプを持つエクスポートされたグループのyamlファイルの例です。
+
+[,yaml]
+----
+  kind: NvClusterSecurityRule
+  metadata:
+    name: egress
+    namespace: default
+  spec:
+    egress: []
+    file:             #File path profile applicable to the Target group only, and only applies to self-learned and user create groups
+    - app:
+      - vi
+      - cat
+      behavior: block_access
+      filter: /etc/mysecret              #Only vi and cat can access this file with “block_access”.
+      recursive: false
+    ingress:
+    - selector:
+        criteria:
+        - key: service
+          op: =
+          value: nginx-pod.neuvector
+        - key: domain
+          op: =
+          value: neuvector
+        name: nv.nginx-pod.neuvector     #Group Name
+      action: allow
+      applications:
+      - Apache
+      - ElasticSearch
+      name: egress-ingress-0             #Policy Name
+      ports: tcp/9400
+    process:      #Process profile applicable to the Target group only, and only applies to self-learned and user create groups.
+       - action: deny     #Possible values are deny and allow
+          name: ls
+          path: /bin/ls        #This example shows it denies the ls command for this target.
+    target:
+      selector:
+        criteria:
+        - key: service
+          op: =
+          value: nginx-pod.demo
+        name: egress                     #Group Name
+      policymode: null
+- apiVersion: neuvector.com/v1
+  kind: NvSecurityRule
+  metadata:
+    name: ingress
+    namespace: demo
+  spec:
+----
+
+[NOTE]
+====
+CRDインポートの動作は、リンクされたグループのポリシーモードを無視し、リンクされたグループが既に存在する場合はポリシーモードを変更しません。リンクされたグループが存在しない場合は、自動的に作成され、-> 設定におけるデフォルトの新しいサービスモードに設定されます。
+====
+
+=== サポートされていないエクスポートグループタイプ
+
+* 連合型の
+* IPベース（学習したサービスIPのみにはサポートされていませんが、ユーザーが作成したカスタムIPグループはサポートされています）
+
+=== インポートシナリオ
+
+* インポートは、グループがまだ宛先環境に存在しない場合、宛先システムに新しいグループを作成します。また、現在使用中のKubernetesユーザーコンテキストが、インポートされるCRD-yamlファイルに設定されたネームスペースにアクセスするために必要な権限を持っている必要があります。
+* インポートされたグループが宛先システムに異なる基準または値で存在する場合、インポートは拒否されます。
+* インポートされたグループが宛先システムに同一の構成で存在する場合、異なるタイプの既存のグループを再利用します。
+
+== グローバルルールのためのCRDサンプル
+
+以下のサンプルCRDには二つの部分があります：
+
+. 最初の部分は、containersという名前のグループのためのNvClusterSecurityRuleです：
+このNvClusterSecurityRuleのターゲットはすべてのコンテナです。外部からの接続（クラスターの外部）をコンテナにSSHで接続させないインバウンドポリシーがあります。また、すべてのコンテナがSSHプロセスを使用することを拒否します。 この定義されたグローバルな動作は、すべてのコンテナに適用されます。
+. 二つ目の部分は、alpineサービスのためのNvSecurityRuleです：
+ターゲットは、'default'ネームスペースにあるnv.alpine.defaultというサービスです。すべてのコンテナに属しているため、上記のネットワークポリシーとプロセスルールを継承します。また、ポート80を通じて外部ネットワークへのHTTPトラフィックの接続を許可しないルールを追加します。さらに、SCPプロセスの実行を許可しません。
+
+サービス nv.alpine.default (nv.xxx.yyy として定義され、xxx は alpine のようなサービス名、yyy は default のようなネームスペース) に対して、ポリシーモードを定義することができます。ここでは、保護モード (すべての異常な活動をブロックする) として定義されています。
+
+全体として、nv.alpine.default が保護モードにあるため、コンテナは ssh および scp の実行を拒否し、外部からの ssh 接続や外部への http 接続も拒否します。
+
+nv.alpine.default のポリシーモードをモニターに変更すると、{product-name} は scp/ssh が呼び出されたときや、外部からの ssh 接続や外部への http 接続があるときにログを記録します。
+
+[,yaml]
+----
+apiVersion: v1
+items:
+- apiVersion: neuvector.com/v1
+  kind: NvClusterSecurityRule
+  metadata:
+    name: containers
+    namespace: default
+  spec:
+    egress: []
+    file: []
+    ingress:
+    - selector:
+        criteria: []
+        name: external
+      action: deny
+      applications:
+      - SSH
+      name: containers-ingress-0
+      ports: tcp/22
+    process:
+    - action: deny
+      name: ssh
+      path: /bin/ssh
+    target:
+      selector:
+        criteria:
+        - key: container
+          op: =
+          value: '*'
+        name: containers
+      policymode: null
+- apiVersion: neuvector.com/v1
+  kind: NvSecurityRule
+  metadata:
+    name: nv.alpine.default
+    namespace: default
+  spec:
+    egress:
+    - selector:
+        criteria: []
+        name: external
+      action: deny
+      applications:
+      - HTTP
+      name: external-egress-0
+      ports: tcp/80
+    file: []
+    ingress: []
+    process:
+    - action: deny
+      name: scp
+      path: /bin/scp
+    target:
+      selector:
+        criteria:
+        - key: service
+          op: =
+          value: alpine.default
+        - key: domain
+          op: =
+          value: default
+        name: nv.alpine.default
+      policymode: Protect
+kind: List
+metadata: null
+----
+
+監視プロセスのようなプロセスを実行するために許可またはホワイトリストに追加するには、プロセス名に対してアクション: allow のプロセスルールを追加し、パスを追加します。 許可ルールにはパスを指定する必要がありますが、拒否ルールでは省略可能です。
+
+== CRD ルールの更新と既存グループへの追加
+
+{product-name} における CRD 生成ルールの更新は、適切な yaml ファイルを更新し、更新を適用するだけで簡単です。
+
+[,shell]
+----
+kubectl apply -f <crdrule.yaml>
+----
+
+=== NvClusterSecurityRule の動的基準サポート
+
+既存のカスタムグループの基準を変更する複数の CRD がサポートされています。この機能により、ユーザーは複数の CRD を一度に適用でき、{product-name} の動作は CRD を受け入れてキューに入れるため、ユーザーへの即時の応答は常に成功となります。 処理中に、エラーはコンソール通知 -> イベントに報告されます。

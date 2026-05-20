@@ -1,0 +1,233 @@
+= Evaluando y probando {product-name}
+:revdate: 2025-05-08
+:page-revdate: {revdate}
+:page-opendocs-origin: /09.testing/01.testing/01.testing.md
+:page-opendocs-slug:  /testing/testing
+
+== Aplicaciones de muestra
+
+Después de haber desplegado los componentes {product-name}, puedes evaluarlo utilizando las aplicaciones de muestra que proporcionamos. Estas se encuentran en el repositorio de `'nvbeta` en Docker Hub.
+
+Un entorno de prueba típico basado en Kubernetes tendría un nodo maestro y de dos a tres nodos trabajadores. Puedes controlar si los pods de aplicación y los contenedores {product-name} se despliegan en un nodo maestro (desactivado por defecto).
+
+== Plan de Pruebas de Kubernetes
+
+Para desplegar una aplicación de múltiples capas utilizando Nginx, Nodejs y Redis, utiliza los ejemplos a continuación (en el orden indicado). Estos pueden necesitar ser editados para el despliegue en OpenShift, Rancher y otras herramientas basadas en Kubernetes.
+
+Crea un espacio de nombres de demostración
+
+[,shell]
+----
+kubectl create namespace demo
+----
+
+[NOTE]
+====
+La muestra a continuación utiliza apiVersion: apps/v1 requerido por Kubernetes 1.16+.
+====
+
+Crea el servicio y el despliegue de Redis utilizando este yaml:
+
+[,yaml]
+----
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: demo
+spec:
+  ports:
+  - port: 6379
+    protocol: "TCP"
+    name: "cluster-tcp-6379"
+  clusterIP: None
+  selector:
+    app: redis-pod
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-pod
+  namespace: demo
+spec:
+  selector:
+    matchLabels:
+      app: redis-pod
+  template:
+    metadata:
+      labels:
+        app: redis-pod
+    spec:
+      containers:
+      - name: redis-pod
+        image: redis
+----
+
+Crea el servicio y el despliegue de Nodejs utilizando este yaml:
+
+[,yaml]
+----
+apiVersion: v1
+kind: Service
+metadata:
+  name: node
+  namespace: demo
+spec:
+  ports:
+  - port: 8888
+    protocol: "TCP"
+    name: "cluster-tcp-8888"
+  clusterIP: None
+  selector:
+    app: node-pod
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-pod
+  namespace: demo
+spec:
+  selector:
+    matchLabels:
+      app: node-pod
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: node-pod
+    spec:
+      containers:
+      - name: node-pod
+        image: nvbeta/node
+----
+
+Crea el servicio y el despliegue de Nginx utilizando este yaml:
+
+[,yaml]
+----
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-webui
+  namespace: demo
+spec:
+  ports:
+    - port: 80
+      name: webui
+      protocol: TCP
+  type: NodePort
+  selector:
+    app: nginx-pod
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-pod
+  namespace: demo
+spec:
+  selector:
+    matchLabels:
+      app: nginx-pod
+  template:
+    metadata:
+      labels:
+        app: nginx-pod
+    spec:
+      containers:
+      - name: nginx-pod
+        image: nvbeta/swarm_nginx
+        ports:
+        - containerPort: 80
+          protocol: TCP
+----
+
+Para acceder al servicio Nginx-webui externamente, encuentra el puerto aleatorio asignado a él (mapeado al puerto 80) por el NodePort:
+
+[,shell]
+----
+kubectl get svc -n demo
+----
+
+Luego conéctate a la dirección IP pública/puerto de uno de los nodos de Kubernetes, por ejemplo, `http://(public_IP):(NodePort)`
+
+Después de desplegar {product-name}, puedes ejecutar tráfico de prueba a través de las aplicaciones de demostración para generar las reglas de lista blanca, y luego mover todos los servicios a modo Monitor o Proteger para ver violaciones y ataques.
+
+=== Generando Violaciones de Red en Kubernetes
+
+Para generar una violación desde un pod de nodejs, encuentra un pod:
+
+[,shell]
+----
+kubectl get pod -n demo
+----
+
+Entonces intenta algunas violaciones (reemplaza el nombre del nodo-pod):
+
+[,shell]
+----
+kubectl exec node-pod-name curl www.google.com -n demo
+----
+
+O encuentra la dirección IP interna de otro nodo pod, como 172.30.2.21 en el ejemplo a continuación, para conectarte de un nodo a otro:
+
+[,shell]
+----
+kubectl exec node-pod-name curl 172.30.2.21:8888 -n demo
+----
+
+==== Generar una Amenaza/Ataque
+
+Para simular un ataque, inicia sesión en un contenedor y luego intenta un ataque de ping:
+
+[,shell]
+----
+kubectl exec -it node-pod-name bash -n demo
+----
+
+Utiliza la IP interna de otro nodo pod:
+
+[,shell]
+----
+ping 172.30.2.21 -s 40000
+----
+
+Para todo lo anterior, puedes ver los eventos de seguridad en el mapa de Actividad de Red de la consola {product-name}, así como en la pestaña de Notificaciones.
+
+=== Pruebas de Protección de Procesos y Archivos
+
+Intenta diversas actividades de procesos y archivos accediendo a un contenedor y ejecutando comandos como apt-get update, ssh, scp u otros. Cualquier actividad de proceso o acceso a archivos no permitido generará alertas en Notificaciones.
+
+=== Escaneo de Registro y Control de Admisión
+
+Una prueba popular es configurar el escaneo de imágenes de un registro en Activos -> Registros. Después de que el escaneo esté completo, configura una regla de Control de Admisión en la directiva. Asegúrate de habilitar los Controles de Admisión y establecer una regla para Denegar cuando haya altas vulnerabilidades en una imagen. Luego elige una imagen que tenga altas vulnerabilidades e intenta desplegarla en Kubernetes. El despliegue será bloqueado en modo Protección y verás un evento en Notificaciones -> Riesgos de Seguridad.
+
+Se pueden realizar pruebas de control de admisión más avanzadas utilizando diferentes criterios en las reglas, o combinando criterios.
+
+==== Desplegar otra aplicación
+
+La aplicación de demostración Guestbook de Kubernetes también se puede desplegar en Kubernetes. Se recomienda desplegarla en su propio espacio de nombres para que puedas ver el filtrado basado en el espacio de nombres en la consola {product-name}.
+
+== Plan de Pruebas nativo de Docker
+
+Después de desplegar los {product-name} componentes y la(s) aplicación(es) de muestra, podrás Descubrir, Monitorizar y Proteger los contenedores en ejecución. El plan de pruebas a continuación proporciona sugerencias para generar violaciones en tiempo de ejecución del comportamiento permitido de la aplicación y escanear contenedores en busca de vulnerabilidades.
+
+xref:attachment$testplan.pdf[{product-name} Plan de Pruebas]
+
+Si el enlace anterior no funciona, puedes http://neuvector.com/sample-applications-test-plan/[descargarlo] desde nuestro sitio web utilizando la contraseña nv1851blvd.
+
+{product-name} también puede detectar amenazas a tus contenedores, como ataques DDOS. Si ejecutas una herramienta para generar tales ataques en tus contenedores, estos resultados aparecerán en Actividad de Red y en el Panel de Control.
+
+Por ejemplo, un simple comando de ping con una carga alta mostrará el ataque Ping.Death en la consola. Para probar esto, haz lo siguiente a la dirección IP de uno de los contenedores (IP interna del contenedor).
+
+[,shell]
+----
+ping <container_ip> -s 40000
+----
+
+En Kubernetes, puedes hacer esto desde cualquier nodo, incluyendo el maestro. En otros entornos, puede que necesites estar conectado al nodo donde se está ejecutando el contenedor.

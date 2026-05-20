@@ -1,0 +1,142 @@
+= 集成与其他组件
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /14.releasenotes/02.other/02.other.md
+:page-opendocs-slug:  /releasenotes/other
+
+== 集成模块、插件和其他组件的发布说明
+
+=== Github Actions
+
+* 用于漏洞扫描的Github Actions现已发布于 https://github.com/neuvector/neuvector-image-scan-action.
+
+=== Helm Chart 1.8.9
+
+* Helm chart v1.8.9已发布用于5.0.0部署。如果使用5.0.0的预览版本，则应对values.yml进行以下更改：
+** 将注册表更新为docker.io
+** 将镜像名称/标签更新为Docker hub上的预览版本
+** 将imagePullSecrets留空
+
+=== Splunk应用已发布
+
+* 新的Splunk应用已发布于 https://splunkbase.splunk.com/app/6205/，适用于{product-name}
+
+=== Helm Chart 更新 1.8.7
+
+* 支持控制器、扫描器和管理器的亲和性和容忍度自定义。
+* 为控制器、管理器、扫描器和更新器 Pod 添加 nodeSelector 支持。
+* 支持控制器容器的用户定义环境变量。
+
+=== Helm Chart 1.8.2的社区操作员v1.2.7
+
+* 允许用户指定{product-name}发布版本
+* 部署最新的扫描器CVE数据库版本
+* 容器操作员镜像位置已移至registry.neuvector.com/public
+* {product-name}实例名称默认为neuvector（之前是example-neuvector）
+* 更新了安装页面上的自述文件，并添加了发布说明的链接
+
+=== Helm Chart 1.8.2
+
+* 添加控制器入口和路由主机选项。
+
+=== 认证操作员 v1.2.8 适用于 {product-name} v4.3.1
+
+* 支持 helm chart 版本 1.8.2
+* 部署 {product-name} 版本 4.3.1
+* 部署扫描器数据库版本 2.360
+* 与之前的 1.2.7 版本的其他更改
+** neuvector实例名称默认为neuvector，之前是example-neuvector
+** 更新了安装页面上的自述文件
+** 修正了 {product-name} logo 显示问题
+* 已知问题
+** 从1.2.7升级到1.2.8不会升级扫描器数据库 +
+解决方法：在扫描器部署中将扫描器镜像更新为registry.connect.redhat.com/neuvector/scanner@sha256:a802c012eee80444d9deea8c4402a1d977cf57d7b2b2044f90c9acc0e7ca3e06
+** 安装页面上的自述文件未正确对齐
+** 扫描器数据库未通过更新程序更新
+
+=== Helm Chart 更新 1.8.0 2021年7月
+
+* Helm Chart v1.8.0 已更新，默认使用 registry.neuvector.com 作为注册表。注意：必须手动指定版本标签。
+* 在 Helm Chart 中添加可配置参数，例如控制器 API 注释。从版本 1.7.6+ 开始可用。
+* 社区操作员 1.2.6，认证操作员 1.2.7 已更新，以反映 Helm Chart 的更新，包括在启用 controller.apisvc.type 时添加 OpenShift 路由。
+
+=== 其他集成 2021 年 7 月
+
+* 在 Jenkins 流水线扫描结果中添加扫描结果的 HTML 输出格式。
+* 在 Prometheus 导出器警报中添加受影响工作负载的名称空间。现在支持 neuvector/prometheus-exporter:4.2.2 及更高版本。
+
+=== Helm 图表更新 1.7.5 2021 年 5 月
+
+* 支持新镜像注册表 registry.neuvector.com 所需的更改。 对此的更改将导致镜像路径的变化（即从 neuvector/controller 的路径中去除 neuvector）。
+
+=== Helm 图表更新 1.7.2 2021 年 4 月
+
+* 添加对单独组件资源请求和限制的支持，例如控制器、执行器的 CPU、内存请求。
+
+=== Jenkins 插件更新 v1.13 2021 年 4 月
+
+* 修复同时运行多个扫描仪时存在的扫描错误。
+* 在基于 Red Hat 的镜像的扫描结果中显示 Red Hat 漏洞评级。
+
+=== 操作员更新 2021 年 4 月
+
+* OpenShift 操作员/Helm 能够替换自签名证书。Helm Chart 版本为 1.7.1。社区操作员版本为 1.2.4，认证操作员版本为 1.2.3。
+
+=== Jenkins 插件 v1.12 2021 年 3 月
+
+* 按分数覆盖漏洞严重性。能够编辑用于高和中等分类的漏洞 (CVE) 分数范围。这使得可以自定义在管道中失败构建所使用的分数。
+* 向 JAVA 异常 hudson.AbortException 添加错误消息。当发生错误时，启用来自 {product-name} 的更好的错误消息报告。
+
+=== 将 Helm Chart 更新到 1.7.1 2021 年 3 月
+
+* 添加管理服务负载均衡器 IP 和注释。
+* 添加设置以设置 PVC 容量。
+* 为 k3s 和 AWS bottlerocket 添加运行时套接字设置。
+* 添加设置以替换控制器和管理器证书。
+
+=== 扫描器 2021 年 2 月
+
+* 修复在扫描器版本 1.191 及更早版本中未发现的 CVE-2020-1938。在 1.191 之后更新到最新的扫描器版本。
+
+=== Jenkins 插件 v1.11 2021 年 2 月
+
+==== 增强功能
+
+* 添加对部署独立 {product-name} 扫描器的支持。这不需要控制器，必须在与 Jenkins 安装相同的主机上部署。主机上还必须安装 Docker。目前，仅支持 Linux 版本的 Jenkins（不支持容器版本）。此外，将 _jenkins_ 用户添加到 _docker_ 组。
+
+[,bash]
+----
+sudo usermod -aG docker jenkins
+----
+
+参考：
+https://plugins.jenkins.io/neuvector-vulnerability-scanner/
+https://github.com/jenkinsci/neuvector-vulnerability-scanner-plugin/releases/tag/neuvector-vulnerability-scanner-1.11
+
+=== Rancher 目录更新 2021 年 1 月
+
+* 更新 Rancher 目录中的 {product-name} 以支持 4.x
+
+=== Helm Chart 更新 2021 年 1 月
+
+* 在部署时创建所需的 {product-name} CRD
+* 修复将控制器 ingress 设置为 true 时的错误
+
+=== 操作员更新 2021 年 1 月
+
+* 更新操作员（社区版、认证版）以支持 4.x。
+
+=== Helm Chart 变更 2020 年 12 月
+
+* 允许用户自定义管理者/控制器/执行者/扫描器部署的 PriorityClass。我们建议为 {product-name} 容器分配更高的优先级，以确保在节点资源紧张或集群升级过程中安全策略能够得到执行。
+
+=== 重要的 Helm Chart 更新 2020 年 11 月
+
+[IMPORTANT]
+====
+Helm Chart 结构的变更
+====
+
+* {product-name} chart 的目录已从 ./neuvector-helm/ 更改为 ./neuvector-helm/charts/core/
+
+如果使用 Helm 进行升级，请将路径更新为上述路径。

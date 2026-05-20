@@ -1,0 +1,64 @@
+= 内部自己署名証明書のローテーション
+
+この機能により、ユーザーはNeuVector内部証明書を自動的に更新／ローテーションできるようになります。
+
+有効にすると、コントローラーポッドの新しく追加されたinitコンテナがKubernetesジョブリソースを作成し、内部証明書のローテーションを実行します。アップグレーダージョブはCronJobオブジェクトを介してもトリガーできるため、内部証明書は定期的にローテーションされます。
+
+自動ローテーションを有効にするには、```internal.autoRotateCert```を```true```に設定する必要があります。（デフォルトでは無効です。）
+
+== internal.autoRotateCertが有効な場合の想定される動作
+=== 新規インストール
+
+1. すべてのコンテナが実行を開始すると、コントローラーのinitコンテナが実行され、アップグレーダージョブが作成されます。
++
+image:cert_rotate_01.png[certrotate]
++
+2. アップグレーダーは実行され、新しい内部シークレットを初期化します。その間、コンポーネントはシークレットが初期化されるのを待っています。
++
+image:cert_rotate_02.png[certrotate]
++
+3. 内部シークレットが初期化された後、すべてのコンポーネントはシークレットを読み取り、通常のフローを進みます。
++
+image:cert_rotate_03.png[certrotate]
+
+=== アップグレード
+
+1. 古いデプロイメントはすでに実行中です。
++
+image:cert_rotate_04.png[certrotate]
++
+2. helm upgradeを実行した後、ローリングアップデートが開始されます。コントローラーのinitコンテナがアップグレーダージョブを作成します。
++
+image:cert_rotate_05.png[certrotate]
++
+3. アップグレーダージョブはローリングアップデートが完了するまで待機します。
++
+image:cert_rotate_06.png[certrotate]
++
+4. その後、アップグレーダーは内部証明書を更新します。各コンポーネントはk8sシークレットを介して更新された証明書を読み取ります。
++
+image:cert_rotate_07.png[certrotate]
+
+`internal.autoRotateCert`がfalseの場合、アップグレーダージョブは開始されますが、アクションは実行されません。元の動作が維持されます。すなわち、initコンテナはなく、ビルトインの証明書がすべてのケースで使用されます。
+
+== HELMチャートの新しいオプション
+HELMチャートでは、これらのオプションが追加されます：
+[source, yaml]
+---
+internal.autoGenerateCert (default true): Control whether to automatically generate internal certificate.
+internal.autoRotateCert (default false): Control whether the auto rotation is on/off.
+controller.upgrader.env (default []): Control upgrader's environment variables.
+controller.upgrader.imagePullPolicy (default IfNotPresent): Upgrader's pull policy.
+controller.upgrader.schedule (default "0 0 1 * *"): Upgrader's cronjob schedule.
+---
+
+== 設定の機密フィールドのローテーション
+
+デバイスの暗号化キーがローテーションされると、NeuVectorは既存の機密設定フィールドを即座に再暗号化しません。これらのフィールドは、ローテーション後に更新または変更されたときのみ再暗号化されます。
+
+暗号化キーがローテーションされるたびに、そのバージョン番号は1つ増加します。NeuVectorは、このバージョン管理を使用して、複数の世代の暗号化キーを安全に追跡および管理します。
+
+[NOTE]
+====
+NeuVectorチームは、Kubernetesシークレット`neuvector-store-secret`のデータを`neuvector`ネームスペース内から定期的にバックアップすることをお勧めします。
+====

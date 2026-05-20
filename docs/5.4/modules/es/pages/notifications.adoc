@@ -1,0 +1,50 @@
+= Informes de eventos
+:page-opendocs-origin: /15.ui_extension/03.notifications/03.notifications.md
+:page-opendocs-slug:  /ui_extension/notifications
+
+== Security Events
+
+En la extensión de la interfaz de usuario en el portal de Rancher, la pestaña **Eventos de Seguridad** funciona de manera similar a la página independiente de NeuVector. Los eventos pueden ser desencadenados por varios factores:
+
+* Conversación peligrosa o transporte de datos desde algún lugar hasta el punto final (Nodo o pod).
+* Conexión violada de extremo a extremo contra la directiva de red.
+* Operación violada contra la regla del perfil de proceso.
+* Operación violada contra la regla de acceso a archivos.
+
+image:sec_events.png[Eventos de Seguridad]
+
+Desliza el punto hacia la izquierda o hacia la derecha en el control deslizante de tiempo para filtrar eventos por fecha.
+
+image:sec_events_time_filter.png[Eventos de Seguridad]
+
+Escribe palabras clave en el cuadro de filtro rápido para filtrar cualquier evento que incluya la palabra clave.
+
+image:sec_events_quick_filter.png[Eventos de Seguridad]
+
+Abre el panel lateral **Filtro Avanzado**, y encontrarás múltiples opciones que apoyan tu búsqueda:
+
+* Se puede filtrar la Severidad, Ubicación y Categoría según las etiquetas en el lado derecho del título del evento.
+* La lista de autocompletar admite entradas de usuario para los campos de Host, Fuente y Destino y admite un cuadro de entrada de múltiples etiquetas para espacio de nombres.
+
+image:sec_events_adv_filter.png[Eventos de Seguridad]
+
+Haz clic en un evento para expandir el panel y mostrar más detalles. En el cuadro de mensaje puedes ver más información.
+
+image:sec_event_detail.png[Eventos de Seguridad]
+
+El nombre del **Host** es clicable y abre el popup de detalles del host. Los campos **Vulnerabilidades** y **Grupo** tienen un enlace externo que redirige a la página SSO de NeuVector.
+
+image:node_detail_open.png[Eventos de Seguridad]
+
+El nombre del **Carga de Trabajo** es clicable y abre el popup de detalles de la carga de trabajo. El campo **Grupo** tiene un enlace externo que redirige a la página SSO de NeuVector.
+
+image:pod_detail_open.png[Eventos de Seguridad]
+
+El campo **Reportado por** en el cuadro de mensaje es clicable y abre el popup de detalles del ejecutor.
+
+image:enforcer_detail_open.png[Eventos de Seguridad]
+
+== Funciones no incluidas al comparar con la página independiente de NeuVector.
+
+* Revisar / Proponer regla.
+* Informes en PDF.

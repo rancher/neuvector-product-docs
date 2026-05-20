@@ -1,0 +1,117 @@
+= Verificações de Conformidade Personalizadas
+:revdate: 2024-09-25
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/11.customcompliance/11.customcompliance.md
+:page-opendocs-slug:  /política/conformidadepersonalizada
+
+== Criando Scripts Personalizados para Verificações de Conformidade
+
+Scripts personalizados podem ser executados em contêineres e hosts para uso em verificações de conformidade e outras avaliações. A verificação de conformidade personalizada é um script bash que pode ser executado em qualquer contêiner para validar uma condição e relatar o resultado na seção de conformidade do contêiner ou nó.
+
+[NOTE]
+====
+A capacidade de criar scripts personalizados é desativada por padrão para proteger contra uso indevido. Isso pode ser ativado definindo a xref:details.adoc#_environment_variables[variável de ambiente CUSTOM_CHECK_CONTROL] no Controlador e no Aplicador. Os valores são "desativar" (padrão, não permitido), "estrito" (apenas papel de administrador) ou "flexível" (papéis de administrador, conformidade e política de tempo de execução).
+====
+
+[CAUTION]
+====
+Scripts personalizados devem ser usados com extrema cautela. O script personalizado pode executar qualquer executável no namespace do contêiner com privilégio de contêiner. Executáveis podem ser muito destrutivos, como rm, format, fdisk etc. Essa cautela se aplica também a hosts/nós. Scripts de verificação personalizados em hosts podem ser ainda mais destrutivos se puderem acessar o nó mestre no cluster.
+====
+
+* Um script personalizado é controlado pela permissão da política de runtime com RBAC de namespace; os usuários devem configurar corretamente os papéis de usuário do Kubernetes.
+* Scripts personalizados são executados com o mesmo privilégio que o contêiner em execução.
+* O resultado da conformidade é removido uma vez que um script personalizado é excluído.
+* Verificações de Conformidade Personalizadas precisam seguir um formato para relatar o resultado corretamente no relatório de conformidade para o contêiner ou nó.
+** O script começa com a declaração 'if' para verificar alguma condição.
+** A verificação personalizada é aprovada se o código de saída for 0
+** A verificação personalizada falha se o código de saída for 1
+
+=== Script de exemplo para verificar se o contêiner tem uma conta root sem senha.
+
+[,bash]
+----
+if [ $(cat /etc/shadow | grep  'root:::0:::::') ]; then
+     DESCRIPTION="CVE-2019-5021 fails."
+     echo $DESCRIPTION;
+     exit 1;
+else
+     echo "CVE-2019-5021 pass";
+     exit 0;
+fi
+----
+
+==== Script de exemplo para verificar o arquivo dirty cow no contêiner.
+
+[,bash]
+----
+if [ $(find . / | grep -w 'cow') ]; then
+     DESCRIPTION="dirty cow seen in the container"
+    echo $DESCRIPTION;
+    exit 1;
+else
+    echo "no dirty cow found pass";
+    exit 0;
+fi
+----
+
+Outras Observações
+
+* Os scripts têm um tempo limite de 1 minuto para serem concluídos, caso contrário, são encerrados e relatados como um erro no resultado de conformidade.
+* O script pode ser executado em todos os 3 modos de operação: Descobrir, Monitorar e Proteger.
+
+== Criando um script de verificação personalizada
+
+* Selecione o grupo de serviço (criado pelo usuário ou aprendido automaticamente) do Grupo de Política ->.
+* Clique na aba de verificação personalizada.
+* Digite o nome do script. Espaços não são permitidos.
+* Copie e cole o script na seção de script.
+* Clique no botão ADICIONAR para adicionar o script.
+* Vários scripts podem ser criados e gerenciados pela opção fornecida no canto direito.
+* Os scripts são executados nos contêineres cobertos pelo grupo de serviços assim que o script é criado, bem como quando o script é atualizado.
+* Visualize o resultado do script de ativos -> contêiner -> conformidade, ou ativos -> nós -> conformidade.
+
+=== Amostras
+
+Criando um script de verificação personalizada no grupo de demonstração composto por 3 contêineres.
+
+image:compliance1.png[ComplianceDemo]
+
+Mostrando os resultados de conformidade para o contêiner nginx, que possui um arquivo dirty cow, portanto, um aviso é relatado.
+
+image:compliance2.png[ConformidadeNginx]
+
+Mostrando o resultado de conformidade para o contêiner nodejs, que não possui um arquivo dirty cow, portanto, uma aprovação é relatada pelo script.
+
+image:compliance_nodejs.png[ComplianceNodejs]
+
+Mostrando o resultado de conformidade para o contêiner nginx para uma verificação personalizada que teve um tempo limite.
+
+image:compliance_timeout.png[ConformidadeTimeout]
+
+== Criando uma regra de resposta para o relatório de conformidade
+
+As regras de resposta podem ser criadas na Política -> Regras de Resposta que são baseadas nos resultados das verificações de conformidade personalizadas. Os resultados fazem parte da categoria conformidade, e respostas podem ser criadas para todos os eventos de um determinado nível.
+
+* Escolha a categoria conformidade
+* Digite o nome do grupo de serviço na opção de grupo e escolha o grupo desejado na opção de seleção automática
+* Digite o nível e escolha o nível: Aviso na opção de seleção automática
+* Ative as ações desejadas Quarentena, webhook e/ou suprimir log
+* Ative o botão de status
+* Clique no botão Adicionar para adicionar a regra de resposta
+
+O próximo evento de conformidade com resultado de aviso acionará a ação da regra de resposta correspondente.
+
+image:compliance_response_1.png[ComplianceResponse]
+
+Crie uma regra de resposta para o relatório de conformidade e o script de verificação personalizada pelo nome:
+
+* Escolha a categoria conformidade
+* Digite o nome do grupo de serviço na opção de grupo e escolha o grupo desejado nas opções suspensas, ou deixe o nome do grupo em branco para aplicar a todos
+* Digite 'n' e escolha o nome do script de verificação personalizada no menu suspenso de opções
+* Ative as ações desejadas Quarentena, webhook e/ou suprimir log
+* Ative o botão de status
+* Clique no botão Adicionar para adicionar a regra de resposta
+
+O próximo evento de conformidade com aviso acionará a ação da regra de resposta correspondente.
+
+image:compliance_report_2.png[ComplianceResponse]

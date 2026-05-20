@@ -1,0 +1,129 @@
+= Escaneo y cumplimiento
+:revdate: 2025-01-16
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/01.scanning/01.scanning.md
+:page-opendocs-slug:  /escaneo/escaneo
+
+{product-name} permite el escaneo y el cumplimiento de todo el ciclo de vida a través del escaneo de vulnerabilidades y la ejecución de los benchmarks CIS para la seguridad, así como comprobaciones de cumplimiento personalizadas. El menú de Riesgos de Seguridad permite la investigación, el triaje y la elaboración de informes de gestión de vulnerabilidades y cumplimiento personalizables. Investiga fácilmente las vulnerabilidades de las imágenes y descubre qué nodos o contenedores contienen esas vulnerabilidades. El filtrado avanzado facilita la revisión de los resultados de los escaneos y comprobaciones de cumplimiento y proporciona informes personalizados. También proporciona informes y plantillas de cumplimiento estándar y personalizables para PCI, RGPD y otras regulaciones.
+
+== Resumen de {product-name} Escaneo
+
+El escaneo se realiza en todas las fases de la canalización, desde la Construcción hasta el Registro y el Tiempo de Ejecución, sobre varios activos, como se muestra a continuación.
+
+|===
+| *Tipo de escaneo* | Imagen | Nodo | Contenedor | Orchestrator
+
+| *Vulnerabilidades*
+| Sí
+| Sí
+| Sí
+| Sí
+
+| *CIS Benchmarks*
+| Sí
+| Sí
+| Sí
+| Sí
+
+| *Cumplimiento personalizado*
+| No
+| Sí
+| Sí
+| No
+
+| *Secretos*
+| Sí
+| Sí
+| Sí
+| No
+
+| *Módulos*
+| Sí
+| N/D
+| N/D
+| N/D
+|===
+
+Las imágenes se escanean ya sea en el escaneo del Registro o a través de complementos de fase de Construcción como Jenkins, CircleCI, Gitlab, etc.
+
+Los CIS Benchmarks soportados por {product-name} incluyen:
+
+* Kubernetes
+* Docker
+* Borrador de Red Hat OpenShift 'Inspirado en CIS'
+* Google GKE
+
+La implementación de código abierto de estos benchmarks se puede encontrar en la página de Github https://github.com/neuvector[{product-name} Github page].
+
+[NOTE]
+====
+Los secretos también se pueden detectar en Nodos y en Contenedores con xref:customcompliance.adoc[Guiones Personalizados].
+====
+
+
+=== Escaneo de archivos de despliegue de recursos de Kubernetes
+
+{product-name} puede escanear archivos yaml de despliegue para evaluaciones de configuración contra las reglas de Control de Admisión. Esto es útil para escanear archivos yaml de despliegue temprano en la canalización para determinar si el despliegue violaría alguna regla antes de intentar el despliegue. Por favor, consulte xref:assessment.adoc[Evaluación de Configuración] bajo Controles de Admisión para más detalles.
+
+== Gestión de Vulnerabilidades y Cumplimiento
+
+{product-name} proporciona varias formas de revisar los resultados de escaneo de vulnerabilidades y cumplimiento y generar informes. Son las siguientes:
+
+* *Panel de control.* Revise las vulnerabilidades resumidas y vea cómo impactan en el xref:improve-score.adoc[Puntuación de Riesgo de Seguridad] general.
+* *Menú de Riesgos de Seguridad.* Vea el impacto de las vulnerabilidades y los problemas de cumplimiento y genere informes con filtrado avanzado.
+* *Menú de Activos.* Vea los resultados de vulnerabilidad y cumplimiento para cada activo, como registros, nodos y contenedores.
+* *Notificaciones -> Informes de Riesgo.* Vea los eventos de escaneo para cada activo.
+* *Reglas de Respuesta.* Cree respuestas como notificaciones de webhook o cuarentenas basadas en los resultados del escaneo.
+* *API REST.* Active escaneos y obtenga resultados de escaneo programáticamente para automatizar el proceso.
+* *Alertas SYSLOG/Webhook.* Envía los resultados del escaneo a un SIEM u otras plataformas empresariales.
+
+=== Menú de Riesgos de Seguridad
+
+Estos menús combinan los resultados de los escaneos de vulnerabilidades y verificaciones de cumplimiento de registro (imagen), nodo y contenedor encontrados en el menú de Activos para permitir la gestión y el informe de vulnerabilidades de extremo a extremo. El menú de perfil de Cumplimiento permite la personalización de las verificaciones de cumplimiento PCI, RGPD y otras para generar informes de cumplimiento.
+
+image:vulnerabilities_4_4.png[SecurityRisks]
+
+Consulta la siguiente sección sobre xref:vulnerabilities.adoc[Gestión de Vulnerabilidades] para saber cómo gestionar las vulnerabilidades en este menú, y la sección xref:compliance.adoc[Cumplimiento y CIS Benchmarks] para informar sobre los CIS Benchmarks y el cumplimiento de la industria como PCI, RGPD, HIPAA, NIST, PCIv4 y DISA STIG.
+
+=== Menú de Activos
+
+El menú de Activos informa sobre las vulnerabilidades y los resultados de las verificaciones de cumplimiento organizados por activo.
+
+* Plataformas. La plataforma de orquestación como Kubernetes, y los escaneos de vulnerabilidades de la plataforma.
+* Nodos. Nodos/anfitriones protegidos por {product-name} Aplicadores, y resultados de las verificaciones de Cumplimiento como los CIS Benchmarks y verificaciones personalizadas, así como escaneos de vulnerabilidades de anfitriones.
+* Contenedores. Todos los contenedores en el clúster, incluidos los contenedores del sistema, y los resultados de las verificaciones de Cumplimiento como los CIS Benchmarks y verificaciones personalizadas, así como escaneos de vulnerabilidades en tiempo de ejecución de contenedores. La actividad del proceso y las estadísticas de rendimiento también se pueden encontrar aquí.
+* Registros. Registros/repositorios escaneados por {product-name}. Los resultados del escaneo de imágenes en capas se encuentran aquí, y los resultados del escaneo se pueden utilizar en las reglas de control de Admisión (encontradas en la Política -> Controles de Admisión).
+
+[NOTE]
+====
+xref:customcompliance.adoc[Verificaciones de cumplimiento personalizadas] como se mencionó anteriormente se definen en el menú xref:groups.adoc[Política -> Grupos].
+====
+
+=== Escaneo Automatizado en Tiempo de Ejecución
+
+{product-name} puede escanear contenedores en ejecución, nodos anfitriones y la plataforma de orquestación en busca de vulnerabilidades. En el menú de Activos para Nodos o Contenedores, habilita el Escaneo Automático haciendo clic en la pestaña de Vulnerabilidades para un nodo o contenedor, luego Escaneo Automático (aparece en la parte superior derecha) para escanear todos los contenedores en ejecución, nodos y la plataforma, incluidos los recién iniciados una vez que comienzan a ejecutarse. También puedes seleccionar un contenedor o nodo y escanearlo manualmente.
+
+Puedes hacer clic en cada nombre de vulnerabilidad/CVE que se descubra para recuperar una descripción de la misma, y hacer clic en la flecha de inspección en el popup para ver la descripción detallada de la vulnerabilidad.
+
+image:Vuln1.png[Vulnerabilidades]
+
+El escaneo automático también se activará siempre que haya una actualización en la base de datos de {product-name} CVE. Por favor, consulta la sección xref:updating.adoc[Actualización de la base de datos CVE] para más detalles.
+
+== Acciones automatizadas, mitigaciones y respuestas basadas en vulnerabilidades
+
+Se pueden crear reglas de control de admisión para prevenir el despliegue de imágenes vulnerables basadas en los resultados del escaneo del registro. Consulta la sección de la Política de Seguridad -> xref:admission.adoc[Control de Admisión] para más detalles.
+
+Consulta la sección de la Política de Seguridad -> xref:responserules.adoc[Reglas de Respuesta] para instrucciones sobre cómo crear respuestas automatizadas a vulnerabilidades detectadas ya sea durante el escaneo del registro, el escaneo en tiempo de ejecución, o los CIS Benchmarks. Las respuestas pueden incluir cuarentena, notificación por webhook y supresión.
+
+=== Registros Federados para Resultados de Escaneo de Imágenes Distribuidas
+
+El clúster primario (maestro) puede escanear un registro/repo designado como un registro federado. Los resultados del escaneo de estos registros se sincronizarán con todos los clústeres gestionados (remotos). Esto permite mostrar los resultados del escaneo en la consola del clúster downstream, así como utilizar los resultados en las reglas de control de admisión del clúster downstream. Los registros solo necesitan ser escaneados una vez en lugar de por cada clúster, reduciendo el uso de CPU/memoria y el ancho de banda de la red. Consulta la sección xref:multicluster.adoc[multi-cluster] para más detalles.
+
+=== Escalado automático de Pods de Escaneo
+
+Los pods de escaneo pueden configurarse para escalar automáticamente según ciertos criterios. Esto asegurará que los trabajos de escaneo se manejen de manera rápida y eficiente, especialmente si hay miles de imágenes que escanear o volver a escanear. Hay tres configuraciones posibles: retrasado, inmediato y deshabilitado. Cuando las imágenes están en cola para ser escaneadas por el controlador, mantiene un 'conteo de tareas' del tamaño de la cola. Por favor, consulta la sección xref:scanners.adoc[múltiples escáneres] para más detalles.
+
+[IMPORTANT]
+====
+La autoescalabilidad del escáner no es compatible cuando el escáner se despliega con un operador de OpenShift, ya que el operador siempre cambiará el número de pods a su valor configurado.
+====

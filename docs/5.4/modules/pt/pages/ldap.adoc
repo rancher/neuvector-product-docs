@@ -1,0 +1,21 @@
+= LDAP
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/02.ldap/02.ldap.md
+:page-opendocs-slug:  /integração/ldap
+
+== LDAP
+
+Configure os campos necessários para conectar ao seu servidor LDAP.
+
+image:ldap-ad.png[LDAPAD]
+
+. Porta. A porta padrão é 389 para SSL desativado e 636 para SSL ativado.
+. Nome de usuário (opcional). Usamos este nome de usuário administrador para vincular o servidor LDAP para cada consulta.
+. DN base. Isso deve ser um nó raiz no servidor LDAP para buscar o usuário e o grupo LDAP.
+. Função padrão. Esta é a função que um usuário assumirá se o mapeamento do grupo de funções (abaixo) falhar. Se o atributo de grupo do usuário for encontrado e puder ser mapeado para uma função, então a função padrão não será utilizada. Se nenhum atributo de grupo correspondente for encontrado, a função padrão será utilizada. Se a função padrão for None neste caso, o login do usuário falhará. O botão '`test connection`' verificará se um nome de usuário/senha pode ser autenticado pelo servidor LDAP configurado.
+. Mapeamento de funções Administrador e Leitor. Isso define como mapear a associação de grupo LDAP de um usuário para a função do usuário em {product-name}. Adicione a lista de grupos LDAP às funções correspondentes. Ao procurar a associação de grupo de um usuário no esquema LDAP, assumimos que o atributo membro do grupo é nomeado como "`memberUid`".
+
+=== Mapeando Grupos para Funções e Namespaces
+
+Por favor, veja a seção xref:users.adoc#_mapping_groups_to_roles_and_namespaces[Usuários e Funções] para saber como mapear grupos para funções predefinidas e personalizadas, bem como namespaces em {product-name}.

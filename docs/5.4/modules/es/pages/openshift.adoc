@@ -1,0 +1,979 @@
+= RedHat OpenShift
+:revdate: 2025-06-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/04.openshift/04.openshift.md
+:page-opendocs-slug: /deploying/openshift
+
+== Desplegar componentes separados {product-name} con RedHat OpenShift
+
+{product-name} es compatible con los complementos SDN ovs estándar, así como con otros como flannel, weave o calico. Las muestras a continuación suponen que se utiliza un complemento ovs estándar. Esto también supone que se utilizará un registro de docker local (ver instrucciones al final para crear el secreto para extraer dinámicamente de neuvector o Docker Hub).
+
+{product-name} admite el despliegue basado en Helm con un https://github.com/neuvector/neuvector-helm[Helm chart] en https://github.com/neuvector/neuvector-helm.. El Operador {product-name} también se puede utilizar para desplegar y se basa en el Helm chart. Para desplegar las últimas versiones de contenedores {product-name} utilizando un operador, utilice ya sea el operador certificado de Red Hat de Operator Hub o el operador comunitario, como se detalla en la xref:operators.adoc[sección de operadores].
+
+Para desplegar manualmente, primero extraiga los contenedores {product-name} apropiados del registro {product-name} a su registro local. Nota: la imagen del escáner debe extraerse regularmente para actualizaciones de la base de datos CVE desde {product-name}.
+
+=== Imágenes de {product-name} en Docker Hub
+
+Las imágenes están en el {product-name} registro de Docker Hub. Utilice la etiqueta de versión apropiada para el manager, controller y enforcer, y deje la versión como 'latest' para el scanner y el updater. Por ejemplo:
+
+* neuvector/manager:5.4.3
+* neuvector/controller:5.4.3
+* neuvector/enforcer:5.4.3
+* neuvector/scanner:latest
+* neuvector/updater:latest
+
+Asegúrese de actualizar las referencias de imagen en los archivos yaml apropiados.
+
+Si se despliega con el actual {product-name} Helm chart (v1.8.9+), se deben realizar los siguientes cambios en values.yml:
+
+* Actualiza el registro a docker.io
+* Actualiza los nombres/etiquetas de las imágenes a la versión actual en Docker Hub, como se muestra arriba
+* Deja vacíos los imagePullSecrets
+
+== Despliega en OpenShift
+
+[,shell]
+----
+docker login docker.io
+docker pull docker.io/neuvector/manager:<version>
+docker pull docker.io/neuvector/controller:<version>
+docker pull docker.io/neuvector/enforcer:<version>
+docker pull docker.io/neuvector/scanner
+docker pull docker.io/neuvector/updater
+docker logout docker.io
+----
+
+El archivo de muestra a continuación desplegará un manager, 3 controllers y 2 pods de scanner. Desplegará un enforcer en cada nodo como un daemonset, incluyendo en el nodo maestro (si es programable). Consulta la sección inferior para especificar nodos dedicados de manager o controller utilizando etiquetas de nodo. Nota: No se recomienda desplegar (escalar) más de un manager detrás de un balanceador de carga debido a posibles problemas de estado de sesión. Si planeas usar una reclamación de PersistentVolume para almacenar la copia de seguridad de los archivos de configuración de {product-name}, consulta la sección general de copia de seguridad/datos persistentes en la xref:production.adoc#_backups_and_persistent_data[Descripción general del despliegue en producción].
+
+A continuación, establece la ruta y permite contenedores privilegiados de {product-name} utilizando las instrucciones a continuación. Por defecto, OpenShift no permite contenedores privilegiados. Además, por defecto OpenShift no programa pods en el nodo Maestro. Consulta las instrucciones al final para habilitar/deshabilitar esto.
+
+[NOTE]
+====
+Consulta la sección de Integración Empresarial para obtener detalles sobre la integración con el control de acceso basado en funciones (RBAC) de OpenShift.
+====
+
+. Inicia sesión como un usuario normal
++
+--
+[,shell]
+----
+oc login -u <user_name>
+----
+--
+. Crear un proyecto nuevo.
++
+--
+[NOTE]
+====
+Si se utiliza el argumento --node-selector al crear un proyecto, esto restringirá la colocación de pods, como para el {product-name} enforcer, a nodos específicos.
+====
+
+[,shell]
+----
+oc new-project neuvector
+----
+--
+. Sube imágenes de {product-name} al registro de Docker de OpenShift.
++
+--
+[NOTE]
+====
+Para OpenShift 4.6+, cambia docker-registry.default.svc a continuación por image-registry.openshift-image-registry.svc en los comandos a continuación
+====
+
+[,shell]
+----
+docker login -u <user_name> -p `oc whoami -t` docker-registry.default.svc:5000
+docker tag docker.io/neuvector/enforcer:<version> docker-registry.default.svc:5000/neuvector/enforcer:<version>
+docker tag docker.io/neuvector/controller:<version> docker-registry.default.svc:5000/neuvector/controller:<version>
+docker tag docker.io/neuvector/manager:<version> docker-registry.default.svc:5000/neuvector/manager:<version>
+docker tag docker.io/neuvector/scanner docker-registry.default.svc:5000/neuvector/scanner
+docker tag docker.io/neuvector/updater docker-registry.default.svc:5000/neuvector/updater
+docker push docker-registry.default.svc:5000/neuvector/enforcer:<version>
+docker push docker-registry.default.svc:5000/neuvector/controller:<version>
+docker push docker-registry.default.svc:5000/neuvector/manager:<version>
+docker push docker-registry.default.svc:5000/neuvector/scanner
+docker push docker-registry.default.svc:5000/neuvector/updater
+docker logout docker-registry.default.svc:5000
+----
+
+[NOTE]
+====
+Consulta la sección Actualización de la Base de Datos CVE a continuación para recomendaciones sobre cómo mantener la imagen del escáner más reciente actualizada en tu registro.
+====
+--
+. Iniciar sesión como cuenta de sistema:admin
++
+--
+[,shell]
+----
+oc login -u system:admin
+----
+--
+. Crear cuentas de servicio y otorgar acceso al SCC privilegiado
++
+--
+[,shell]
+----
+oc create sa controller -n neuvector
+oc create sa enforcer -n neuvector
+oc create sa basic -n neuvector
+oc create sa updater -n neuvector
+oc create sa scanner -n neuvector
+oc create sa registry-adapter -n neuvector
+oc create sa cert-upgrader -n neuvector
+oc -n neuvector adm policy add-scc-to-user privileged -z enforcer
+----
+
+La siguiente información se añadirá en el SCC privilegiado
+usuarios:
+
+[,yaml]
+----
+- system:serviceaccount:neuvector:enforcer
+----
+
+Añadir un nuevo scc neuvector-scc-controller para la cuenta de servicio del controller en Openshift, creando un archivo con:
+
+[,yaml]
+----
+allowHostDirVolumePlugin: false
+allowHostIPC: false
+allowHostNetwork: false
+allowHostPID: false
+allowHostPorts: false
+allowPrivilegeEscalation: false
+allowPrivilegedContainer: false
+allowedCapabilities: null
+apiVersion: security.openshift.io/v1
+defaultAddCapabilities: null
+fsGroup:
+  type: RunAsAny
+groups: []
+kind: SecurityContextConstraints
+metadata:
+  name: neuvector-scc-controller
+priority: null
+readOnlyRootFilesystem: false
+requiredDropCapabilities:
+- ALL
+runAsUser:
+  type: RunAsAny
+seLinuxContext:
+  type: RunAsAny
+supplementalGroups:
+  type: RunAsAny
+users: []
+volumes:
+- configMap
+- downwardAPI
+- emptyDir
+- persistentVolumeClaim
+- azureFile
+- projected
+- secret
+----
+
+Luego aplicar
+
+[,shell]
+----
+oc apply -f (filename)
+----
+
+Luego ejecutar el siguiente comando para vincular la cuenta de servicio del controller al scc neuvector-scc-controller
+
+[,shell]
+----
+oc -n neuvector adm policy add-scc-to-user neuvector-scc-controller -z controller
+----
+
+En OpenShift 4.6+ usar lo siguiente para comprobar:
+
+[,shell]
+----
+oc get rolebinding system:openshift:scc:privileged -n neuvector -o wide
+----
+
+[,shell]
+----
+NAME                              ROLE                                          AGE     USERS   GROUPS   SERVICEACCOUNTS
+system:openshift:scc:privileged   ClusterRole/system:openshift:scc:privileged   9m22s                    neuvector/enforcer
+----
+
+Ejecutar este comando para comprobar el servicio {product-name} para el controller:
+
+[,shell]
+----
+oc get rolebinding system:openshift:scc:neuvector-scc-controller -n neuvector -o wide
+----
+
+La salida se verá como
+
+[,shell]
+----
+NAME                                            ROLE                                                        AGE     USERS   GROUPS   SERVICEACCOUNTS
+System:openshift:scc:neuvector-scc-controller   ClusterRole/system:openshift:scc:neuvector-scc-controller   9m22s                    neuvector/controller
+----
+--
+. Crear los recursos personalizados (CRD) para las reglas de seguridad {product-name}. Para OpenShift 4.6+ (Kubernetes 1.19+):
++
+--
+[,shell]
+----
+oc apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.4.0/crd-k8s-1.19.yaml
+oc apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.4.0/waf-crd-k8s-1.19.yaml
+oc apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.4.0/dlp-crd-k8s-1.19.yaml
+oc apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.4.0/com-crd-k8s-1.19.yaml
+oc apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.4.0/vul-crd-k8s-1.19.yaml
+oc apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.4.0/admission-crd-k8s-1.19.yaml
+oc apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.4.0/5.4.3_group-definition-k8s.yaml
+----
+--
+. Añadir permiso de lectura para acceder a la API de kubernetes y a los RBAC de OpenShift. 
++
+[IMPORTANT]
+====
+La ampliación estándar {product-name} 5.2+ utiliza cuentas de servicio con el menor privilegio en lugar de la predeterminada. Ver a continuación si se actualiza a 5.2+ desde una versión anterior a 5.2.
+====
++
+--
+[CAUTION]
+========
+Si está actualizando a 5.3.0+, ejecute los siguientes comandos según su versión actual:
+
+[tabs]
+======
+Versión 5.2.0::
++
+====
+[,shell]
+----
+oc delete clusterrole neuvector-binding-nvsecurityrules neuvector-binding-nvadmissioncontrolsecurityrules neuvector-binding-nvdlpsecurityrules neuvector-binding-nvwafsecurityrules
+----
+==== 
+
+Versiones anteriores a 5.2.0::
++
+====
+[,shell]
+----
+oc delete clusterrolebinding neuvector-binding-app neuvector-binding-rbac neuvector-binding-admission neuvector-binding-customresourcedefinition neuvector-binding-nvsecurityrules neuvector-binding-view neuvector-binding-nvwafsecurityrules neuvector-binding-nvadmissioncontrolsecurityrules neuvector-binding-nvdlpsecurityrules neuvector-binding-co oc delete rolebinding neuvector-admin -n neuvector
+----
+====
+======
+========
+
+[,shell]
+----
+oc create clusterrole neuvector-binding-app --verb=get,list,watch,update --resource=nodes,pods,services,namespaces
+oc create clusterrole neuvector-binding-rbac --verb=get,list,watch --resource=rolebindings.rbac.authorization.k8s.io,roles.rbac.authorization.k8s.io,clusterrolebindings.rbac.authorization.k8s.io,clusterroles.rbac.authorization.k8s.io,imagestreams.image.openshift.io
+oc adm policy add-cluster-role-to-user neuvector-binding-app system:serviceaccount:neuvector:controller
+oc adm policy add-cluster-role-to-user neuvector-binding-rbac system:serviceaccount:neuvector:controller
+oc create clusterrole neuvector-binding-admission --verb=get,list,watch,create,update,delete --resource=validatingwebhookconfigurations,mutatingwebhookconfigurations
+oc adm policy add-cluster-role-to-user neuvector-binding-admission system:serviceaccount:neuvector:controller
+oc create clusterrole neuvector-binding-customresourcedefinition --verb=watch,create,get,update --resource=customresourcedefinitions
+oc adm policy add-cluster-role-to-user neuvector-binding-customresourcedefinition system:serviceaccount:neuvector:controller
+oc create clusterrole neuvector-binding-nvsecurityrules --verb=get,list,delete --resource=nvsecurityrules,nvclustersecurityrules
+oc create clusterrole neuvector-binding-nvadmissioncontrolsecurityrules --verb=get,list,delete --resource=nvadmissioncontrolsecurityrules
+oc create clusterrole neuvector-binding-nvdlpsecurityrules --verb=get,list,delete --resource=nvdlpsecurityrules
+oc create clusterrole neuvector-binding-nvwafsecurityrules --verb=get,list,delete --resource=nvwafsecurityrules
+oc adm policy add-cluster-role-to-user neuvector-binding-nvsecurityrules system:serviceaccount:neuvector:controller
+oc adm policy add-cluster-role-to-user view system:serviceaccount:neuvector:controller --rolebinding-name=neuvector-binding-view
+oc adm policy add-cluster-role-to-user neuvector-binding-nvwafsecurityrules system:serviceaccount:neuvector:controller
+oc adm policy add-cluster-role-to-user neuvector-binding-nvadmissioncontrolsecurityrules system:serviceaccount:neuvector:controller
+oc adm policy add-cluster-role-to-user neuvector-binding-nvdlpsecurityrules system:serviceaccount:neuvector:controller
+oc create role neuvector-binding-scanner --verb=get,patch,update,watch --resource=deployments -n neuvector
+oc adm policy add-role-to-user neuvector-binding-scanner system:serviceaccount:neuvector:updater system:serviceaccount:neuvector:controller -n neuvector --role-namespace neuvector
+oc create clusterrole neuvector-binding-co --verb=get,list --resource=clusteroperators
+oc adm policy add-cluster-role-to-user neuvector-binding-co system:serviceaccount:neuvector:enforcer system:serviceaccount:neuvector:controller
+oc create role neuvector-binding-secret --verb=get,list,watch --resource=secrets -n neuvector
+oc adm policy add-role-to-user neuvector-binding-secret system:serviceaccount:neuvector:controller system:serviceaccount:neuvector:enforcer system:serviceaccount:neuvector:scanner system:serviceaccount:neuvector:registry-adapter -n neuvector --role-namespace neuvector
+oc create clusterrole neuvector-binding-nvcomplianceprofiles --verb=get,list,delete --resource=nvcomplianceprofiles
+oc create clusterrolebinding neuvector-binding-nvcomplianceprofiles --clusterrole=neuvector-binding-nvcomplianceprofiles --serviceaccount=neuvector:controller
+oc create clusterrole neuvector-binding-nvvulnerabilityprofiles --verb=get,list,delete --resource=nvvulnerabilityprofiles
+oc create clusterrolebinding neuvector-binding-nvvulnerabilityprofiles --clusterrole=neuvector-binding-nvvulnerabilityprofiles --serviceaccount=neuvector:controller
+oc apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.4.0/neuvector-roles-k8s.yaml
+oc create role neuvector-binding-lease --verb=create,get,update --resource=leases -n neuvector
+oc adm policy add-role-to-user neuvector-binding-cert-upgrader system:serviceaccount:neuvector:cert-upgrader -n neuvector --role-namespace neuvector
+oc adm policy add-role-to-user neuvector-binding-job-creation system:serviceaccount:neuvector:cert-upgrader -n neuvector --role-namespace neuvector
+oc adm policy add-role-to-user neuvector-binding-lease system:serviceaccount:neuvector:controller system:serviceaccount:neuvector:cert-upgrader -n neuvector --role-namespace neuvector
+oc create clusterrole neuvector-binding-nvgroupdefinitions --verb=get,list,delete --resource=nvgroupdefinitions
+oc create clusterrolebinding neuvector-binding-nvgroupdefinitions --clusterrole=neuvector-binding-nvgroupdefinitions --serviceaccount=neuvector:controller
+----
+--
+. Ejecutar el siguiente comando para comprobar si las cuentas de servicio neuvector/controller, neuvector/enforcer y neuvector/updater se han añadido correctamente.
++
+--
+[,shell]
+----
+oc get ClusterRoleBinding neuvector-binding-app neuvector-binding-rbac neuvector-binding-admission neuvector-binding-customresourcedefinition neuvector-binding-nvsecurityrules neuvector-binding-view neuvector-binding-nvwafsecurityrules neuvector-binding-nvadmissioncontrolsecurityrules neuvector-binding-nvdlpsecurityrules neuvector-binding-co -o wide
+----
+
+Salida de ejemplo:
+
+[,shell]
+----
+NAME                                                ROLE                                                            AGE   USERS   GROUPS   SERVICEACCOUNTS
+neuvector-binding-app                               ClusterRole/neuvector-binding-app                               56d                    neuvector/controller
+neuvector-binding-rbac                              ClusterRole/neuvector-binding-rbac                              34d                    neuvector/controller
+neuvector-binding-admission                         ClusterRole/neuvector-binding-admission                         72d                    neuvector/controller
+neuvector-binding-customresourcedefinition          ClusterRole/neuvector-binding-customresourcedefinition          72d                    neuvector/controller
+neuvector-binding-nvsecurityrules                   ClusterRole/neuvector-binding-nvsecurityrules                   72d                    neuvector/controller
+neuvector-binding-view                              ClusterRole/view                                                72d                    neuvector/controller
+neuvector-binding-nvwafsecurityrules                ClusterRole/neuvector-binding-nvwafsecurityrules                72d                    neuvector/controller
+neuvector-binding-nvadmissioncontrolsecurityrules   ClusterRole/neuvector-binding-nvadmissioncontrolsecurityrules   72d                    neuvector/controller
+neuvector-binding-nvdlpsecurityrules                ClusterRole/neuvector-binding-nvdlpsecurityrules                72d                    neuvector/controller
+neuvector-binding-co                                ClusterRole/neuvector-binding-co                                72d                    neuvector/enforcer, neuvector/controller
+----
+
+Y este comando:
+
+[,shell]
+----
+oc get RoleBinding neuvector-binding-scanner neuvector-binding-cert-upgrader neuvector-binding-job-creation neuvector-binding-lease neuvector-binding-secret -n neuvector -o wide
+----
+
+Salida de ejemplo:
+
+[,shell]
+----
+NAME                              ROLE                                   AGE   USERS   GROUPS   SERVICEACCOUNTS
+neuvector-binding-scanner         Role/neuvector-binding-scanner         56m                    neuvector/controller, neuvector/updater
+neuvector-binding-cert-upgrader   Role/neuvector-binding-cert-upgrader   56m                    neuvector/cert-upgrader
+neuvector-binding-job-creation    Role/neuvector-binding-job-creation    56m                    neuvector/controller
+neuvector-binding-lease           Role/neuvector-binding-lease           56m                    neuvector/controller, neuvector/cert-upgrader
+neuvector-binding-secret          Role/neuvector-binding-secret          56m                    neuvector/controller, neuvector/enforcer, neuvector/scanner, neuvector/registry-adapter
+----
+--
+. (*Opcional*) Crea los servicios de gestión de clústeres múltiples y/o del Maestro de Federación. Si planeas utilizar las funciones de gestión de clústeres múltiples en {product-name}, un clúster debe tener el servicio Maestro de Federación desplegado, y cada clúster remoto debe tener el servicio Trabajador de Federación. Para mayor flexibilidad, puedes optar por desplegar tanto los servicios Maestro como Trabajador en cada clúster, de modo que cualquier clúster pueda ser maestro o remoto.
++
+--
+Servicios de Gestión Federada
+
+[,yaml]
+----
+apiVersion: v1
+kind: Service
+metadata:
+  name: neuvector-service-controller-fed-master
+  namespace: neuvector
+spec:
+  ports:
+  - port: 11443
+    name: fed
+    protocol: TCP
+  type: NodePort
+  selector:
+    app: neuvector-controller-pod
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: neuvector-service-controller-fed-worker
+  namespace: neuvector
+spec:
+  ports:
+  - port: 10443
+    name: fed
+    protocol: TCP
+  type: NodePort
+  selector:
+    app: neuvector-controller-pod
+----
+
+Luego crea el/los servicio(s) apropiado(s):
+
+[,shell]
+----
+oc create -f nv_master_worker.yaml
+----
+--
+. Crea los servicios y pods de neuvector basándote en los yamls de muestra a continuación. 
++
+[IMPORTANT] 
+====
+Reemplaza las etiquetas <version> para las referencias de imagen del manager, controller y enforcer en el archivo yaml. También realiza cualquier otra modificación necesaria para tu entorno de despliegue.
+====
++
+--
+[,shell]
+----
+oc create -f <compose file>
+----
+--
+
+Es así de sencillo. Deberías poder conectarte a la consola de {product-name} e iniciar sesión con admin:admin, por ejemplo, `https://<public-ip>:8443`.
+
+Para ver cómo acceder a la consola del servicio neuvector-webui:
+
+[,shell]
+----
+oc get services -n neuvector
+----
+
+Si has creado tu propio espacio de nombres en lugar de usar "`neuvector`", reemplaza todas las instancias de "`namespace: neuvector`" y otras referencias de espacio de nombres con tu espacio de nombres en los archivos yaml de muestra a continuación.
+
+*OpenShift 4.6+ con tiempo de ejecución CRI-O*
+
+El nombre de tu registro OpenShift predeterminado puede haber cambiado de docker-registry a openshift-image-registry. Es posible que necesites cambiar el registro de imágenes para el manager, controller y enforcer en el yaml de muestra.
+
+[NOTE]
+====
+El tipo NodePort se utiliza para los servicios fed-master y fed-worker en lugar de LoadBalancer. Es posible que necesites ajustar para tu despliegue.
+====
+
+Si utilizas el tiempo de ejecución CRI-O, consulta este https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.4.0/neuvector-crio-oc.yaml[ejemplo de CRI-O].
+
+*Taints y Tolerancias del Nodo Maestro*
+
+Toda la información de taint debe coincidir para programar los enforcer en los nodos. Para comprobar la información de taint en un nodo (por ejemplo, Maestro):
+
+[,shell]
+----
+$ oc get node taintnodename -o yaml
+----
+
+Salida de ejemplo:
+
+[,yaml]
+----
+spec:
+  taints:
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/master
+  # there may be an extra info for taint as below
+  - effect: NoSchedule
+    key: mykey
+    value: myvalue
+----
+
+Si hay taints adicionales como los anteriores, añádelos a la sección de tolerancias del yaml de la muestra:
+
+[,yaml]
+----
+spec:
+  template:
+    spec:
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+        # if there is an extra info for taints as above, please add it here. This is required to match all the taint info defined on the taint node. Otherwise, the Enforcer won't deploy on the taint node
+        - effect: NoSchedule
+          key: mykey
+          value: myvalue
+----
+
+== Uso de etiquetas de nodo para nodos de manager y controller
+
+Para controlar en qué nodos se despliegan el manager y el controller, etiqueta cada nodo. Reemplaza `<nodename>` con el nombre de nodo apropiado.
+
+[,shell]
+----
+oc label nodes <nodename> nvcontroller=true
+----
+
+Luego, añade un nodeSelector al archivo yaml para las secciones de despliegue del manager y del controller. Por ejemplo:
+
+[,yaml]
+----
+          - mountPath: /host/cgroup
+              name: cgroup-vol
+              readOnly: true
+      nodeSelector:
+        nvcontroller: "true"
+      restartPolicy: Always
+----
+
+Para evitar que el enforcer se despliegue en un nodo controller, si es un nodo de gestión dedicado (sin contenedores de aplicación que deban ser monitorizados), añade un nodeAffinity a la sección yaml del enforcer. Por ejemplo:
+
+[,yaml]
+----
+app: neuvector-enforcer-pod
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: nvcontroller
+                  operator: NotIn
+                  values: ["true"]
+      imagePullSecrets:
+----
+
+== Actualización de la base de datos CVE en despliegues de OpenShift
+
+La última imagen del escáner siempre contiene la actualización más reciente de la base de datos CVE de {product-name}. Por esta razón, no se recomienda una etiqueta de versión al extraer la imagen. Sin embargo, actualizar la base de datos CVE requiere extraer regularmente la última imagen del escáner para que el trabajo cron del actualizador pueda volver a desplegar el/los escáner(es).  Las muestras anteriores asumen que se extraen, etiquetan y envían imágenes de {product-name} a un registro local de OpenShift. El despliegue se realiza entonces desde este registro en lugar de directamente desde neuvector (o el {product-name} registro legado en Docker Hub).
+
+Para actualizar regularmente la base de datos CVE, recomendamos crear un script/trabajo cron para extraer la última {product-name} imagen del escáner y realizar los pasos de etiquetado y subida al registro local. Esto asegurará que la base de datos CVE se actualice regularmente y que las imágenes y contenedores se escaneen en busca de nuevas vulnerabilidades.
+
+== Actualizaciones continuas
+
+Las herramientas de orquestación como Kubernetes, RedHat OpenShift y Rancher soportan actualizaciones continuas con políticas configurables. Puedes usar esta función para actualizar los contenedores {product-name}. Lo más importante será asegurar que haya al menos un Allinone/Controlador en funcionamiento para que no se pierdan las directivas, los registros y los datos de conexión. Asegúrate de que haya un mínimo de 30 segundos entre las actualizaciones de contenedores para que se pueda elegir un nuevo líder y sincronizar los datos entre controladores.
+
+Antes de comenzar la actualización progresiva, por favor extrae y etiqueta los contenedores {product-name} de la misma manera que al principio de esta página. Puedes obtener la última versión sin un número de versión, pero para activar la actualización progresiva necesitarás etiquetar la imagen con una versión.
+
+Por ejemplo, para el controlador (última versión):
+
+[,shell]
+----
+docker pull neuvector/controller
+----
+
+Luego, para etiquetar/empujar, si la última versión es 2.0.1, lo mismo que el paso 3 en la parte superior de esta página:
+
+[,shell]
+----
+docker login -u <user_name> -p `oc whoami -t` docker-registry.default.svc:5000
+docker tag neuvector/controller docker-registry.default.svc:5000/neuvector/controller:2.0.1
+docker push docker-registry.default.svc:5000/neuvector/controller:2.0.1
+----
+
+Ahora puedes actualizar tu archivo yaml con estas nuevas versiones y '`apply`', o usar el comando '`oc set image ...`' para activar la actualización progresiva. Por favor, consulta los ejemplos de actualización progresiva de Kubernetes en esta sección de Producción para saber cómo lanzar y monitorear actualizaciones progresivas de los contenedores {product-name}.
+
+Los archivos yaml de despliegue de muestra proporcionados ya configuran la directiva de actualización progresiva. Si estás actualizando a través del chart de Helm {product-name}, por favor, obtén el chart más reciente para configurar correctamente nuevas características como el control de admisión, y elimina el antiguo rol de clúster y la vinculación de rol de clúster para {product-name}.
+
+== Habilitando la API REST
+
+Para habilitar la API REST, el puerto 10443 debe configurarse de la siguiente manera:
+
+[,yaml]
+----
+apiVersion: v1
+kind: Service
+metadata:
+  name: neuvector-service-controller
+  namespace: neuvector
+spec:
+  ports:
+    - port: 10443
+      name: controller
+      protocol: TCP
+  type: NodePort
+  selector:
+    app: neuvector-controller-pod
+----
+
+== Habilitar/Deshabilitar la programación en el nodo maestro
+
+Los siguientes comandos se pueden usar para habilitar/deshabilitar la programación en el nodo maestro.
+
+[,shell]
+----
+oc adm manage-node nodename --schedulable
+----
+
+[,shell]
+----
+oc adm manage-node nodename --schedulable=false
+----
+
+== Despliegue de OpenShift en modo no privilegiado
+
+Las siguientes instrucciones se pueden usar para desplegar {product-name} sin utilizar contenedores en modo privilegiado. El controlador ya está en modo no privilegiado y el despliegue del enforcer debería ser cambiado, como se muestra en los fragmentos extraídos a continuación.
+
+Enforcer:
+
+[,yaml]
+----
+spec:
+  template:
+    metadata:
+      annotations:
+        container.apparmor.security.beta.kubernetes.io/neuvector-enforcer-pod: unconfined
+      # this line below is required to be added if k8s version is pre-v1.19
+      # container.seccomp.security.alpha.kubernetes.io/neuvector-enforcer-pod: unconfined
+    spec:
+      containers:
+          securityContext:
+            # openshift
+            seLinuxOptions:
+              type: unconfined_t
+            # the following two lines are required for k8s v1.19+. pls comment out both lines if version is pre-1.19. Otherwise, a validating data error message will show
+            seccompProfile:
+              type: Unconfined
+            capabilities:
+              add:
+              - SYS_ADMIN
+              - NET_ADMIN
+              - SYS_PTRACE
+              - IPC_LOCK
+              - NET_RAW
+              - SYS_CHROOT
+              - MKNOD
+              - AUDIT_WRITE
+              - SETFCAP
+----
+
+El siguiente ejemplo es una referencia de despliegue completa utilizando el tiempo de ejecución cri-o. Para otros tiempos de ejecución, por favor, realiza los cambios apropiados en los volúmenes/montajes de volumen para el crio.sock.
+
+.Haga clic aquí para obtener más información
+[%collapsible]
+====
+[,yaml]
+----
+apiVersion: v1
+kind: Service
+metadata:
+  name: neuvector-svc-crd-webhook
+  namespace: neuvector
+spec:
+  ports:
+  - port: 443
+    targetPort: 30443
+    protocol: TCP
+    name: crd-webhook
+  type: ClusterIP
+  selector:
+    app: neuvector-controller-pod
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: neuvector-svc-admission-webhook
+  namespace: neuvector
+spec:
+  ports:
+  - port: 443
+    targetPort: 20443
+    protocol: TCP
+    name: admission-webhook
+  type: ClusterIP
+  selector:
+    app: neuvector-controller-pod
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: neuvector-service-webui
+  namespace: neuvector
+spec:
+  ports:
+    - port: 8443
+      name: manager
+      protocol: TCP
+  type: ClusterIP
+  selector:
+    app: neuvector-manager-pod
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: neuvector-svc-controller
+  namespace: neuvector
+spec:
+  ports:
+  - port: 18300
+    protocol: "TCP"
+    name: "cluster-tcp-18300"
+  - port: 18301
+    protocol: "TCP"
+    name: "cluster-tcp-18301"
+  - port: 18301
+    protocol: "UDP"
+    name: "cluster-udp-18301"
+  clusterIP: None
+  selector:
+    app: neuvector-controller-pod
+
+---
+
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: neuvector-route-webui
+  namespace: neuvector
+spec:
+  to:
+    kind: Service
+    name: neuvector-service-webui
+  port:
+    targetPort: manager
+  tls:
+    termination: passthrough
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neuvector-manager-pod
+  namespace: neuvector
+spec:
+  selector:
+    matchLabels:
+      app: neuvector-manager-pod
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: neuvector-manager-pod
+    spec:
+      serviceAccountName: basic
+      serviceAccount: basic
+      containers:
+        - name: neuvector-manager-pod
+          image: image-registry.openshift-image-registry.svc:5000/neuvector/manager:<version>
+          env:
+            - name: CTRL_SERVER_IP
+              value: neuvector-svc-controller.neuvector
+      restartPolicy: Always
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neuvector-controller-pod
+  namespace: neuvector
+spec:
+  selector:
+    matchLabels:
+      app: neuvector-controller-pod
+  minReadySeconds: 60
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: neuvector-controller-pod
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - neuvector-controller-pod
+              topologyKey: "kubernetes.io/hostname"
+      serviceAccountName: controller
+      serviceAccount: controller
+      containers:
+        - name: neuvector-controller-pod
+          image: image-registry.openshift-image-registry.svc:5000/neuvector/controller:<version>
+          securityContext:
+            runAsUser: 0
+          readinessProbe:
+            exec:
+              command:
+              - cat
+              - /tmp/ready
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          env:
+            - name: CLUSTER_JOIN_ADDR
+              value: neuvector-svc-controller.neuvector
+            - name: CLUSTER_ADVERTISED_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: CLUSTER_BIND_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            # - name: CTRL_PERSIST_CONFIG
+            #   value: "1"
+          volumeMounts:
+            # - mountPath: /var/neuvector
+            #   name: nv-share
+            #   readOnly: false
+            - mountPath: /etc/config
+              name: config-volume
+              readOnly: true
+      terminationGracePeriodSeconds: 300
+      restartPolicy: Always
+      volumes:
+        # - name: nv-share
+        #   persistentVolumeClaim:
+        #     claimName: neuvector-data
+        - name: config-volume
+          projected:
+            sources:
+              - configMap:
+                  name: neuvector-init
+                  optional: true
+              - secret:
+                  name: neuvector-init
+                  optional: true
+              - secret:
+                  name: neuvector-secret
+                  optional: true
+
+---
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: neuvector-enforcer-pod
+  namespace: neuvector
+spec:
+  selector:
+    matchLabels:
+      app: neuvector-enforcer-pod
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: neuvector-enforcer-pod
+      annotations:
+        container.apparmor.security.beta.kubernetes.io/neuvector-enforcer-pod: unconfined
+      # Add the following for pre-v1.19
+      # container.seccomp.security.alpha.kubernetes.io/neuvector-enforcer-pod: unconfined
+    spec:
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+      hostPID: true
+      serviceAccountName: enforcer
+      serviceAccount: enforcer
+      containers:
+        - name: neuvector-enforcer-pod
+          image: image-registry.openshift-image-registry.svc:5000/neuvector/enforcer:<version>
+          securityContext:
+            # openshift
+            seLinuxOptions:
+              type: unconfined_t
+            # the following two lines are required for k8s v1.19+. pls comment out both lines if version is pre-1.19. Otherwise, a validating data error message will show
+            seccompProfile:
+              type: Unconfined
+            capabilities:
+              add:
+              - SYS_ADMIN
+              - NET_ADMIN
+              - SYS_PTRACE
+              - IPC_LOCK
+              - NET_RAW
+              - SYS_CHROOT
+              - MKNOD
+              - AUDIT_WRITE
+              - SETFCAP
+          env:
+            - name: CLUSTER_JOIN_ADDR
+              value: neuvector-svc-controller.neuvector
+            - name: CLUSTER_ADVERTISED_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: CLUSTER_BIND_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          volumeMounts:
+            - mountPath: /lib/modules
+              name: modules-vol
+              readOnly: true
+            # - mountPath: /run/runtime.sock
+            #   name: runtime-sock
+            #   readOnly: true
+            # - mountPath: /host/proc
+            #   name: proc-vol
+            #   readOnly: true
+            # - mountPath: /host/cgroup
+            #   name: cgroup-vol
+            #   readOnly: true
+            - mountPath: /var/nv_debug
+              name: nv-debug
+              readOnly: false
+      terminationGracePeriodSeconds: 1200
+      restartPolicy: Always
+      volumes:
+        - name: modules-vol
+          hostPath:
+            path: /lib/modules
+        # - name: runtime-sock
+        #   hostPath:
+        #     path: /var/run/crio/crio.sock
+        # - name: proc-vol
+        #   hostPath:
+        #     path: /proc
+        # - name: cgroup-vol
+        #   hostPath:
+        #     path: /sys/fs/cgroup
+        - name: nv-debug
+          hostPath:
+            path: /var/nv_debug
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neuvector-scanner-pod
+  namespace: neuvector
+spec:
+  selector:
+    matchLabels:
+      app: neuvector-scanner-pod
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: neuvector-scanner-pod
+    spec:
+      serviceAccountName: scanner
+      serviceAccount: scanner
+      containers:
+        - name: neuvector-scanner-pod
+          image: image-registry.openshift-image-registry.svc:5000/neuvector/scanner:<version>
+          imagePullPolicy: Always
+          env:
+            - name: CLUSTER_JOIN_ADDR
+              value: neuvector-svc-controller.neuvector
+      restartPolicy: Always
+
+---
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: neuvector-updater-pod
+  namespace: neuvector
+spec:
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: neuvector-updater-pod
+        spec:
+          serviceAccountName: updater
+          serviceAccount: updater
+          containers:
+          - name: neuvector-updater-pod
+            image: image-registry.openshift-image-registry.svc:5000/neuvector/updater:<version>
+            imagePullPolicy: Always
+            command:
+            - /bin/sh
+            - -c
+            - TOKEN=`cat /var/run/secrets/kubernetes.io/serviceaccount/token`; /usr/bin/curl -kv -X PATCH -H "Authorization:Bearer $TOKEN" -H "Content-Type:application/strategic-merge-patch+json" -d '{"spec":{"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt":"'`date +%Y-%m-%dT%H:%M:%S%z`'"}}}}}' 'https://kubernetes.default/apis/apps/v1/namespaces/neuvector/deployments/neuvector-scanner-pod'
+          restartPolicy: Never
+----
+====

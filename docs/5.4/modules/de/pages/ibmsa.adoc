@@ -1,0 +1,40 @@
+= IBM Security Advisor
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/09.ibmsa/09.ibmsa.md
+:page-opendocs-slug:  /integration/ibmsa
+
+== Integration mit IBM Security Advisor
+
+{product-name} integriert sich mit IBM Security Advisor auf IBM Cloud.
+
+Um die erforderliche Registrierungs-URL zu generieren, melden Sie sich bitte als Administrator in der {product-name} Konsole an und gehen Sie zu Einstellungen -> Konfiguration.
+
+. Aktivieren Sie "Integration mit IBM Security Advisor" -> Absenden
+. Klicken Sie auf "URL abrufen" -> In die Zwischenablage kopieren
+
+image:ibmsa_config_new.png[ibmconfigure]
+
+Kehren Sie dann zur IBM Security Advisor Konsole zurück und geben Sie unter "Geben Sie die {product-name} setup-URL ein" "https://{{product-name} controller hostname/ip}:{port}" ein und fügen Sie das, was Sie aus den obigen Schritten kopiert haben, ein. Für den Port verwenden Sie den freigegebenen {product-name} REST API-Port (Standard ist 10443). Für Multi-Cluster-Umgebungen ist dies auch der 'fed-worker'-Dienst, der diesen Port bereitstellt.
+
+IBM Security Advisor wird über den bereitgestellten Hostnamen oder die IP-Adresse mit Ihrem {product-name} Clustercontroller kommunizieren. Hinweis: Dies muss möglicherweise als Dienst für den Zugriff von außerhalb des Kubernetes-Clusters bereitgestellt werden, ähnlich wie die REST API als Dienst bereitgestellt wird.
+
+=== Verbindung überprüfen
+
+Wenn die Verbindung zwischen IBM Security Advisor und {product-name} erfolgreich hergestellt wurde, sehen Sie das grüne "Verbunden bei {date, time}"-Symbol neben "Integration mit IBM Security Advisor" in der {product-name} Konsole.
+
+image:ibmsa_connected.png[verbunden]
+
+=== Überprüfung von Sicherheitsereignissen in IBM Security Advisor
+
+Eine Zusammenfassungskarte mit Informationen zu Sicherheitsereignissen wird angezeigt.
+
+image:ibm_sa_threat_summary.png[Bedrohungen]
+
+Jedes Sicherheitsereignis kann detaillierter untersucht werden, wie unten gezeigt:
+
+image:ibm_sa_findings.png[findings]
+
+== Die Integration entfernen
+
+Wenn Sie eine {product-name} Integrationsverbindung in Ihrem IBM Cloud-Konto löschen, denken Sie daran, auch die "IBM SA-Integration" für diesen {product-name} Cluster in den Einstellungen -> Konfiguration zu deaktivieren.

@@ -1,0 +1,48 @@
+= Microsoft AD
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/03.msad/03.msad.md
+:page-opendocs-slug:  /integration/msad
+
+== Configurando o Active Directory
+
+Isto explica como {product-name} se autentica com o Windows Active Directory.
+A página de configuração para o servidor Windows Active Directory é mostrada abaixo.
+
+image:ad1.png[ad_config]
+
+Nome do usuário: Isto pode ser qualquer usuário que tenha permissão de leitura no objeto Base DN. O atributo dn deve ser usado como mostrado abaixo, ou o nome de logon do Windows, como user@local.nvtest.com.
+
+image:ad2.png[ad_config]
+
+DN Base: Este é um objeto raiz do Windows Active Directory para autenticação de usuários. O requisito mínimo de permissão de acesso é leitura. Como mostrado no exemplo acima, o objeto OU=IT,DC=local,DC=nvtest,DC=com é permitido apenas para uma conta de usuário que está definida no campo Nome de usuário para permitir a leitura.
+
+image:ad3.png[ad_config]
+
+Com as configurações de Nome de usuário e Base DN acima, {product-name} consegue se conectar com o Windows Active Directory com sucesso. Clique em TESTAR CONEXÃO para verificá-lo.
+
+image:ad4.png[ad_config]
+
+Nome do usuário: É necessário usar o atributo sAMAccountName SOMENTE para correspondência. Por exemplo, na tela abaixo, {product-name} vai verificar se o usuário ituser(CN=ituser,OU=IT,DC=local,DC=nvtest,DC=com) consegue fazer login com {product-name} o console web.
+
+[NOTE]
+====
+{product-name} não usa os valores dos atributos cn, displayName, dn, givenName, name ou userPrincipalName etc. para verificar o usuário de teste.
+====
+
+image:ad5.png[ad_config]
+
+A última parte é o mapeamento de função para {product-name} para o login no console web.
+
+image:ad6.png[ad_config]
+
+No exemplo acima, o grupo definido, _d_s_itgroup, na função {product-name} deve ter os atributos member e sAMAccountType. O valor do atributo sAMAccountType DEVE ser 268435456, que é o grupo de Segurança Global, e o nome de usuário de login deve estar nas listas de membros.
+
+image:ad7.png[ad_config]
+
+Atributo de membro do grupo: Este é um atributo de membro para o Windows Active Directory por padrão e é usado para o propósito de mapeamento de função, como mostrado acima.
+Se todos os requisitos acima forem atendidos, o usuário do Active Directory do Windows deverá conseguir fazer login no {product-name} console da web com sucesso.
+
+=== Mapeando Grupos para Funções e Namespaces
+
+Por favor, consulte a seção xref:users.adoc#_mapping_groups_to_roles_and_namespaces[Usuários e Funções] para saber como mapear grupos para funções predefinidas e personalizadas, bem como namespaces em {product-name}.

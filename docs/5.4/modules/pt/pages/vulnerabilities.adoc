@@ -1,0 +1,83 @@
+= Gerenciamento de Vulnerabilidades
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/01.scanning/01.vulnerabilities/01.vulnerabilities.md
+:page-opendocs-slug:  /scanning/scanning/vulnerabilities
+
+== Gerenciando Vulnerabilidades com {product-name}
+
+{product-name} permite a varredura e gerenciamento automatizados de vulnerabilidades ao longo do pipeline. As melhores práticas para gerenciar vulnerabilidades em {product-name} incluem:
+
+* Realizar varredura durante a xref:build-image-scanning.adoc[fase-de-construção], falhando a construção se houver vulnerabilidades críticas 'com correção disponível.' Isso força os desenvolvedores a resolver vulnerabilidades corrigíveis antes de armazená-las em registros.
+* Realizar varredura em registros de staging e produção continuamente para procurar novas vulnerabilidades descobertas. Vulnerabilidades com correções disponíveis podem ser exigidas para serem corrigidas imediatamente, ou um período extra pode ser permitido para fornecer tempo para remediá-las.
+* Configurar regras de xref:admission.adoc[Controle de Admissão] para bloquear implantações em produção com base em critérios como crítico/alto, correção disponível e data reportada.
+* Realizar varredura continuamente nos nós/hospedeiros de produção, contêineres e plataforma de orquestração para vulnerabilidades recém-descobertas. Implementar respostas com base na criticidade/severidade que podem ser alertas de webhook (que contatam segurança e desenvolvedor), colocar contêiner em quarentena, ou iniciar um período extra para remediação.
+* Garantir que os contêineres em execução estejam em modo Monitorar ou Proteger com regras de lista de permissões apropriadas para 'patch virtual' de vulnerabilidades para evitar qualquer exploração em produção.
+* Realizar varredura em imagens baseadas em distroless e PhotonOS.
+
+O Painel no {product-name} apresenta um resumo da pontuação de risco que inclui vulnerabilidades, que pode ser usado para reduzir o risco de vulnerabilidades. Veja xref:improve-score.adoc[como melhorar a pontuação de risco] para mais detalhes.
+
+A outra ferramenta principal para revisar, filtrar e relatar vulnerabilidades está no menu Riscos de Segurança.
+
+=== Menu de Riscos de Segurança - Vulnerabilidades
+
+Este menu combina os resultados das varreduras de vulnerabilidades e verificações de conformidade de registro (imagem), nó e contêiner encontrados no menu Ativos para permitir gerenciamento e relatórios de vulnerabilidades de ponta a ponta.
+
+O menu de Vulnerabilidades fornece uma ferramenta poderosa de exploração para:
+
+* Facilitar a filtragem para visualização ou download de relatórios, digitando uma string de pesquisa ou usando o filtro avançado ao lado da caixa. O filtro avançado permite que os usuários filtrem vulnerabilidades por correção disponível (ou não disponível), urgência, cargas de trabalho, serviço, contêiner, nós ou nomes de namespace.
+* Compreender o impacto das vulnerabilidades e das verificações de conformidade clicando na linha de impacto e revisando as imagens, nós ou contêineres afetados e a remediação.
+* Ver o Status de Proteção (risco de exploração) de qualquer vulnerabilidade ou problema de conformidade para verificar se há {product-name} proteções de segurança em tempo de execução (regras) habilitadas para nós ou contêineres afetados.
+* 'Aceitar' uma vulnerabilidade/CVE após ter sido revisada para ocultá-la das visualizações e suprimir de relatórios.
+
+image:vulnerabilities_4_4.png[SecurityRisks]
+
+Use a caixa de filtro para inserir uma correspondência de string ou use o filtro avançado ao lado para selecionar critérios mais específicos, conforme mostrado abaixo. Relatórios em PDF e CSV baixados mostrarão apenas os resultados filtrados.
+
+image:advanced_filter_4.png[AdvancedFilter]
+
+Selecionar qualquer CVE listado fornece detalhes adicionais sobre o CVE, remediação e quais imagens, nós ou contêineres estão afetados. O ícone do Estado de Proteção (círculo) mostra várias cores para indicar uma porcentagem aproximada dos itens afetados que estão desprotegidos por {product-name} durante o tempo de execução, protegidos por {product-name} regras (em modo Monitorar ou Proteger), ou não afetados em tempo de execução (por exemplo, uma imagem escaneada com essa vulnerabilidade não possui contêineres em execução). O esquema de cores da coluna Estado de Proteção é:
+
+* Preto = não afetado
+* Verde = protegido por {product-name} com modo Monitorar ou Proteger
+* Vermelho = desprotegido por {product-name}, ainda em modo Descobrir
+
+O esquema de cores da janela de análise de impacto (mostrando imagens, nós, contêineres afetados) é:
+
+* Preto = não afetado. Não há contêineres usando esta imagem em produção
+* Roxo = em execução no modo Monitorar em produção
+* Verde Escuro = em execução no modo Proteger em produção
+* Azul Claro = em execução no modo Descobrir em produção (não protegido)
+
+As cores de Impacto são destinadas a corresponder às cores de proteção em tempo de execução para os modos Descobrir, Monitorar e Proteger em outros lugares no console {product-name}.
+
+=== Aceitando Vulnerabilidades
+
+Você pode 'Aceitar' uma vulnerabilidade (CVE) para excluí-la de relatórios, visualizações, pontuação de risco etc. Uma vulnerabilidade pode ser selecionada e o botão Aceitar clicado a partir de várias telas, como Riscos de Segurança -> Vulnerabilidades, Ativos -> Contêineres etc. Uma vez aceita, ela é adicionada à lista de Arquivos de Controle de Riscos de Segurança ->. Ela pode ser visualizada, exportada e editada aqui. Observe que este recurso de Aceitar pode ser limitado a Imagens e/ou Namespaces listados. Novas entradas também podem ser adicionadas manualmente a esta lista a partir desta tela.
+
+Para Aceitar uma vulnerabilidade globalmente, vá para a página Riscos de Segurança -> Vulnerabilidades e selecione a vulnerabilidade, em seguida, Aceitar. Isso criará um Perfil de Vulnerabilidade para este CVE globalmente.
+
+image:accept_global.png[global]
+
+Para Aceitar uma vulnerabilidade encontrada em uma varredura de imagem, abra os resultados da varredura de imagem em Ativos -> Registros, abra o menu suspenso Visualizar e selecione Aceitar. Observe que você também pode escolher Mostrar ou Ocultar vulnerabilidades aceitas para esta imagem. NOTA: Esta ação criará uma entrada de Perfil de Vulnerabilidade para este CVE nesta IMAGEM apenas.
+
+image:accept_image_cve.png[imagem]
+
+Para Aceitar uma vulnerabilidade encontrada em um contêiner em Ativos -> Contêineres, selecione a vulnerabilidade e abra o menu suspenso Visualizar e selecione Aceitar. Observe que você também pode escolher Mostrar ou Ocultar vulnerabilidades aceitas para este contêiner. NOTA: Esta ação criará uma entrada de Perfil de Vulnerabilidade para este CVE apenas neste namespace.
+
+image:accept_containers.png[container]
+
+Esta ação também pode ser realizada em Ativos -> Nós, o que criará um Perfil de Vulnerabilidade para o CVE para todos os contêineres, imagens e namespaces.
+
+[IMPORTANT]
+====
+Vulnerabilidades Globalmente Aceitas são excluídas da visualização em Riscos de Segurança -> Vulnerabilidades e em relatórios exportados desta página. Vulnerabilidades Aceitas que são limitadas a imagens ou namespaces específicos continuarão a ser exibidas na visualização, mas serão excluídas de relatórios onde o Filtro Avançado limita a visualização a essas imagens ou namespaces.
+====
+
+=== Gerenciando Arquivos de Controle de Vulnerabilidade
+
+Cada vulnerabilidade/CVE aceita cria uma entrada na lista de Arquivos de Controle de Riscos de Segurança ->. Essas entradas podem ser editadas para adicionar ou remover atributos como nome(s) da imagem e namespace(s).
+
+image:vuln_profile.png[arquivo de controle]
+
+Novas vulnerabilidades aceitas também podem ser adicionadas aqui inserindo o nome do CVE a ser Aceito.

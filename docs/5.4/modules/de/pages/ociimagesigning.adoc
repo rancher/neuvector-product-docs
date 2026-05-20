@@ -1,0 +1,55 @@
+= Bildsignierung für OCI-Image
+:revdate: 2026-02-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/03.admission/01.sigstore/03.ociimagesigning.md
+:page-opendocs-slug:  /policy/admission/ociimagesigning
+
+== Überprüfen Sie die Bilder der SUSE Rancher Application Collection mit Sigstore
+
+Die SUSE Rancher Application Collection verwendet ein OCI-basiertes Registry, in dem alle Anwendungen von Sigstore signiert sind. Benutzer können die Anwendungen in der Application Collection mit Sigstore-Verifizierern in {product-name} überprüfen.
+
+Sie benötigen im Voraus den öffentlichen Schlüssel von Cosign aus der SUSE Rancher Application Collection, dann können die Sigstore-Verifizierer in {product-name} konfiguriert werden.
+
+image:oci_image_1.png[Sigstore-Verifizierer hinzufügen]
+
+Befolgen Sie diese Schritte, um die Sigstore-Überprüfung für Bilder in der SUSE Rancher Application Collection zu konfigurieren.
+
+. Erstellen Sie ein Zugriffstoken, indem Sie die Authentifizierungsanleitung befolgen:
++
+https://docs.apps.rancher.io/get-started/authentication/
+
+. Rufen Sie den Cosign-öffentlichen Schlüssel (`ap-pubkey.pem`) ab, indem Sie die Anleitung zur Signaturüberprüfung befolgen:
++
+https://docs.apps.rancher.io/howto-guides/verify-signatures-with-cosign/
+
+. Erstellen Sie im {product-name} Web-UI eine Sigstore-Wurzel des Vertrauens.
++
+--
+* Gehen Sie zu *Assets* > *Sigstore-Verifizierer*.
+* Erstellen Sie einen neuen Verifizierer.
+* Fügen Sie den Cosign-öffentlichen Schlüssel als Schlüsselpaar-Verifizierer hinzu.
+--
+
+. Konfigurieren Sie das Registry und starten Sie einen Scan.
++
+--
+* Gehen Sie zu *Assets* > *Registries*.
+* Erstellen Sie ein neues Registry mit den folgenden Werten:
++
+[source,text]
+----
+Registry: https://dp.apps.rancher.io/
+Filter: containers/openjdk:21.0.4-build7
+Username: <your SUSE username>
+Password: <access token created earlier>
+----
+--
++
+Das gefilterte Image ist ein OCI-Image, das in der SUSE Rancher Application Collection veröffentlicht wurde.
+
+. Überprüfen Sie die Scanergebnisse, um die Signaturüberprüfung zu bestätigen.
+
+
+image:oci_image_2.png[Verifizierer-Scanergebnis]
+
+Nach Abschluss des Scans zeigt {product-name} die Details des Sigstore-Verifizierers in den Scanergebnissen an und bestätigt, dass die Image-Signatur erfolgreich validiert wurde.

@@ -1,0 +1,23 @@
+= Azure DevOps
+:revdate: 2025-05-08
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/03.build/04.azuredevops/04.azuredevops.md
+:page-opendocs-slug:  /scanning/build/azuredevops
+
+== Azure DevOpsビルドパイプラインにおける脆弱性のスキャン
+
+{product-name}スキャナーは、Azure DevOpsマーケットプレイスに公開されている{product-name}拡張機能を使用して、Azure DevOpsパイプラインからトリガー可能です。
+
+image:azure_devops.png[AzureDevOps]
+
+この拡張機能は、{product-name}コントローラーがビルド中にレジストリ内のイメージをリモートでスキャンしたり、Azure エージェント VM 上でイメージをスキャンするためにローカルコントローラーを動的に起動したりする、リモートおよびローカルスキャンの両方をサポートしています。
+
+さらに、Allinoneまたはコントローラーに接続するようにデプロイおよび構成された{product-name}スキャナーコンテナがあることを確認してください。4.0以降では、neuvector/scannerコンテナは allinone またはコントローラーとは別にデプロイする必要があります。
+
+* {product-name}タスクを使用したイメージスキャンは、Azure DevOps パイプラインに {product-name} 脆弱性スキャナーを統合します。
+* イメージビルド後に、外部{product-name}コントローラーインスタンスまたはパイプライン内のサービス コンテナ内で実行されているローカル{product-name}コントローラーインスタンスでコンテナイメージの脆弱性スキャンを実行します。
+* 異なる深刻度の検出された脆弱性の数に基づいて、ビルド失敗の閾値を定義します。
+* ビルド サマリ タブで分析のためのイメージスキャンの詳細なレポートを提供します。
+* 外部{product-name}コントローラーインスタンスは、ビルドパイプライン定義を接続パラメータや認証情報から切り離すためのサービスエンドポイントとして定義されます。
+
+サンプル画面を含む概要は https://marketplace.visualstudio.com/items?itemName=NeuVector.neuvector-vsts.で確認できます。

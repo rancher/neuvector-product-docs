@@ -1,0 +1,28 @@
+= Importando CRD do Console
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/13.usingcrd/1.import/1.import.md
+:page-opendocs-slug:  /policy/usingcrd/import
+
+== Importando um arquivo no formato CRD do console ou da API
+
+{product-name} suporta a importação de um arquivo formatado em CRD do console. No entanto, isso não é o mesmo que aplicá-lo no Kubernetes como uma definição de recurso personalizado (CRD).
+
+Um arquivo no formato {product-name} CRD pode ser importado do console para definir a política de segurança (regras) especificadas no arquivo. Essas regras NÃO serão importadas como regras designadas 'CRD', mas como regras criadas pelo usuário. A implicação é que essas regras podem ser modificadas ou excluídas como outras regras, do console ou através da API. Elas não estão protegidas como regras CRD contra modificação.
+
+Para importar do console, vá para Grupos de Política -> e selecione Importar Grupo de Política.
+
+image:4-3_Import_Policy.png[importar]
+
+[IMPORTANT]
+====
+Regras importadas substituirão quaisquer regras existentes para o Grupo.
+====
+
+Regras que são definidas usando as funções CRD do Kubernetes, por exemplo, através de 'kubectl apply my_crd.yaml' criam regras do tipo CRD em {product-name} que não podem ser modificadas do console ou API. Essas só podem ser modificadas atualizando o arquivo CRD e aplicando a alteração através do Kubernetes.
+
+Possíveis casos de uso para importação de arquivo de regras do console incluem:
+
+* Configuração inicial (uma vez) de regras para um Grupo ou grupos
+* Migração de regras de um ambiente para outro
+* Criação de regras onde a modificação deve ser permitida pelo console ou pela API.

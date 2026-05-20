@@ -1,0 +1,220 @@
+= 连接到管理器，REST API 服务器
+:revdate: 2025-05-08
+:page-revdate: {revdate}
+:page-opendocs-origin: /03.configuration/01.console/01.console.md
+:page-opendocs-slug: /configuration/console
+
+== 连接到 UI
+
+打开浏览器窗口，通过 HTTPS 连接到管理器。接受 EULA 后，用户可以访问 UI。
+
+[TIP]
+====
+根据您选择的部署方式，管理器地址如下。
+====
+
+[tabs]
+======
+Docker::
++
+====
+[,shell]
+----
+https://<manager_host_ip>:8443
+----
+==== 
+
+Kubernetes 无负载均衡器或 Ingress::
++
+====
+[,shell]
+----
+https://<node_host_ip>:<NodePort>
+----
+====
+
+已配置负载均衡器或 Ingress::
++
+====
+[,shell]
+----
+https://<FQDN|IP>/
+---- 
+==== 
+======
+
+image:3_0_Dashboard.png[导航]
+
+您可以通过控制台或使用 REST API 管理 {product-name}。
+
+[NOTE]
+====
+请参见下文，了解您的公司防火墙阻止 8443 的情况。
+====
+
+[NOTE]
+====
+如果您的 Chrome 浏览器阻止 {product-name} 自签名证书，请参见下一节关于 Chrome 证书上传的内容。
+====
+
+== 连接到 REST API 服务器 
+
+在 {product-name} 中的所有操作都可以通过 REST API 而不是控制台调用。REST API 服务器是 Controller/Allinone 容器的一部分。有关 REST API 的详细信息，请参见工作流和 xref:automation.adoc[自动化] 部分。
+
+== 默认用户名和密码 
+
+**admin:admin**
+
+成功登录后，管理员用户应使用更安全的密码更新账户。
+
+== 创建额外用户 
+
+可以从设置 -> 用户和角色菜单中添加新用户。在 {product-name} 中有预定义的全局角色：
+
+* 管理能够执行除联邦策略以外的所有操作。
+* 联邦管理员。能够执行所有操作，包括设置主/远程集群和联邦策略（规则）。仅在启用xref:multicluster.adoc[多集群]时可见。
+* 仅查看（读者）。不允许任何操作，仅限查看。
+* CI集成（ciops）。能够执行CI/CD扫描集成任务，例如镜像扫描。建议在构建阶段扫描插件中使用此用户角色，例如Jenkins、Bamboo等，并用于REST API调用。仅限于扫描功能，无法在控制台中执行任何操作。
+
+用户可以使用高级设置限制到一个或多个名称空间。
+
+请参阅xref:users.adoc[用户与角色]部分以获取高级用户管理和自定义角色的创建。
+
+== 连接超时设置 
+
+您可以在控制台右上角的我的个人资料->会话超时中设置控制台超时的秒数。默认值为5分钟，最大值为3600秒（1小时）。
+
+== 为管理器启用HTTP 
+
+要禁用HTTPS并启用HTTP访问，请将此添加到管理器或Allinone yaml部分的环境变量部分。例如，在Kubernetes中：
+
+[,yaml]
+----
+- name: MANAGER_SSL 
+  value: "off" 
+----
+
+对于OpenShift，还需从yaml的路由部分删除此设置：
+
+[,yaml]
+----
+tls:
+    termination: passthrough 
+----
+
+如果将管理器放在负载均衡器后面，这将很有用。
+
+== 启用来自阻止8443的企业网络的访问。 
+
+如果您的企业网络不允许通过8443端口访问管理控制台，您可以创建一个入口服务来映射该端口并允许访问。
+
+[NOTE]
+====
+{product-name} UI控制台在容器中以非root用户身份运行，因此无法监听低于1024的端口。这就是为什么它无法更改为443的原因。
+====
+
+如果您试图从企业网络访问控制台，以下是使用ClusterIP服务和入口HTTPS重定向来实现此目的的方法。
+
+首先，创建一个用于HTTPS终止的证书。示例如下：
+
+[,shell]
+----
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN=mycloud.domain.com" kubectl create secret tls neuvector-ingress-tls -n neuvector --key="tls.key" --cert="tls.crt" 
+----
+
+然后，使用以下yaml文件来暴露443端口，该端口将HTTPS连接重定向到管理器。
+
+[,yaml]
+----
+apiVersion: v1
+kind: Service
+metadata:
+  name: neuvector-cluster-webui
+  namespace: neuvector
+spec:
+  ports:
+  - port: 443
+    targetPort: 8443
+    protocol: TCP
+  type: ClusterIP
+  selector:
+    app: neuvector-manager-pod
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: neuvector-ingress-webui
+  namespace: neuvector
+  annotations:
+    ingress.mycloud.net/ssl-services: ssl-service=neuvector-cluster-webui
+spec:
+  tls:
+  - hosts:
+    - cloud.neuvector.com
+    secretName: neuvector-ingress-tls
+  rules:
+  - host: cloud.neuvector.com
+    http:
+      paths:
+      - path:
+        backend:
+          serviceName: neuvector-cluster-webui
+          servicePort: 443
+----
+
+您需要将 Ingress 地址的注解从 ingress.mycloud.net 更改为您自己的地址。
+
+此示例使用的URL是cloud.neuvector.com。创建 Ingress 服务后，您可以找到它的外部 IP。然后，您可以配置hosts文件，将cloud.neuvector.com指向该IP。之后，您应该能够浏览到`https://cloud.neuvector.com`（您选择使用的URL）。
+
+=== 使用SSL直通而不是重定向 
+
+要使用 TLS/SSL 直通而不是上面的重定向示例（在某些 Ingress 控制器如 nginx 上支持），请确保 Ingress 控制器已适当地配置为直通，并且已将适当的注解添加到 Ingress。例如，
+
+[,yaml]
+----
+annotations: 
+  ingress.kubernetes.io/ssl-passthrough: "true" 
+----
+
+== 替换{product-name}自签名证书 
+
+有关详细信息，请参见下一节xref:replacecert.adoc[替换自签名证书]。证书必须在管理器和控制器/Allinone的yaml中都进行替换。
+
+== 使用证书ARN配置AWS ALB 
+
+以下是使用 AWS 负载均衡器和证书 ARN 的示例 Ingress 配置（实际 ARN 已被模糊处理）。
+[,yaml]
+----
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    # https://kubernetes-sigs.github.io/aws-alb-ingress-controller/guide/ingress/annotation/#healthcheck-path
+    alb.ingress.kubernetes.io/backend-protocol: HTTPS
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-west-2:596810101010:certificate/380b6abc-1234-408d-axyz-651710101010
+    alb.ingress.kubernetes.io/healthcheck-path: /
+    alb.ingress.kubernetes.io/healthcheck-protocol: HTTPS
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/success-codes: "301"
+    alb.ingress.kubernetes.io/target-type: instance
+    external-dns.alpha.kubernetes.io/hostname: eks.neuvector.com
+    kubernetes.io/ingress.class: alb
+  labels:
+    app: neuvector-webui-ingress
+  name: neuvector-webui-ingress
+  namespace: neuvector
+spec:
+  tls:
+  - hosts:
+    - eks.neuvector.com
+  rules:
+  - http:
+      paths:
+      - backend:
+          serviceName: neuvector-service-webui
+          servicePort: 8443
+        path: /*
+----

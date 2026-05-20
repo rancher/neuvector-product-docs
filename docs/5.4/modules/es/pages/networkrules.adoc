@@ -1,0 +1,160 @@
+= Reglas de red
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/05.networkrules/05.networkrules.md
+:page-opendocs-slug:  /policy/networkrules
+
+== Directiva: Reglas de red
+
+{product-name} crea automáticamente reglas de red a partir de tus aplicaciones en ejecución en modo Descubrimiento. También puedes añadirlas manualmente en cualquier modo: Descubrimiento, Monitor o Proteger. Las reglas se pueden añadir o editar desde la CLI o la API REST.
+
+{product-name} utiliza una política declarativa que consiste en reglas que rigen las conexiones permitidas y denegadas en la capa de aplicación. {product-name} analiza y protege no solo en función de la dirección IP y el puerto, sino determinando el comportamiento real de la red basado en los protocolos de aplicación. Esto permite que {product-name} proteja automáticamente cualquier nuevo contenedor de aplicación independientemente de la dirección IP y el puerto.
+
+Las reglas de red especifican el comportamiento PERMITIDO o DENEGADO para tus aplicaciones. Estas reglas determinan qué conexiones son un comportamiento normal para tus servicios, así como cuáles son violaciones. Puedes eliminar automáticamente las reglas '`learned`' así como añadir nuevas reglas a tu directiva.
+
+[IMPORTANT]
+====
+Las reglas de red se aplican en el orden en que aparecen en la lista, de arriba a abajo. Para reordenar las reglas, selecciona la regla que deseas mover, luego verás aparecer un cuadro 'Mover a' en la parte superior, y puedes mover la regla seleccionada a la posición antes o después de una regla especificada.
+====
+
+[IMPORTANT]
+====
+Si editas (añades, eliminas, cambias) reglas, tus cambios NO se aplican hasta que hagas clic en el botón Guardar en la parte superior. Si sales de esta página sin desplegar tus cambios, se perderán.
+====
+
+=== Añadiendo nuevas reglas
+Añade una regla utilizando el '`+`' ya sea debajo de otra regla en la columna derecha, o utilizando el botón en la parte inferior derecha.
+
+* *ID*
++
+____
+(Opcional) Introduce un número. Las reglas de red se ordenan inicialmente de menor a mayor, pero el orden de las reglas se puede cambiar arrastrándolas y soltándolas en la lista.
+____
+
+* *Desde*
++
+____
+Especifica el GRUPO desde donde se originará la conexión. Empieza a escribir y {product-name} coincidirá con cualquier grupo previamente descubierto, así como con cualquier nuevo grupo definido.
+____
+
+* *A*
++
+____
+Especifica el GRUPO de destino donde estas conexiones están permitidas o denegadas.
+____
+
+* *Aplicaciones*
++
+--
+____
+Introduce aplicaciones para {product-name} para permitir o denegar. {product-name} entiende el comportamiento profundo de las aplicaciones y analizará la carga útil para determinar los protocolos de aplicación. Los protocolos incluyen HTTP, HTTPS, SSL, SSH, DNS, DNCP, NTP, TFTP, ECHO, RTSP, SIP, MySQL, Redis, Zookeeper, Cassandra, MongoDB, PostgresSQL, Kafka, Couchbase, ActiveMQ, ElasticSearch, RabbitMQ, Radius, VoltDB, Consul, Syslog, Etcd, Spark, Apache, Nginx, Jetty, NodeJS, Oracle, MSSQL, Memcached y gRPC.
+____
+
+[NOTE]
+====
+Para seleccionar Cualquiera/Todos, deja este campo en blanco.
+====
+--
+
+* *Puertos*
++
+--
+____
+Si hay puertos específicos a los que limitar esta regla, introdúcelos aquí. Para el tráfico ICMP, introduce icmp.
+____
+
+[NOTE]
+====
+Para seleccionar Cualquiera/Todos, deja este campo en blanco.
+====
+--
+
+* *Deny/Allow*
++
+--
+____
+Indica si esta regla es para Permitir este tipo de conexión, o Denegarla.
+____
+
+Si se selecciona Denegar, {product-name} registrará esto como una violación mientras esté en modo Monitor, y lo bloqueará mientras esté en modo Proteger. La acción predeterminada es Denegar una conexión (registrar violación solo si está en modo Monitor) si ninguna regla coincide con ella.
+--
+
+[IMPORTANT]
+====
+¡No olvides Desplegar/Actualizar si realizas algún cambio!
+====
+
+== Control de Salida: Permitir Conexiones a Servicios Internos de Confianza en Otras Redes
+
+Un caso de uso común para personalizar reglas es permitir que un servicio de contenedor se conecte a una red fuera de la red del clúster downstream de {product-name}. En muchos casos, dado que {product-name} no reconoce esta red, la clasificará como una red '`External`', incluso si es una red interna.
+
+Para permitir que los contenedores se conecten a servicios en otras redes internas, primero crea un grupo, luego una regla para él.
+
+. Crea un Grupo. En la directiva -> grupos, haz clic para añadir un nuevo grupo. Nombra el grupo (por ejemplo, interno) y luego especifica los criterios para el grupo. Por ejemplo, especifica el nombre DNS, la dirección IP o el rango de direcciones de los servicios internos. Guarda el nuevo grupo.
+. Crea una regla. En las reglas de la directiva ->, haz clic para añadir una nueva regla. Selecciona el grupo que representa el contenedor desde el cual se originarán las conexiones, y luego el grupo de destino (por ejemplo, interno). Puedes refinar aún más la regla con protocolos o puertos específicos, o dejarlo en blanco. Asegúrate de que el selector esté configurado en Permitir (verde).
+
+Asegúrate de hacer clic en Desplegar para guardar la nueva regla.
+
+Finalmente, revisa la lista de reglas para asegurarte de que la nueva regla esté en el orden y prioridad deseados. Las reglas se aplican de arriba hacia abajo.
+
+=== Política de IP de entrada basada en X-FORWARDED-FOR
+
+En un clúster de Kubernetes, una aplicación puede ser expuesta al exterior del clúster mediante un NodePort, LoadBalancer o servicios de Ingress. Estos servicios típicamente reemplazan la IP de origen mientras realizan el NAT de origen (SNAT) en los paquetes. Como la IP de origen original está enmascarada, esto impide que {product-name} reconozca que la conexión proviene realmente de 'externo'.
+
+Para preservar la dirección IP de origen original, el usuario necesita añadir la siguiente línea a los servicios expuestos, en la sección 'spec' del balanceador de carga o controlador de ingress que enfrenta al exterior. (Ref: https://kubernetes.io/docs/tutorials/services/source-ip/)
+
+[,json]
+----
+"externalTrafficPolicy":"Local"
+----
+
+Muchas implementaciones de servicios LoadBalancer y controladores de Ingress añadirán la línea X-FORWARDED-FOR al encabezado de la solicitud HTTP para comunicar la verdadera IP de origen a las aplicaciones de backend. Este producto puede reconocer este conjunto de encabezados HTTP, identificar la IP de origen original y hacer cumplir la directiva de acuerdo a eso.
+
+Esta mejora creó algunos problemas inesperados en algunas configuraciones. Si la línea anterior ha sido añadida a los servicios expuestos y las directivas de red {product-name} han sido creadas de tal manera que esperan que las conexiones de red provengan de servicios de proxy/ingress internos, porque ahora identificamos que las conexiones son de "externo" al clúster, el tráfico normal de la aplicación podría activar alertas o ser bloqueado si las aplicaciones se ponen en modo "Proteger".
+
+Hay un interruptor disponible para desactivar esta función. Desactivarlo indica a {product-name} que no identifique que la conexión es "externa" utilizando los encabezados X-FORWARDED-FOR. Por defecto, esto está habilitado, y el encabezado X-FORWARDED-FOR se utiliza en la aplicación de directivas. Para desactivarlo, ve a Configuración ->, y desactiva la opción "Coincidencia de directiva basada en X-Forwarded-For".
+
+=== Aplicación Especial para Destinos de Istio ServiceEntry
+
+La funcionalidad de aplicación de directivas de red de salida se añadió en la versión 5.1.0 para pods a destinos de ServiceEntry declarados con Istio. Típicamente, un ServiceEntry define cómo un servicio externo referido por nombre DNS se resuelve a una dirección IP de destino. Antes de la v5.1, {product-name} no podía detectar y aplicar reglas para conexiones a un ServiceEntry, por lo que todas las conexiones se clasificaban como Externas. Con la 5.1, se pueden aplicar reglas para destinos específicos de ServiceEntry. Se informarán violaciones implícitas para el tráfico recién visible si no existen reglas de permiso. Estas reglas se pueden aprender y crear automáticamente en modo Descubrimiento. Para permitir este tráfico, puedes poner el grupo en modo descubrimiento o crear un grupo personalizado con direcciones de destino (o nombre DNS) y añadir una nueva regla de red a este destino para permitir el tráfico.
+
+=== Directiva de Red Basada en Host Virtual
+
+Los grupos personalizados pueden soportar grupos de direcciones basados en host virtual. Esto habilita un caso de uso donde dos direcciones FQDN diferentes se resuelven a la misma dirección IP, pero se deben aplicar diferentes reglas para cada FQDN. Se puede crear un nuevo grupo personalizado con '`address=vh:xxx.yyy`' utilizando el indicador '`vh:`' para habilitar esta protección. Una regla de red puede entonces usar el grupo personalizado como la fuente '`From`' basada en el nombre de host virtual (en lugar de la dirección IP resuelta) para aplicar diferentes reglas para hosts virtuales.
+
+== Protecciones de Red en Modo Dividido
+
+Los Grupos de Contenedores pueden tener reglas de Proceso/Archivo en un modo diferente al de las reglas de Red, como se describe xref:modes.adoc#_network_service_policy_mode[aquí].
+
+== Detección de Amenazas de Red Integrada
+
+{product-name} detecta automáticamente ciertos ataques de red, independientemente del modo de protección. En modo Descubrimiento y Monitor, se alertará sobre estas amenazas y se podrán encontrar en Notificaciones -> Eventos de Seguridad. En modo Proteger, estas también serán alertadas y bloqueadas. Se pueden crear reglas de respuesta basadas en la detección de amenazas también.
+
+Ten en cuenta que la detección de amenazas de red personalizada se puede configurar a través de la sección de reglas WAF.
+
+{product-name} incluye las siguientes detecciones de amenazas:
+
+* Ataque RCE de Apache Struts
+* Ataque de desbordamiento de cifrado
+* Detectar desbordamiento de búfer de longitud de contenido HTTP negativa
+* Detectar denegación de acceso a MySQL
+* Detectar versión 1, 2 o 3 de SSH
+* Detectar SSL TLS v1.0, v1.1 (requiere variable de entorno para habilitar)
+* Ataque de desbordamiento de búfer DNS
+* Ataque de inundación DDOS a DNS
+* Ataque de tipo nulo DNS
+* Ataque de tunelización DNS
+* Ataque de transferencia de zona DNS
+* Ataque DDOS tipo Slowloris en HTTP
+* Ataque de enmascaramiento HTTP
+* Ataque de inundación ICMP
+* Ataque de tunelización ICMP
+* Ataque Teardrop de IP
+* Ataque man-in-the-middle en Kubernetes según CVE-2020-8554
+* Ataque de ping de la muerte
+* Ataque de inyección SQL
+* Ataque de SSL Heartbleed
+* Ataque de inundación SYN
+* Ataque de ventana pequeña TCP
+* Ataque de apretón de manos dividido TCP
+* Ataque de MSS pequeño TCP

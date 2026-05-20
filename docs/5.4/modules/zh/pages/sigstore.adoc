@@ -1,0 +1,50 @@
+= Sigstore Cosign 签名验证器
+:revdate: 2025-05-08
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/03.admission/01.sigstore/01.sigstore.md
+:page-opendocs-slug:  /policy/admission/sigstore
+
+== 配置 Sigstore/Cosign 验证器以要求图像签名
+
+{product-name} 使用户能够通过集成由 Sigstore 的 cosign 工具生成的图像签名来执行签名验证逻辑。
+
+[NOTE]
+====
+NeuVector 目前仅支持扫描使用 cosign v2 生成的图像签名。使用 cosign v3 创建的签名不会触发 Sigstore 验证。
+====
+
+以下是一个准入控制配置示例，该配置要求部署的图像由适当的密钥或身份签名。
+
+首先，配置一个 root。这可以是公共或私有的 root，具体取决于用于生成签名的 Sigstore 部署。如果您已部署自己的 Sigstore 服务实例，请选择私有 root 选项。
+
+公共 root 不需要任何额外配置，只需给它一个易于引用的名称。
+
+image:1configure-public-root-of-trust.png[sigstore]
+
+私有 root 需要您私有部署的 Sigstore 服务实例的密钥和/或证书。
+
+image:2configure-private-root-of-trust.png[sigstore]
+
+接下来，对于给定的 root，配置您希望在准入控制中使用的每个验证器。有两种类型的验证器：密钥对和无密钥。当尝试验证由用户定义的私钥签名的图像时，将使用密钥对验证器。当验证由 Sigstore 的无密钥模式生成的签名时，将使用无密钥验证器。有关 Sigstore 签名方法的更多信息，请参考 https://docs.sigstore.dev/quickstart/quickstart-cosign/[Sigstore 签名概述] 文档。
+
+要配置密钥对验证器，请提供一个名称和与目标私钥对应的公钥。
+
+image:3add-keypair-verifier-for-public-root-of-trust.png[sigstore]
+
+要配置无密钥验证器，请提供在签名过程中使用的 OIDC 发行者和身份。
+
+image:4add-keyless-verifier-for-public-root-of-trust.png[sigstore]
+
+请注意，在配置 root 和验证器后，必须扫描图像以确定给定图像的签名满足哪些验证器。
+
+在资产->注册表中，可以在给定图像扫描结果的右上角查看该图像满足的已配置验证器。如果图像未由验证器签名，则不会出现在其扫描结果中。
+
+image:6new_show_verifiers.scanresults.png[sigstore]
+
+要在准入控制规则中引用特定的 root 和验证器，请将两个名称用斜杠连接，如下所示：`my-root-of-trust/my-verifier`。
+
+image:5new_admission_rule_signature.png[sigstore]
+
+要在准入控制规则中要求图像被签名，请为图像签名标准设置真/假值。
+
+image:7image_signed.png[sigstore]

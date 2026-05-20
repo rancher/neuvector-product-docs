@@ -1,0 +1,50 @@
+= Verificadores de firmas Sigstore Cosign
+:revdate: 2025-05-08
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/03.admission/01.sigstore/01.sigstore.md
+:page-opendocs-slug:  /policy/admission/sigstore
+
+== Configurando verificadores de Sigstore/Cosign para requerir la firma de imágenes
+
+{product-name} permite a un usuario realizar la lógica de verificación de firmas integrando las firmas de imagen generadas por la herramienta cosign de Sigstore.
+
+[NOTE]
+====
+NeuVector actualmente solo admite el escaneo de firmas de imagen generadas con cosign v2. Las firmas creadas con cosign v3 no activan la verificación de Sigstore.
+====
+
+El siguiente es un ejemplo de una configuración de control de admisión que requiere que la imagen de una ampliación esté firmada por una clave o identidad apropiada.
+
+Primero, configura una raíz de confianza. Esto puede ser una raíz de confianza pública o privada, dependiendo de la ampliación de Sigstore utilizada para generar las firmas. Si has desplegado tus propias instancias de los servicios de Sigstore, selecciona la opción de raíz de confianza privada.
+
+Una raíz de confianza pública no necesita ninguna configuración adicional más allá de darle un nombre fácilmente referenciado.
+
+image:1configure-public-root-of-trust.png[sigstore]
+
+Una raíz de confianza privada requiere las claves y/o certificados de tus instancias de los servicios de Sigstore desplegadas privadamente.
+
+image:2configure-private-root-of-trust.png[sigstore]
+
+A continuación, para una raíz de confianza dada, configura cada uno de los verificadores que te gustaría utilizar durante el control de admisión. Hay dos tipos de verificadores: con clave y sin clave. Un verificador con clave se utilizaría al intentar verificar una imagen firmada por una clave privada definida por el usuario. Un verificador sin clave se utilizaría al verificar una firma generada por el patrón sin clave de Sigstore. Más información sobre los métodos de firma de Sigstore se puede consultar en la documentación de https://docs.sigstore.dev/quickstart/quickstart-cosign/[Visión general de la firma de Sigstore].
+
+Para configurar un verificador con clave, proporciona un nombre y una clave pública correspondiente a una clave privada objetivo.
+
+image:3add-keypair-verifier-for-public-root-of-trust.png[sigstore]
+
+Para configurar un verificador sin clave, proporciona el emisor OIDC y la identidad utilizada durante la firma.
+
+image:4add-keyless-verifier-for-public-root-of-trust.png[sigstore]
+
+Ten en cuenta que, después de la configuración de la raíz de confianza y del verificador, se debe escanear una imagen para determinar qué verificadores satisfacen las firmas de la imagen dada.
+
+Los verificadores configurados que satisfacen una imagen se pueden ver en la sección superior derecha de los resultados del escaneo de una imagen en Activos->Registros. Si una imagen no está firmada por un verificador, no aparecerá en sus resultados de escaneo.
+
+image:6new_show_verifiers.scanresults.png[sigstore]
+
+Para hacer referencia a una raíz de confianza y a un verificador en una regla de control de admisión, une los dos nombres con una barra diagonal así: `my-root-of-trust/my-verifier`.
+
+image:5new_admission_rule_signature.png[sigstore]
+
+Para requerir que una imagen esté firmada en una regla de control de admisión, establece el valor Verdadero/Falso para el criterio Imagen Firmada.
+
+image:7image_signed.png[sigstore]

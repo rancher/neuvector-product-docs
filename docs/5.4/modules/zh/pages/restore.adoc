@@ -1,0 +1,97 @@
+= 恢复{product-name}配置
+:revdate: 2024-12-08
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/11.restore/11.restore.md
+:page-opendocs-slug: /deploying/restore
+
+== 恢复{product-name}配置
+
+您可以通过应用配置备份文件来恢复之前的{product-name}配置。您可以手动生成备份，或通过导航到*设置 > 配置*从{product-name}控制台导出一个备份，并选择以下选项之一：
+
+* *所有配置*：包括注册表配置、集成、系统设置和策略。
+* *仅策略*：包括规则和安全策略。
+
+您还可以通过使用 REST API 来自动化备份。例如，请参见 xref:automation.adoc#export-import-configuration-file[导出和导入配置文件]。
+
+如果所有控制器停止运行并且实时配置状态丢失，{product-name} 可以在 xref:production.adoc#_backups_and_persistent_data[持久存储] 正确配置时自动恢复配置。
+
+[WARNING]
+====
+从 *{product-name} v5.4.7* 开始，敏感配置数据通过使用名为 `neuvector-store-secret` 的 Kubernetes Secret 在 `neuvector` 名称空间中加密。
+
+版本 *5.3.0 到 5.4.6* 使用固定的硬编码加密密钥。在升级或恢复期间，{product-name} 会自动检测使用旧密钥加密的数据，并使用从 `neuvector-store-secret` 派生的新密钥重新加密。
+
+在恢复配置数据之前，请始终升级到 *v5.4.7 或更高版本*。
+
+有关详细信息，请参见安全公告： https://github.com/neuvector/neuvector/security/advisories/GHSA-h773-7gf7-9m2x
+====
+
+[NOTE]
+====
+{product-name} 不支持部分恢复（例如，仅恢复网络规则）或时间点恢复。使用自动化脚本定期备份配置文件并管理带时间戳的备份。
+
+有关更多信息，请参见 xref:automation.adoc#export-import-configuration-file[导出和导入配置文件]。
+====
+
+[WARNING]
+====
+请勿修改备份配置文件。导出后编辑备份文件可能导致恢复失败或导致系统状态不可预测。
+====
+
+[CAUTION]
+====
+仅使用备份配置文件来恢复{product-name}，并且只能在导出它们的同一集群上进行。将备份恢复到不同的集群可能会导致不可预测的行为。
+====
+
+== 加密密钥管理
+
+`neuvector-store-secret`包含*密钥加密密钥（KEK）*。{product-name}使用KEK生成*数据加密密钥（DEKs）*，以加密敏感的配置数据。
+
+密钥行为：
+
+* 您必须维护并备份`neuvector-store-secret`。
+* 如果 Secret 丢失或密钥值不符合长度要求，{product-name} 会自动创建或更新它。
+* 当{product-name}创建或更新 Secret 时，它会生成一个提醒您备份的警报。
+* 如果KEK更改或丢失，之前加密的数据将无法解密。
+
+在滚动升级或恢复期间：
+
+. 使用从KEK派生的DEK重新加密使用传统硬编码密钥加密的数据。
+. 使用从KEK派生的DEK加密的数据只能由{product-name}使用相同的KEK解密。
+
+image:rolling-upgrade-event.png[滚动升级重新加密事件]
+
+当重新加密发生时，{product-name}记录该操作并生成事件。
+
+== 通过加密保护的敏感数据
+
+{product-name}加密存储在以下键值路径下的敏感数据：
+
+* `object/config/server/ldap1`
+* `object/config/server/oidc1`
+* `object/config/server/saml1`
+* `object/config/system`
+* `object/config/registry`
+* `object/config/federation/membership`
+* `object/config/federation/clusters/...`
+* `object/cert/...`
+
+image:neuvector-store-secret.png[NeuVector存储Secret]
+
+[NOTE]
+====
+始终将`neuvector-store-secret`与{product-name}配置数据一起备份。
+
+在数据丢失后或恢复到新集群时，您必须恢复{product-name}*相同的Secret*。没有相应Secret的配置备份无法解密。
+====
+
+== 推荐的高可用性设置
+
+手动备份和恢复应视为最后的恢复选项。为了实现高可用性，请遵循以下建议：
+
+. 通过使用 Helm 和 ConfigMap 进行初始配置来部署 {product-name}。
+. 使用 CRD 定义网络规则、进程控制文件、准入控制和其他策略。
+. 运行多个控制器（至少三个）以在 Pod 之间同步配置，并将它们调度到不同的主机上。
+. 配置持久存储，以便在所有控制器停止运行的集群范围故障中进行恢复。
+. 定期备份配置到带时间戳的备份文件。
+. 仅在最后手段时从备份文件恢复 {product-name} 配置，并重新应用备份创建后更改的任何 CRD。

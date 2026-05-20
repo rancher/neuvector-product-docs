@@ -1,0 +1,41 @@
+= Resultado da Verificação de Segurança de Ativos
+:page-opendocs-origin: /15.ui_extension/02.runtime_security/02.runtime_security.md
+:page-opendocs-slug:  /ui_extension/runtime_security
+
+Como o Rancher Manager possui sua própria aba de **Nodes** e **Workloads** para gerenciar e monitorar o status dos ativos, o NeuVector injeta componentes para exibir o resultado da verificação de runtime.
+
+== Nós
+
+Na visualização em tabela da aba **Nodes**, a coluna **Vulnerabilities** é injetada para mostrar a quantidade de vulnerabilidades detectadas em cada nó, classificadas por severidade alta / média.
+
+image:nodes.png[Nodes]
+
+Clicar na célula **Vulnerabilities** abrirá uma nova página de exibição para mostrar os detalhes do resultado da verificação. A versão do banco de dados do scanner é exibida, assim como uma lista de vulnerabilidades filtrável.
+
+image:nodes_vul.png[Nodes]
+
+Clicar na célula **Name** na tabela **Nodes** redireciona para a página de detalhes do nó. O NeuVector injeta uma aba **Vulnerabilities** para exibir uma tabela com as vulnerabilidades listadas.
+
+image:node_detail_vul.png[Nodes]
+
+Clicar no link CVE na célula **Name** na tabela **Vulnerabilities** abre um pop-up para mostrar as descrições do CVE com um link externo no cabeçalho para o site de informações sobre CVE da SUSE.
+
+image:node_detail_vul_cve.png[Nodes]
+
+image:suse_cve.png[SUSE]
+
+Um botão para download de arquivo CSV é fornecido acima da tabela **Vulnerabilities**. Os dados do arquivo incluem todos os campos que estão na tabela.
+
+image:download_vul.png[CSV]
+
+image:cve_csv.png[CSV]
+
+== Cargas de trabalho
+
+Temporariamente, a coluna **Vulnerabilities** não será injetada na tabela **Workloads** na versão v5.4 devido a uma potencial preocupação de desempenho. A equipe do NeuVector trabalhará com a equipe do Rancher para integrá-la em breve.
+
+Clicar em um **Name** na tabela **Pods** redireciona para a página de detalhes do pod. O NeuVector injeta uma aba **Vulnerabilities** para exibir uma tabela com as vulnerabilidades listadas.
+
+image:pods.png[Pods]
+
+image:pod_detail_vul.png[Pod_Detail]

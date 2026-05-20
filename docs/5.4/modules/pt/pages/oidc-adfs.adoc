@@ -1,0 +1,72 @@
+= OpenID Connect (OIDC) para ADFS
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/08.oidc_adfs/08.oidc_adfs.md
+:page-opendocs-slug:  /integration/oidc_adfs
+
+== Integração com OpenID Connect (OIDC) para ADFS
+
+No Gerenciamento do AD FS, clique em "Grupos de Aplicativos" e depois clique em "Adicionar Grupo de Aplicativo..."
+
+image:adfs1.png[adfs]
+
+Digite um nome, selecione "Aplicativo de servidor acessando uma API da web" e depois clique em Avançar
+
+image:adfs2.png[adfs]
+
+Digite a URI de Redirecionamento da {product-name} página de Configurações > Configuração do OpenID Connect e depois clique em Avançar
+
+image:adfs3.png[adfs]
+
+Ative a caixa de seleção "Gerar um segredo compartilhado" e depois clique em Avançar
+
+image:adfs4.png[adfs]
+
+Digite o Identificador criado na etapa anterior e depois clique em Avançar
+
+image:adfs5.png[adfs]
+
+image:adfs6.png[adfs]
+
+Ative os escopos allatclaims, email, openid e arquivo de controle e depois clique em Avançar
+
+image:adfs7.png[adfs]
+
+image:adfs8.png[adfs]
+
+image:adfs9.png[adfs]
+
+Clique duas vezes em um grupo de aplicativos que você acabou de criar anteriormente
+
+image:adfs10.png[adfs]
+
+Clique duas vezes em API da Web e depois clique na aba Regras de Transformação de Emissão
+
+image:adfs11.png[adfs]
+
+Clique em Adicionar Regra... e selecione "Enviar Atributos LDAP como Claims" e depois clique em Avançar
+
+image:adfs12.png[adfs]
+
+Digite um nome para a regra de Claim, escolha Active Directory como o Armazenamento de Atributos e forneça o mapeamento de atributos LDAP para tipos de claims de saída conforme abaixo
+
+* Grupos de token -- Nomes não qualificados -> grupos
+* Nome-Principal-do-Usuário -> nome_de_usuário_preferido
+* Endereço-de-E-Mail -> email
+
+image:adfs13.png[adfs]
+
+image:adfs14.png[adfs]
+
+=== {product-name} Configuração
+
+* Emissor do Provedor de Identidade: "https://<adfs-fqdn>/adfs"
+* ID do cliente: É um "Identificador de Cliente" exibido na caixa de diálogo "Aplicativo do Servidor" no "Assistente para Adicionar Grupo de Aplicativos"
+* Segredo do Cliente: É um segredo exibido na caixa de diálogo "Configurar Credenciais do Aplicativo" no "Assistente para Adicionar Grupo de Aplicativos"
+* Reivindicação de Grupo: grupos
+
+image:adfs15.png[adfs]
+
+image:adfs16.png[adfs]
+
+image:adfs17.png[adfs]

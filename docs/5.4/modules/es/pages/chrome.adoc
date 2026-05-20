@@ -1,0 +1,75 @@
+= Carga del certificado de Chrome - MacOS
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /03.configuration/01.console/02.chrome/02.chrome.md
+:page-opendocs-slug: /configuration/console/chrome
+
+== Habilitando los navegadores Chrome para aceptar el certificado autofirmado {product-name} en MacOS
+
+Bajo ciertas circunstancias, el navegador Chrome se negará rotundamente a aceptar un {product-name} certificado autofirmado.  Una posible razón podría ser que el certificado aún no ha sido importado en el almacén de certificados de inicio de sesión de macOS.  Otra posibilidad es que un certificado existente aún no ha sido configurado para ser de confianza.  Esto impedirá que el usuario lo acepte y proceda a la página de inicio de sesión {product-name} utilizando Chrome, como se ilustra en el ejemplo que se muestra a continuación:
+
+image:chrome1.png[chrome]
+
+Se pueden tomar medidas correctivas para habilitar Chrome para aceptar el certificado autofirmado colocado en el almacén de llaveros de macOS.  Esto se puede hacer configurando el certificado de {product-name} para que sea de confianza utilizando la aplicación Acceso a Llaveros de Mac.  Esto es con la suposición de que el certificado efectivamente existe en el almacén de Acceso a Llaveros de macOS.  Primero veremos cómo exportar un certificado de un nodo {product-name} existente de un sistema, y luego se puede importar en otro sistema.   Hay 2 maneras de exportar el certificado que revisaremos a continuación.  Son, utilizando el navegador Chrome y utilizando la aplicación Acceso a Llaveros de macOS.
+
+=== Exportación de certificado utilizando Chrome
+
+La captura de pantalla a continuación ilustra cómo acceder al {product-name} certificado utilizando Chrome.
+
+image:chrome2.png[chrome]
+
+Para exportar el certificado, arrastre y suelte el certificado en una ubicación de su elección.
+
+image:chrome3.png[chrome]
+
+=== Exportación de certificado utilizando Acceso a Llaveros de macOS
+
+Inicia la aplicación Acceso a Llaveros de macOS presionando simultáneamente las teclas ⌘ + F en un teclado de Mac, busca Acceso a Llaveros y haz doble clic en la aplicación.
+Esto lanza la aplicación Acceso a Llaveros.  Selecciona el certificado {product-name} y elige Exportar "`{product-name}`" del menú desplegable.  Esto permitirá la exportación del certificado a una ubicación de su elección.
+
+image:chrome4.png[chrome]
+
+=== Lanzando la aplicación Acceso a Llaveros de macOS
+
+Hay dos maneras de lanzar la aplicación Acceso a Llaveros de macOS.  Esto se puede hacer buscando desde el macOS, que ha sido descrito en los pasos inmediatamente anteriores, o utilizando el navegador Chrome.
+
+=== Lanzando Acceso a Llaveros desde el navegador Chrome
+
+Configuración > Avanzado > Gestionar certificados
+
+image:chrome5.png[chrome]
+
+Hacer clic en Gestionar certificados como se muestra arriba lanza la aplicación Acceso a Llaveros del Mac como se muestra a continuación.
+
+image:chrome6.png[chrome]
+
+=== Importación de certificados en el almacén Acceso a Llaveros de macOS
+
+Lanza la aplicación Acceso a Llaveros de macOS introduciendo simultáneamente las teclas ⌘ + F utilizando un teclado Mac, busca Acceso a Llaveros y haz clic en la aplicación.  Luego importa el certificado arrastrando y soltando un certificado {product-name} (ejemplo: nvcertificate.cer) en el panel derecho de Certificado de la aplicación Acceso a Llaveros.  Ahora que el certificado ha sido importado, aún no es de confianza.
+Lo siguiente es un ejemplo que muestra la configuración de confianza predeterminada después de que se ha importado el certificado de un {product-name} en la aplicación Acceso a Llaveros.
+
+image:chrome7.png[chrome]
+
+Observa que ninguno de los parámetros ha sido configurado, y no es de confianza por defecto.  Necesita ser configurado para ser de confianza para permitir al usuario acceder a la página de inicio de sesión utilizando el navegador Chrome.
+
+=== Habilitando la confianza para el {product-name} certificado
+
+Los siguientes pasos detallan cómo habilitar la confianza para el {product-name} certificado en el almacén Acceso a Llaveros.
+
+image:chrome8.png[chrome]
+
+Hacer doble clic en el {product-name} certificado de la captura de pantalla anterior abrirá otro cuadro de diálogo emergente que permite configurar los permisos de confianza para diferentes parámetros.  Configura la Capa de sockets seguros (SSL) a "`Always Trust`".
+
+image:chrome9.png[chrome]
+
+Cierra el cuadro de diálogo y haz clic en '\`actualizar configuración`" después de introducir la contraseña del usuario de inicio de sesión de Mac en el siguiente cuadro de diálogo emergente.
+
+image:chrome10.png[chrome]
+
+Esto finaliza las configuraciones de confianza.  A continuación, borra toda la caché del navegador Chrome, cierra todos los navegadores Chrome y vuelve a abrir el navegador Chrome.  A continuación, visita la {product-name} página de inicio de sesión, y al hacer clic en el enlace "`Advanced`", se mostrará el enlace Proceder a ... (no seguro).  Hacer clic en Proceder a ... (no seguro) permitirá al usuario continuar a la página de inicio de sesión de nombre de usuario y contraseña.
+
+image:chrome11.png[chrome]
+
+A continuación se muestra una captura de pantalla que permite al usuario proceder a la {product-name} página de inicio de sesión después de hacer clic en el enlace ... Proceder a (no seguro).
+
+image:chrome12.png[chrome]

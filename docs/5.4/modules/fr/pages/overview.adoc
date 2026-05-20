@@ -1,0 +1,89 @@
+= Présentation de la version 5.x
+:revdate: 2025-01-10
+:page-revdate: {revdate}
+:page-opendocs-origin: /01.basics/01.overview/01.overview.adoc
+:page-opendocs-slug: /basics/overview
+
+== La plate-forme de sécurité des conteneurs tout au long de leur cycle de vie
+
+[NOTE]
+====
+Ces documents décrivent la version 5.x (Open Source). Les images 5.x sont accessibles depuis Docker Hub avec le tag approprié, par exemple `neuvector/controller:(version)`.
+====
+
+{product-name} fournit une puissante plate-forme de sécurité des conteneurs de bout en bout. Cela inclut une analyse des vulnérabilités de bout en bout et une protection complète en temps réel pour les conteneurs, les pods et les hôtes, y compris{nbsp}:
+
+. Gestion des vulnérabilités CI/CD et contrôle d'admission. Analysez les images avec un plug-in Jenkins, scannez les registres et appliquez des règles de contrôle d'admission pour les déploiements en production.
+. Protection contre les violations. Découvre les comportements et crée une politique basée sur une liste blanche pour détecter les violations du comportement normal.
+. Détection des menaces. Détecte les attaques d'application courantes telles que les attaques DDoS et DNS sur les conteneurs.
+. Capteurs DLP et WAF. Inspecte le trafic réseau pour la prévention de la perte de données sensibles et détecte les attaques courantes du Top10 OWASP WAF.
+. Analyse des vulnérabilités en temps réel. Scanne les registres, les images et les plateformes d'orchestration de conteneurs en cours d'exécution ainsi que les hôtes pour des vulnérabilités communes (CVE) ainsi que des vulnérabilités spécifiques aux applications.
+. Conformité et audit. Exécute automatiquement les tests Docker Bench et les benchmarks CIS Kubernetes.
+. Sécurité des points de terminaison/hôtes. Détecte les élévations de privilèges, surveille les processus et l'activité des fichiers sur les hôtes et dans les conteneurs, et surveille les systèmes de fichiers des conteneurs pour détecter une activité suspecte.
+. Gestion multi-cluster. Surveillez et gérez plusieurs clusters Kubernetes depuis une seule console.
+
+D'autres fonctionnalités de {product-name} incluent la possibilité de mettre les conteneurs en quarantaine et d'exporter des journaux via SYSLOG et des webhooks, d'initier la capture de paquets pour enquête, et d'intégrer avec les RBAC OpenShift, LDAP, Microsoft AD, et SSO avec SAML. Remarque : La quarantaine signifie que tout le trafic réseau est bloqué.  Le conteneur restera et continuera à fonctionner - juste sans aucune connexion réseau.  Kubernetes ne démarrera pas un conteneur pour remplacer un conteneur en quarantaine, car le serveur API peut toujours atteindre le conteneur.
+
+== Conteneurs de sécurité
+
+La solution de sécurité des conteneurs à l'exécution {product-name} contient quatre types de conteneurs de sécurité{nbsp}: *Contrôleurs*, *Enforcers*, *Managers*, et *Scanners*. Un conteneur spécial appelé *All-in-One* est également fourni pour combiner les fonctions de Contrôleur, d'Enforcer et de Manager dans un seul conteneur, principalement pour les déploiements natifs Docker.
+
+{product-name} peut être déployé sur des machines virtuelles ou sur du matériel sans système d'exploitation.
+
+image:1Overview.png[Déploiement]
+
+=== Contrôleur
+
+Le Contrôleur gère {product-name} le cluster de conteneurs Enforcer. Il fournit également des API REST pour la console de gestion. Bien que les déploiements de test typiques aient un Contrôleur, plusieurs Contrôleurs dans une configuration de haute disponibilité sont recommandés. 3 contrôleurs est la valeur par défaut dans l'échantillon yaml de déploiement de production Kubernetes.
+
+=== Enforcer
+
+L'Enforcer est un conteneur léger qui applique les politiques de sécurité. Un Enforcer doit être déployé sur chaque nœud (hôte), par exemple sous forme de Daemon set.
+
+[NOTE]
+====
+Pour les déploiements Docker natifs (non Kubernetes), le conteneur Enforcer et le Controller ne peuvent pas être déployés sur le même nœud (sauf dans le cas All-in-One ci-dessous).
+====
+
+
+=== Gestionnaire
+
+Le Manager est un conteneur sans état qui fournit une console web-UI (HTTPS uniquement) pour que les utilisateurs gèrent {product-name} la solution de sécurité. Plus d'un conteneur Manager peut être déployé si nécessaire.
+
+=== Tout-en-un
+
+Le conteneur All-in-One inclut un Controller, un Enforcer et un Manager dans un seul paquet. Il est utile pour une installation facile dans des déploiements à nœud unique ou à petite échelle.
+
+=== Scanner
+
+Le Scanner est un conteneur qui effectue l'analyse des vulnérabilités et de la conformité pour les images, les conteneurs et les nœuds. Il est généralement déployé sous forme de replicaset et peut être mis à l'échelle jusqu'à autant de scanners parallèles que souhaité afin d'augmenter les performances d'analyse. Le Controller attribue des tâches de scan à chaque scanner disponible de manière cyclique jusqu'à ce que tous les scans soient terminés. Le Scanner contient également la dernière base de données CVE et est mis à jour régulièrement par {product-name}.
+
+=== Updater
+
+Le Updater est un conteneur qui, lorsqu'il est exécuté, met à jour la base de données CVE pour {product-name}. {product-name} publie régulièrement de nouvelles images de Scanner pour inclure la dernière CVE pour l'analyse des vulnérabilités. L'Updater redéploie tous les pods de Scanner en réduisant le déploiement à zéro, puis en le remettant à l'échelle, forçant le téléchargement d'une image de Scanner mise à jour.
+
+== Architecture
+
+Voici un aperçu général de l'architecture de {product-name}. Le conteneur Scanner séparé n'est pas montré et peut également être exécuté en tant que scanner de pipeline autonome.
+
+image:architecture.png[Architecture]
+
+== Exemples de déploiement
+
+Pour des modèles de déploiement courants et des meilleures pratiques, voir la section xref:production.adoc#_best_practices_tips_qa_for_deploying_and_managing_suse_security[Onboarding/Meilleures Pratiques].
+
+=== All-in-One et Enforcers
+
+Ce déploiement est idéal pour des environnements à nœud unique ou à petite échelle, par exemple pour l'évaluation, les tests et les petits déploiements. Un conteneur All-in-One est déployé sur un nœud, qui peut également être un nœud avec des conteneurs d'application en cours d'exécution. Un Enforcer peut être déployé sur tous les autres nœuds, avec un Enforcer requis sur chaque nœud que vous souhaitez protéger avec {product-name}. Ceci est également utile pour les déploiements Docker natifs où un Controller et un Enforcer ne peuvent pas fonctionner sur le même hôte.
+
+=== Conteneurs de Contrôleur, de Manager et d'Enforcer.
+
+C'est un cas d'utilisation de déploiement plus générique qui consiste en un ou plusieurs Contrôleurs, un Manager et un ensemble d'Enforcers. Le Contrôleur et le Manager peuvent être déployés sur le même nœud ou sur des nœuds différents de l'Enforcer.
+
+=== All-in-One uniquement.
+
+Vous pouvez déployer uniquement le conteneur All-in-One pour le scan de registre, en utilisant le plug-in Jenkins, ou pour des tests simples sur un nœud de {product-name}.
+
+=== Controller uniquement.
+
+Il est possible de déployer un seul conteneur Controller et/ou un Scanner pour gérer l'analyse des vulnérabilités en dehors d'un cluster, par exemple pour une utilisation avec le plug-in Jenkins. Le scan de registre peut également être effectué par le Controller en utilisant exclusivement l'API REST, mais généralement, un conteneur Manager est également souhaité pour fournir une configuration via console et une visualisation des résultats pour le scan de registre.

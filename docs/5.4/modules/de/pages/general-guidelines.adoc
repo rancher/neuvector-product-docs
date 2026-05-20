@@ -1,0 +1,39 @@
+= Allgemeine Richtlinien
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /13.special/01.general/01.general.md
+:page-opendocs-slug:  /spezial/allgemein
+
+== Testen von {product-name} mit dem Allinone-Container
+
+Die Beispiele in diesem Abschnitt zeigen, wie man die Allinone- und Enforcer-Container bereitstellt. Dieses Setup ist nützlich, um {product-name} in Nicht-Kubernetes-Umgebungen zu testen. Für Kubernetes-Bereitstellungen verwenden Sie das neueste {product-name} Helm-Chart. Für weitere Informationen verweisen Sie auf xref:./production.adoc[Planung von Bereitstellungen].
+
+[IMPORTANT]
+====
+Das {product-name} Team rät dringend davon ab, dieses Setup in Produktionsumgebungen zu verwenden, und es wird nicht für den Produktionsgebrauch unterstützt.
+====
+
+== Allgemeine Richtlinien für die Bereitstellung
+
+Bereiten Sie Ihre Host-Umgebung für eine ordnungsgemäße Installation vor. Stellen Sie sicher, dass die {product-name} Container zwischen den Hosts miteinander kommunizieren können. Überprüfen und bearbeiten Sie dann die Beispieldateien für Ihre Umgebung.
+
+Im Allgemeinen ist es wichtig, Folgendes zu tun:
+
+. Kennzeichnen Sie die Knoten entsprechend. Wenn Sie Knotenlabels verwenden, um zu steuern, wo der Allinone- oder Controller bereitgestellt werden, kennzeichnen Sie sie vor der Bereitstellung.
+. Stellen Sie sicher, dass Volumes ordnungsgemäß zugeordnet werden können. Beispiel
++
+[,yaml]
+----
+volumes:
+        - /var/neuvector:/var/neuvector
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup:/host/cgroup:ro
+----
+
+. Öffnen Sie die erforderlichen Ports auf den Hosts. Stellen Sie sicher, dass die erforderlichen Ports ordnungsgemäß zugeordnet und auf dem Host geöffnet sind. Der Allinone benötigt 8443 (wenn die Konsole verwendet wird), 18300, 18301, 18400 und 18401. Der Enforcer benötigt 18301 und 18401.
+. Bearbeiten Sie die CLUSTER_JOIN_ADDR. Finden Sie die IP-Adresse des Knotens, den Knotennamen (wenn ein Nameserver verwendet wird) oder die Knotenvariable (wenn Orchestrierungstools verwendet werden) für den Allinone (Controller)"`node IP`", die in den Beispieldateien sowohl für Allinone als auch für Enforcer verwendet werden sollen.
+
+== Zugriff auf die Konsole
+
+Bitte sehen Sie sich den ersten Abschnitt Grundlagen -> Verbindung zum Manager an, um Optionen zum Deaktivieren von https oder zum Zugriff auf die Konsole über eine Unternehmensfirewall zu erhalten, die den Port 8443 für den Konsolenzugriff nicht zulässt.

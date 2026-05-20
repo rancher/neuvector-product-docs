@@ -1,0 +1,80 @@
+= 检测由 Pod/组使用的高带宽（DDoS）
+:revdate: 2026-02-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/15.detectbandwidthddos/15.detectbandwidthddos.md
+:page-opendocs-slug:  /policy/detectbandwidthddos
+
+{product-name} 用户可以根据预配置的阈值设置组级带宽或会话速率违规检测。这些设置适用于学习的或用户创建的组，但不适用于保留组。
+
+创建一个一分钟的计时器，以定期检查组指标阈值是否存在违规。一旦检测到违规，将生成一个 `Group.Metric.Violation` 事件，并打印出一条消息以描述该事件。
+
+您可以为每个组配置以下指标阈值：
+
+* `Mon_metric`：启用或禁用该组的指标监控。
+
+* `Grp_sess_rate`：会话速率阈值，以每秒连接数（cps）为单位。默认值为 `0`，这将禁用检测。
+
+* `Grp_band_width`：吞吐量阈值，以每秒兆比特（Mbps）为单位。默认值为 `0`，这将禁用检测。
+
+* `Grp_cur_sess`：活动会话计数阈值。
+
+== 配置组指标阈值
+
+您可以通过使用 {product-name} CLI 或网页 UI 来配置组指标阈值。
+
+=== 通过使用 CLI 配置阈值
+
+要查看可用的组指标选项，请运行以下命令：
+
+[source,shell]
+----
+set group <group-name> setting -h
+----
+
+示例输出：
+
+[source,shell]
+----
+--monitor_metric [enable|disable]   Monitor metric status
+--cur_sess INTEGER                  Active session threshold
+--sess_rate INTEGER                 Session rate threshold (cps)
+--bandwidth INTEGER                 Throughput threshold (Mbps)
+----
+
+=== 通过使用网页 UI 配置阈值
+
+在创建或编辑组时，您可以启用或禁用组指标阈值。
+
+* 使用 *Add Group* 视图为新组配置阈值。
++
+image:bandwidth_ddos_1.png[Add Group]
++
+* 使用 *Edit Group* 视图更新现有组的阈值。
++
+image:bandwidth_ddos_2.png[Edit Group]
+
+== 示例工作流程
+
+以下示例展示了组指标阈值检测的工作原理。
+
+. 向学习的或用户创建的组添加指标阈值。
++
+image:bandwidth_ddos_3.png[Add Group]
++
+. 向该组生成流量，直到活动会话数达到配置的阈值。
++
+image:bandwidth_ddos_4.png[Add Group]
++
+. 当阈值被超越时，{product-name} 会生成一个 `Group.Metric.Violation` 事件。
++
+image:bandwidth_ddos_5.png[Add Group]
+
+
+[NOTE]
+====
+* {product-name} 评估过去60秒的平均流量，以确定是否超过了阈值。
+* 保护模式可以提供最准确的测量，因为执行器在数据路径上以内联方式运行。
+* 在多集群环境中，主集群和管理集群必须运行5.4版本或更高版本，以支持联合组指标阈值。
+* 如果管理集群运行的版本早于5.4，则联合阈值设置将被忽略，直到这些集群升级。
+* 在将管理集群升级到5.4版本或更高版本后，手动重新同步集群以启用联合组的DDoS监控。
+====

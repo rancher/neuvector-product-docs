@@ -1,0 +1,541 @@
+= Controles de Admissão
+:revdate: 2025-06-25
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.política/03.admissão/03.admissão.md
+:page-opendocs-slug:  /política/admissão
+
+== Controle de Imagem / Implantações de Contêiner
+
+Com a integração do Controle de Admissão com plataformas de orquestração como Kubernetes e OpenShift, {product-name} desempenha um papel importante dentro do pipeline de implantação da plataforma de orquestração. Sempre que um recurso de cluster, como um Deployment, for criado, a solicitação do apiserver do cluster será encaminhada para um dos {product-name} controladores, a fim de determinar se a implantação deve ser permitida ou negada com base nas regras de Controle de Admissão definidas pelo usuário, antes de criar o recurso do cluster. A decisão de política tomada por {product-name} será enviada de volta ao apiserver do cluster para aplicação.
+
+Este recurso é suportado no Kubernetes 1.9+ e no OpenShift 3.9+. Antes de usar a função de Controle de Admissão em {product-name}, embora seja possível configurar o controle de admissão a partir do argumento `--admission-control` passado ao apiserver do cluster, é recomendado usar o controle de admissão dinâmico. Por favor, veja as seções do Kubernetes e do OpenShift abaixo para configuração.
+
+=== Kubernetes
+
+Os plugins ValidatingAdmissionWebhook e MutatingAdmissionWebhook estão habilitados por padrão.
+
+Verifique se admissionregistration.kubernetes.io/v1beta1 está habilitado
+
+[,bash]
+----
+kubectl api-versions | grep admissionregistration
+admissionregistration.k8s.io/v1beta1
+----
+
+=== Openshift
+
+Os plugins ValidatingAdmissionWebhook e MutatingAdmissionWebhook NÃO estão habilitados por padrão. Por favor, veja os exemplos nas seções de implantação do OpenShift para instruções sobre como habilitar esses. É necessário reiniciar os serviços da API e dos controladores do OpenShift.
+
+Verifique se admissionregistration.kubernetes.io/v1beta1 está habilitado
+
+[,bash]
+----
+oc api-versions | grep admissionregistration
+admissionregistration.k8s.io/v1beta1
+----
+
+== Habilitando o Controle de Admissão (Webhook) em {product-name}
+
+O recurso de Controle de Admissão está desabilitado por padrão. Por favor, vá para a página de Controle de Admissão da Política -> para habilitá-lo no console {product-name}.
+
+image:ac_enable.png[Ativar]
+
+Uma vez que o recurso de Controle de Admissão esteja habilitado com sucesso, o seguinte recurso ValidatingWebhookConfiguration será criado automaticamente. Para verificar isso:
+
+[,shell]
+----
+kubectl get ValidatingWebhookConfiguration neuvector-validating-admission-webhook
+----
+
+Saída de exemplo:
+
+[,shell]
+----
+NAME                                     CREATED AT
+neuvector-validating-admission-webhook   2019-03-28T00:05:09Z
+----
+
+A informação mais importante no recurso ValidatingWebhookConfiguration para {product-name} são os recursos do cluster. Atualmente, uma vez que um recurso de cluster, como o Deployment {product-name}, registrado é criado, a solicitação será enviada do apiserver da plataforma de orquestração para um dos {product-name} Controladores para determinar se deve ser permitido ou negado com base nas regras definidas pelo usuário na página de Controle de Admissão da Política {product-name} ->.
+
+Se a implantação do recurso for negada, um evento será registrado nas Notificações.
+
+Para testar a conexão do Kubernetes para o acesso em modo cliente, vá para Avançado.
+
+image:ac_advanced.png[Avançado]
+
+Para casos especiais, o método de acesso por URL usando o serviço NodePort pode ser necessário.
+
+== Eventos/Notificações de Controle de Admissão
+
+Todos os eventos de controle de admissão para eventos permitidos e negados podem ser encontrados no menu Notificações -> Riscos de Segurança.
+
+== Critérios de Controle de Admissão
+
+{product-name} suporta muitos critérios para criar uma Regra de Controle de Admissão. Esses incluem Contagem Alta de CVE, Nomes de CVE, rótulos de imagem, imageScanned, namespace, usuário, runAsRoot, etc. Existem duas fontes possíveis de avaliação de critérios, varreduras de imagem e varreduras de arquivos yaml de implantação. Se um critério requer uma varredura de imagem, os resultados da varredura de registro serão utilizados. Se a imagem não foi escaneada, a regra de controle de admissão não será aplicada. Se um critério requer a varredura do yaml de implantação, ele será avaliado a partir da implantação do Kubernetes. Alguns critérios usarão os resultados de uma varredura de imagem OU uma varredura do yaml de implantação.
+
+* A pontuação CVE é um exemplo de um critério que requer uma varredura de imagem.
+* Variáveis de ambiente com segredos são um exemplo de um critério usando a varredura do yaml de implantação.
+* Rótulos e variáveis de ambiente são exemplos de critérios que usarão os resultados de ambas as varreduras de imagem e do yaml de implantação (ou lógico) para determinar correspondências.
+
+image:adm_control_criteria.png[Critérios]
+
+Após o critério ser selecionado, os possíveis operadores serão exibidos. Clique no botão '`+`' para adicionar cada critério.
+
+*Usando Múltiplos Critérios em uma Única Regra* A lógica de correspondência para múltiplos critérios em uma única regra de controle de admissão é:
+
+* Para diferentes tipos de critérios dentro de uma única regra, aplique 'e'
+* Para múltiplos critérios do mesmo tipo (por exemplo, múltiplos namespaces, registros, imagens),
+** Aplique 'e' para todas as correspondências negativas ("não contém nenhum", "não é um dos") até a primeira correspondência positiva;
+** Após a primeira correspondência positiva, aplique 'ou'
+
+=== Exemplo com Correspondência de um Rótulo de Pod
+
+[,yaml]
+----
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iperfserver
+  namespace: neuvector-1
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: iperfserver
+----
+
+A regra para correspondência seria:
+
+image:ac_label.png[Admissão]
+
+=== Exemplo com Correspondência de Variáveis de Ambiente com Segredos
+
+[,yaml]
+----
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iperfserver
+  namespace: neuvector-1
+  labels:
+    name: iperfserver
+spec:
+  selector:
+    matchLabels:
+      name: iperfserver
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: iperfserver
+    spec:
+      containers:
+        - name: iperfserver
+          image: nvlab/iperf
+          env:
+            - name: env1
+              value: AIDAJQABLZS4A3QDU576
+            - name: env2
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: env5
+              value: AIDAJQABLZS4A3QDU57E
+          command:
+            - iperf
+            - -s
+            - -p
+            - "6068"
+      nodeSelector:
+        nvallinone: "true"
+      restartPolicy: Always
+----
+
+A regra de correspondência seria:
+
+image:ac_environment.png[Admissão]
+
+=== Critérios Relacionados aos Resultados da Varredura
+
+Os seguintes critérios estão relacionados aos resultados na página {product-name} Ativos > varredura de registro:
+
+Imagem, imageScanned, cveHighCount, cveMediumCount, violações de conformidade da imagem, cveNames e outros.
+
+Antes que {product-name} realize a correspondência contra as regras de Controle de Admissão, {product-name} recupera as informações da imagem (por exemplo, 10.1.127.3:5000/neuvector/toolbox/iperf:latest) do apiserver do cluster (Por favor, consulte a seção Solicitação do apiserver abaixo). A imagem é composta pelo servidor de registro (`https://10.1.127.3:5000`), repositório (neuvector/toolbox/iperf) e tag (latest).
+
+{product-name} usa essas informações para corresponder os resultados na página de varredura de registro de {product-name} Ativos -> e coleta as informações correspondentes, como nome do cve, contagem alta ou média do cve, etc. Violações de conformidade de imagem são consideradas qualquer imagem que tenha segredos ou violações de setuid/setgid.
+Se os usuários estiverem usando a imagem do registro docker para criar um recurso de cluster, normalmente as informações do servidor de registro estão vazias ou são docker.io e atualmente {product-name} está usando os seguintes servidores de registro codificados para corresponder ao resultado da varredura do registro em vez da string vazia ou docker.io. Claro, se houver mais servidores de registro docker suportados além dos seguintes definidos na página de varredura do registro, {product-name} não conseguirá obter os resultados da varredura do registro com sucesso.
+
+Se os usuários estiverem usando a imagem incorporada, como alpine ou ubuntu, do registro docker, há um nome de organização oculto chamado library. Quando você consultar os resultados para uma imagem incorporada do docker na página de varredura de registro em {product-name} Ativos, o nome do repositório será library/alpine ou library/ubuntu. Atualmente, {product-name} assume que há apenas um nome de organização de biblioteca oculta no registro docker. Se houver mais de um, {product-name} também não conseguirá obter os resultados da varredura do registro com sucesso.
+A limitação acima também pode se aplicar a outros tipos de servidores de registro docker, se houver.
+
+=== Criando Regras de Critérios Personalizados
+
+Os usuários podem criar um critério personalizado a ser usado para permitir ou bloquear implantações com base em objetos comuns encontrados no yaml da imagem (verificados durante a implantação). Selecione o objeto a ser usado, por exemplo, imagePullSecrets e o valor correspondente, por exemplo, existe. Também é recomendado usar critérios adicionais para direcionar ainda mais a regra, como namespace, PSP/PSA, condições de CVE, etc.
+
+image:custom_admission.png[Admissão]
+
+==== Explicações dos Critérios
+
+Critérios com um ícone de disco exigem que a imagem seja verificada (veja a varredura do registro), e critérios com um ícone de arquivo verificarão o yaml da implantação. Se ambos os ícones estiverem listados, a correspondência será para qualquer um (OU). Se um critério exigir uma verificação de imagem, mas a imagem NÃO for verificada, essa parte da regra será ignorada (ou seja, a regra é contornada, ou se o yaml da implantação também estiver listado, então apenas o yaml da implantação será usado para a correspondência). Para evitar que imagens não verificadas contornem as regras, consulte o critério 'Imagem Escaneada' abaixo. 
+
+* Adicionar critério personalizado. Selecione o objeto no menu suspenso. Todos os critérios personalizados suportam operadores de existe e não existe. Para aqueles que permitem valores, operadores adicionais e o valor podem ser inseridos. Os valores podem ser estáticos, separados por vírgulas, e incluir curingas. 
+* Permitir Escalação de Privilégios. Se o contêiner permitir escalonamentos de privilégios, isso pode ser bloqueado definindo Negar como a ação. 
+* Contagem de CVEs de Alta Severidade. Isso leva os resultados de uma varredura de imagem (registro) e combina com o número de alta severidade (pontuações CVSS de 7 ou mais). Um operador adicional pode ser adicionado para restringir a CVEs relatados um certo número de dias antes, dando tempo para remediação para CVEs recentes. 
+* Contagem de CVEs de Alta Severidade com correção. Isso leva os resultados de uma varredura de imagem (registro) e corresponde a alta severidade (pontuações CVSS de 7 ou mais), E se houver uma correção disponível para o CVE. Selecione esta opção se você planeja bloquear implantações de CVEs altos caso uma correção devesse ter sido aplicada. Um operador adicional pode ser adicionado para restringir a CVEs relatados um certo número de dias antes, dando tempo para remediação para CVEs recentes. 
+* Contagem de CVEs de Média Severidade. Esse processo utiliza os resultados da varredura de imagem (registro) e verifica o número de ocorrências com severidade média (pontuações CVSS entre 4 e 6). Um operador adicional pode ser adicionado para restringir a CVEs relatados um certo número de dias antes, dando tempo para remediação para CVEs recentes. 
+* Nomes de CVE. Isso combina com nomes de CVE específicos (por exemplo, CVE-2023-23914, 2023-23914, 23914, ou texto único) onde múltiplos são separados por vírgulas. 
+* Pontuação de CVE. Configure tanto a pontuação mínima quanto o número de CVEs que correspondem ou excedem a pontuação mínima de CVSS. 
+* Variáveis de ambiente com segredos. Se o yaml de implantação ou o resultado da varredura de imagem contiver (ou não contiver) quaisquer variáveis de ambiente com segredos. Veja os critérios para correspondência de segredos abaixo. 
+* Variáveis de ambiente. Use isso para exigir ou excluir certas variáveis de ambiente no yaml de implantação ou na varredura de imagem. 
+* Imagem. Correspondência em nomes de imagem específicos, tipicamente combinados com outros critérios para a regra. 
+* Violações de conformidade de imagem. Corresponde se a verificação da imagem (registro) resultar em quaisquer violações de conformidade. Veja xref:compliance.adoc#_managing_compliance_and_cis_benchmarks[conformidade] para detalhes sobre as verificações de conformidade. 
+* Imagem sem informações do SO. Corresponde se a verificação da imagem (registro) resultar na incapacidade de recuperar informações do SO. 
+* Registro de imagens. Corresponde a nomes específicos de registro de imagens. Tipicamente usado para restringir implantações de certos registros ou exigir implantações apenas de certos registros aprovados. Frequentemente usado com outros critérios, como namespaces. 
+* Imagem verificada. Exigir que uma imagem seja verificada. Frequentemente usado para garantir que todas as imagens sejam verificadas para garantir que critérios baseados em verificação, como altas CVEs, possam ser aplicados às implantações. 
+* Imagem assinada. Exigir que uma imagem seja assinada através da integração do Sigstore/Cosign. Este critério simplesmente verifica se há algum verificador no resultado da verificação.
+* Verificadores de Imagem Sigstore. Exige que uma imagem seja assinada por um nome específico de raiz de confiança do Sigstore, conforme configurado em Ativos -> Verificadores de Sigstore. Verifica se os verificadores no resultado da varredura correspondem aos verificadores na configuração da regra.
+* Rótulos. Exige que um ou mais rótulos estejam presentes no yaml de implantação ou nos resultados da varredura da imagem. 
+* Módulos. Exige ou exclui que certos módulos (pacotes, bibliotecas) estejam presentes na imagem como resultado da varredura da imagem (registro). 
+* Montar volumes. Normalmente usado para impedir que certos volumes sejam montados. 
+* Namespace. Permite ou restringe implantações em determinados namespaces. Usado de forma independente, mas frequentemente combinado com outros critérios para limitar a correspondência da regra ao namespace. 
+* Melhor Prática de PSP. Regras equivalentes para PSP (nota: O PSP foi completamente removido do kubernetes 1.25+, no entanto, este {product-name} equivalente ainda pode ser usado em 1.25+). Inclui Executar como privilegiado, Executar como root, Compartilhar namespaces PID do host, Compartilhar namespaces IPC do host, Compartilhar rede do host, Permitir Elevação de Privilégios. 
+* Configuração de Limite de Recursos (RLC). Exige que limites de recursos sejam configurados para Limite/Solicitação de CPU, Limite/Solicitação de Memória, e pode exigir que o operador seja > ou \<= a um valor de recurso configurado. 
+* Executar como privilegiado. Normalmente usado para limitar ou bloquear implantações de contêineres privilegiados. 
+* Executar como root. Normalmente usado para limitar ou bloquear implantações de contêineres executados como root. 
+* Função de Alto Risco Vinculada à Conta de Serviço. Pode corresponder a múltiplos critérios que podem representar uma função de conta de serviço de alto risco, incluindo listar segredos, realizar operações em cargas de trabalho, modificação de recursos RBAC, criação de recursos de carga de trabalho e permitir execuções em um contêiner. 
+* Compartilhar namespaces IPC do host. Corresponde a namespaces IPC. 
+* Compartilhar a Rede do host. Permitir ou negar implantações para compartilhar a rede do host. 
+* {blank}
+** Compartilhar namespaces PID do host. Corresponde a namespaces PID. 
+* Usuário. Permitir ou negar https://kubernetes.io/docs/reference/access-authn-authz/rbac/#referring-to-subjects[usuários definidos vinculados pelo kubernetes] em tempo de execução, visível no campo userInfo. Nota: A função de auditoria yaml (upload) não poderá verificar isso porque está vinculada em tempo de execução. 
+* Grupos de usuários. Permitir ou negar https://kubernetes.io/docs/reference/access-authn-authz/rbac/#referring-to-subjects[grupos de usuários definidos vinculados pelo kubernetes] em tempo de execução, visível no campo userInfo.  Nota: A função de auditoria yaml (upload) não poderá verificar isso porque está vinculada em tempo de execução. 
+* Viola a política PSA. Corresponde se a implantação viola uma PSA Restrita ou Baseline https://kubernetes.io/docs/concepts/security/pod-security-standards/[Padrão de Segurança de Pod] (equivalente às definições de PSA no kubernetes 1.25+) 
+
+=== Detecção de segredos
+
+Detecção de segredos, por exemplo, em variáveis de ambiente é correspondida usando a seguinte regex:
+
+[,shell]
+----
+Rule{Description: "Password.in.YML", 
+Expression: `(?i)(password|passwd|api_token)\S{0,32}\s*:\s*(?-i)([0-9a-zA-Z\/+]{16,40}\b)`, ExprFName: `.*\.ya?ml`, Tags: []string{share.SecretProgram, "yaml", "yml"}, 
+Suggestion: msgReferVender}, 
+----
+
+Na página **Relatórios de Risco**, quando segredos são detectados, o formato do alerta será exibido com informações gerais de saída mostrando como "${variable}=${value}". Como exemplo na imagem abaixo, isso pode ser visto com a variável "env1=AIDAJQ...".
+
+image::https://github.com/user-attachments/assets/848533ed-70c1-494b-b7d5-6e9b60951f77[secret_detection]
+
+Uma lista de tipos de segredos detectados pode ser encontrada xref:compliance.adoc#_secrets_auditing[aqui] 
+
+== Modos de Controle de Admissão
+
+Existem dois modos que {product-name} suporta - Monitorar e Proteger.
+
+* Monitor: há uma mensagem de alerta no log de eventos se uma decisão for negada. Neste caso, o apiserver do cluster pode criar um recurso com sucesso. Nota: mesmo que a ação da regra seja Negar, no modo Monitor isso apenas alertará.
+* Proteger: este é um modo de proteção inline. Uma vez que uma decisão é negada, o recurso do cluster não poderá ser criado com sucesso, e um evento será registrado.
+
+== Regras de Controle de Admissão
+
+As regras podem ser regras de Permitir (lista branca) ou Negar (lista negra). As regras são avaliadas na ordem exibida, de cima para baixo. As regras de Permitir são avaliadas primeiro e são úteis para definir exceções (subconjuntos) às regras de Negar. Se uma implantação de recurso não corresponder a nenhuma regra, a ação padrão é Permitir a implantação.
+
+Existem duas regras pré-configuradas que devem ser permitidas para habilitar o contêiner do sistema Kubernetes e as implantações de {product-name}.
+
+As regras de controle de admissão se aplicam a todos os recursos que criam pods (por exemplo, implantações, daemonsets, replicasets etc.).
+
+Para regras de controle de admissão, a ordem de correspondência é:
+
+. Regras de permissão padrão (por exemplo, namespaces do sistema)
+. Regras de permissão federadas (se existirem)
+. Regras de negação federadas (se existirem)
+. Regras de permissão aplicadas pelo CRD (se existirem)
+. Regras de negação aplicadas pelo CRD (se existirem)
+. Regras de permissão definidas pelo usuário
+. Regras de negação definidas pelo usuário
+. Permita a solicitação se ela não corresponder a nenhum dos critérios das regras acima
+
+Em cada uma das etapas de correspondência (1~7), a ordem das regras não importa. Desde que a solicitação corresponda a um dos critérios de uma regra, a ação (permitir ou negar) é tomada e a solicitação é permitida ou negada.
+
+== Resultados de varredura federada nas regras de controle de admissão
+
+O cluster primário (mestre) pode escanear um registro/repositório designado como um registro federado. Os resultados da varredura desses registros serão sincronizados para todos os clusters gerenciados (remotos). Isso permite a exibição dos resultados da varredura no console do cluster gerenciado, bem como o uso dos resultados nas regras de controle de admissão do cluster gerenciado. Os registros precisam ser escaneados apenas uma vez, em vez de por cada cluster, reduzindo o uso de CPU/memória e largura de banda de rede. Veja a seção xref:multicluster.adoc[multi-cluster] para mais detalhes.
+
+== Configurando Verificadores Sigstore/Cosign para Requerer Assinatura de Imagem
+
+Por favor, veja xref:sigstore.adoc[esta seção] para configurar verificadores.
+
+== Solução de problemas
+
+Se você estiver enfrentando erros e tiver acesso ao nó mestre, pode inspecionar o log do kube-apiserver para procurar eventos de webhook de admissão. Exemplos:
+
+[,shell]
+----
+W0406 13:16:49.012234 1 admission.go:236] Failed calling webhook, failing open neuvector- validating-admission-webhook.neuvector.svc: failed calling admission webhook "neuvector-validating- admission-webhook.neuvector.svc": Post https://neuvector-svc-admission- webhook.neuvector.svc:443/v1/validate/1554514310852084622-1554514310852085078?timeout=30s: dial tcp: lookup neuvector-svc-admission-webhook.neuvector.svc on 8.8.8.8:53: no such host
+----
+
+O log acima indica que o kube-apiserver do cluster não consegue enviar a solicitação para o webhook {product-name} com sucesso porque não consegue resolver o nome neuvector-svc-admission-webhook.neuvector.svc.
+
+[,shell]
+----
+W0405 23:43:01.901346 1 admission.go:236] Failed calling webhook, failing open neuvector- validating-admission-webhook.neuvector.svc: failed calling admission webhook "neuvector-validating- admission-webhook.neuvector.svc": Post https://neuvector-svc-admission-webhook.neuvector.svc:443/v1/validate/1554500399933067744-1554500399933068005?timeout=30s: net/http: request canceled while waiting for connection (Client.Timeout exceeded while awaiting headers)
+----
+
+O log acima indica que o kube-apiserver do cluster não consegue enviar a solicitação para o webhook {product-name} com sucesso porque resolve o nome neuvector-svc-admission-webhook.neuvector.svc com o endereço IP errado. Isso também pode indicar um problema de conectividade de rede ou gateway de segurança entre o api-server e os nós do controlador.
+
+[,shell]
+----
+W0406 01:14:48.200513 1 admission.go:236] Failed calling webhook, failing open neuvector- validating-admission-webhook.xyz.svc: failed calling admission webhook "neuvector-validating- admission-webhook.xyz.svc": Post https://neuvector-svc-admission- webhook.xyz.svc:443/v1/validate/1554500399933067744-1554500399933068005?timeout=30s: x509: certificate is valid for neuvector-svc-admission-webhook.neuvector.svc, not neuvector-svc-admission- webhook.xyz.svc
+----
+
+O log acima indica que o kube-apiserver do cluster pode enviar a solicitação para o webhook {product-name} com sucesso, mas o certificado em caBundle está errado.
+
+[,shell]
+----
+W0404 23:27:15.270619 1 admission.go:236] Failed calling webhook, failing open neuvector- validating-admission-webhook.neuvector.svc: failed calling admission webhook "neuvector-validating- admission-webhook.neuvector.svc": Post https://neuvector-svc-admission- webhook.neuvector.svc:443/v1/validate/1554384671766437200-1554384671766437404?timeout=30s: service "neuvector-svc-admission-webhook" not found
+----
+
+O log acima indica que o cluster kube-apiserver não consegue enviar a solicitação para o webhook {product-name} com sucesso porque o serviço neuvector-svc-admission-webhook não foi encontrado.
+
+=== Revise as Configurações de Controle de Admissão
+
+Primeiro, verifique sua versão do Kubernetes ou OpenShift. O controle de admissão é suportado no Kubernetes 1.9+ e no OpenShift 3.9+.
+Para o OpenShift, certifique-se de ter editado o master-config.yaml para adicionar a configuração MutatingAdmissionWebhook e reiniciado os servidores API do master.
+
+==== Verifique o Clusterrole
+
+[,shell]
+----
+kubectl get clusterrole neuvector-binding-admission -o json
+----
+
+Certifique-se de que os verbos incluam:
+
+[,json]
+----
+                "get",
+                "list",
+                "watch",
+                "create",
+                "update",
+                "delete"
+----
+
+Em seguida, verifique:
+
+[,shell]
+----
+kubectl get clusterrole neuvector-binding-app -o json
+----
+
+Certifique-se de que os verbos incluam:
+
+[,json]
+----
+   "get",
+   "list",
+   "watch",
+   "update"
+----
+
+Se os verbos acima não estiverem listados, o botão de Teste falhará.
+
+==== Verifique o Clusterrolebinding
+
+[,shell]
+----
+kubectl get clusterrolebinding neuvector-binding-admission -o json
+----
+
+Certifique-se de que o ServiceAccount esteja configurado corretamente:
+
+[,json]
+----
+"subjects": [
+        {
+            "kind": "ServiceAccount",
+            "name": "default",
+            "namespace": "neuvector"
+----
+
+==== Verifique a Configuração do Webhook
+
+[,shell]
+----
+kubectl get ValidatingWebhookConfiguration --as system:serviceaccount:neuvector:default -o yaml > nv_validation.txt
+----
+
+O nv_validation.txt deve ter um conteúdo semelhante a:
+
+.Clique aqui para ver os detalhes
+[%collapsible]
+====
+[,yaml]
+----
+apiVersion: v1
+items:
+- apiVersion: admissionregistration.k8s.io/v1beta1
+  kind: ValidatingWebhookConfiguration
+  metadata:
+    creationTimestamp: "2019-09-11T00:51:08Z"
+    generation: 1
+    name: neuvector-validating-admission-webhook
+    resourceVersion: "6859045"
+    selfLink: /apis/admissionregistration.k8s.io/v1beta1/validatingwebhookconfigurations/neuvector-validating-admission-webhook
+    uid: 3e1793ed-d42e-11e9-ba43-000c290f9e12
+  webhooks:
+  - admissionReviewVersions:
+    - v1beta1
+    clientConfig:
+      caBundle: {.........................}
+      service:
+        name: neuvector-svc-admission-webhook
+        namespace: neuvector
+        path: /v1/validate/{.........................}
+    failurePolicy: Ignore
+    name: neuvector-validating-admission-webhook.neuvector.svc
+    namespaceSelector: {}
+    rules:
+    - apiGroups:
+      - '*'
+      apiVersions:
+      - v1
+      - v1beta1
+      operations:
+      - CREATE
+      resources:
+      - cronjobs
+      - daemonsets
+      - deployments
+      - jobs
+      - pods
+      - replicasets
+      - replicationcontrollers
+      - services
+      - statefulsets
+      scope: '*'
+    - apiGroups:
+      - '*'
+      apiVersions:
+      - v1
+      - v1beta1
+      operations:
+      - UPDATE
+      resources:
+      - daemonsets
+      - deployments
+      - replicationcontrollers
+      - statefulsets
+      - services
+      scope: '*'
+    - apiGroups:
+      - '*'
+      apiVersions:
+      - v1
+      - v1beta1
+      operations:
+      - DELETE
+      resources:
+      - daemonsets
+      - deployments
+      - services
+      - statefulsets
+      scope: '*'
+    sideEffects: Unknown
+    timeoutSeconds: 30
+kind: List
+metadata:
+  resourceVersion: ""
+  selfLink: ""
+----
+====
+
+Se você ver algum conteúdo como "Erro do servidor ...." ou "... é proibido", isso significa que a conta de serviço do controlador NV não tem direitos de acesso para o recurso ValidatingWebhookConfiguration. Nesse caso, geralmente significa que o clusterrole/clusterrolebinding neuvector-binding-admission tem algum problema. Excluir e recriar o clusterrole/clusterrolebinding neuvector-binding-admission geralmente é a solução mais rápida.
+
+==== Teste o Botão de Conexão do Controle de Admissão
+
+No Console {product-name} em Política -> Controle de Admissão, vá para Mais Operações -> Configuração Avançada e clique no botão "Testar". {product-name} irá modificar o serviço neuvector-svc-admission-webhook e verificar se nosso servidor webhook pode receber a notificação de alteração ou se falha.
+
+. Execute:
++
+--
+[,shell]
+----
+kubectl get svc neuvector-svc-admission-webhook -n neuvector -o yaml
+----
+
+A saída deverá ser semelhante a esta:
+
+[,yaml]
+----
+apiVersion: v1
+   kind: Service
+   metadata:
+     annotations:
+       ...................
+     creationTimestamp: "2019-09-10T22:53:03Z"
+     labels:
+       echo-neuvector-svc-admission-webhook: "1568163072"      //===> from last test. could be missing if it's a fresh NV deployment
+       tag-neuvector-svc-admission-webhook: "1568163072"       //===> from last test. could be missing if it's a fresh NV deployment
+     name: neuvector-svc-admission-webhook
+     namespace: neuvector
+     ...................
+   spec:
+     clusterIP: 10.107.143.177
+     ports:
+     - name: admission-webhook
+       port: 443
+       protocol: TCP
+       targetPort: 20443
+     selector:
+       app: neuvector-controller-pod
+     sessionAffinity: None
+     type: ClusterIP
+   status:
+     loadBalancer: {}
+----
+--
+. Agora clique no botão "Testar" da configuração avançada do controle de admissão ->. Aguarde até que mostre sucesso ou falha. {product-name} irá modificar implicitamente o rótulo tag-neuvector-svc-admission-webhook do serviço neuvector-svc-admission-webhook.
+. Aguarde a operação interna do controlador. Se o servidor de webhook {product-name} receber uma solicitação de atualização do kube-apiserver sobre essa alteração de serviço, {product-name} modificará o rótulo echo-neuvector-svc-admission-webhook do serviço neuvector-svc-admission-webhook para o mesmo valor do rótulo tag-neuvector-svc-admission-webhook.
+. Execute:
++
+--
+[,shell]
+----
+kubectl get svc neuvector-svc-admission-webhook -n neuvector -o yaml
+----
+
+A saída deverá ser semelhante a
+
+[,yaml]
+----
+   apiVersion: v1
+   kind: Service
+   metadata:
+     annotations:
+       .............
+     creationTimestamp: "2019-09-10T22:53:03Z"
+     labels:
+       echo-neuvector-svc-admission-webhook: "1568225712"      //===> changed in step 3-3 after receiving request from kube-apiserver
+       tag-neuvector-svc-admission-webhook: "1568225712"       //===> changed in step 3-2 because of UI operation
+     name: neuvector-svc-admission-webhook
+     namespace: neuvector
+     .................
+   spec:
+     clusterIP: 10.107.143.177
+     ports:
+     - name: admission-webhook
+       port: 443
+       protocol: TCP
+       targetPort: 20443
+     selector:
+       app: neuvector-controller-pod
+     sessionAffinity: None
+     type: ClusterIP
+   status:
+     loadBalancer: {}
+----
+--
+. Após o teste, se o valor do rótulo tag-neuvector-svc-admission-webhook não mudar, isso significa que o serviço do controlador não conseguiu atualizar o serviço neuvector-svc-admission-webhook. Verifique se o clusterrole/clusterrolebinding neuvector-binding-app estão configurados corretamente.
+. Após o teste, se o valor do rótulo tag-neuvector-svc-admission-webhook for alterado, mas não o valor do rótulo echo-neuvector-svc-admission-webhook, isso significa que o servidor de webhook não recebeu a solicitação do kube-apiserver. A solicitação do kub-apiserver não pode alcançar o servidor de webhook {product-name}. A causa disso pode ser problemas de conectividade de rede, gateways de segurança bloqueando a solicitação (na porta padrão 443), a resolução do IP errado para o controlador ou outros.

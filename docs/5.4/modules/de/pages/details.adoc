@@ -1,0 +1,173 @@
+= Details zu Umgebungsvariablen
+:revdate: 2024-12-03
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/01.production/03.details/03.details.md
+:page-opendocs-slug: /deploying/production/details
+
+== Umgebungsvariablen
+
+=== Sowohl für den Controller (All-in-One) als auch für den Enforcer.
+
+* CLUSTER_JOIN_ADDR
++
+____
+Setzen Sie die Variable auf die Host-IP für den ersten Controller; und setzen Sie sie auf die Host-IP des Master-Controllers für andere Controller und Enforcer. Es ist nicht notwendig, diese IP für Kubernetes-basierte Implementierungen festzulegen, verwenden Sie einfach die Beispieldatei.
+____
+
+* CLUSTER_LAN_PORT
++
+____
+(Optional) Cluster Serf LAN-Port. Sowohl TCP- als auch UDP-Ports müssen direkt auf den Host abgebildet werden. Optional, wenn es keinen Portkonflikt auf dem Host gibt. Standard `18301`
+____
+
+* DOCKER_URL
++
+____
+(Optional) Wenn die Docker-Engine auf dem Host nicht an den normalen Unix-Socket bindet, verwenden Sie diese Variable, um den TCP-Verbindungspunkt im Format `tcp://10.0.0.1:2376` anzugeben.
+____
+
+* NV_PLATFORM_INFO
++
+____
+Verwenden Sie den Wert platform=Docker für Docker Swarm/EE-Implementierungen oder platform=Kubernetes:GKE für GKE (um GKE CIS-Benchmarks auszuführen).
+____
+
+* CUSTOM_CHECK_CONTROL
++
+____
+(Optional) Wird verwendet, um die Möglichkeit zu aktivieren/deaktivieren, benutzerdefinierte Compliance-Skripte in Containern/Hosts zu erstellen. Die Werte sind "disable" (Standard, nicht erlaubt), "strict" (nur Admin-Rolle) oder "loose" (Admin-, Compliance- und Laufzeit-Richtlinien-Rollen).
+____
+
+* AUTO_PROFILE_COLLECT
++
+____
+Setzen Sie den Wert auf 1, um die Sammlung von Speicherprofildaten zu aktivieren, um Speicherprobleme zu untersuchen.
+____
+
+=== Controller
+
+* CTRL_PERSIST_CONFIG
++
+____
+(Optional) Um Konfigurationsdateien zu sichern und sie von einem persistenten Volume wiederherzustellen. Fügen Sie dies zur YAML hinzu, um zu aktivieren; entfernen Sie es, um zu deaktivieren.
+____
+
+* CLUSTER_RPC_PORT
++
+____
+(Optional) Cluster-Server RPC-Port. Muss direkt auf den Host abgebildet werden. Die Umgebungsvariable ist optional, wenn es keinen Portkonflikt auf dem Host gibt. Standard `18300`
+____
+
+* CTRL_SERVER_PORT
++
+____
+(Optional) HTTPS-Port, auf dem der REST-Server hören soll. Der Standardwert ist `10443`. Normalerweise kann es als Standard belassen werden, und die Docker-Portoption kann verwendet werden, um den Port auf dem Host abzubilden.
+____
+
+* DISABLE_PACKET_CAPTURE
++
+____
+(Optional) Fügen Sie dies zur YAML hinzu, um die Paketaufzeichnung zu deaktivieren; entfernen Sie es, um sie wieder zu aktivieren (Standard).
+____
+
+* NO_DEFAULT_ADMIN
++
+____
+(Optional) Wenn aktiviert, wird kein 'admin'-Benutzer im lokalen Cluster erstellt. Dies wird standardmäßig für die Rancher-SSO-Integration verwendet. Wenn nicht aktiviert, werden der Benutzer dauerhaft gewarnt und Ereignisse aufgezeichnet, um das Standard-Admin-Passwort zu ändern, falls es nicht angepasst wurde.
+____
+
+* CTRL_EN_ICMP_POLICY
++
+____
+(Optional) Wenn aktiviert (Wert=1), kann ICMP-Verkehr im Entdeckungsmodus gelernt werden, und eine Richtlinie kann generiert werden. Wenn es keine Netzwerkrichtlinie im Überwachungs- oder Schutzmodus für die Gruppe gibt, wird eine implizite Verletzung für ICMP-Verkehr generiert.
+____
+
+=== manager
+
+* CTRL_SERVER_IP
++
+____
+(Optional für All-in-One) IP-Adresse des Controller-REST-Servers. Der Standardwert ist `127.0.0.1`. Für den All-in-One-Container lassen Sie es als Standard. Wenn der Manager separat läuft, muss der Manager diese IP angeben, um sich mit dem Controller zu verbinden.
+____
+
+* CTRL_SERVER_PORT
++
+____
+(Optional für All-in-One) Port des Controller-REST-Servers. Der Standardwert ist `10443`. Für den All-in-One-Container belassen Sie ihn als Standard. Wenn der Manager separat läuft, sollte der Manager diese Variable angeben, um sich mit dem Controller zu verbinden.
+____
+
+* MANAGER_SERVER_PORT
++
+____
+(Optional) Manager-UI-Port. Der Standardwert ist `8443`. Es sei denn, der Manager läuft im Host-Modus, lassen Sie es und verwenden Sie die Docker-Portoption, um den Port auf dem Host abzubilden.
+____
+
+* MANAGER_SSL
++
+____
+(Optional) Der Manager verwendet standardmäßig eine HTTPS/SSL-Verbindung. Setzen Sie den Wert auf "`off`", um HTTP zu verwenden.
+____
++
+[IMPORTANT]
+====
+Diese Umgebungsvariable ist nur für das eigenständige NeuVector-Produkt. Bitte setzen Sie die Variable auf "on", wenn Sie Rancher SSO verwenden, oder lassen Sie sie ungesetzt, da NeuVector standardmäßig HTTPS verwendet.
+====
+
+=== Enforcer
+
+* CONTAINER_NET_TYPE
++
+____
+(Optional) Um spezielle Netzwerk-Plugins zu unterstützen, setzen Sie den Wert auf "macvlan".
+____
+
+* ENF_NO_SECRET_SCANS
++
+____
+(Optional) Setzen Sie den Wert auf "`1`", um das Scannen nach Geheimnissen in Dateien zu deaktivieren (verbessert die Leistung).
+____
+
+* ENF_NO_AUTO_BENCHMARK
++
+____
+(Optional) Setzen Sie den Wert auf "`1`", um CIS-Benchmarks auf Host und Containern zu deaktivieren (verbessert die Leistung).
+____
+
+* ENF_NO_SYSTEM_PROFILES
++
+____
+(Optional) Setzen Sie den Wert auf "1", um die Prozess- und Dateimonitoren zu deaktivieren. Es werden keine Lernprozesse, keine Profilmodi, keine Prozess-/Datei (Paket)-Vorfälle und kein Dateiaktivitätsmonitor durchgeführt. Dies reduziert die CPU-/Speicherressourcennutzung und Dateivorgänge.
+____
+
+* ENF_NETPOLICY_PULL_INTERVAL
++
+____
+(Optional) Wert in Sekunden (empfohlener Wert 60), um den Netzwerkverkehr und den Ressourcenverbrauch des Enforcers aufgrund von Richtlinienaktualisierungen/-neuberechnungen in Clustern mit hoher Knotenzahl oder Arbeitslasten zu reduzieren. Standard ist null, was bedeutet, dass es keine Verzögerung bei der Aktualisierung der Enforcer-Richtlinie gibt.
+____
+
+* THRT_SSL_TLS_1DOT0
++
+____
+(Optional) Setzen Sie den Wert auf "`1`", um die Erkennung für TLS Version 1.0 (veraltet) zu aktivieren.
+____
+
+* THRT_SSL_TLS_1DOT1
++
+____
+(Optional) Setzen Sie den Wert auf "`1`", um die Erkennung für TLS Version 1.1 (veraltet) zu aktivieren.
+____
+
+* NV_SYSTEM_GROUPS
++
+____
+(Optional) Geben Sie an, welche Gruppen oder Namespaces {product-name} als 'Systemcontainer' betrachtet, getrennt durch Semikolons. Zum Beispiel, für auf Rancher basierende Apps und den Standard-Namespace, NV_SYSTEM_GROUPS=__cattle-system;__default. Diese Werte werden in Regex übersetzt. Systemcontainer (die auch {product-name} und Kubernetes-Systemcontainer umfassen) arbeiten nur im Monitor-Modus (nur Alarm), selbst wenn die Gruppe auf Schutzmodus gesetzt ist.
+____
+
+== Offene Ports
+
+* CLUSTER_RPC_PORT - auf Controller und All-in-One. Standardwert 18300.
+* CLUSTER_LAN_PORT - auf dem Controller, Enforcer und All-in-One. Standardwert 18301.
+* MANAGER_SERVER_PORT - auf dem Manager oder All-in-One. Standardwert 8443.
+* CTRL_SERVER_PORT - auf dem Controller. Standardwert 10443.
+
+Bitte siehe den Abschnitt xref:installation.adoc[Implementierungsvorbereitung] für eine vollständige Beschreibung der Kommunikationsanforderungen für die {product-name} Container.

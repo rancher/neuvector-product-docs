@@ -1,0 +1,97 @@
+= Wiederherstellen der {product-name} Konfiguration
+:revdate: 2024-12-08
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/11.restore/11.restore.md
+:page-opendocs-slug: /deploying/wiederherstellen
+
+== Wiederherstellen der {product-name} Konfiguration
+
+Sie können eine vorherige {product-name} Konfiguration wiederherstellen, indem Sie eine Konfigurationssicherungsdatei anwenden. Sie können eine Sicherung manuell erstellen oder eine aus der {product-name} Konsole exportieren, indem Sie zu *Einstellungen > Konfiguration* navigieren und eine der folgenden Optionen auswählen:
+
+* *Alle Konfiguration*: Beinhaltet Registrierungskonfigurationen, Integrationen, Systemeinstellungen und Richtlinien.
+* *Nur Richtlinien*: Beinhaltet Regeln und Sicherheitsrichtlinien.
+
+Sie können auch Sicherungen automatisieren, indem Sie die REST API verwenden. Für ein Beispiel siehe xref:automation.adoc#export-import-configuration-file[Exportieren und Importieren von Konfigurationsdateien].
+
+Wenn alle Controller nicht mehr laufen und der Echtzeit-Konfigurationsstatus verloren geht, kann {product-name} die Konfiguration automatisch wiederherstellen, wenn xref:production.adoc#_backups_and_persistent_data[persistenter Speicher] ordnungsgemäß konfiguriert ist.
+
+[WARNING]
+====
+Beginnend mit *{product-name} v5.4.7* werden sensible Konfigurationsdaten mit einem Kubernetes Secret namens `neuvector-store-secret` im `neuvector` Namespace verschlüsselt.
+
+Versionen *5.3.0 bis 5.4.6* verwendeten einen festen, hartcodierten Verschlüsselungsschlüssel. Während eines Upgrades oder einer Wiederherstellung erkennt {product-name} automatisch Daten, die mit dem alten Schlüssel verschlüsselt wurden, und verschlüsselt sie erneut mit einem neuen Schlüssel, der aus `neuvector-store-secret` abgeleitet ist.
+
+Führen Sie immer ein Upgrade auf *v5.4.7 oder höher* durch, bevor Sie Konfigurationsdaten wiederherstellen.
+
+Für Details siehe die Sicherheitswarnung: https://github.com/neuvector/neuvector/security/advisories/GHSA-h773-7gf7-9m2x
+====
+
+[NOTE]
+====
+{product-name} unterstützt keine teilweisen Wiederherstellungen (zum Beispiel nur Netzwerkregeln wiederherstellen) oder Wiederherstellungen zu einem bestimmten Zeitpunkt. Verwenden Sie Automatisierungsskripte, um Konfigurationsdateien regelmäßig zu sichern und zeitgestempelte Sicherungen zu verwalten.
+
+Für weitere Informationen siehe xref:automation.adoc#export-import-configuration-file[Exportieren und Importieren von Konfigurationsdateien].
+====
+
+[WARNING]
+====
+Ändern Sie keine Sicherungskonfigurationsdateien. Das Bearbeiten einer Sicherungsdatei nach dem Export kann zu Wiederherstellungsfehler führen oder einen unvorhersehbaren Systemzustand zur Folge haben.
+====
+
+[CAUTION]
+====
+Verwenden Sie Sicherungskonfigurationsdateien nur, um {product-name} im selben Cluster wiederherzustellen, aus dem sie exportiert wurden. Die Wiederherstellung einer Sicherung in einem anderen Cluster kann zu unvorhersehbarem Verhalten führen.
+====
+
+== Schlüsselverwaltung für die Verschlüsselung
+
+Die `neuvector-store-secret` enthält den *Schlüssel für die Verschlüsselung (KEK)*. {product-name} verwendet die KEK, um *Schlüssel für die Datenverschlüsselung (DEK)* zu generieren, die sensible Konfigurationsdaten verschlüsseln.
+
+Schlüsselverhalten:
+
+* Sie müssen die `neuvector-store-secret` verwalten und sichern.
+* Wenn das Geheimnis fehlt oder der Schlüsselwert die Längenanforderungen nicht erfüllt, erstellt oder aktualisiert {product-name} es automatisch.
+* Wenn {product-name} das Geheimnis erstellt oder aktualisiert, generiert es eine Warnung, die Sie daran erinnert, eine Sicherung davon zu erstellen.
+* Wenn sich die KEK ändert oder verloren geht, können zuvor verschlüsselte Daten nicht entschlüsselt werden.
+
+Während rollierender Upgrades oder Wiederherstellungen:
+
+. Daten, die mit dem veralteten fest codierten Schlüssel verschlüsselt sind, werden mit einem DEK, das von der KEK abgeleitet ist, erneut verschlüsselt.
+. Daten, die mit einem DEK, das von der KEK abgeleitet ist, verschlüsselt sind, können nur von {product-name} mit derselben KEK entschlüsselt werden.
+
+image:rolling-upgrade-event.png[Ereignis zur erneuten Verschlüsselung bei rollierendem Upgrade]
+
+Wenn die erneute Verschlüsselung erfolgt, protokolliert {product-name} die Aktion und generiert ein Ereignis.
+
+== Sensible Daten, die durch Verschlüsselung geschützt sind
+
+{product-name} verschlüsselt sensible Daten, die unter den folgenden Schlüssel-Wert-Pfaden gespeichert sind:
+
+* `object/config/server/ldap1`
+* `object/config/server/oidc1`
+* `object/config/server/saml1`
+* `object/config/system`
+* `object/config/registry`
+* `object/config/federation/membership`
+* `object/config/federation/clusters/...`
+* `object/cert/...`
+
+image:neuvector-store-secret.png[NeuVector speichert das Geheimnis]
+
+[NOTE]
+====
+Sichern Sie immer die `neuvector-store-secret` zusammen mit den {product-name}-Konfigurationsdaten.
+
+Wenn Sie {product-name} nach einem Datenverlust oder in ein neues Cluster wiederherstellen, müssen Sie das *gleiche Geheimnis* wiederherstellen. Konfigurationssicherungen ohne das entsprechende Geheimnis können nicht entschlüsselt werden.
+====
+
+== Empfohlene Einstellungen für hohe Verfügbarkeit
+
+Manuelle Sicherung und Wiederherstellung sollten als letzte Rettungsoption betrachtet werden. Für hohe Verfügbarkeit befolgen Sie diese Empfehlungen:
+
+. Stellen Sie {product-name} mithilfe von Helm und einer ConfigMap für die Erstkonfiguration bereit.
+. Verwenden Sie CRDs, um Richtlinien wie Netzwerkregeln, Prozessprofile, Zulassungssteuerung und andere Richtlinien zu definieren.
+. Führen Sie mehrere Controller (mindestens drei) aus, um die Konfiguration über Pods hinweg zu synchronisieren, und planen Sie sie auf verschiedenen Hosts.
+. Konfigurieren Sie persistenten Speicher, um sich von clusterweiten Ausfällen zu erholen, bei denen alle Controller nicht mehr laufen.
+. Sichern Sie regelmäßig die Konfiguration in zeitgestempelten Sicherungskonfigurationsdateien.
+. Stellen Sie die {product-name}-Konfiguration aus einer Konfigurationssicherungsdatei nur als letzte Möglichkeit wieder her und wenden Sie alle CRDs erneut an, die sich nach der Erstellung der Sicherung geändert haben.

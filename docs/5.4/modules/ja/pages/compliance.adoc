@@ -1,0 +1,111 @@
+= コンプライアンスとCISベンチマーク
+:revdate: 2025-01-16
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/01.scanning/02.compliance/02.compliance.md
+:page-opendocs-slug:  /スキャンニング/スキャンニング/コンプライアンス
+
+== コンプライアンスとCISベンチマークの管理
+
+{product-name}によるコンプライアンス監査には、CISベンチマーク、カスタムチェック、シークレット監査、およびPCI、GDPRなどの業界標準テンプレートが含まれます。
+
+{product-name}によって自動的に実行されるCISベンチマークには、以下が含まれます。
+
+* Kubernetes
+* Docker
+* Red Hat OpenShiftのドラフト「CISに触発された」ベンチマーク
+* Google GKE
+
+コンプライアンススキャンの結果は、関連する資産を選択し、コンプライアンスタブをクリックすることで、レジストリ（イメージ用）、ノード、およびコンテナメニューの個々の資産に対して表示されます。
+
+セキュリティリスク->コンプライアンスメニューは、脆弱性メニューが機能するのと同様に、統合されたコンプライアンスレポートを可能にします。
+
+=== セキュリティリスク - コンプライアンスとコンプライアンスプロファイル
+
+コンプライアンス結果は、カテゴリと名前でリストに表示されます。カテゴリには、Docker、Kubernetes、OpenShift、およびカスタムが含まれます。各項目の名前はCISベンチマークに対応しています。例えば、K.4.2.3はKubernetesのCISベンチマーク4.2.3に対応しています。Dockerベンチマークは「D」で始まり、イメージ関連のベンチマークのみ「I」で始まります。
+
+プラットフォーム、ホスト、ネームスペース、または業界標準に基づいてコンプライアンスチェックを選択するには、下記のように高度なフィルターを使用してください。
+
+image:compliance_4.png[コンプライアンス]
+
+フィルターを適用した後、関連するCISベンチマークとカスタムチェックのみが表示され、レポートを生成してダウンロードできます。これにより、PCI、HIPAA、GDPRなどの標準に対するレポートを生成できます。
+
+以下のスクリーンショットは、イメージスキャンで見つかったシークレットの例を示しています。
+
+image:secret_compliance_4.png[secrets]
+
+=== PCI、GDPR、HIPAA、NIST、PCIv4、およびDISA STIGのコンプライアンステンプレートのカスタマイズ
+
+コンプライアンスプロファイルメニューでは、PCI、GDPR、HIPAA、NIST、PCIv4、およびDISA STIGなどの業界標準用のビルトインテンプレートをカスタマイズできます。これらのレポートは、セキュリティリスク->コンプライアンスメニューから、フィルタリングする標準の1つを選択し、エクスポートすることで生成できます。NISTプロファイルは https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-190.pdf[NIST SP 800-190]用です。
+
+任意のコンプライアンスプロファイルをカスタマイズするには、業界標準（例：PCI）を選択し、その標準に対して特定のチェックを有効または無効にします。これらは、業界標準のコンプライアンスレポートを生成するために各チェックに適用されるコンプライアンス「タグ」と考えてください。
+
+アクションボタンを使用して、そのチェックから任意のコンプライアンスタグを追加または削除できます。
+
+image:compliance_profile_4.png[profile]
+
+さらに、アセットタブをクリックすることで、コンプライアンスレポートの一部と見なされる「アセット」を選択できます。デフォルトでは、すべてのコンプライアンステンプレートは、イメージ、ノード、およびコンテナに適用されます。
+
+image:profile_assets_4.png[compliance_assets]
+
+アクションボタンを使用して、アセットのコンプライアンステンプレートを追加または削除できます。
+
+* イメージ。イメージのために報告される標準を選択します。
+* ノード。ノード（ホスト）のために報告される標準を選択します。
+* コンテナ。コンテナのために報告される標準を選択します。
+
+また、上記の基準で制限する代わりに、コンプライアンステンプレートを特定のネームスペースに制限することもできます。このボックスがチェックされ、ネームスペースが追加されると、これらのネームスペースに適用されるすべてのアセットのレポートが生成されます。これは、たとえば、PCIテンプレートがPCIの範囲内（適用可能）なワークロードを含むネームスペースのアセットのみを報告する場合に便利です。
+
+image:DocheckASSETSEnableNS.png[namespace]
+
+テンプレートとアセットがカスタマイズされた後（必要に応じて）、セキュリティリスク -> コンプライアンスプロファイルメニューでレポートを生成できます。セキュリティリスク -> コンプライアンスメニューを開き、詳細フィルターを選択して、希望するコンプライアンステンプレートを選択します。例えば、GDPRを選択すると、表示とレポートがGDPRプロファイルのみにフィルタリングされます。
+
+=== プライムコンプライアンスを使用したサンプルHelmインストール
+
+以下は、プライムコンプライアンスでSUSE Security 5.4.0をインストールするためのサンプルHelmインストールコマンドです。ユーザーは、プライムコンプライアンスが5.4.0から始まるため、インストールバージョンを5.4.0以降に変更できます。インストール後、プライムユーザーはSUSE SecurityウェブUIの**コンプライアンス > 規制**タブビューから利用可能な規制を確認できます。
+
+[,shell]
+----
+helm install neuvector -n neuvector ./ --set controller.prime.enabled=true --set
+controller.prime.image.repository=nvlab/compliance_config,controller.prime.image.tag=1.
+0.0 --set
+tag=5.4.0-b2,controller.image.repository=nvpublic/co,enforcer.image.repository=nvpublic/
+en,manager.image.repository=nvpublic/ma
+----
+
+=== シークレット監査
+
+{product-name}は、イメージコンプライアンススキャンおよびランタイムスキャンの一環として、40種類以上の一般的なシークレットをチェックします。さらに、xref:customcompliance.adoc[カスタムコンプライアンススクリプト]をコンテナまたはホスト用に設定でき、xref:dlp.adoc[DLPパケット検査]機能を使用してネットワークペイロード内のシークレットをチェックできます。
+
+シークレット監査の結果は、イメージスキャンのコンプライアンスセクション（Assets -> レジストリ）、コンテナ（Assets -> コンテナ）、ノード（Assets -> ノード）、およびコンプライアンス管理メニュー（Security Risks -> Compliance）で見つけることができます。
+
+以下は、イメージスキャンで検出されたシークレットがどのように表示されるかの例です。
+
+image:secrets_image_4.png[secrets]
+
+ここに検出されているシークレットの種類のリストがあります。
+
+* 一般的な秘密鍵
+* 'apikey'、'api_key'、'password'、'secret'、'passwd'などを含む資格情報の一般的な検出。
+* 'password'、'passwd'、'api_token'などを含むyamlファイル内の一般的なパスワード。
+* キー/値ペアの一般的なシークレットキー。
+* Putty 秘密鍵
+* XML秘密鍵
+* AWS https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html[資格情報 / IAM]
+* Facebookクライアントシークレット
+* Facebookエンドポイントシークレット
+* Facebookアプリシークレット
+* TwitterクライアントID
+* Twitterシークレットキー
+* Githubシークレット
+* SquareプロダクトID
+* Stripeアクセスキー
+* Slack APIトークン
+* Slackウェブフック
+* LinkedInクライアントID
+* LinkedInシークレットキー
+* Google APIキー
+* SendGrid APIキー
+* Twilio APIキー
+* Heroku APIキー
+* MailChimp APIキー
+* MailGun APIキー

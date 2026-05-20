@@ -1,0 +1,230 @@
+= 使用操作员进行部署
+:revdate: 2025-06-02
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/01.production/02.operators/02.operators.md
+:page-opendocs-slug: /deploying/production/operators
+
+== 操作员
+
+操作员将人类的操作知识编码为软件，以便更容易与用户共享。操作员是简化运行另一种软件的操作复杂性的程序。更技术性地说，操作员是一种打包、部署和管理 Kubernetes 应用程序的方法。
+
+== {product-name} 操作员
+
+{product-name} 操作员基于 {product-name} Helm 图表。{product-name} RedHat OpenShift 操作员在 OpenShift 容器平台中运行，以部署和管理 {product-name} 安全集群组件。{product-name} 操作员包含使用 Helm 图表部署 {product-name} 所需的所有信息。您只需从 OpenShift 嵌入的操作员中心安装 {product-name} 操作员并创建 {product-name} 实例。
+
+要部署最新的 {product-name} 容器版本，请使用 Operator Hub 中的 link:https://catalog.redhat.com/search?searchType=software&deployed_as=Operator&partnerName={product-name}&p=1[Red Hat 认证操作员] 或 link:https://github.com/redhat-openshift-ecosystem/community-operators-prod/tree/main/operators/neuvector-community-operator[社区操作员]。社区操作员的文档可以在 https://github.com/neuvector/neuvector-operator[{product-name} 操作员] 中找到。
+
+[NOTE]
+.关于 SCC 和升级的说明
+====
+
+特权 SCC 在新部署中由操作员版本 1.3.4 及以上添加到部署 yaml 中指定的服务帐户。在将 {product-name} 操作员从先前版本升级到 1.3.4 的情况下，请在升级之前删除特权 SCC。
+
+[,shell]
+----
+oc delete rolebinding -n neuvector system:openshift:scc:privileged
+----
+====
+
+[IMPORTANT]
+====
+{product-name} 认证操作员版本与 {product-name} 产品版本相关联，每个新版本在发布之前必须经过 Red Hat 的认证过程。5.3.x 的认证操作员版本与 helm 版本 2.7.2 和 {product-name} APP 版本 5.3.2 相关联。认证操作员版本 1.3.9 与 {product-name} 版本 5.2.0 相关联。认证操作员版本 1.3.7 与 {product-name} 版本 5.1.0 相关联。版本 1.3.4 的操作员版本与 {product-name} 5.0.0 相关联。如果您希望能够更改已部署的 {product-name} 容器的版本标签，请使用社区版本。
+====
+
+.使用认证操作员进行部署
+[%collapsible]
+======
+*从操作员中心使用红帽认证操作员进行部署*
+
+[IMPORTANT]
+====
+{product-name} 操作员版本与 {product-name} 产品版本相关联，每个新产品版本在发布之前必须经过红帽的认证过程。
+====
+
+*技术说明*
+
+* {product-name} 容器镜像通过使用红帽市场镜像拉取密钥，从 registry.connect.redhat.com 拉取。
+* {product-name} 管理界面通常通过域上的 OpenShift 直通路由进行暴露。例如，在IBM Cloud上，neuvector-route-webui-neuvector.(cluster_name)-(random_hash)-0000.(region).containers.appdomain.cloud。它也可以通过节点端口地址或公共 IP 作为服务 neuvector-service-webui 进行暴露。
+* OpenShift version >=4.6.
+
+. 创建项目neuvector
++
+--
+[,shell]
+----
+oc new-project neuvector
+----
+--
+. 从操作员中心安装红帽认证操作员 
+** 在 OpenShift 控制台 UI 中，导航到操作员中心 
+** 搜索 {product-name} 操作员并选择没有社区或市场徽章的列表 
+** 单击“安装”
+. 配置更新通道 
+** 当前最新通道为beta，但未来可能会转移到稳定版 
+** 如果可用，请选择稳定版
+. 配置安装模式和已安装的名称空间 
+** 在集群上选择特定名称空间 
+** 选择 neuvector 作为已安装的名称空间 
+** 配置审批策略
+. 确认安装
+. 准备 {product-name} 安装的 YAML 配置值，如下方示例屏幕截图所示。OpenShift控制台中提供的YAML展示了所有可用的配置选项及其默认值。
++
+image:operator_cert.png[]
+. 当操作员安装并准备好使用时，可以安装 {product-name} 实例。
+** 单击查看操作员（在操作员安装后）或从已安装的操作员视图中选择 {product-name} 操作员。 
+** 单击创建实例 
+** 选择通过YAML视图进行配置 
+** 粘贴准备好的YAML配置值 
+** 单击“创建”。
+. 验证 {product-name} 实例的安装 
+** 导航到 {product-name} 操作员的详细信息 
+** 打开 {product-name} 选项卡 
+** 选择 neuvector-default 实例 
+** 打开资源选项卡 
+** 验证资源状态为已创建或正在运行
+
+在成功将 {product-name} 平台部署到您的集群后，请登录到地址为 `https://neuvector-route-webui-neuvector.(OC_INGRESS)` 的 {product-name} 控制台。 +
+* 使用初始用户名 admin 和密码 admin 登录。 +
+* 接受 {product-name} 最终用户许可协议。 +
+* 更改 admin 用户的密码。可选地，您还可以在设置 -> 用户与角色菜单中创建其他用户。现在您可以导航到 {product-name} 控制台，开始漏洞扫描，观察正在运行的应用程序 pod，并对容器应用安全保护。
+
+*升级{product-name}*
+
+通过更新与所需 {product-name} 版本关联的 Operator 版本来升级 {product-name} 版本。
+======
+
+.使用社区操作员进行部署
+[%collapsible]
+======
+*从操作员中心部署 {product-name} 社区操作员*
+
+*技术说明*
+
+* {product-name} 容器镜像是从 Docker Hub 的 {product-name} 账户拉取的。
+* {product-name} 管理界面通常通过域上的 OpenShift 直通路由进行暴露。例如，在IBM Cloud上，neuvector-route-webui-neuvector.(cluster_name)-(random_hash)-0000.(region).containers.appdomain.cloud。它也可以通过节点端口地址或公共 IP 作为服务 neuvector-service-webui 进行暴露。
+* OpenShift version 4.6+ 
+* 建议在创建 {product-name} 实例之前，通过修改 YAML 值来审查和修改 {product-name} 安装配置。示例包括 imagePullSecrets 名称、标签版本、入口/控制台访问、多集群联合、持久卷 PVC 等。请参考 https://github.com/neuvector/neuvector-helm 中的 Helm 指令，以获取在安装过程中可以修改的值。
+
+. 创建项目neuvector
++
+--
+[,shell]
+----
+oc new-project neuvector
+----
+--
+. 从操作员中心安装 {product-name} 社区操作员 
+** 在OpenShift控制台UI中，导航到操作员中心 
+** 搜索 {product-name} 操作员并选择带有社区徽章的列表 
+** 单击“安装” 
+** 配置更新通道。当前最新通道为 beta，但未来可能会转移到稳定版。如果可用，请选择稳定版。
+** 配置安装模式和已安装的名称空间 
+** 在集群上选择特定名称空间 
+** 选择 neuvector 作为已安装的名称空间 
+** 配置审批策略 
+** 确认安装
+. 下载包含访问 {product-name} 容器注册表凭据的 Kubernetes 秘密清单。将 YAML 清单文件保存为 ./neuvector-secret-registry.yaml。
+. 应用包含注册表凭据的 Kubernetes 秘密清单。
++
+--
+[,shell]
+----
+kubectl apply -n neuvector -f ./neuvector-secret-registry.yaml
+----
+--
+. 准备 {product-name} 安装的 YAML 配置值，从以下 YAML 片段开始。确保在 'tag' 值中指定所需的 {product-name} 版本。检查 {product-name} Helm 图表中的值参考，以获取可用的配置选项。还有其他可能的 Helm 值可以在 YAML 中配置，例如您是否会配置集群以通过暴露主节点（联合主节点）或远程（联合工作节点）服务来允许多集群管理。
++
+--
+[,yaml]
+----
+apiVersion: apm.neuvector.com/v1alpha1
+kind: Neuvector
+metadata:
+  name: neuvector-default
+  namespace: neuvector
+spec:
+  openshift: true
+  tag: 4.3.0
+  registry: docker.io
+  exporter:
+    image:
+      repository: prometheus-exporter
+      tag: 0.9.0
+  manager:
+    enabled: true
+    env:
+      ssl: true
+    image:
+      repository: manager
+    svc:
+      type: ClusterIP
+      route:
+        enabled: true
+        termination: passthrough
+  enforcer:
+    enabled: true
+    image:
+      repository: enforcer
+  cve:
+    updater:
+      enabled: true
+      image:
+        repository: updater
+        tag: latest
+      schedule: 0 0 * * *
+    scanner:
+      enabled: true
+      replicas: 3
+      image:
+        repository: scanner
+        tag: latest
+  controller:
+    enabled: true
+    image:
+      repository: controller
+    replicas: 3
+----
+--
+. 当操作员安装并准备好使用时，可以安装{product-name}实例。
+** 单击查看操作员（在操作员安装后）或从已安装的操作员视图中选择 {product-name} 操作员。 
+** 单击创建实例 
+** 选择通过YAML视图进行配置 
+** 粘贴准备好的YAML配置值 
+** 单击“创建”。
+. 验证 {product-name} 实例的安装。
+** 导航到 {product-name} 操作员的详细信息 
+** 打开 {product-name} 选项卡 
+** 选择 neuvector-default 实例 
+** 打开资源选项卡 
+** 验证资源状态为已创建或正在运行
+. 在成功将 {product-name} 平台部署到您的集群后，请登录到地址为 `https://neuvector-route-webui-neuvector.(INGRESS_DOMAIN)` 的 {product-name} 控制台。
+** 使用初始用户名 admin 和密码 admin 登录。
+** 接受 {product-name} 最终用户许可协议。
+** 更改管理员用户的密码。
+** 可选地，您还可以在设置 -> 用户和角色菜单中创建其他用户。
+
+现在您可以导航到 {product-name} 控制台，以开始漏洞扫描、观察正在运行的应用程序 pod，并对容器应用安全保护。
+
+*升级 {product-name}*
+
+. 从 操作员 > 已安装的操作员 > {product-name} 操作员 
++
+image:1_Installed.png[]
+. 单击 {product-name} 以列出实例 
++
+image:2_Instance.png[]
+. 单击YAML以编辑参数 
++
+image:3_YAML.png[]
+. 更新标签并单击保存 
++
+image:4_tag_save.png[]
+======
+
+=== 查错
+
+* 检查已部署 YAML 文件中的操作员部署值
+* 验证步骤2中 {product-name} 的安全上下文约束 (SCC) 是否已成功添加
+* 审查并检查 {product-name} Helm 图表值
+* 确保注册表路径和版本标签设置正确（社区操作员；认证将使用默认值）
+* 确保到 {product-name} 管理服务 neuvector-route-webui 的路由已配置

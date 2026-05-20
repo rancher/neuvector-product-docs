@@ -1,0 +1,173 @@
+= Detalhes das Variáveis de Ambiente
+:revdate: 2024-12-03
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/01.production/03.details/03.details.md
+:page-opendocs-slug: /deploying/production/details
+
+== Variáveis de Ambiente
+
+=== Para ambos o Controlador (All-in-One) e o Enforcer
+
+* CLUSTER_JOIN_ADDR
++
+____
+Defina a variável para o IP do host para o primeiro controlador; e defina-a para o IP do host do controlador mestre para outros controladores e enforcers. Não é necessário definir este IP para implantações baseadas em Kubernetes, basta usar o arquivo de exemplo.
+____
+
+* CLUSTER_LAN_PORT
++
+____
+(Opcional) Porta LAN do Cluster Serf. As portas TCP e UDP devem ser mapeadas diretamente para o host. Opcional se não houver conflito de porta no host. Padrão `18301`
+____
+
+* DOCKER_URL
++
+____
+(Opcional) Se o motor docker no host não se vincular ao socket Unix normal, use esta variável para especificar o ponto de conexão TCP, no formato `tcp://10.0.0.1:2376`.
+____
+
+* NV_PLATFORM_INFO
++
+____
+(Opcional) Use o valor platform=Docker para implantações Docker Swarm/EE, ou platform=Kubernetes:GKE para GKE (para executar os Benchmarks CIS do GKE).
+____
+
+* CUSTOM_CHECK_CONTROL
++
+____
+(Opcional) Usado para habilitar/desabilitar a capacidade de criar scripts de conformidade personalizados em contêineres/hosts. Os valores são "disable" (padrão, não permitido), "strict" (apenas papel de administrador) ou "loose" (papéis de administrador, conformidade e política de runtime).
+____
+
+* AUTO_PROFILE_COLLECT
++
+____
+(Opcional) Defina o valor como 1 para habilitar a coleta de dados de perfil de memória para ajudar a investigar problemas de pressão de memória.
+____
+
+=== Controlador
+
+* CTRL_PERSIST_CONFIG
++
+____
+(Opcional) Fazer backup dos arquivos de configuração e restaurá-los de um volume persistente. Adicione isso ao yaml para habilitar; remova para desabilitar.
+____
+
+* CLUSTER_RPC_PORT
++
+____
+(Opcional) Porta RPC do servidor de cluster. Deve ser mapeado diretamente para o host. A variável de ambiente é opcional se não houver conflito de porta no host. Padrão `18300`
+____
+
+* CTRL_SERVER_PORT
++
+____
+(Opcional) Porta HTTPS que o servidor REST deve estar escutando. O padrão é `10443`. Normalmente, pode ser deixado como padrão e usar a opção de porta do Docker para mapear a porta no host.
+____
+
+* DISABLE_PACKET_CAPTURE
++
+____
+(Opcional) Adicione isso ao yaml para desabilitar a captura de pacotes; remova para reabilitar (padrão).
+____
+
+* NO_DEFAULT_ADMIN
++
+____
+(Opcional) Quando habilitado, não cria um usuário 'admin' no cluster local. Isso é usado para a integração do SSO do Rancher como padrão. Se não estiver habilitado, avise persistentemente o usuário e registre eventos para alterar a senha do admin padrão se não for alterada.
+____
+
+* CTRL_EN_ICMP_POLICY
++
+____
+(Opcional) Quando habilitado (valor=1), o tráfego icmp pode ser aprendido em modo de descoberta, e a política pode ser gerada. Se não houver política de rede em modo de monitoramento ou proteção para o grupo, uma violação implícita será gerada para o tráfego ICMP.
+____
+
+=== Gerente
+
+* CTRL_SERVER_IP
++
+____
+(Opcional para tudo-em-um) Endereço IP do servidor REST do controlador. O padrão é `127.0.0.1`. Para o contêiner All-in-One, deixe como padrão. Se o Gerenciador estiver sendo executado separadamente, o Gerenciador deve especificar este IP para se conectar ao controlador.
+____
+
+* CTRL_SERVER_PORT
++
+____
+(Opcional para All-in-One) Porta do servidor REST do controlador. O padrão é `10443`. Para o contêiner All-in-One, deixe como padrão. Se o Gerenciador estiver sendo executado separadamente, o Gerenciador deve especificar esta variável para se conectar ao controlador.
+____
+
+* MANAGER_SERVER_PORT
++
+____
+(Opcional) Porta da interface do usuário do Gerenciador. O padrão é `8443`. A menos que o Gerenciador esteja sendo executado em modo host, deixe-o como padrão e use a opção de porta do Docker para mapear a porta no host.
+____
+
+* MANAGER_SSL
++
+____
+(Opcional) O Gerenciador por padrão usa uma conexão HTTPS/SSL. Defina o valor para "`off`" para usar HTTP.
+____
++
+[IMPORTANT]
+====
+Esta variável de ambiente é apenas para o produto NeuVector autônomo. Por favor, defina a variável como "on" se estiver usando Rancher SSO ou deixe sem definir, pois o NeuVector usará HTTPS por padrão.
+====
+
+=== Enforcer
+
+* CONTAINER_NET_TYPE
++
+____
+(Opcional) Para suportar plug-in de rede especial, defina o valor como "macvlan".
+____
+
+* ENF_NO_SECRET_SCANS
++
+____
+(Opcional) Defina o valor para "`1`" para desabilitar a busca por segredos em arquivos (melhora o desempenho).
+____
+
+* ENF_NO_AUTO_BENCHMARK
++
+____
+(Opcional) Defina o valor para "`1`" para desabilitar benchmarks CIS em hosts e contêineres (melhora o desempenho).
+____
+
+* ENF_NO_SYSTEM_PROFILES
++
+____
+(Opcional) Defina o valor como "1" para desabilitar os monitores de processo e arquivo. Não serão realizados processos de aprendizado, modos de perfil, incidentes de processo/arquivo (pacote) nem monitoramento de atividade de arquivos. Isso reduzirá o uso de recursos de CPU/memória e operações de arquivo.
+____
+
+* ENF_NETPOLICY_PULL_INTERVAL
++
+____
+(Opcional) Valor em segundos (valor recomendado 60) para reduzir o tráfego de rede e o consumo de recursos pelo Enforcer devido a atualizações/recalculações de políticas, em clusters com alta contagem de nós ou cargas de trabalho. O padrão é zero, significando que não há atraso na atualização da política do Enforcer.
+____
+
+* THRT_SSL_TLS_1DOT0
++
+____
+(Opcional) Defina o valor para "`1`" para habilitar a detecção da versão TLS 1.0 (Descontinuado).
+____
+
+* THRT_SSL_TLS_1DOT1
++
+____
+(Opcional) Defina o valor para "`1`" para habilitar a detecção da versão TLS 1.1 (Descontinuado).
+____
+
+* NV_SYSTEM_GROUPS
++
+____
+(Opcional) Especifique quais grupos ou namespaces que {product-name} considera como 'contêineres do sistema', separados por ponto e vírgula. Por exemplo, para aplicativos baseados em Rancher e o namespace padrão, NV_SYSTEM_GROUPS=__cattle-system;__default. Esses valores são traduzidos em regex. Contêineres do sistema (que também incluem {product-name} e contêineres do sistema Kubernetes) operam apenas no modo de monitoramento (apenas alerta), mesmo que o grupo esteja configurado para o modo de proteção.
+____
+
+== Portas Abertas
+
+* CLUSTER_RPC_PORT - no controlador e All-in-One. Padrão 18300.
+* CLUSTER_LAN_PORT - no controlador, Enforcer e All-in-One. Padrão 18301.
+* MANAGER_SERVER_PORT - no Gerenciador ou All-in-One. Padrão 8443.
+* CTRL_SERVER_PORT - no controlador. Padrão 10443.
+
+Por favor, veja a seção xref:installation.adoc[Preparação para Implantação] para uma descrição completa dos requisitos de comunicação de porta para os contêineres {product-name}.

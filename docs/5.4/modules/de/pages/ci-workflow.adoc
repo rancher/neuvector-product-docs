@@ -1,0 +1,25 @@
+= {product-name} Arbeitsablauf
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /11.automation/01.ci_workflow/01.ci_workflow.md
+:page-opendocs-slug:  /automation/ci_workflow
+
+== {product-name} Integration in den CI/CD-Arbeitsablauf
+
+{product-name} unterstützt den gesamten CI/CD-Prozess und kann leicht in den Arbeitsablauf integriert werden, um Sicherheit während des Entwicklungs- und Implementierungsprozesses zu gewährleisten.
+
+=== Entwicklungs- und Continuous Integration-Arbeitsablauf
+
+{product-name} kann in die Entwicklungs- und CI-Prozesse integriert werden, um den Scan auf Schwachstellen zu automatisieren. Die Verwendung des {product-name} Jenkins-Plugins und der Registry-Scan-Funktionen ermöglicht das Scannen von Images in dieser Phase.
+
+image:ci_workflow.png[integration]
+
+Darüber hinaus kann {product-name} während automatisierter Anwendungstests verwendet werden, um Netzwerkverbindungen und das Verhalten von Containern zu analysieren, um mögliche Probleme in der Staging- oder Produktionsumgebung vorherzusehen.
+
+=== Continuous Deployment und Produktionsarbeitsablauf
+
+{product-name} kann vor der Implementierung sowie in der Produktion Compliance-Tests und Sicherheitsprüfungen durchführen.
+
+image:cd_workflow.png[Produktion]
+
+Die Multi-Vektor-Sicherheitsplattform ist in der Lage, Netzwerksicherheit, Containerinspektionen und Hostsicherheit zu kombinieren, um Container zur Laufzeit zu schützen.

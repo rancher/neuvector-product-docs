@@ -1,0 +1,218 @@
+= Configuration système requise
+:revdate: 2025-06-02
+:page-revdate: {revdate}
+:page-opendocs-origin: /01.basics/02.requirements/02.requirements.md
+:page-opendocs-slug: /basics/requirements
+
+== Configuration système requise
+
+[cols="1,1,1,1,4", options="header"]
+|===
+| Composant | Nombre d'instances | vCPU recommandé | Mémoire minimale | Notes
+
+| Contrôleur
+| min. 1 +
+3 pour HA (nombre impair uniquement)
+| 1
+| 1GB
+| Le noyau vCPU peut être partagé
+
+| Enforcer
+| 1 par nœud/VM
+| 1+
+| 1GB
+| Un ou plusieurs vCPU dédiés pour un débit réseau plus élevé en mode Protect
+
+| Scanner
+| min. 1 +
+2+ pour HA/Performance
+| 1
+| 1GB
+| Le noyau d'UC peut être partagé pour des charges de travail standard. +
+Dédier 1 ou plusieurs UC pour un volume élevé (10k+) de numérisation d'images. +
+La numérisation d'images de registre est effectuée par le scanner et gérée par le contrôleur, et l'image est récupérée par le scanner et développée en mémoire. +
+La recommandation de mémoire minimale suppose que les images à numériser ne dépassent pas 0,5 Go. +
+Lors de la numérisation d'images de plus de 1 Go, la mémoire du scanner doit être calculée en prenant la taille de la plus grande image et en ajoutant 0,5 Go. +
+Exemple : taille de la plus grande image = 1,3 Go, la mémoire du conteneur du scanner doit être de 1,8 Go
+
+| Gestionnaire
+| min 1 +
+2+ pour HA
+| 1
+| 1GB
+| vCPU peut être partagé
+|===
+
+* Pour la sauvegarde de configuration/HA, un PVC RWX de 1Gi ou plus. Voir xref:production.adoc#_backups_and_persistent_data[la section Sauvegardes et Données Persistantes] pour plus de détails.
+* Navigateur recommandé{nbsp}: Chrome pour de meilleures performances
+
+== Plates-formes prises en charge
+
+* Distributions Linux officiellement supportées{nbsp}: SUSE Linux, Ubuntu, CentOS/Red Hat (RHEL), Debian, CoreOS, AWS Bottlerocket et Photon.
+* Architectures AMD64 et ARM
+* CoreOS est supporté (novembre 2023) pour le scan CVE via le tableau de correspondance RHEL fourni par RedHat. Une fois qu'un flux officiel est publié par RedHat pour CoreOS, il sera supporté.
+* Systèmes de gestion de conteneurs conformes à Kubernetes et Docker officiellement supportés. Les plateformes suivantes sont testées avec chaque version de {product-name}{nbsp}: Kubernetes 1.19-1.32, SUSE Rancher (RKE, RKE2, K3s, etc.), RedHat OpenShift 4.6-4.16 (3.x à 4.12 supporté avant {product-name} 5.2.x), Google GKE, Amazon EKS, Microsoft Azure AKS, IBM IKS, docker natif, docker swarm. Les plateformes conformes à Kubernetes et Docker suivantes sont supportées et ont été vérifiées pour fonctionner avec {product-name}{nbsp}: VMware Photon et Tanzu, SUSE CaaS, Oracle OKE, Mirantis Kubernetes Engine, Nutanix Kubernetes Engine, docker UCP/DataCenter, docker Cloud.
+* Version d'exécution de Docker{nbsp}: 1.9.0 et plus{nbsp}; version de l'API Docker{nbsp}: 1.21, CE et EE.
+* Environnements d'exécution Containerd et CRI-O (nécessite des modifications des chemins de volume dans les fichiers yamls d'exemple). Voir les modifications requises pour Containerd dans la section de déploiement Kubernetes et CRI-O dans la section de déploiement OpenShift.
+* {product-name} est compatible avec la plupart des CNI commercialement supportés. Les tests officiels et le support concernent openshift ovs (sous-réseau/multitenant), calico, flannel, cilium, antrea et les clouds publics (gke, aks, iks, eks). Le support pour Multus a été ajouté dans la version v5.4.0.
+* Console : Navigateur Chrome ou Firefox recommandé. IE 11 n'est pas pris en charge en raison de problèmes de performance.
+* Minikube est pris en charge pour une évaluation initiale simple mais pas pour une preuve de concept complète. Voir ci-dessous les modifications requises pour que le fichier yaml Allinone fonctionne sur Minikube.
+
+Note sur AWS Bottlerocket{nbsp}: Il est nécessaire de changer le chemin du socket containerd spécifique à Bottlerocket. Veuillez consulter la section de déploiement Kubernetes pour plus de détails.
+
+== Non pris en charge
+
+* GKE Autopilot.
+* AWS ECS n'est plus pris en charge. (REMARQUE : Aucune fonctionnalité n'a été activement supprimée pour faire fonctionner {product-name} sur les déploiements ECS. Cependant, les tests sur ECS ne sont plus effectués par SUSE. Bien que la protection des charges de travail ECS avec {product-name} fonctionne probablement comme prévu, les problèmes ne seront pas examinés.)
+* Docker sur Mac
+* Docker sur Windows
+* Rkt (conteneur linux) de CoreOS
+* AppArmor sur les environnements K3S / SLES. Certaines configurations peuvent entrer en conflit avec {product-name} et provoquer des erreurs de scanner{nbsp}; AppArmor doit être désactivé lors du déploiement de {product-name}.
+* IPv6 n'est pas pris en charge.
+* VMWare Integrated Containers (VIC) sauf en mode imbriqué
+* CloudFoundry
+* Console : IE 11 n'est pas pris en charge en raison de problèmes de performance.
+* Hôte de conteneur imbriqué dans un outil de conteneur utilisé pour des tests simples. Par exemple, déploiement d'un cluster Kubernetes utilisant 'kind' https://kind.sigs.k8s.io/docs/user/configuration/.
+
+[NOTE]
+====
+PKS est testé sur le terrain et nécessite d'activer les conteneurs privilégiés pour le plan/tile, et de modifier le yaml chemin d'hôte comme suit pour Allinone, Controller, Enforcer{nbsp}:
+
+[,yaml]
+----
+            hostPath:
+            path: /var/vcap/sys/run/docker/docker.sock
+----
+====
+
+[NOTE]
+====
+{product-name} prend en charge l'exécution sur des VM basées sur Linux sur Mac/Windows en utilisant Vagrant, VirtualBox, VMware ou d'autres environnements virtualisés.
+====
+
+
+== Minikube
+
+Veuillez apporter les modifications suivantes au yaml de déploiement Allinone.
+
+[,yaml]
+----
+apiVersion: apps/v1 <<-- required for k8s 1.19
+kind: DaemonSet
+metadata:
+ name: neuvector-allinone-pod
+ namespace: neuvector
+spec:
+ selector: <-- Added
+ matchLabels: <-- Added
+ app: neuvector-allinone-pod <-- Added
+ minReadySeconds: 60
+...
+ nodeSelector: <-- DELETE THIS LINE
+ nvallinone: "true" <-- DELETE THIS LINE
+apiVersion: apps/v1 <<-- required for k8s 1.19
+kind: DaemonSet
+metadata:
+ name: neuvector-enforcer-pod
+ namespace: neuvector
+spec:
+ selector: <-- Added
+ matchLabels: <-- Added
+ app: neuvector-enforcer-pod <-- Added
+----
+
+== Performance et scalabilité
+
+Comme toujours, la planification des performances pour les conteneurs {product-name} dépendra de plusieurs facteurs, y compris{nbsp}:
+
+* (Controller & Scanner) Nombre et taille des images dans le registre à scanner (par le Scanner) initialement
+* (Enforcer) Mode de services (Découvrir, Surveiller, Protéger), où le mode Protéger fonctionne comme un pare-feu en ligne
+* (Enforcer) Type de connexions réseau pour les charges de travail en mode Protéger
+
+En mode Surveiller (filtrage réseau similaire à un miroir/tap), il n'y a pas d'impact sur les performances et l'Enforcer gère le trafic à la vitesse de ligne, générant des alertes si nécessaire. En mode Protéger (pare-feu en ligne), l'Enforcer nécessite de l'UC et de la mémoire pour filtrer les connexions avec une inspection approfondie des paquets et les maintenir pour déterminer si elles doivent être bloquées/abandonnées. En général, avec 1 Go de mémoire et une UC partagée, l'Enforcer devrait être capable de gérer la plupart des environnements en mode Protect.
+
+Pour les environnements sensibles au débit ou à la latence, une mémoire supplémentaire et/ou un noyau d'UC dédié peuvent être alloués au {product-name} conteneur Enforcer.
+
+Pour l'optimisation des performances du Controller et du Scanner pour le scan du registre, voir les exigences système ci-dessus.
+
+Pour des conseils supplémentaires sur les performances et le dimensionnement, voir la section xref:production.adoc#_best_practices_tips_qa_for_deploying_and_managing_suse_security[Onboarding/Meilleures Pratiques].
+
+=== Widget Throughput
+
+Comme le montre le graphique ci-dessous, des tests de référence de débit de base ont montré un débit maximum de 1,3 Gbps PAR NŒUD sur une petite instance de cloud public avec 4 noyaux d'UC. Par exemple, un cluster de 10 nœuds pourrait alors gérer un maximum de 13 Gbps de débit pour l'ensemble du cluster pour les services en mode Protect.
+
+image:throughput.png[Débit]
+
+Ce débit devrait être projeté pour augmenter à mesure qu'une UC dédiée est attribuée à l'Enforcer, ou que la vitesse de l'UC change, et/ou que de la mémoire supplémentaire est allouée. Encore une fois, l'échelle dépendra du type de trafic réseau/application des charges de travail.
+
+=== Latence
+
+La latence est une autre métrique de performance qui dépend du type de connexions réseau. Tout comme le débit, la latence n'est pas affectée en mode Monitor, uniquement pour les services en mode Protect (pare-feu en ligne). De petits paquets ou des services simples/rapides généreront une latence plus élevée de {product-name} en pourcentage, tandis que des paquets plus grands ou des services nécessitant un traitement complexe montreront un pourcentage de latence ajoutée plus faible par l'Enforcer {product-name}.
+
+Le tableau ci-dessous montre la latence moyenne de 2 à 10 % mesurée à l'aide de l'outil de benchmark Redis. Le benchmark Redis utilise des paquets assez petits, donc la latence avec des paquets plus grands devrait être plus faible.
+
+|===
+| Test | Monitor | Protéger | Latence
+
+| PING_INLINE
+| 34,904
+| 31,603
+| 9,46 %
+
+| SET
+| 38,618
+| 36,157
+| 6,37 %
+
+| GET
+| 36,055
+| 35,184
+| 2,42 %
+
+| LPUSH
+| 39 853
+| 35 994
+| 9,68 %
+
+| RPUSH
+| 37 685
+| 36 010
+| 4,45 %
+
+| LPUSH (Benchmark LRANGE)
+| 37 399
+| 35 220
+| 5,83 %
+
+| LRANGE_100
+| 25 539
+| 23 906
+| 6,39 %
+
+| LRANGE_300
+| 13 082
+| 12 277
+| 6,15 %
+|===
+
+Le benchmark ci-dessus montre le TPS moyen du mode Protect par rapport au mode Monitor, ainsi que la latence ajoutée pour le mode Protect pour plusieurs tests dans le benchmark. Le principal moyen de réduire la latence réelle (microsecondes) en mode Protect est d'exécuter sur un système avec une UC plus rapide. Vous pouvez trouver plus de détails sur cet outil de benchmark Redis open source à https://redis.io/topics/benchmarks.
+
+=== Ajout de contraintes de mise à l'échelle pour des environnements de charge de travail importants
+
+Lors de l'installation de NeuVector, si votre système d'exploitation hôte a une grande quantité de charges de travail, les pods NeuVector Enforcer peuvent échouer à se lancer en essayant d'ouvrir le grand volume de fichiers en raison de la surveillance de l'hôte des pods. Cela peut également provoquer des échecs du serveur RKE2 en raison des grandes quantités de fichiers ouverts.
+
+En tant que solution de contournement pour les environnements de charge de travail importants, vous devez créer un fichier tel que `example-fs-max.conf` à l'emplacement `/etc/sysctl.d/` et ajouter des contraintes de mise à l'échelle avec la configuration suivante{nbsp}:
+
+[,shell]
+----
+fs.inotify.max_user_instances=8192
+fs.inotify.max_user_watches=524288
+fs.filemax=5000
+----
+
+Ensuite, assurez-vous que la configuration est appliquée avec un redémarrage via la commande suivante{nbsp}:
+
+[,shell]
+----
+systemctl restart systemd-sysctl
+----

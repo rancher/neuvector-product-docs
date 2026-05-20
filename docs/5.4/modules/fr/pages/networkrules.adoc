@@ -1,0 +1,160 @@
+= Règles réseau
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/05.networkrules/05.networkrules.md
+:page-opendocs-slug:  /stratégie/networkrules
+
+== Stratégie{nbsp}: Règles réseau
+
+{product-name} crée automatiquement des règles réseau à partir de vos applications en cours d'exécution en mode Découverte. Vous pouvez également les ajouter manuellement dans n'importe quel mode, Découverte, Surveillance ou Protection. Les règles peuvent être ajoutées ou modifiées depuis l'interface en ligne de commande ou l'API REST.
+
+{product-name} utilise une stratégie déclarative qui consiste en des règles qui régissent les connexions autorisées et refusées au niveau de l'application. {product-name} analyse et protège non seulement en fonction de l'adresse IP et du port, mais en déterminant le comportement réseau réel basé sur les protocoles d'application. Cela permet à {product-name} de protéger automatiquement tous les nouveaux conteneurs d'application, quelle que soit l'adresse IP et le port.
+
+Les règles réseau spécifient le comportement AUTORISÉ ou REFUSÉ pour vos applications. Ces règles déterminent quelles connexions sont un comportement normal pour vos services ainsi que ce qui constitue des violations. Vous pouvez supprimer automatiquement les règles '`learned`' ainsi qu'ajouter de nouvelles règles à votre stratégie.
+
+[IMPORTANT]
+====
+Les règles réseau sont appliquées dans l'ordre dans lequel elles apparaissent dans la liste, de haut en bas. Pour réorganiser les règles, sélectionnez la règle que vous souhaitez déplacer, puis vous verrez une boîte 'Déplacer vers' apparaître en haut, et vous pouvez déplacer la règle sélectionnée à la position avant ou après une règle spécifiée.
+====
+
+[IMPORTANT]
+====
+Si vous modifiez (ajoutez, supprimez, changez) des règles, vos modifications ne sont PAS appliquées tant que vous n'avez pas cliqué sur le bouton Enregistrer en haut. Si vous quittez cette page sans déployer vos modifications, elles seront perdues.
+====
+
+=== Ajout de nouvelles règles
+Ajoutez une règle en utilisant le '`+`' soit en dessous d'une autre règle dans la colonne de droite, soit en utilisant le bouton en bas à droite.
+
+* *ID*
++
+____
+(Facultatif) Entrez un numéro. Les règles réseau sont initialement ordonnées de la plus basse à la plus haute, mais l'ordre des règles peut être modifié en les faisant glisser et en les déposant dans la liste.
+____
+
+* *De*
++
+____
+Spécifiez le GROUPE d'où la connexion va provenir. Commencez à taper et {product-name} correspondra à tous les groupes précédemment découverts, ainsi qu'à tout nouveau groupe défini.
+____
+
+* *Vers*
++
+____
+Spécifiez le GROUPE de destination où ces connexions sont autorisées ou refusées.
+____
+
+* *Applications*
++
+--
+____
+Entrez les applications pour {product-name} à autoriser ou à refuser. {product-name} comprend le comportement des applications en profondeur et analysera la charge utile pour déterminer les protocoles d'application. Les protocoles incluent HTTP, HTTPS, SSL, SSH, DNS, DNCP, NTP, TFTP, ECHO, RTSP, SIP, MySQL, Redis, Zookeeper, Cassandra, MongoDB, PostgresSQL, Kafka, Couchbase, ActiveMQ, ElasticSearch, RabbitMQ, Radius, VoltDB, Consul, Syslog, Etcd, Spark, Apache, Nginx, Jetty, NodeJS, Oracle, MSSQL, Memcached et gRPC.
+____
+
+[NOTE]
+====
+Pour sélectionner Tout/Tous, laissez ce champ vide.
+====
+--
+
+* *Ports*
++
+--
+____
+S'il y a des ports spécifiques à limiter à cette règle, entrez-les ici. Pour le trafic ICMP, entrez icmp.
+____
+
+[NOTE]
+====
+Pour sélectionner Tout/Tous, laissez ce champ vide.
+====
+--
+
+* *Refuser/Autoriser*
++
+--
+____
+Indiquez si cette règle doit autoriser ce type de connexion ou le refuser.
+____
+
+Si Refuser est sélectionné, {product-name} enregistrera cela comme une violation en mode Surveillance, et bloquera cela en mode Protection. L'action par défaut est de Refuser une connexion (enregistrer la violation uniquement si en mode Surveillance) si aucune règle ne correspond.
+--
+
+[IMPORTANT]
+====
+N'oubliez pas de déployer/mettre à jour si vous apportez des modifications !
+====
+
+== Contrôle de sortie{nbsp}: Autoriser les connexions aux services internes de confiance sur d'autres réseaux
+
+Un cas d'utilisation courant pour personnaliser les règles est de permettre à un service de conteneur de se connecter à un réseau en dehors du réseau du cluster géré par {product-name}. Dans de nombreux cas, puisque {product-name} ne reconnaît pas ce réseau, il le classera comme un réseau '`External`', même s'il s'agit d'un réseau interne.
+
+Pour permettre aux conteneurs de se connecter à des services sur d'autres réseaux internes, créez d'abord un groupe, puis une règle pour celui-ci.
+
+. Créer un groupe. Dans les groupes de la stratégie ->, cliquez pour ajouter un nouveau groupe. Nommez le groupe (par exemple, interne) puis spécifiez les critères pour le groupe. Par exemple, spécifiez le nom DNS, l'adresse IP ou la plage d'adresses des services internes. Enregistrez le nouveau groupe.
+. Créer une règle. Dans les règles de la stratégie ->, cliquez pour ajouter une nouvelle règle. Sélectionnez le groupe représentant le conteneur à partir duquel les connexions vont provenir, puis le groupe de destination (par exemple, interne). Vous pouvez affiner davantage la règle avec des protocoles ou des ports spécifiques, ou laisser vide. Assurez-vous que le sélecteur est réglé sur Autoriser (vert).
+
+N'oubliez pas de cliquer sur Déployer pour enregistrer la nouvelle règle.
+
+Enfin, passez en revue la liste des règles pour vous assurer que la nouvelle règle est dans l'ordre et la priorité souhaités. Les règles sont appliquées de haut en bas.
+
+=== Politique IP d'entrée basée sur X-FORWARDED-FOR
+
+Dans un cluster Kubernetes, une application peut être exposée à l'extérieur du cluster par un NodePort, un LoadBalancer ou des services Ingress. Ces services remplacent généralement l'IP source tout en effectuant le NAT source (SNAT) sur les paquets. Comme l'IP source d'origine est masquée, cela empêche {product-name} de reconnaître que la connexion provient en réalité de l'"extérieur".
+
+Pour préserver l'adresse IP source d'origine, l'utilisateur doit ajouter la ligne suivante aux services exposés, dans la section 'spec' du load balancer ou du contrôleur d'ingress exposé. (Réf{nbsp}: https://kubernetes.io/docs/tutorials/services/source-ip/)
+
+[,json]
+----
+"externalTrafficPolicy":"Local"
+----
+
+De nombreuses implémentations de services LoadBalancer et de contrôleurs d'ingress ajouteront la ligne X-FORWARDED-FOR à l'en-tête de la requête HTTP pour communiquer la véritable IP source aux applications backend. Ce produit peut reconnaître cet ensemble d'en-têtes HTTP, identifier l'IP source d'origine et appliquer la stratégie en conséquence.
+
+Cette amélioration a créé des problèmes inattendus dans certaines configurations. Si la ligne ci-dessus a été ajoutée aux services exposés et que les stratégies réseau {product-name} ont été créées de manière à s'attendre à ce que les connexions réseau proviennent de services proxy/ingress internes, car nous identifions maintenant que les connexions proviennent de "l'extérieur" du cluster, le trafic normal des applications pourrait déclencher des alertes ou être bloqué si les applications sont mises en mode "Protéger".
+
+Un interrupteur est disponible pour désactiver cette fonctionnalité. La désactivation indique à {product-name} de ne pas identifier que la connexion provient de "l'externe" en utilisant les en-têtes X-FORWARDED-FOR. Par défaut, cela est activé, et l'en-tête X-FORWARDED-FOR est utilisé dans l'application des stratégies. Pour le désactiver, allez dans Paramètres -> Configuration, et désactivez le paramètre "Correspondance de stratégie basée sur X-Forwarded-For".
+
+=== Application spéciale pour les destinations Istio ServiceEntry
+
+La fonctionnalité d'application de politique réseau Egress a été ajoutée dans la version 5.1.0 pour les pods vers les destinations ServiceEntry déclarées avec Istio. Typiquement, un ServiceEntry définit comment un service externe référencé par un nom DNS est résolu en une adresse IP de destination. Avant la v5.1, {product-name} ne pouvait pas détecter et appliquer des règles pour les connexions à un ServiceEntry, donc toutes les connexions étaient classées comme externes. Avec la version 5.1, des règles peuvent être appliquées pour des destinations ServiceEntry spécifiques. Des violations implicites seront signalées pour le trafic nouvellement visible si des règles d'autorisation n'existent pas. Ces règles peuvent être apprises et auto-créées en mode Découverte. Pour autoriser ce trafic, vous pouvez mettre le groupe en mode Découverte ou créer un groupe personnalisé avec des adresses de destination (ou un nom DNS) et ajouter une nouvelle règle réseau à cette destination pour autoriser le trafic.
+
+=== Politique réseau basée sur l'hôte virtuel
+
+Les groupes personnalisés peuvent prendre en charge des groupes d'adresses basés sur l'hôte virtuel. Cela permet un cas d'utilisation où deux adresses FQDN différentes sont résolues en la même adresse IP, mais des règles différentes pour chaque FQDN doivent être appliquées. Un nouveau groupe personnalisé avec '`address=vh:xxx.yyy`' peut être créé en utilisant l'indicateur '`vh:`' pour activer cette protection. Une règle réseau peut alors utiliser le groupe personnalisé comme la source '`From`' basée sur le nom d'hôte virtuel (au lieu de l'adresse IP résolue) pour appliquer des stratégies différentes pour les hôtes virtuels.
+
+== Protections réseau en mode fractionné
+
+Les groupes de conteneurs peuvent avoir des règles de processus et de fichier dans un mode différent de celui des règles réseau, comme décrit xref:modes.adoc#_network_service_policy_mode[ici].
+
+== Détection des menaces réseau intégrée
+
+{product-name} détecte automatiquement certaines attaques réseau, quel que soit le mode de protection. En mode Découverte et Surveillance, ces menaces seront signalées et peuvent être trouvées dans les Notifications -> Événements de Sécurité. En mode Protection, celles-ci seront également signalées et bloquées. Des règles de réponse peuvent également être créées en fonction de la détection des menaces.
+
+Notez que la détection des menaces réseau personnalisée peut être configurée via la section des règles WAF.
+
+{product-name} inclut les détections suivantes pour les menaces{nbsp}:
+
+* Attaque RCE Apache Struts
+* Attaque de débordement de chiffre
+* Détecter le débordement de tampon de longueur de contenu HTTP négative
+* Détecter le refus d'accès MySQL
+* Détecter la version SSH 1, 2 ou 3
+* Détecter SSL TLS v1.0, v1.1 (nécessite une variable d'environnement pour être activé)
+* Attaque de débordement de tampon DNS
+* Attaque DDOS par inondation DNS
+* Attaque de type nul DNS
+* Attaque de tunneling DNS
+* Attaque de transfert de zone DNS
+* Attaque DDOS HTTP Slowloris
+* Attaque de contournement HTTP
+* Attaque par inondation ICMP
+* Attaque par tunneling ICMP
+* Attaque Teardrop IP
+* Attaque de l'homme du milieu Kubernetes selon CVE-2020-8554
+* Attaque Ping de la mort
+* attaque par injection SQL
+* attaque SSL Heartbleed
+* attaque par inondation SYN
+* attaque par petite fenêtre TCP
+* attaque par poignée de main TCP fractionnée
+* Attaque par réduction de la MSS TCP

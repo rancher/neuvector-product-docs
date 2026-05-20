@@ -1,0 +1,184 @@
+= Scanners Paralelos e Independentes
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/06.scanners/06.scanners.md
+:page-opendocs-slug:  /scanning/scanners
+
+== Aumente a escalabilidade do scanner com múltiplos scanners
+
+Para aumentar o desempenho e a escalabilidade do scanner, {product-name} suporta a implantação de múltiplos pods de scanner que podem, em paralelo, escanear imagens em registros. O controlador atribui tarefas de escaneamento a cada pod de scanner disponível. Os pods de scanner podem ser facilmente escalados para cima ou para baixo conforme necessário usando o Kubernetes.
+
+Os pods de scanner devem ser implantados em nós separados para distribuir a carga de trabalho entre diferentes recursos de host. Lembre-se de que um scanner requer memória suficiente para puxar e expandir a imagem, portanto, deve ter disponível mais do que o maior tamanho de imagem a ser escaneada. Se necessário, os scanners podem ser colocados em nós específicos ou evitar colocar múltiplos pods em um único nó usando rótulos de nó padrão do Kubernetes, taints/tolerations ou configurações de afinidade de nó.
+
+Por padrão, {product-name} implanta 2 pods de scanner, como parte das implantações de exemplo na seção Implantando {product-name}. Esses replicasets podem ser escalados para cima ou para baixo conforme necessário.
+
+O contêiner do scanner possui o banco de dados CVE mais recente e é atualizado regularmente (com a tag 'latest') pelo {product-name}. O atualizador reimplanta o scanner, forçando-o a puxar a imagem mais recente do scanner para obter o banco de dados CVE mais recente. Veja a seção xref:updating.adoc[Atualizando o Banco de Dados CVE] para mais detalhes sobre o atualizador.
+
+Por favor, note que nas versões iniciais a presença e o status de múltiplos scanners são visíveis apenas no Kubernetes com 'kubectl get pods -n neuvector' e não serão exibidos no console web.
+
+Os resultados de escaneamento de todos os scanners são exibidos no menu Assets -> Registries. Recursos adicionais de monitoramento de scanners serão adicionados em futuras versões.
+
+=== Escalonamento automático de pods de scanner
+
+Os pods de scanner podem ser configurados para escalar automaticamente com base em certos critérios. Isso garantirá que os trabalhos de digitalização sejam tratados de forma rápida e eficiente, especialmente se houver milhares de imagens a serem digitalizadas ou redigitalizadas. Existem três configurações possíveis: atrasada, imediata e desativada. Quando as imagens estão na fila para digitalização pelo controlador, ele mantém uma 'contagem de tarefas' do tamanho da fila.
+
+* Estratégia atrasada:
+** Quando o controlador principal vê continuamente "contagem de tarefas" > 0 por mais de 90 segundos, um novo pod de scanner é iniciado se o maxScannerPods ainda não foi alcançado.
+** Quando o controlador principal vê continuamente que "contagem de tarefas" é 0 por mais de 180 segundos, ele reduz um pod de scanner se o minScannerPods ainda não foi alcançado.
+* Estratégia imediata:
+** Toda vez que o controlador principal vê "contagem de tarefas" > 0, um novo pod de scanner é iniciado se o maxScannerPods ainda não foi alcançado.
+** Quando o controlador principal vê continuamente que "contagem de tarefas" é 0 por mais de 180 segundos, ele reduz um pod de scanner se o minScannerPods ainda não foi alcançado.
+
+O escalonamento automático do scanner é configurado em Configurações -> Configuração. A configuração minimumScannerPods define o número mínimo de pods de scanner em execução a qualquer momento, enquanto maxScannerPods define o número máximo de pods que a estratégia de escalonamento automático pode escalar até. NOTA: Definir um valor mínimo não ajustará o valor original do ReplicaSet de implantação do scanner. O valor mínimo será aplicado durante o primeiro evento de aumento/redução de escala.
+
+[IMPORTANT]
+====
+O escalonamento automático do scanner não é suportado quando o scanner é implantado com um operador OpenShift, pois o operador sempre mudará o número de pods para seu valor configurado.
+====
+
+=== Operações e Depuração
+
+Cada pod de scanner consultará os registros a serem digitalizados para baixar a lista completa de imagens disponíveis e outros dados. Cada scanner será então designado a uma imagem para puxar e digitalizar do registro.
+
+Para inspecionar o comportamento do scanner, os logs de cada pod de scanner podem ser examinados usando
+
+[,shell]
+----
+kubectl logs <scanner-pod-name> -n neuvector
+----
+
+== Planejamento de Desempenho
+
+Experimente com diferentes números de scanners em registros com um grande número de imagens para observar o comportamento do tempo de conclusão da digitalização em seu ambiente. 2-5 scanners, pois a configuração de réplica deve ser suficiente para a maioria dos casos.
+
+Quando uma tarefa de digitalização é atribuída a um scanner, ele puxa a imagem do registro (após consultar o registro para a lista de imagens disponíveis). O tempo que leva para puxar a imagem (baixar) geralmente consome mais tempo. Múltiplos scanners podem estar puxando imagens do mesmo registro em paralelo, portanto, o desempenho pode ser limitado pela largura de banda do registro ou da rede.
+
+Imagens grandes levarão mais tempo para serem puxadas, além de precisarem ser expandidas para que possam ser digitalizadas, consumindo mais memória. Certifique-se de que cada scanner tenha memória suficiente alocada para lidar com mais do que a maior imagem esperada (mínimo de 10% a mais).
+
+Múltiplos pods de scanner podem ser implantados no mesmo host/nó, mas considerações devem ser feitas para garantir que o host tenha memória, CPU, e largura de banda de rede suficientes para maximizar o desempenho do scanner.
+
+== Scanner Autônomo para Digitalização Local
+
+{product-name} suporta implantações de scanner autônomo para digitalização de imagens locais (que não requer um Controlador). No exemplo de execução do docker abaixo, a imagem local será digitalizada e os resultados armazenados em /var/neuvector localmente. Para digitalização local, a imagem deve ser acessível através do docker.sock montado, caso contrário, um registro pode ser especificado.
+
+[,bash]
+----
+docker run --name neuvector.scanner --rm -e SCANNER_REPOSITORY=ubuntu -e SCANNER_TAG=16.04 -e SCANNER_ON_DEMAND=true -v /var/run/docker.sock:/var/run/docker.sock -v /var/neuvector:/var/neuvector  neuvector/scanner
+----
+
+As seguintes variáveis de ambiente do scanner podem ser usadas no comando de execução do docker:
+
+* SCANNER_REGISTRY= URL do registro (opcional em vez de digitalização local)
+* SCANNER_REPOSITORY= repositório a ser digitalizado
+* SCANNER_TAG= tag de versão
+* SCANNER_REGISTRY_USERNAME= usuário (opcional em vez de digitalização local)
+* SCANNER_REGISTRY_PASSWORD= senha (opcional em vez de digitalização local)
+* SCANNER_SCAN_LAYERS= verdadeiro ou falso (para retornar resultados de digitalização em camadas)
+* SCANNER_ON_DEMAND=verdadeiro (obrigatório)
+* CLUSTER_JOIN_ADDR (opcional), CLUSTER_JOIN_PORT (opcional) - para enviar resultados ao controlador para uso em regras de controle de admissão (controlador implantado no Kubernetes).
+* CLUSTER_ADVERTISED_ADDR (opcional) - se o scanner estiver em um host diferente do controlador, para enviar resultados para uso nas regras de controle de admissão (controlador implantado no Kubernetes).
+
+=== Escaneamento de Host em Modo Autônomo
+
+Utilize o seguinte comando para escanear o host.
+
+[CAUTION]
+====
+Requer modo privilegiado!
+====
+
+
+[,shell]
+----
+docker run --rm --privileged --pid=host neuvector/scanner -n neuvector
+----
+
+=== Implantação Manual de Múltiplos Scanners no Kubernetes
+
+Para implantar scanners manualmente como parte de uma implantação existente no Kubernetes, crie um novo vínculo de função:
+
+[,shell]
+----
+kubectl create rolebinding neuvector-admin --clusterrole=admin --serviceaccount=neuvector:default -n neuvector
+----
+
+Ou para OpenShift
+
+[,shell]
+----
+oc adm policy add-role-to-user admin system:serviceaccount:neuvector:default -n neuvector
+----
+
+Utilize o arquivo abaixo para implantar múltiplos scanners. Edite as réplicas para aumentar ou diminuir o número de scanners em execução em paralelo.
+
+[,yaml]
+----
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neuvector-scanner-pod
+  namespace: neuvector
+spec:
+  selector:
+    matchLabels:
+      app: neuvector-scanner-pod
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: neuvector-scanner-pod
+    spec:
+      containers:
+        - name: neuvector-scanner-pod
+          image: neuvector/scanner
+          imagePullPolicy: Always
+          env:
+            - name: CLUSTER_JOIN_ADDR
+              value: neuvector-svc-controller.neuvector
+# Commented out sections are required only for local build-phase scanning
+#            - name: SCANNER_DOCKER_URL
+#              value: tcp://192.168.1.10:2376
+#          volumeMounts:
+#            - mountPath: /var/run/docker.sock
+#              name: docker-sock
+#              readOnly: true
+#      volumes:
+#        - name: docker-sock
+#          hostPath:
+#            path: /var/run/docker.sock
+      restartPolicy: Always
+----
+
+Em seguida, crie ou atualizar o cron job do atualizador do banco de dados CVE. Isso atualizará o banco de dados CVE todas as noites.
+
+[,yaml]
+----
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: neuvector-updater-pod
+  namespace: neuvector
+spec:
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: neuvector-updater-pod
+        spec:
+          containers:
+          - name: neuvector-updater-pod
+            image: neuvector/updater
+            imagePullPolicy: Always
+            command:
+            - /bin/sh
+            - -c
+            - TOKEN=`cat /var/run/secrets/kubernetes.io/serviceaccount/token`; /usr/bin/curl -kv -X PATCH -H "Authorization:Bearer $TOKEN" -H "Content-Type:application/strategic-merge-patch+json" -d '{"spec":{"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt":"'`date +%Y-%m-%dT%H:%M:%S%z`'"}}}}}' 'https://kubernetes.default/apis/apps/v1/namespaces/neuvector/deployments/neuvector-scanner-pod'
+          restartPolicy: Never
+----

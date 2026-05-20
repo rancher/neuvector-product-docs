@@ -1,0 +1,80 @@
+= Detectar el uso de ancho de banda alto por un Pod/Grupo (DDoS)
+:revdate: 2026-02-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/15.detectbandwidthddos/15.detectbandwidthddos.md
+:page-opendocs-slug:  /policy/detectbandwidthddos
+
+Los usuarios {product-name} pueden establecer la detección de violaciones de ancho de banda o de tasa de sesión a nivel de grupo basándose en ajustes de umbral preconfigurados. Estas configuraciones funcionan para grupos aprendidos o creados por el usuario, pero no para grupos reservados.
+
+Se crea un agente temporizador de un minuto para comprobar periódicamente el umbral de métrica del grupo en busca de violaciones. Una vez que se detecta una violación, se genera un evento `Group.Metric.Violation` y se imprime un mensaje para describir el evento.
+
+Puedes configurar los siguientes umbrales de métrica para cada grupo:
+
+* `Mon_metric`: Habilita o deshabilita la monitorización de métricas para el grupo.
+
+* `Grp_sess_rate`: Umbral de tasa de sesión, medido en conexiones por segundo (cps). El valor por defecto es `0`, que desactiva la detección.
+
+* `Grp_band_width`: Umbral de rendimiento, medido en megabits por segundo (Mbps). El valor por defecto es `0`, que desactiva la detección.
+
+* `Grp_cur_sess`: Umbral de conteo de sesiones activas.
+
+== Configurar umbrales de métrica del grupo
+
+Puedes configurar los umbrales de métrica del grupo utilizando ya sea la {product-name} CLI o la interfaz web.
+
+=== Configurar umbrales utilizando la CLI
+
+Para ver las opciones de métrica del grupo disponibles, ejecuta el siguiente comando:
+
+[source,shell]
+----
+set group <group-name> setting -h
+----
+
+Resultado de ejemplo:
+
+[source,shell]
+----
+--monitor_metric [enable|disable]   Monitor metric status
+--cur_sess INTEGER                  Active session threshold
+--sess_rate INTEGER                 Session rate threshold (cps)
+--bandwidth INTEGER                 Throughput threshold (Mbps)
+----
+
+=== Configurar umbrales utilizando la interfaz web
+
+Puedes habilitar o deshabilitar los umbrales de métrica del grupo al crear o editar un grupo.
+
+* Utiliza la vista *Añadir grupo* para configurar umbrales para un nuevo grupo.
++
+image:bandwidth_ddos_1.png[Añadir grupo]
++
+* Utiliza la vista *Editar grupo* para actualizar los umbrales de un grupo existente.
++
+image:bandwidth_ddos_2.png[Editar grupo]
+
+== Flujo de trabajo de ejemplo
+
+El siguiente ejemplo muestra cómo funciona la detección de umbrales de métricas de grupo.
+
+. Añade umbrales de métrica a un grupo aprendido o creado por el usuario.
++
+image:bandwidth_ddos_3.png[Añadir grupo]
++
+. Genera tráfico hacia el grupo hasta que el conteo de sesiones activas alcance el umbral configurado.
++
+image:bandwidth_ddos_4.png[Añadir grupo]
++
+. Cuando se supera un umbral, {product-name} genera un evento `Group.Metric.Violation`.
++
+image:bandwidth_ddos_5.png[Añadir grupo]
+
+
+[NOTE]
+====
+* {product-name} evalúa el tráfico promedio durante los 60 segundos anteriores para determinar si se ha superado un umbral.
+* El modo de protección proporciona las mediciones más precisas porque el aplicador opera en línea en la ruta de datos.
+* En entornos de múltiples clústeres, tanto el clúster primario como los clústeres downstream deben ejecutar la versión 5.4 o posterior para soportar umbrales de métricas de grupo federados.
+* Si los clústeres downstream ejecutan versiones anteriores a la 5.4, se ignoran las configuraciones de umbral federadas hasta que esos clústeres sean actualizados.
+* Después de actualizar los clústeres downstream a la versión 5.4 o posterior, resincroniza manualmente los clústeres para habilitar la monitorización de DDoS para grupos federados.
+====

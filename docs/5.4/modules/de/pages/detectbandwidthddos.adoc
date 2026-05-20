@@ -1,0 +1,80 @@
+= Erkennung von hohem Bandbreitenverbrauch durch einen Pod/eine Gruppe (DDoS)
+:revdate: 2026-02-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/15.detectbandwidthddos/15.detectbandwidthddos.md
+:page-opendocs-slug:  /policy/detectbandwidthddos
+
+{product-name} Benutzer können die Bandbreiten- oder Sitzungsratenverletzungsüberwachung auf Gruppenebene basierend auf vordefinierten Schwellenwerten einstellen. Diese Einstellungen gelten für erlernte oder benutzererstellte Gruppen, jedoch nicht für reservierte Gruppen.
+
+Ein Timer mit einer Minute wird erstellt, um regelmäßig den Schwellenwert für Gruppenmetriken auf Verstöße zu überprüfen. Sobald ein Verstoß erkannt wird, wird ein `Group.Metric.Violation` Ereignis generiert und eine Nachricht wird ausgegeben, um das Ereignis zu beschreiben.
+
+Sie können die folgenden Metrikschwellenwerte für jede Gruppe konfigurieren:
+
+* `Mon_metric`: Aktiviert oder deaktiviert die Metriküberwachung für die Gruppe.
+
+* `Grp_sess_rate`: Schwellenwert für die Sitzungsrate, gemessen in Verbindungen pro Sekunde (cps). Der Standardwert ist `0`, was die Erkennung deaktiviert.
+
+* `Grp_band_width`: Schwellenwert für den Durchsatz, gemessen in Megabit pro Sekunde (Mbps). Der Standardwert ist `0`, was die Erkennung deaktiviert.
+
+* `Grp_cur_sess`: Schwellenwert für die Anzahl aktiver Sitzungen.
+
+== Konfigurieren Sie die Metrikschwellenwerte der Gruppe
+
+Sie können die Metrikschwellenwerte der Gruppe entweder über die {product-name} Kommandozeilenschnittstelle oder die Web-UI konfigurieren.
+
+=== Konfigurieren Sie Schwellenwerte über die Kommandozeilenschnittstelle
+
+Um die verfügbaren Metrikoptionen für Gruppen anzuzeigen, führen Sie den folgenden Befehl aus:
+
+[source,shell]
+----
+set group <group-name> setting -h
+----
+
+Beispielausgabe:
+
+[source,shell]
+----
+--monitor_metric [enable|disable]   Monitor metric status
+--cur_sess INTEGER                  Active session threshold
+--sess_rate INTEGER                 Session rate threshold (cps)
+--bandwidth INTEGER                 Throughput threshold (Mbps)
+----
+
+=== Konfigurieren Sie Schwellenwerte über die Web-UI
+
+Sie können die Metrikschwellenwerte der Gruppe beim Erstellen oder Bearbeiten einer Gruppe aktivieren oder deaktivieren.
+
+* Verwenden Sie die *Add Group* Ansicht, um Schwellenwerte für eine neue Gruppe zu konfigurieren.
++
+image:bandwidth_ddos_1.png[Add Group]
++
+* Verwenden Sie die *Edit Group* Ansicht, um die Schwellenwerte für eine vorhandene Gruppe zu aktualisieren.
++
+image:bandwidth_ddos_2.png[Edit Group]
+
+== Beispielworkflow
+
+Das folgende Beispiel zeigt, wie die Schwellenwertüberwachung für Gruppen funktioniert.
+
+. Fügen Sie einer gelernten oder benutzererstellten Gruppe Metrikschwellenwerte hinzu.
++
+image:bandwidth_ddos_3.png[Add Group]
++
+. Generieren Sie Verkehr zur Gruppe, bis die Anzahl der aktiven Sitzungen den konfigurierten Schwellenwert erreicht.
++
+image:bandwidth_ddos_4.png[Add Group]
++
+. Wenn ein Schwellenwert überschritten wird, {product-name} generiert ein `Group.Metric.Violation` Ereignis.
++
+image:bandwidth_ddos_5.png[Add Group]
+
+
+[NOTE]
+====
+* {product-name} bewertet den durchschnittlichen Verkehr der letzten 60 Sekunden, um festzustellen, ob ein Schwellenwert überschritten wurde.
+* Der Schutzmodus bietet die genauesten Messungen, da der Durchsetzer inline im Datenpfad arbeitet.
+* In Multi-Cluster-Umgebungen müssen sowohl der primäre als auch die verwalteten Cluster Version 5.4 oder höher verwenden, um federierte Gruppenmetrik-Schwellenwerte zu unterstützen.
+* Wenn verwaltete Cluster Versionen vor 5.4 ausführen, werden federierte Schwellenwerteinstellungen ignoriert, bis diese Cluster aktualisiert werden.
+* Nach der Aktualisierung der verwalteten Cluster auf Version 5.4 oder höher synchronisieren Sie die Cluster manuell, um die DDoS-Überwachung für federierte Gruppen zu aktivieren.
+====

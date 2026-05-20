@@ -1,0 +1,110 @@
+= Modes{nbsp}: Découvrir, Surveiller, Protéger
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/02.modes/02.modes.md
+:page-opendocs-slug:  /stratégie/modes
+
+== {product-name} Modes
+
+Le {product-name} module de détection des violations a trois modes : Découvrir, Surveiller et Protéger. À tout moment, tout Groupe (commençant par 'nv', ou le groupe 'Nœuds') peut être dans l'un de ces modes. Le mode peut être changé depuis le menu Groupes, la vue Activité Réseau ou le Tableau de Bord. Les Groupes de Conteneurs peuvent avoir des règles de Processus/Fichier dans un mode différent de celui des règles Réseau, comme décrit xref:modes.adoc#_network_service_policy_mode[ici].
+
+image:switchmodes.png[Modes]
+
+[NOTE]
+====
+Les groupes créés sur mesure n'ont pas de mode de Protection. C'est parce qu'ils peuvent contenir des conteneurs provenant de différents groupes sous-jacents, chacun pouvant être dans un mode différent, ce qui entraîne une confusion sur le comportement.
+====
+
+=== Découverte
+
+Par défaut, {product-name} commence en mode Découverte. Dans ce mode, {product-name}{nbsp}:
+
+* Découvre votre infrastructure de conteneurs, y compris les conteneurs, les nœuds et les hôtes.
+* Apprend vos applications et comportements en observant les conversations (connexions réseau) entre les conteneurs.
+* Identifie les services et applications distincts en cours d'exécution.
+* Construit automatiquement une liste blanche de Règles Réseau pour protéger le comportement normal du réseau des applications.
+* Établit des références des processus en cours d'exécution dans les conteneurs pour chaque service et crée des Règles de Profil de Processus en liste blanche.
+
+[NOTE]
+====
+Pour déterminer combien de temps un service doit fonctionner en mode Découverte, faites passer du trafic de test à travers l'application et examinez toutes les règles pour en vérifier l'exhaustivité. Plusieurs heures devraient suffire, mais certaines applications peuvent nécessiter quelques jours pour être pleinement exercées. En cas de doute, passez en mode Surveillance et vérifiez les violations, qui peuvent ensuite être converties en règles de liste blanche avant de passer en mode Protection.
+====
+
+=== Monitor
+
+En mode Surveillance, {product-name} surveille les conversations et détecte les violations de votre Stratégie de Sécurité en temps réel. Dans ce mode, aucune nouvelle règle n'est créée par {product-name}, mais des règles peuvent être ajoutées manuellement à tout moment.
+
+Lorsque des violations sont détectées, elles sont visibles sur la carte d'Activité Réseau par une ligne rouge. Les violations sont également enregistrées et affichées dans l'onglet Notifications. Les violations de règles de profil de processus et d'accès aux fichiers sont enregistrées dans les Notifications -> Événements de Sécurité.
+
+Dans la carte Réseau, vous pouvez cliquer sur n'importe quelle conversation (ligne verte, jaune, rouge) pour afficher plus de détails sur le type de connexion et le protocole surveillé en dernier. Vous pouvez également utiliser les boutons Rechercher et Filtrer par Groupe en bas à droite pour affiner l'affichage de vos conteneurs.
+
+=== Protéger
+
+En mode Protection, {product-name} les agents bloqueront (refuseront) toutes les violations et attaques réseau détectées. Les violations sont affichées sur la carte Réseau avec un '`x`' rouge, ce qui signifie qu'elles ont été bloquées. Les processus non autorisés et l'accès aux fichiers seront également bloqués en mode Protection. Les capteurs DLP qui correspondent bloqueront les connexions réseau.
+
+== Changement entre les modes
+
+Vous pouvez facilement changer {product-name} Groupes d'un mode à un autre. N'oubliez pas qu'en mode Découverte, {product-name} construit une stratégie de sécurité pour le comportement normal des conteneurs autorisés. Vous pouvez voir ces règles dans l'onglet Groupes de la stratégie -> ou en détail dans le menu Règles réseau de la stratégie ->.
+
+Lorsque vous passez du mode Découverte au mode Surveillance, {product-name} signalera toutes les violations de comportement normal non explicitement autorisées. Parce que {product-name} applique la stratégie en fonction des applications et des groupes avec des attributs similaires, il n'est généralement pas nécessaire d'ajouter ou de modifier des règles lors de l'augmentation ou de la réduction des conteneurs.
+
+Veuillez vous assurer qu'avant d'introduire de nouvelles mises à jour entraînant de nouveaux types de connexions entre les conteneurs, vous passez le(s) Service(s) concerné(s) en mode Découverte pour apprendre ces nouveaux comportements. Alternativement, vous pouvez ajouter manuellement de nouvelles règles en étant dans n'importe quel mode, ou modifier le CRD utilisé pour créer les règles afin d'ajouter de nouveaux comportements.
+
+=== Nouveau mode de service
+
+Si de nouveaux services sont découverts par {product-name}, par exemple, si un conteneur précédemment inconnu commence à fonctionner, il peut être défini sur un mode par défaut. En mode Découverte, {product-name} commencera à apprendre son comportement et à établir des règles. En mode Surveillance, une violation sera générée lorsque des connexions au nouveau service seront détectées. En mode Protection, toutes les connexions au nouveau service seront bloquées à moins que les règles n'aient été créées au préalable.
+
+image:newservices.png[NewServiceMode]
+
+=== Mode de stratégie de service réseau
+
+Il existe un paramètre global disponible dans Paramètres -> Configuration pour définir séparément le mode de protection du réseau pour l'application des règles réseau. L'activation de cette option (par défaut désactivée) entraîne que toutes les règles réseau se voient appliquer le mode de protection sélectionné (Découverte, Surveillance, Protection), tandis que les règles de processus/fichier restent dans le mode de protection pour ce groupe, comme affiché dans l'onglet Groupes de la stratégie ->. De cette manière, les règles réseau peuvent être définies sur Protection (blocage), tandis que la stratégie de processus/fichier peut être définie sur Surveillance, ou vice versa.
+
+=== Promotion automatisée des modes de groupe
+
+Promeut le mode de protection d'un groupe en fonction du temps écoulé et des critères. Cette automatisation ne s'applique pas aux groupes créés par CRD. Cette fonctionnalité permet à une nouvelle application de fonctionner en mode Découverte pendant une certaine période, apprenant le comportement et {product-name} créant des règles de liste blanche pour le réseau et le processus, puis passant automatiquement en mode Surveillance, puis en mode Protection.
+
+Le critère pour passer du mode Découverte au mode Surveillance est{nbsp}: le temps écoulé pour apprendre toute l'activité réseau et de processus d'au moins un pod actif dans le groupe. Par exemple, si cela est réglé sur 7 jours, alors 7 jours après qu'un pod en cours d'exécution pour le groupe soit détecté, le mode sera automatiquement promu à Surveillance.
+
+Le critère pour passer du mode Surveillance au mode Protection est{nbsp}: il n'y a aucun événement de sécurité (réseau, processus, etc.) pour la période de temps définie pour le groupe. Par exemple, si cela est réglé sur 14 jours, alors si aucune violation (réseau, processus, fichier) n'est déclenchée pendant 14 jours (par exemple, la période de calme), alors le mode est automatiquement promu à Protection. S'il n'y a pas de pods en cours d'exécution dans le groupe, la promotion ne se produira pas.
+
+image:policy_promotion.png[Promotion]
+
+==== Résolution des conflits entre services dans différents modes
+
+Pour les connexions réseau entre conteneurs dans différents groupes de services, si leurs modes de stratégie sont différents, le tableau suivant montre comment le système résout les conflits.
+
+|===
+| Source | Destination | Mode effectif
+
+| Découverte
+| Monitor
+| Découverte
+
+| Découverte
+| Protéger
+| Découverte
+
+| Monitor
+| Découverte
+| Découverte
+
+| Monitor
+| Protéger
+| Monitor
+
+| Protéger
+| Découverte
+| Découverte
+
+| Protéger
+| Monitor
+| Monitor
+|===
+
+Comme vous pouvez le constater, le mode effectif par défaut est toujours le mode de stratégie le moins restrictif.
+
+[NOTE]
+====
+Ce qui précède s'applique uniquement aux règles réseau.
+====

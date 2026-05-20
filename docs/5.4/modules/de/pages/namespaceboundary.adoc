@@ -1,0 +1,86 @@
+= Durchsetzung der Namespace-Grenze
+:revdate: 2026-02-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/14.namespaceboundary/14.namespaceboundary.md
+:page-opendocs-slug:  /policy/namespaceboundary
+
+== Richtlinie: Durchsetzung der Namespace-Grenze
+
+Standardmäßig können Pods in verschiedenen Namespaces miteinander kommunizieren, auch wenn sie unterschiedliche Labels verwenden. Um dieses Verhalten einzuschränken, müssen Sie zusätzliche Netzwerkregeln erstellen.
+
+Die Durchsetzung der Namespace-Grenze bietet eine einfachere Möglichkeit, die Pod-Kommunikation auf einen Namespace oder auf natürliche Anwendungsgrenzen zu beschränken.
+
+== Wie die Durchsetzung der Namespace-Grenze funktioniert
+
+Das `NeuvectorNamespaceBoundary`-Namespace-Label setzt Kommunikationsgrenzen zwischen Pods durch. Wenn aktiviert, beschränkt NeuVector den Datenverkehr, sodass Pods nur innerhalb desselben Namespace oder innerhalb definierter Anwendungsgrenzen kommunizieren.
+
+Dieser Ansatz reduziert die Notwendigkeit für benutzerdefinierte Gruppen und zusätzliche Richtlinien.
+
+== Aktivieren oder Deaktivieren der Durchsetzung der Namespace-Grenze
+
+Um die Durchsetzung der Namespace-Grenze zu steuern, wenden Sie das `NeuvectorNamespaceBoundary`-Label auf einen Namespace an.
+
+=== Durchsetzung aktivieren
+
+[source,bash]
+----
+kubectl label namespace <namespace> NeuvectorNamespaceBoundary=enabled
+----
+
+=== Durchsetzung deaktivieren
+
+[source,bash]
+----
+kubectl label namespace <namespace> NeuvectorNamespaceBoundary=disabled
+----
+
+=== Label entfernen
+
+Das Entfernen des Labels deaktiviert die Durchsetzung der Namespace-Grenze.
+
+[source,bash]
+----
+kubectl label namespace <namespace> NeuvectorNamespaceBoundary-
+----
+
+== Beispielszenario
+
+Dieses Beispiel zeigt, wie die Durchsetzung der Namespace-Grenze die Eingangs- und Ausgangskontrolle vereinfacht.
+
+=== Umgebung
+
+* Zwei Namespaces: `ns1` und `ns2`
+* Pods:
+** `ns1`: `pod1` (Labels: `app=app1`, `label=one`), `pod2` (Labels: `app=app2`, `label=two`)
+** `ns2`: `pod3` (Labels: `app=app1`, `label=three`), `pod4` (Labels: `app=app2`, `label=four`)
+* Gruppen:
+** `g1`: `app=app1` (einschließlich `pod1` und `pod3`)
+** `g2`: `app=app2` (einschließlich `pod2` und `pod4`)
+
+Eine Richtlinie erlaubt den Datenverkehr von `g1` zu `g2` über jede Anwendung und jeden Port.
+
+=== Verhalten ohne Durchsetzung der Namespace-Grenze
+
+Mit nur der gruppenbasierten Richtlinie:
+
+* `pod1` kann mit `pod2` und `pod4` kommunizieren
+* `pod3` kann mit `pod2` und `pod4` kommunizieren
+
+Um die Kommunikation auf denselben Namespace zu beschränken, müssen Sie zusätzliche Gruppen und Ablehnungsrichtlinien erstellen:
+
+* Erstellen Sie Gruppen basierend auf einzelnen Labels
+* Fügen Sie Ablehnungsrichtlinien hinzu, um den Datenverkehr zwischen Namespaces zu blockieren
+
+Dies erhöht die Komplexität der Richtlinien und den Wartungsaufwand.
+
+=== Verhalten mit Durchsetzung der Namespace-Grenze
+
+Wenn die Durchsetzung der Namespace-Grenze aktiviert ist:
+
+* `pod1` kann nur mit `pod2` kommunizieren
+* `pod3` kann nur mit `pod4` kommunizieren
+* Die Kommunikation zwischen Namespaces wird automatisch blockiert
+
+Es sind keine zusätzlichen Gruppen oder Richtlinien erforderlich.
+
+Die Durchsetzung der Namespace-Grenze vereinfacht das Richtlinienmanagement und gewährleistet gleichzeitig eine strikte Isolation auf Namespace-Ebene.

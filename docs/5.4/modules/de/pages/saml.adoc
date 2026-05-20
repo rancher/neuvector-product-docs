@@ -1,0 +1,38 @@
+= SAML (Okta)
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/04.saml/04.saml.md
+:page-opendocs-slug:  /integration/saml
+
+== SAML IDP-Konfiguration
+
+Um {product-name} so zu konfigurieren, dass der Okta SAML IDP-Server verwendet wird, konfigurieren Sie zunächst den SAML IDP-Server auf der Okta-Website.
+
+image:okta.png[Okta]
+
+. Kopieren Sie die "SAML Redirect URI" von der {product-name} SAML-Einstellungsseite und fügen Sie sie in die Felder für die URL für die einmalige Anmeldung, die Empfänger-URL und die Ziel-URL von Okta ein.
+. Verschlüsselung der Assertion: Dieses Feld muss *unverschlüsselt.* sein.
+. Attribut-Aussagen: Geben Sie die E-Mail- und Benutzernamenattribute ein.
+. Gruppenattribut-Aussagen: Aktivieren Sie diese Option, wenn die gruppenbasierte Rollenzuordnung erforderlich ist. Der Standardattributname, nach dem {product-name} sucht, ist NVRoleGroup. Wenn ein anderer Attributname für die Gruppenmitgliedschaft des Benutzers verwendet wird, kann er auf der SAML-Einstellungsseite von {product-name} angepasst werden.
+
+Konfigurieren Sie die SAML-Einstellungen in der UI-Konsole von {product-name}.
+
+image:saml1.png[SAML]
+
+Verwenden Sie die Schaltfläche "Setup-Anleitung anzeigen", wie im folgenden Screenshot gezeigt, um die folgenden Informationen zu finden und in die SAML-Seite von {product-name} zu kopieren.
+
+. URL für die einmalige Anmeldung des Identitätsanbieters
+. Aussteller des Identitätsanbieters
+. X.509-Zertifikat
+. Geben Sie den Gruppenattributnamen an, wenn ein anderer Wert verwendet wird.
+
+image:setting.png[Einstellung]
+
+Nachdem der Benutzer authentifiziert ist, kann die entsprechende Rolle durch die gruppenbasierte Rollenzuordnung abgeleitet werden. Um die gruppenbasierte Rollenzuordnung einzurichten,
+
+. Wenn die gruppenbasierte Rollenzuordnung nicht konfiguriert ist oder die übereinstimmenden Gruppen nicht gefunden werden können, wird dem authentifizierten Benutzer die Standardrolle zugewiesen. Wenn die Standardrolle auf Keine gesetzt ist, kann der Benutzer sich nicht anmelden, wenn die gruppenbasierte Rollenzuordnung fehlschlägt.
+. Geben Sie eine Liste von Gruppen in der Rollenzuordnung für Administratoren und Leser an. Das Gruppenattribut des Benutzers wird in der Antwort nach der Authentifizierung mitgeschickt. Wenn die übereinstimmende Gruppe gefunden wird, wird die entsprechende Rolle dem Benutzer zugewiesen.
+
+=== Gruppen zu Rollen und Namespaces zuordnen
+
+Bitte sehen Sie sich den Abschnitt xref:users.adoc#_mapping_groups_to_roles_and_namespaces[Benutzer und Rollen] an, um zu erfahren, wie Gruppen den vordefinierten und benutzerdefinierten Rollen sowie Namespaces in {product-name} zugeordnet werden.

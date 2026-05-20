@@ -1,0 +1,75 @@
+= Importation du certificat Chrome - MacOS
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /03.configuration/01.console/02.chrome/02.chrome.md
+:page-opendocs-slug: /configuration/console/chrome
+
+== Activation des navigateurs Chrome pour accepter {product-name} le certificat auto-signé sur MacOS
+
+Dans certaines circonstances, le navigateur Chrome refusera catégoriquement d'accepter {product-name} un certificat auto-signé.  Une raison possible pourrait être que le certificat n'a pas encore été importé dans le magasin de certificats de connexion de macOS.  Une autre possibilité est qu'un certificat existant n'a pas encore été configuré pour être approuvé.  Cela empêchera l'utilisateur de l'accepter et de procéder à la page de connexion {product-name} en utilisant Chrome, comme illustré dans l'exemple ci-dessous{nbsp}:
+
+image:chrome1.png[chrome]
+
+Des mesures correctives peuvent être prises pour permettre à Chrome d'accepter le certificat auto-signé placé dans le trousseau macOS.  Cela peut être fait en configurant {product-name} le certificat de pour qu'il soit approuvé à l'aide de l'application Accès au trousseau de Mac.  Cela part du principe que le certificat existe effectivement dans le magasin Accès au trousseau de macOS.  Nous allons d'abord examiner comment exporter un certificat d'un {product-name} nœud existant d'un système, puis l'importer dans un autre système.   Il existe 2 façons d'exporter le certificat que nous allons examiner ci-dessous{nbsp}:  Elles consistent à utiliser le navigateur Chrome et à utiliser l'application Accès au trousseau de macOS.
+
+=== Exportation de certificat à l'aide de Chrome
+
+La capture d'écran ci-dessous illustre comment accéder {product-name} au certificat à l'aide de Chrome.
+
+image:chrome2.png[chrome]
+
+Pour exporter le certificat, faites glisser et déposez le certificat à l'emplacement de votre choix.
+
+image:chrome3.png[chrome]
+
+=== Exportation de certificat à l'aide d'Accès au trousseau de macOS
+
+Lancez l'application Accès au trousseau de macOS en appuyant simultanément sur les touches ⌘ + F à l'aide d'un clavier Mac, recherchez Accès au trousseau et double-cliquez sur l'application.
+Cela lance l'application Accès au trousseau.  Sélectionnez {product-name} le certificat et choisissez Exporter "`{product-name}`" dans le menu déroulant.  Cela permettra l'exportation du certificat vers un emplacement de votre choix.
+
+image:chrome4.png[chrome]
+
+=== Lancement de l'application Accès au trousseau de macOS
+
+Il existe deux façons de lancer l'application Accès au trousseau de macOS.  Cela peut être fait en recherchant depuis macOS, comme décrit dans les étapes ci-dessus, ou en utilisant le navigateur Chrome.
+
+=== Lancement de l'Accès au trousseau depuis le navigateur Chrome
+
+Paramètres > Avancé > Gérer les certificats
+
+image:chrome5.png[chrome]
+
+En cliquant sur Gérer les certificats comme indiqué ci-dessus, l'application Accès au trousseau de Mac se lance comme montré ci-dessous.
+
+image:chrome6.png[chrome]
+
+=== Importation de certificat dans le magasin Accès au trousseau de macOS
+
+Lancez l'application Accès au trousseau de macOS en entrant simultanément les touches ⌘ + F sur un clavier Mac, recherchez Accès au trousseau, et cliquez sur l'application.  Ensuite, importez le certificat en faisant glisser et déposer un {product-name} certificat (exemple{nbsp}: nvcertificate.cer) dans le volet droit de l'application Accès au trousseau.  Maintenant que le certificat a été importé, il n'est pas encore approuvé.
+Ce qui suit est un exemple montrant les paramètres de confiance par défaut après qu'un {product-name} certificat a été importé dans l'application Accès au trousseau.
+
+image:chrome7.png[chrome]
+
+Remarquez qu'aucun des paramètres n'a été configuré, et il n'est pas approuvé par défaut.  Il doit être configuré pour être approuvé afin de permettre à l'utilisateur d'accéder à la page de connexion en utilisant le navigateur Chrome.
+
+=== Activation de la confiance pour {product-name} le certificat
+
+Les étapes suivantes détaillent comment activer la confiance pour {product-name} le certificat dans Accès au trousseau.
+
+image:chrome8.png[chrome]
+
+Un double-clic sur {product-name} le certificat de la capture d'écran ci-dessus fera apparaître une autre boîte de dialogue contextuelle qui permet de configurer les autorisations de confiance pour différents paramètres.  Configurer le protocole Secure Sockets Layer (SSL) pour "`Always Trust`".
+
+image:chrome9.png[chrome]
+
+Fermez la boîte de dialogue et cliquez sur '\`Mettre à jour les paramètres`' après avoir saisi le mot de passe de l'utilisateur de connexion Mac dans la boîte de dialogue contextuelle suivante.
+
+image:chrome10.png[chrome]
+
+Cela finalise les configurations de confiance.  Ensuite, videz tout le cache du navigateur Chrome, fermez tous les navigateurs Chrome et relancez le navigateur Chrome.  Ensuite, visitez {product-name} la page de connexion, et en cliquant sur le lien "`Advanced`", le lien Procéder à ... (non sécurisé) sera affiché.  Cliquer sur Procéder à ... (non sécurisé) permettra à l'utilisateur de passer à la page de connexion avec le nom d'utilisateur et le mot de passe.
+
+image:chrome11.png[chrome]
+
+Ci-dessous se trouve une capture d'écran qui permet à l'utilisateur de passer à {product-name} la page de connexion après avoir cliqué sur le lien Procéder à ... (non sécurisé).
+
+image:chrome12.png[chrome]

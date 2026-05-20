@@ -1,0 +1,11 @@
+= GitHub
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/03.build/06.github/06.github.md
+:page-opendocs-slug:  /scanning/build/github
+
+== 扫描 GitHub Action 管道中的漏洞
+
+可以通过使用在 GitHub Action 市场上发布的 https://github.com/marketplace/actions/neuvector-vulnerability-scan-action[{product-name}漏洞扫描操作] 来触发{product-name}扫描器。
+
+image:github_action.png[GithubAction]

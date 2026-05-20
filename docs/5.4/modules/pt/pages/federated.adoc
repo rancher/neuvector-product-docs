@@ -1,0 +1,70 @@
+= Política Federada
+:revdate: 2024-09-25
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/12.federated/12.federated.md
+:page-opendocs-slug:  /policy/federated
+
+== Política Federada
+
+Após a criação de um cluster Master, regras Federadas podem ser criadas no Master e são automaticamente propagadas para cada cluster. Isso é útil para criar regras globais que devem ser aplicadas a cada cluster, como regras de rede globais. Regras Federadas aparecerão em cada cluster como somente leitura e NÃO podem ser deletadas ou editadas pelo administrador local do cluster.
+
+Para configurar regras Federadas, clique em Política Federada no menu suspenso no canto superior direito. Você verá abas para Grupos, Controle de Acesso, Regras de Rede e outras regras que podem ser federadas. Selecione a aba e crie um novo Grupo ou regra. No exemplo abaixo, dois grupos Federados foram criados, que serão propagados para cada cluster.
+
+image:fed_group.png[FederatedGroup]
+
+E a seguinte Regra de Rede Federada foi criada para permitir o acesso de SSL dos pods demo do nó ao google.com.
+
+image:fed_network.png[RedeFederada]
+
+Após essas regras e grupos terem sido propagados para o(s) cluster(s) remoto(s), eles aparecerão como regras e grupos Federados no console do cluster local.
+
+image:fed_rule_remote.png[FederatedRuleRemote]
+
+No exemplo acima, a regra Federada é mostrada, que é diferente das regras aprendidas e das regras 'criadas pelo usuário' que foram criadas no cluster local. A regra criada pelo usuário 1 pode ser selecionada para edição ou exclusão, enquanto a regra federada não pode. Além disso, regras de rede Federadas sempre aparecerão no topo da lista, assim tendo precedência sobre outras regras.
+
+Outras regras, como Controle de Acesso, Resposta, Processo e Arquivo, se comportarão da mesma forma, exceto que a ordem das regras é relevante apenas para as regras de Rede.
+
+Observe que a configuração das regras de Processo e Arquivo requer a seleção de um Grupo Federado, pois estas devem ser aplicadas a um grupo-alvo conforme definido na aba de Grupo Federado. Após um novo Grupo ter sido configurado em Grupos -> Federados, ele aparecerá como uma opção selecionável ao configurar um grupo nas regras de Processo ou Arquivo.
+
+== Exportar/Importar política de Federação
+
+As políticas de Federação—incluindo *Grupos*, *Controle de Admissão*, *Sensores DLP*, *Sensores WAF*, *Regras de Resposta* e *Configuração*—podem ser importadas e exportadas.
+
+Você pode selecionar uma ou mais entradas e clicar em **Exportar** para baixar o arquivo YAML localmente ou exportá-lo para um repositório remoto.
+
+As políticas de Federação podem ser importadas apenas no cluster primário. Após a importação, o cluster primário implanta as políticas em todos os clusters gerenciados.
+
+O seguinte exemplo demonstra como exportar um grupo federado.
+
+. Selecione um ou mais grupos federados e clique em **Exportar Política do Grupo**.
++
+image::select-group.png[Selecione grupo federado]
+
+. Selecione **Baixar para Local**, em seguida clique em **Enviar** para baixar o arquivo YAML.
++
+image::download-to-local.png[Baixar para Local]
+
+. Selecione **Exportar para Repositório Remoto**, em seguida clique em **Enviar** para exportar o arquivo YAML para o repositório remoto configurado.
++
+[NOTE]
+====
+A opção **Exportar para Repositório Remoto** está desativada até que um repositório remoto seja configurado em *Configurações > Configuração*.
+====
++
+image::Remote-repo-configurations.png[Configuração do repositório remoto]
+
+. Após uma exportação bem-sucedida, a mensagem de resposta exibe o caminho e o nome do arquivo exportado.
+
+Se o campo *Destino* estiver vazio, o NeuVector gera um nome de arquivo padrão e o exibe na resposta.
+
+image::response-for-empty-destination.png[Resposta para destino vazio]
+
+Se você especificar um nome de arquivo personalizado, a mensagem de resposta exibirá o nome fornecido.
+
+* Defina um nome personalizado para o arquivo exportado:
++
+image::define-name-for-exported-file.png[Defina o nome do arquivo exportado]
+
+* Resposta para um destino personalizado:
++
+image::response-for-customized-destination.png[Resposta para destino personalizado]

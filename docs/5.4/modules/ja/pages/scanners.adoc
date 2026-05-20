@@ -1,0 +1,184 @@
+= 並列およびスタンドアロンのスキャナー
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/06.scanners/06.scanners.md
+:page-opendocs-slug:  /スキャン/スキャナー
+
+== 複数のスキャナーでスキャナーのスケーラビリティを向上させる
+
+スキャナーの性能とスケーラビリティを向上させるために、{product-name}は複数のスキャナーポッドを展開することをサポートしており、これにより、並行してレジストリ内のイメージをスキャンできます。コントローラーは、利用可能な各スキャナーポッドにスキャンタスクを割り当てます。スキャナーポッドは、Kubernetesを使用して必要に応じて簡単にスケールアップまたはスケールダウンできます。
+
+スキャナーポッドは、異なるホストリソースに負荷を分散させるために、別々のノードに展開する必要があります。スキャナーは、イメージをプルして開くために十分なメモリを必要とするため、スキャンされる最大のイメージサイズよりも多くのメモリが利用可能である必要があります。必要に応じて、スキャナーは特定のノードに配置することができ、標準のKubernetesノードラベル、汚染/許容、またはノードアフィニティ構成を使用して、1つのノードに複数のポッドを配置しないようにすることができます。
+
+デフォルトでは、{product-name}は、セクション「{product-name}のデプロイ」におけるサンプルデプロイメントの一部として、2つのスキャナーポッドを展開します。これらのレプリカセットは、必要に応じてスケールアップまたはスケールダウンできます。
+
+スキャナーコンテナは最新のCVEデータベースを持ち、{product-name}によって定期的に更新されます（「latest」タグ付き）。アップデーターはスキャナーを再展開し、最新のCVEデータベースを取得するために最新のスキャナーイメージをプルすることを強制します。アップデーターに関する詳細は、セクションxref:updating.adoc[CVE データベースの更新]を参照してください。
+
+初期リリースでは、複数のスキャナーの存在と状態は、'kubectl get pods -n neuvector'でKubernetes内でのみ表示され、Webコンソールには表示されませんのでご注意ください。
+
+すべてのスキャナーからのスキャン結果は、アセット->レジストリメニューに表示されます。追加のスキャナー監視機能は、今後のリリースで追加される予定です。
+
+=== スキャナーポッドの自動スケーリング
+
+スキャナーポッドは、特定の基準に基づいて自動スケーリングするように構成できます。これにより、スキャンジョブが迅速かつ効率的に処理され、特にスキャンまたは再スキャンする必要がある数千のイメージがある場合に効果的です。設定は3つの可能性があります：遅延、即時、無効です。コントローラーによってスキャンのために画像がキューに入れられると、キューのサイズの「タスクカウント」を保持します。
+
+* 遅延戦略：
+** リードコントローラーが90秒以上「タスクカウント」が0より大きいのを継続的に見ると、maxScannerPodsに達していなければ新しいスキャナーポッドが開始されます。
+** リードコントローラーが180秒以上「タスクカウント」が0であるのを継続的に見ると、minScannerPodsに達していなければ1つのスキャナーポッドがスケールダウンされます。
+* 即時戦略：
+** リードコントローラーが「タスクカウント」が0より大きいのを見るたびに、maxScannerPodsに達していなければ新しいスキャナーポッドが開始されます。
+** リードコントローラーが180秒以上「タスクカウント」が0であるのを継続的に見ると、minScannerPodsに達していなければ1つのスキャナーポッドがスケールダウンされます。
+
+スキャナーの自動スケーリングは、設定->設定で設定されています。minimumScannerPods設定は、常に稼働している最小スキャナーポッドの数を設定し、maxScannerPodsは自動スケーリング戦略がスケールアップできる最大ポッド数を設定します。NOTE:最小値を設定しても、元のスキャナーデプロイメントのレプリカセット値は調整されません。最小値は最初のスケールアップ/ダウンイベント中に適用されます。
+
+[IMPORTANT]
+====
+スキャナーがOpenShiftオペレーターでデプロイされている場合、オペレーターは常にポッドの数をその設定値に変更するため、スキャナーの自動スケーリングはサポートされていません。
+====
+
+=== 操作とデバッグ
+
+各スキャナーポッドは、スキャンされるレジストリにクエリを行い、利用可能な画像とその他のデータの完全なリストを取得します。その後、各スキャナーにはレジストリからプルしてスキャンする画像が割り当てられます。
+
+スキャナーの動作を検査するために、各スキャナーポッドのログを使用して確認できます。
+
+[,shell]
+----
+kubectl logs <scanner-pod-name> -n neuvector
+----
+
+== パフォーマンス計画
+
+多くの画像を持つレジストリで異なる数のスキャナーを試して、環境におけるスキャン完了時間の動作を観察してください。2-5スキャナーのレプリカ設定は、ほとんどのケースで十分であるべきです。
+
+スキャンタスクがスキャナーに割り当てられると、レジストリから画像をプルします（利用可能な画像のリストを取得した後）。イメージを取得するのにかかる時間（ダウンロード）は、通常、最も多くの時間を消費します。複数のスキャナーが同じレジストリから並行してイメージを取得することができるため、パフォーマンスはレジストリまたはネットワーク帯域幅によって制限される可能性があります。
+
+大きなイメージは取得により多くの時間がかかり、スキャンするために展開する必要があるため、より多くのメモリを消費します。各スキャナーに、最大の予想イメージの10％以上のメモリが割り当てられていることを確認してください。
+
+複数のスキャナーポッドを同じホスト/ノードに展開することができますが、ホストがスキャナーのパフォーマンスを最大化するために十分なメモリ、CPU、およびネットワーク帯域幅を持っていることを確認する必要があります。
+
+== ローカルスキャン用のスタンドアロンスキャナー
+
+{product-name}は、ローカルイメージスキャンのためのスタンドアロンスキャナーの展開をサポートしています（コントローラーは必要ありません）。以下のサンプルdocker runでは、ローカルイメージがスキャンされ、結果が/var/neuvectorにローカルに保存されます。ローカルスキャンの場合、イメージはマウントされたdocker.sockを通じてアクセスできる必要があります。そうでない場合は、レジストリを指定することができます。
+
+[,bash]
+----
+docker run --name neuvector.scanner --rm -e SCANNER_REPOSITORY=ubuntu -e SCANNER_TAG=16.04 -e SCANNER_ON_DEMAND=true -v /var/run/docker.sock:/var/run/docker.sock -v /var/neuvector:/var/neuvector  neuvector/scanner
+----
+
+以下のスキャナー環境変数は、docker runコマンドで使用できます：
+
+* SCANNER_REGISTRY=レジストリのURL（ローカルスキャンの代わりにオプション）
+* SCANNER_REPOSITORY=スキャンするリポジトリ
+* SCANNER_TAG=バージョンタグ
+* SCANNER_REGISTRY_USERNAME=ユーザー（ローカルスキャンの代わりにオプション）
+* SCANNER_REGISTRY_PASSWORD=パスワード（ローカルスキャンの代わりにオプション）
+* SCANNER_SCAN_LAYERS=trueまたはfalse（レイヤードスキャン結果を返すため）
+* SCANNER_ON_DEMAND=true（必須）
+* CLUSTER_JOIN_ADDR（オプション）、CLUSTER_JOIN_PORT（オプション） - Admission controlルールに使用するためにコントローラーに結果を送信します（Kubernetes展開コントローラー）。
+* CLUSTER_ADVERTISED_ADDR（オプション） - スキャナーがコントローラーとは異なるホストにある場合、Admission controlルールに使用するために結果を送信します（Kubernetes展開コントローラー）。
+
+=== スタンドアロンモードでのホストスキャン
+
+ホストをスキャンするには、次のコマンドを使用してください。
+
+[CAUTION]
+====
+特権モードが必要です！
+====
+
+
+[,shell]
+----
+docker run --rm --privileged --pid=host neuvector/scanner -n neuvector
+----
+
+=== Kubernetes上での複数スキャナーの手動デプロイメント
+
+既存のKubernetesデプロイメントの一部としてスキャナーを手動でデプロイするには、新しいロールバインディングを作成してください：
+
+[,shell]
+----
+kubectl create rolebinding neuvector-admin --clusterrole=admin --serviceaccount=neuvector:default -n neuvector
+----
+
+またはOpenShiftの場合
+
+[,shell]
+----
+oc adm policy add-role-to-user admin system:serviceaccount:neuvector:default -n neuvector
+----
+
+以下のファイルを使用して、複数のスキャナーをデプロイしてください。レプリカを編集して、並行して実行されるスキャナーの数を増減してください。
+
+[,yaml]
+----
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neuvector-scanner-pod
+  namespace: neuvector
+spec:
+  selector:
+    matchLabels:
+      app: neuvector-scanner-pod
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: neuvector-scanner-pod
+    spec:
+      containers:
+        - name: neuvector-scanner-pod
+          image: neuvector/scanner
+          imagePullPolicy: Always
+          env:
+            - name: CLUSTER_JOIN_ADDR
+              value: neuvector-svc-controller.neuvector
+# Commented out sections are required only for local build-phase scanning
+#            - name: SCANNER_DOCKER_URL
+#              value: tcp://192.168.1.10:2376
+#          volumeMounts:
+#            - mountPath: /var/run/docker.sock
+#              name: docker-sock
+#              readOnly: true
+#      volumes:
+#        - name: docker-sock
+#          hostPath:
+#            path: /var/run/docker.sock
+      restartPolicy: Always
+----
+
+次に、CVEデータベースアップデータのcronジョブを作成または更新してください。これにより、CVEデータベースが毎晩更新されます。
+
+[,yaml]
+----
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: neuvector-updater-pod
+  namespace: neuvector
+spec:
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: neuvector-updater-pod
+        spec:
+          containers:
+          - name: neuvector-updater-pod
+            image: neuvector/updater
+            imagePullPolicy: Always
+            command:
+            - /bin/sh
+            - -c
+            - TOKEN=`cat /var/run/secrets/kubernetes.io/serviceaccount/token`; /usr/bin/curl -kv -X PATCH -H "Authorization:Bearer $TOKEN" -H "Content-Type:application/strategic-merge-patch+json" -d '{"spec":{"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt":"'`date +%Y-%m-%dT%H:%M:%S%z`'"}}}}}' 'https://kubernetes.default/apis/apps/v1/namespaces/neuvector/deployments/neuvector-scanner-pod'
+          restartPolicy: Never
+----

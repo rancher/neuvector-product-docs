@@ -1,0 +1,21 @@
+= LDAP
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/02.ldap/02.ldap.md
+:page-opendocs-slug:  /integration/ldap
+
+== LDAP
+
+配置连接到您的 LDAP 服务器所需的字段。
+
+image:ldap-ad.png[LDAPAD]
+
+. 端口。默认端口为 389（未启用 SSL）和 636（启用 SSL）。
+. 用户名（可选）。我们使用此管理员用户名来绑定 LDAP 服务器以进行每个查询。
+. 基本 DN。这应该是 LDAP 服务器中用于搜索 LDAP 用户和组的根节点。
+. 默认角色。这是用户在角色组映射（如下）失败时将采用的角色。如果找到可以映射到角色的用户组属性，则不会使用默认角色。如果未找到匹配的组属性，则将采用默认角色。如果在这种情况下默认角色为 None，则用户登录将失败。'`test connection`' 按钮将检查用户名/密码是否可以通过配置的 LDAP 服务器进行验证。
+. 管理员和读者角色映射。这定义了如何将用户的 LDAP 组成员资格映射到 {product-name} 中的用户角色。将 LDAP 组列表添加到相应的角色。在 LDAP 架构中查找用户的组成员资格时，我们假设组的成员属性命名为 "`memberUid`"。
+
+=== 将组映射到角色和名称空间
+
+请参见 xref:users.adoc#_mapping_groups_to_roles_and_namespaces[用户和角色] 部分，了解如何将组映射到 {product-name} 中的预设和自定义角色以及名称空间。

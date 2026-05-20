@@ -1,0 +1,47 @@
+= Escaneo de ECR utilizando Roles de IAM
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/02.registry/02.ecr-iam/02.ecr-iam.md
+:page-opendocs-slug:  /scanning/registry/ecr-iam
+
+== AWS ECR - Roles de IAM
+
+Cuando los {product-name} contenedores se despliegan en AWS, y a una instancia EC2 se le asigna un rol de "`EC2 Container Registry`" Acceso de Lectura, el registro de AWS ECR puede ser escaneado sin una Clave de Acceso y Clave Secreta.
+
+Así es como se crea un rol de AWS y se asigna al nodo.
+
+=== Seleccionar la Instancia
+
+Ten en cuenta que el rol de IAM está vacío o no incluye el rol de ECR
+
+image:ecr1.png[awsrole]
+
+=== Adjuntar un Rol
+
+Seleccionar Acciones -> Configuración de la Instancia -> Adjuntar/Reemplazar Rol de IAM
+
+image:ecr2.png[awsrole]
+
+Si no has creado previamente el rol de ECR, haz clic en Crear Nuevo Rol de IAM. Introduce el nombre del rol.
+
+image:ecr3.png[attachrole]
+
+=== Seleccionar el Servicio de AWS
+
+image:ecr4.png[Seleccionar]
+
+=== Lista de Roles
+
+image:ecr5.png[awsroles]
+
+=== Adjuntar el Permiso de Lectura de ECR al Rol
+
+image:ecr6.png[permissions]
+
+=== Revisa tu configuración
+
+image:ecr7.png[Revisar]
+
+=== Comprueba la instancia para el rol de IAM
+
+image:ecr9.png[instancia]

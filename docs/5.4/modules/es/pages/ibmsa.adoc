@@ -1,0 +1,40 @@
+= IBM Security Advisor
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/09.ibmsa/09.ibmsa.md
+:page-opendocs-slug:  /integration/ibmsa
+
+== Integración con IBM Security Advisor
+
+{product-name} se integra con IBM Security Advisor en IBM Cloud.
+
+Para generar la URL de registro requerida, inicie sesión en la consola {product-name} como administrador y vaya a Configuración -> Configuración.
+
+. Habilitar "Integrar con IBM Security Advisor" -> Enviar
+. Haga clic en "Obtener URL" -> Copiar al portapapeles
+
+image:ibmsa_config_new.png[ibmconfigure]
+
+Luego regrese a la consola de IBM Security Advisor, y, en "Ingrese la URL de configuración de {product-name}", escriba "https://{{product-name}nombre de host o IP del controlador:{port}" y pegue lo que se copió de los pasos anteriores. Para el puerto, utilice el puerto REST API expuesto {product-name} (el predeterminado es 10443). Para entornos de múltiples clústeres, este también es el servicio 'fed-worker' que expone este puerto.
+
+IBM Security Advisor se comunicará con su controlador de clúster {product-name} a través del nombre de host o IP proporcionado. Nota: Esto puede necesitar ser expuesto como un servicio para acceso desde fuera del clúster de Kubernetes, similar a cómo se expone la REST API como un servicio.
+
+=== Verificando la Conexión
+
+Cuando la conexión se crea con éxito entre IBM Security Advisor y {product-name}, verá el icono verde "Conectado en {date, time}" junto a "Integrar con IBM Security Advisor" en la Consola {product-name}.
+
+image:ibmsa_connected.png[conectado]
+
+=== Revisando Eventos de Seguridad en IBM Security Advisor
+
+Se muestra una tarjeta resumen con información sobre eventos de seguridad.
+
+image:ibm_sa_threat_summary.png[amenazas]
+
+Cada evento de seguridad puede ser investigado con más detalle, como se muestra a continuación:
+
+image:ibm_sa_findings.png[hallazgos]
+
+== Eliminando la Integración
+
+Si elimina una conexión de integración {product-name} en su cuenta de IBM Cloud, recuerde también desactivar la "integración IBM SA" para ese clúster {product-name} en Configuración -> Configuración.

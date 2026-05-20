@@ -1,0 +1,72 @@
+= 用于 ADFS 的 OpenID Connect (OIDC)
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/08.oidc_adfs/08.oidc_adfs.md
+:page-opendocs-slug:  /integration/oidc_adfs
+
+== 与 ADFS 的 OpenID Connect (OIDC) 集成
+
+在 AD FS 管理中，点击 "应用程序组"，然后点击 "添加应用程序组..."
+
+image:adfs1.png[adfs]
+
+输入名称，选择 "访问 Web API 的服务器应用程序"，然后点击下一步
+
+image:adfs2.png[adfs]
+
+输入来自 {product-name} 设置 > OpenID Connect 设置页面的重定向 URI，然后点击下一步
+
+image:adfs3.png[adfs]
+
+启用 "生成共享密钥" 复选框，然后点击下一步
+
+image:adfs4.png[adfs]
+
+输入在上一步中创建的标识符，然后点击下一步
+
+image:adfs5.png[adfs]
+
+image:adfs6.png[adfs]
+
+启用 allatclaims、email、openid 和控制文件范围，然后点击下一步
+
+image:adfs7.png[adfs]
+
+image:adfs8.png[adfs]
+
+image:adfs9.png[adfs]
+
+双击您刚刚创建的应用程序组
+
+image:adfs10.png[adfs]
+
+双击 Web API，然后点击发放转换规则选项卡
+
+image:adfs11.png[adfs]
+
+点击添加规则...，选择 "将 LDAP 属性作为声明发送"，然后点击下一步
+
+image:adfs12.png[adfs]
+
+输入声明规则名称，选择 Active Directory 作为属性存储，并提供 LDAP 属性到输出声明类型的映射，如下所示
+
+* Token-Groups -- 未限定名称 -> 组
+* User-Principal-Name -> preferred_username
+* E-Mail-Address -> email
+
+image:adfs13.png[adfs]
+
+image:adfs14.png[adfs]
+
+=== {product-name} 设置
+
+* 身份提供者发行者: "https://<adfs-fqdn>/adfs"
+* 客户端 ID:这是在 "添加应用程序组向导" 中的 "服务器应用程序" 对话框中显示的 "客户端标识符"
+* 客户端密钥：这是在 "添加应用程序组向导" 中的 "配置应用程序凭据" 对话框中显示的密钥。
+* 组声明：组
+
+image:adfs15.png[adfs]
+
+image:adfs16.png[adfs]
+
+image:adfs17.png[adfs]

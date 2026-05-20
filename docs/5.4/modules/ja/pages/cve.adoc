@@ -1,0 +1,298 @@
+= セキュリティアドバイザリーおよびCVE
+:revdate: 2025-08-26
+:page-revdate: {revdate}
+
+NeuVectorは、コミュニティにセキュリティ問題について通知することを約束しています。以下の表は、解決された問題に対する公開されたセキュリティアドバイザリーと脆弱性（CVE: Common Vulnerabilities and Exposures）を示しています。
+[cols="1,4,1,1", options="header"]
+|===
+| ID | 説明 | 日付 | 解像度
+
+| https://github.com/neuvector/neuvector/security/advisories/GHSA-4jj9-cgqc-x9h5[CVE-2025-66001]
+| パッチ適用されたバージョンでは、新しいNeuVectorのデプロイメントがデフォルトでTLS検証を有効にします。ローリングアップグレードの場合、NeuVectorは中断を避けるためにこの設定を自動的に変更しません。
+| 2025年12月12日
+| https://github.com/neuvector/neuvector/releases/tag/v5.4.8[NeuVector v5.4.8]
+
+| https://github.com/neuvector/neuvector/security/advisories/GHSA-8pxw-9c75-6w56[CVE-2025-8077]
+| Kubernetesベースの環境でのNeuVectorデプロイメントでは、デフォルトの管理者ユーザーのブートストラップパスワードがランダムに生成され、Kubernetesシークレットに保存されます。デフォルトの管理者は、シークレットからブートストラップパスワードを取得し、最初の成功したUIログイン後に変更する必要があります。
+| 2025年8月25日
+| https://github.com/neuvector/neuvector/releases/tag/v5.4.6[NeuVector v5.4.6]
+
+| https://github.com/neuvector/neuvector/security/advisories/GHSA-8ff6-pc43-jwv3[CVE-2025-53884]
+| NeuVectorは、ユーザーパスワードを保護するために、単純なハッシュの代わりにPBKDF2アルゴリズムを使用した暗号的に安全なソルトを使用するようになりました。以前のバージョンからのローリングアップグレード中、NeuVectorは各ユーザーの次回の成功したログイン後に新しいパスワードハッシュを再計算して保存します。
+| 2025年8月25日
+| https://github.com/neuvector/neuvector/releases/tag/v5.4.6[NeuVector v5.4.6]
+
+| https://github.com/neuvector/neuvector/security/advisories/GHSA-w54x-xfxg-4gxq[CVE-2025-54467]
+| NeuVectorは、デフォルトでログとデバッグ出力から`password`、`passwd`、`pwd`、`token`、または`key`を含む処理コマンドを削除します。ユーザーは、削除のための追加の正規表現パターンを定義するためにKubernetes ConfigMapを構成できます。
+| 2025年8月25日
+| https://github.com/neuvector/neuvector/releases/tag/v5.4.6[NeuVector v5.4.6]
+
+| https://github.com/neuvector/manager/security/advisories/GHSA-fggw-hv56-8m6r[CVE-2025-46808]
+| センシティブな情報は、ログ設定や資格情報の権限に応じて、マネージャーコンテナにログされる可能性があります。
+| 2025年7月9日
+| https://github.com/neuvector/neuvector/releases/tag/v5.4.5[NeuVector v5.4.5]
+
+| https://www.suse.com/security/cve/CVE-2024-38095.html[CVE-2024-38095]
+| .NETでは、悪意のあるX.509証明書またはチェーンが過剰なCPU使用を引き起こし、サービス拒否につながる可能性があります。このCVEは影響を受けた.NETライブラリの検出問題としてフラグが立てられました。
+| 2024年7月9日
+| https://github.com/neuvector/neuvector/releases/tag/v5.4.5[NeuVector v5.4.5]
+
+| https://www.suse.com/security/cve/CVE-2024-7347.html[CVE-2024-7347]
+| NGINX `ngx_http_mp4_module`の脆弱性により、作成されたMP4ファイルがメモリの過剰読み取りやワーカープロセスの終了を引き起こす可能性があります。NeuVector 5.4.2で、脆弱性スキャナーにおける可能性のある*false negative*検出として報告されました。これはNeuVector製品の問題ではありません。
+| 2024年8月14日
+| https://github.com/neuvector/neuvector/releases/tag/v5.4.2[NeuVector v5.4.2]
+
+| https://www.suse.com/security/cve/CVE-2018-20796.html[CVE-2018-20796]
+| GNU Cライブラリのバージョン2.29まで、`check_dst_limits_calc_pos_1`は`posix/regexec.c`で制御されていない再帰を持っています。
+| 2025年1月15日
+| 該当なし https://github.com/neuvector/neuvector/releases/tag/v5.4.2[v5.4.2]で*false positive*としてフラグが立てられました。
+
+| https://github.com/advisories/GHSA-v23v-6jw2-98fq[CVE-2024-41110]
+| 一部のDocker Engineバージョンにおけるセキュリティ脆弱性により、攻撃者が https://docs.docker.com/engine/extend/plugins_authorization/[認可プラグイン（AuthZ）]をバイパスできる可能性があります。悪用の可能性は低いです。
+| 2024年11月16日
+| https://github.com/neuvector/neuvector/releases/tag/v5.4.1[NeuVector v5.4.1]
+
+| https://github.com/advisories/GHSA-w73w-5m7g-f7qc[CVE-2020-26160]
+| `jwt-go`は、`[]string{}`が`m["aud"]`に使用されるときに攻撃者がアクセス制限をバイパスできるようにします。ユーザーは https://github.com/golang-jwt/jwt[`golang-jwt`] v3.2.1に移行するべきです。
+| 2024年11月16日
+| https://github.com/neuvector/neuvector/releases/tag/v5.4.1[NeuVector v5.4.1]
+|===
+
+== OpenID ConnectはMITMに対して脆弱です。
+
+* **CVE ID:** https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H&version=3.1[CVE-2025-66001 (AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H)]
+* **CVSSスコア:**8.8
+
+=== 影響を受けるバージョン
+
+* `5.3.0`より前のすべてのバージョン
+* バージョン`5.3.0`から`5.4.7`まで
+
+*修正されたバージョン:* `5.4.8`
+
+=== 影響
+
+NeuVectorはOpenID Connectを使用した認証をサポートしています。TLS検証は、リモートサーバーの真正性と完全性を検証しますが、デフォルトでは強制されていません。これにより、システムが中間者攻撃（MITM）にさらされる可能性があります。
+
+バージョン`5.4.0`以降、NeuVectorは次のためにTLS検証をサポートします：
+
+* レジストリ接続
+* 認証サーバー接続（SAML、LDAP、およびOIDC）
+* Webhook接続
+
+デフォルトでは、TLS検証は無効のままです。この設定は、NeuVector UIの*設定 → 設定*の下にあります。
+
+パッチ適用済みのバージョンでは、新しいNeuVectorのデプロイメントはデフォルトでTLS検証を有効にします。ローリングアップグレードは、サービスの中断を防ぐために既存の設定を変更しません。
+
+[NOTE]
+====
+TLS検証が有効になっている場合、次に適用されます：
+
+* レジストリサーバー
+* 認証サーバー（SAML、LDAP、およびOIDC）
+* Webhookサーバー
+====
+
+=== パッチ
+
+パッチが適用されたバージョンには、リリース`v5.4.8`以降が含まれます。
+
+=== 回避策
+
+TLS検証を手動で有効にするには：
+
+. NeuVector UIを開きます。
+. *設定 → 設定*に移動します。
+. **TLS自己署名証明書設定**で、*TLS検証を有効にする*を選択します。
+. （オプション）TLS自己署名証明書をアップロードまたは貼り付けます。
+
+== 質問とサポート
+
+* セキュリティ関連の問い合わせについては、SUSE Rancher Securityチームに連絡してください。
+* NeuVectorリポジトリに問題を報告します。
+* サポートマトリックスと製品サポートライフサイクルを確認します。
+
+---
+
+== NeuVectorは、バイナリに暗号化された素材を含めています。
+
+* **CVE ID:**CVE-2025-54471
+* **CVSSスコア:**6.5 – https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N&version=3.1[AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N]
+
+=== 影響を受けるバージョン
+
+* `5.3.0`より前のすべてのバージョン
+* バージョン`5.3.0`から`5.4.6`まで
+
+*修正されたバージョン:* `5.4.7`
+
+=== 影響
+
+NeuVectorは以前、ソースコードに埋め込まれたハードコーディングされた暗号鍵を使用していました。コンパイル中に、この値は機密設定フィールドを暗号化するために使用される静的秘密鍵に置き換えられました。
+
+パッチ適用されたリリースでは、NeuVectorはKubernetesシークレット`neuvector-store-secret`（`neuvector`ネームスペース内）を使用して、安全で動的な暗号化鍵を生成します。これにより、静的鍵への依存が排除され、Kubernetes管理のシークレットに鍵を保存することでセキュリティが向上します。
+
+ローリングアップグレード中または永続ストレージからの復元時に、NeuVectorコントローラーは暗号化された設定フィールドをチェックします。フィールドがデフォルトの固定鍵で暗号化されている場合、それは復号化され、新しい動的鍵を使用して再暗号化されます。
+
+コントローラーがKubernetesシークレットにアクセスするためのRBAC権限を持っていない場合、次のようにログに記録します：
+
+`Required Kubernetes RBAC for secrets are not found`
+
+そして終了します。
+
+デバイス暗号化鍵は3ヶ月ごとにローテーションされます。詳細については、次を参照してください：
+xref:certrotate.adoc#_rotating_sensitive_field_in_configuration[設定内の機密フィールドのローテーション]。
+
+=== パッチ
+
+パッチが適用されたバージョンには、リリース`v5.4.7`以降が含まれます。
+
+=== 回避策
+
+回避策は利用できません。できるだけ早くパッチ適用済みのバージョンにアップグレードしてください。
+
+== 質問とサポート
+
+* https://github.com/rancher/rancher/security/policy[SUSE Rancher セキュリティチーム]に連絡してください。
+* https://github.com/neuvector/neuvector/issues/new/choose[NeuVector GitHub リポジトリ]に問題をオープンしてください。
+* リファレンス:
+  ** https://www.suse.com/suse-neuvector/support-matrix/all-supported-versions/neuvector-v-all-versions/[NeuVector サポートマトリックス]
+  ** https://www.suse.com/lifecycle/#suse-security[製品サポートライフサイクル]
+
+---
+
+== テレメトリ送信者はMITMおよびDoSに対して脆弱です。
+
+* **CVE ID:**CVE-2025-54470
+* **CVSSスコア：**8.6 – https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:H&version=3.1[AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:H]
+
+=== 影響を受けるバージョン
+
+* より前のすべてのバージョン`5.3.0`
+* バージョン`5.3.0`から`5.4.6`まで
+
+*修正されたバージョン：* `5.4.7`, `5.3.5`
+
+=== 影響
+
+この脆弱性は、**匿名クラスタデータを報告する**が有効な場合にのみ、NeuVectorのデプロイメントに影響を与えます。有効な場合、NeuVectorは匿名のテレメトリデータを次の宛先に送信します：
+
+`https://upgrades.neuvector-upgrade-responder.livestock.rancher.io`
+
+影響を受けるバージョンでは、TLS証明書の検証が強制されず、テレメトリ通信がMITM攻撃に対して脆弱になります。攻撃者は送信されたデータを傍受または改ざんする可能性があります。
+
+NeuVectorは、テレメトリサーバーの応答をメモリにサイズ制限なしで読み込んでおり、サービス拒否（DoS）のリスクにさらされています。
+
+パッチ適用済みのバージョンには以下が含まれます：
+
+* テレメトリサーバーのTLS証明書チェーンとホスト名の検証。
+* メモリ枯渇を軽減するための応答サイズ制限256バイト。
+
+これらの改善はデフォルトで有効になっており、ユーザーの操作は不要です。
+
+=== パッチ
+
+パッチが適用されたバージョンには、リリース`v5.4.7`以降が含まれます。
+
+=== 回避策
+
+更新できない場合は、**匿名クラスタデータを報告する**を無効にしてください。
+
+*設定 → 設定 → 匿名クラスタデータの報告*
+
+この設定を無効にすると、NeuVectorがテレメトリデータを送信するのを防ぎ、この脆弱性への露出が減少します。
+
+*推奨:*できるだけ早くパッチ適用済みのバージョンにアップグレードしてください。
+
+== 質問とサポート
+
+* https://github.com/rancher/rancher/security/policy[SUSE Rancher セキュリティチーム]に連絡してください。
+* https://github.com/neuvector/neuvector/issues/new/choose[NeuVector GitHub リポジトリ]に問題をオープンしてください。
+* リファレンス:
+  ** https://www.suse.com/suse-neuvector/support-matrix/all-supported-versions/neuvector-v-all-versions/[NeuVector サポートマトリックス]
+  ** https://www.suse.com/lifecycle/#suse-security[製品サポートライフサイクル]
+
+== NeuVectorマネージャーコンテナログにおける機密情報の漏洩
+
+*CVEs：*CVE-2025-46808 +
+*CVSSスコア：*6.8 — https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:N/AC:L/PR:L/UI:R/S:C/C:H/I:N/A:N&version=3.1[CVSS v3.1 Vector] +
+*CWE:* https://cwe.mitre.org/data/definitions/532[CWE-532: ログファイルへの機密情報の挿入]
+
+=== 影響を受けるバージョン
+
+* より前のすべてのバージョン`5.0.0`
+* バージョン`5.0.0`から`5.4.4`まで
+
+*修正されたバージョン:* `5.4.5`
+
+=== 影響
+
+`5.4.4`までのNeuVectorのバージョンにおける脆弱性は、NeuVector Managerコンテナログに機密情報を漏洩させる可能性があります。以下のフィールドがログに表示される可能性があります：
+
+[cols="1,3,2,2,1", options="header"]
+|===
+| フィールド | フィールドの説明 | 表示される場所 | 再現 | 使用環境
+
+| `X-R-Sess`
+| シングルサインオン用のRancherセッショントークン
+| リクエストヘッダー
+| Rancher UIを介してログインし、NeuVector SSOにアクセスします。
+| NeuVector SSOを使用したRancher
+
+| `personal_access_token`
+| GitHubまたはAzure DevOpsトークン
+| リクエストボディ
+| *設定 > 設定*の下にリモートリポジトリ設定を提出します。
+| NeuVector
+
+| `token1.token`
+| NeuVectorユーザーセッショントークン
+| レスポンスボディ
+| NeuVector APIを通じてGETリクエストを送信します: `https://<neuvector-ui-url>/user?name=<username>`
+| NeuVector
+
+| `rekor_public_key`、`root_cert`、`sct_public_key`
+| Rekor公開鍵、ルート証明書、署名された証明書タイムスタンプ(SCT)公開鍵をプライベートルート信頼に含めます
+| リクエストボディ
+| Sigstoreページからプライベートルート信頼を作成または更新します
+| NeuVector
+
+| `public_key`
+| 検証者の公開鍵
+| リクエストボディ
+| Sigstoreページで検証者を作成または更新します
+| NeuVector
+|===
+
+[NOTE]
+====
+シングルサインオン統合を備えたNeuVectorインストールは、Rancher Manager *and* リモートリポジトリ設定が無効になっている場合、影響を受けません。
+====
+
+パッチ適用されたバージョンでは、`X-R-Sess`が部分的にマスクされています。他の機密フィールド（`personal_access_token`、`token`、`rekor_public_key`、`root_cert`、`sct_public_key`、`public_key`）はログから削除されます。
+
+[NOTE]
+====
+* 重大度は、あなたのログ戦略に依存します：
+** *ローカルログ（デフォルト）* — 露出を制限します。
+** *外部ログ* — 外部ログ収集者のセキュリティコントロールに応じて、重大度が増加します。
+* 最終的な影響の重大度は、漏洩した資格情報の権限に依存します。
+====
+
+詳細については、 https://attack.mitre.org/techniques/T1552/[無防備な資格情報（MITRE ATT&CK T1552）]を参照してください。
+
+=== パッチ
+
+パッチが適用されたバージョンには、リリース`5.4.5`以降が含まれます。アップグレード後、リモートリポジトリ設定で使用されるGitHubトークンをローテーションしてください。
+
+=== 回避策
+
+回避策は利用できません。できるだけ早く修正されたバージョンにアップグレードしてください。
+
+== 質問とサポート
+
+* https://github.com/rancher/rancher/security/policy[SUSE Rancher セキュリティチーム]に連絡してください。
+* https://github.com/neuvector/neuvector/issues/new/choose[NeuVector GitHub リポジトリ]に問題をオープンしてください。
+* リファレンス:
+** https://www.suse.com/suse-neuvector/support-matrix/all-supported-versions/neuvector-v-all-versions/[NeuVector サポートマトリックス]
+** https://www.suse.com/lifecycle/#suse-security[製品サポートライフサイクル]

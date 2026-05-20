@@ -1,0 +1,74 @@
+= Splunk
+:revdate: 2025-05-08
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/11.splunk/11.splunk.md
+:page-opendocs-slug:  /integration/splunk
+
+== Integration mit Splunk mit der {product-name} Splunk-App
+
+Die {product-name} Splunk-App ist im Splunkbase-Katalog https://splunkbase.splunk.com/app/6205/[hier] zu finden oder kann durch die Suche nach {product-name} gefunden werden.
+
+Das {product-name} Sicherheits-Dashboard hilft dabei, Sicherheitsereignisse wie verdächtige Anmeldeversuche, Netzwerkverletzungen und anfällige Images zu identifizieren.
+
+Im Folgenden sind Beispielbildschirme angezeigt, die in der Splunk-App dargestellt werden.
+
+=== Image-Schwachstellen
+
+image:vulnerable_images.png[Schwachstellen]
+
+=== Zugangssteuerung und Sicherheitsereignisse
+
+image:admission_security_events.png[admission_security]
+
+=== Netzwerkverletzungen nach Pod/Dienst (Implementierungen)
+
+image:network_violations.png[Netzwerk]
+
+=== Egress-Verbindungsübersicht
+
+image:egress_destinations.png[egress]
+
+=== {product-name} Anmeldeaktivitäts-Dashboard
+
+image:login_summary.png[Anmeldungen]
+
+== Einrichtung und Konfiguration
+
+=== Die App abrufen
+
+==== GitHub
+
+Laden Sie das neueste App-TAR-Archiv (`neuvector_app.tar.gz`) aus dem https://github.com/neuvector/neuvector-splunk-app[neuvector/neuvector-splunk-app Repository] herunter.
+
+==== Splunkbase
+
+Laden Sie das neueste App-TAR-Archiv von https://splunkbase.splunk.com/apps[Splunkbase] herunter.
+
+==== Splunk Apps-Browser
+
+Klicken Sie im Splunk UI auf das Dropdown-Menü "Apps", klicken Sie auf "Weitere Apps finden" und suchen Sie dann nach {product-name} Splunk App.
+
+=== Installation und Einrichtung
+
+Installieren Sie die App, indem Sie entweder das App-TAR-Archiv hochladen oder den Aufforderungen von Splunkbase folgen.
+
+==== Konfigurieren Sie syslog in der {product-name} Konsole
+
+Gehen Sie zu Einstellungen -> Konfiguration -> Syslog
+
+[loweralpha]
+. Setzen Sie den Serverwert auf die IP-Adresse, auf der Splunk läuft
+. Wählen Sie TCP als Protokoll
+. Setzen Sie die Portnummer auf 10514
+. Wählen Sie die Informationsstufe
+. Klicken Sie auf ABSENDEN, um die Einstellung zu speichern.
+
+image:syslog-config.png[syslog]
+
+Sie können mehrere Cluster konfigurieren, um syslog an Ihre Splunk-Instanz zu senden, und Ihre Splunk-Instanz wird diese Syslogs in Echtzeit empfangen.
+
+=== Häufig gestellte Fragen (FAQs)
+
+==== Welche Benutzerrolle wird benötigt?
+
+Jede Benutzerrolle.

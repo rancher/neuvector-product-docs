@@ -1,0 +1,15 @@
+= Konfigurationsbewertung für Kubernetes-Ressourcen
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/03.admission/02.assessment/02.assessment.md
+:page-opendocs-slug:  /policy/admission/assessment
+
+== Scannen von Bereitstellungsdateien für Kubernetes-Ressourcen
+
+{product-name} kann Bereitstellungs-YAML-Dateien auf Konfigurationsbewertungen gemäß den Admission Control-Regeln scannen. Dies ist nützlich, um Bereitstellungs-YAML-Dateien früh in der Pipeline zu scannen und festzustellen, ob die Bereitstellung gegen irgendwelche Regeln verstoßen würde, bevor versucht wird, sie bereitzustellen.
+
+Um eine YAML-Datei zum Scannen hochzuladen, gehen Sie zu Richtlinie -> Admission Control und klicken Sie auf die Schaltfläche Konfigurationsbewertung. Wählen Sie im Fenster eine Datei zum Hochladen aus und klicken Sie dann auf Test.
+
+image:assessment.png[Bewertung]
+
+Sie sehen dann eine Analyse der Datei, in der angezeigt wird, ob die Bereitstellung zulässig wäre, sowie Meldungen zu den Regeln, die für die Bereitstellungsdatei gelten.

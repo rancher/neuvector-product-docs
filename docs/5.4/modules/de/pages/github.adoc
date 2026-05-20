@@ -1,0 +1,11 @@
+= GitHub
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/03.build/06.github/06.github.md
+:page-opendocs-slug:  /scanning/build/github
+
+== Scannen Sie nach Schwachstellen in einer GitHub-Action-Pipeline
+
+Der {product-name} Scanner kann von einer GitHub-Action-Pipeline ausgelöst werden, indem die https://github.com/marketplace/actions/neuvector-vulnerability-scan-action[{product-name} Schwachstellenscan-Aktion] verwendet wird, die im GitHub Action Marketplace veröffentlicht wurde.
+
+image:github_action.png[GithubAction]

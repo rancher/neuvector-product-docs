@@ -1,0 +1,38 @@
+= SAML (Okta)
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/04.saml/04.saml.md
+:page-opendocs-slug:  /integracao/saml
+
+== Configuração do IDP SAML
+
+Para configurar {product-name} para usar o servidor IDP SAML da Okta, primeiro, configure o servidor IDP SAML no site da Okta.
+
+image:okta.png[Okta]
+
+. Copie a "URI de Redirecionamento SAML" da página de Configurações SAML do {product-name}, cole-a nos campos de URL de login único, URL do destinatário e URL de destino da Okta.
+. Criptografia de afirmação: Este campo deve ser *não criptografado.*
+. Declarações de atributos: Insira os atributos de e-mail e nome de usuário.
+. Declarações de atributos de grupo: Ative isso se o mapeamento de papéis baseado em grupos for necessário. O nome de atributo padrão que {product-name} procura é NVRoleGroup. Se outro nome de atributo for usado para a associação de grupo do usuário, ele pode ser personalizado na página de Configurações SAML do {product-name}.
+
+Configure as configurações SAML no console da interface do usuário do {product-name}.
+
+image:saml1.png[SAML]
+
+Use o botão "Ver Instruções de Configuração" conforme mostrado na captura de tela a seguir para localizar as informações a seguir e copiá-las na página SAML do {product-name}.
+
+. URL de Login Único do Provedor de Identidade
+. Emissor do Provedor de Identidade
+. Certificado X.509
+. Especifique o nome do atributo do grupo se um valor não padrão for utilizado.
+
+image:setting.png[Configuração]
+
+Após a autenticação do usuário, o papel adequado pode ser derivado com a configuração de mapeamento de papéis baseada em grupos. Para a configuração do mapeamento de papéis baseado em grupos,
+
+. Se o mapeamento de papéis baseado em grupos não estiver configurado ou os grupos correspondentes não puderem ser localizados, o usuário autenticado será atribuído ao papel Padrão. Se o papel Padrão estiver definido como Nenhum, quando o mapeamento de papéis baseado em grupos falhar, o usuário não conseguirá fazer login.
+. Especifique uma lista de grupos, respectivamente, no mapeamento de papéis de Administrador e Leitor. O atributo de grupo do usuário é anexado à resposta após a autenticação do usuário. Se o grupo correspondente for localizado, o papel correspondente será atribuído ao usuário.
+
+=== Mapeamento de Grupos para Papéis e Namespaces
+
+Consulte a seção xref:users.adoc#_mapping_groups_to_roles_and_namespaces[Usuários e Papéis] para saber como mapear grupos para papéis predefinidos e personalizados, bem como namespaces em {product-name}.

@@ -1,0 +1,121 @@
+= Gestión empresarial de múltiples clústeres
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /04.navigation/02.multicluster/02.multicluster.md
+:page-opendocs-slug:  /navegación/multicluster
+
+== Consola Empresarial
+
+La consola {product-name} se puede utilizar para gestionar grandes despliegues de multi-clústeres y multi-nubes empresariales. Se debe seleccionar un clúster como el clúster primario, y otros clústeres remotos podrán unirse al primario. Una vez conectados, el clúster primario puede enviar reglas federadas a cada clúster remoto, que se mostrarán como reglas federadas en las consolas de cada clúster remoto. Los registros federados escaneados también sincronizarán los resultados del escaneo con los clústeres remotos. Solo los usuarios locales y los usuarios de Rancher que tengan permiso de administrador pueden promover un clúster para que se convierta en el clúster primario.
+
+Además de la directiva federada, la gestión de multi-clústeres soporta la monitorización de cada clúster remoto en una página de resumen, como se muestra a continuación.
+
+image:multicluster_summary.png[Resumen]
+
+DEBE haber conectividad de red entre los controladores en cada clúster en los puertos requeridos. El controlador está expuesto externamente desde su clúster a través de un servicio primario o remoto, como se puede ver en el archivo yaml de despliegue de muestra {product-name}.
+
+== Configurando los clústeres primario y remoto
+
+Inicia sesión en la consola del clúster que será el clúster primario. En el menú desplegable de la esquina superior derecha, selecciona Múltiples Clústeres y luego promover para configurar el primario. Nota: Solo los usuarios locales y los usuarios de Rancher que tengan permiso de administrador pueden promover un clúster para que se convierta en el clúster primario. Actualmente, los usuarios SSO/LDAP/OIDC con rol de administrador no pueden promover un clúster a clúster primario.
+image:master1.png[MasterConfig]
+
+Introduce la IP pública y el puerto del servicio fed-master. Puedes encontrar esto ejecutando
+
+[,shell]
+----
+kubectl get svc -n neuvector
+----
+
+La salida se verá así:
+
+[,shell]
+----
+NAME                                      TYPE           CLUSTER-IP      EXTERNAL-IP      PORT(S)                         AGE
+neuvector-service-controller-fed-master   LoadBalancer   10.27.249.147   35.238.131.23    11443:31878/TCP                 17d
+neuvector-service-controller-fed-worker   LoadBalancer   10.27.251.1     35.226.199.111   10443:32736/TCP                 17d
+----
+
+En el ejemplo anterior, el nombre de host/IP del controlador principal es 35.238.131.23 y el puerto es 11443. Nota: Asegúrate de que esta dirección IP y el puerto sean accesibles externamente (desde los clústeres remotos). Nota: Los relojes del sistema (hora) deben ser los mismos para cada clúster principal y remoto para funcionar correctamente.
+
+Después de volver a iniciar sesión en la consola, selecciona Múltiples Clústeres de nuevo en el menú superior derecho y haz clic en el icono para generar un token necesario para conectar los clústeres remotos. Copia el token para usar en el siguiente paso. El token es válido durante aproximadamente 1 hora, y si expira, debe generarse de nuevo para conectar futuros clústeres remotos.
+
+image:master_token.png[Token]
+
+Para unir un clúster remoto al principal, inicia sesión en la consola del clúster remoto como administrador. Selecciona Múltiples Clústeres del menú desplegable superior derecho y haz clic en Unir. Introduce la IP del controlador o el nombre de host para el clúster remoto, así como el puerto. De nuevo, puedes recuperar esta información del clúster remoto haciendo:
+
+[,shell]
+----
+kubectl get svc -n neuvector
+----
+
+Utiliza la salida de fed-worker del clúster remoto para configurar la dirección IP y el puerto. Luego introduce el token copiado del principal. Ten en cuenta que, después de introducir el token, la dirección IP y el puerto para el principal se rellenarán automáticamente, pero esto puede editarse o introducirse manualmente.
+
+image:join_remote.png[UnirRemoto]
+
+Cierra sesión en el clúster remoto y vuelve a iniciar sesión en el principal. O si ya has iniciado sesión, haz clic en actualizar y el clúster remoto aparecerá en el menú de Múltiples Clústeres.
+
+image:fed_master_list.png[FedMaster]
+
+Puedes hacer clic en el icono de gestionar en la lista, o usar el menú desplegable de múltiples clústeres en la parte superior para cambiar de clúster en cualquier momento. Una vez que hayas cambiado a un clúster remoto, todos los elementos del menú a la izquierda ahora se aplican al clúster remoto.
+
+== Solución de problemas
+
+Para asegurarte de que los servicios están respondiendo como se espera, puedes ejecutar las pruebas desde fuera de los clústeres, o, si es necesario, desde los pods de prueba en los clústeres `fed-master` y `fed-managed` para asegurar que se permite la conexión de red entre los clústeres.
+
+=== Verifica el servicio fed-master
+
+El puerto del servicio de clúster `11443` solo es accesible tras habilitar el servicio `fed-master`. El comando a continuación devuelve un código de error cuando el servicio `fed-master` responde para indicar que el recurso solicitado no está disponible.
+
+.Ejemplo de salida
+[,shell]
+----
+{"code":1,"error":"URL not found","message":"URL not found"}
+----
+
+[IMPORTANT]
+====
+La URL para el comando `curl` depende de cómo se exponga el servicio `fed-master`. Si se configura un servicio `ingress`, no es necesario especificar un puerto.
+====
+
+[,shell]
+----
+curl -v https://<fed-master>[:<port>]/v1/eula
+----
+
+=== Verifica el servicio fed-managed
+
+El puerto del servicio de clúster `10443` se comparte entre `REST API` y el servicio `fed-managed`. El comando a continuación devuelve un código de éxito cuando el servicio `fed-managed` responde para indicar que está disponible.
+
+.Ejemplo de salida
+[,shell]
+----
+{"eula":{"accepted":true}})
+----
+
+[IMPORTANT]
+====
+La URL para el comando `curl` depende de cómo se exponga el servicio `fed-managed`. Si se configura un servicio `ingress`, no es necesario especificar un puerto.
+====
+
+[,shell]
+----
+curl -v https://<fed-managed>[:<port>]/v1/eula
+----
+
+== Directiva Federada
+
+Por favor, consulta la sección de Directiva -> de Directiva Federada para obtener instrucciones sobre cómo crear reglas Federadas que se enviarán a cada clúster.
+
+== Registros Federados para Resultados de Escaneo de Imágenes Distribuidas
+
+El clúster primario (maestro) puede escanear un registro/repositorio designado como un registro federado. Los resultados del escaneo de estos registros se sincronizarán con todos los clústeres downstream. Esto permite mostrar los resultados del escaneo en la consola del clúster downstream, así como utilizar los resultados en las reglas de control de admisión del clúster downstream. Los registros solo necesitan ser escaneados una vez en lugar de por cada clúster, reduciendo el uso de CPU/memoria y el ancho de banda de red.
+
+Los registros federados solo pueden ser configurados por un administrador federado en el clúster primario en Activos -> Registros. Después de añadir y escanear un repositorio federado, los resultados del escaneo se sincronizarán con todos los clústeres downstream. Las reglas de control de admisión en cada clúster downstream que requieren escaneo de imágenes (por ejemplo, CVE, reglas basadas en cumplimiento) utilizarán automáticamente tanto los resultados de escaneo federados como los resultados de escaneo de registros configurados localmente.
+
+=== Federando Resultados de Escáneres CI/CD (Opcional)
+
+Los resultados del escaneo del registro federado se sincronizan siempre con los clústeres downstream, como se ha descrito anteriormente. El clúster principal también puede recibir resultados de escaneo xref:scanners.adoc#_standalone_scanner_for_local_scanning[de escáneres independientes] o complementos de escáner que se invocan desde un pipeline de CI/CD de construcción. Para habilitar que los resultados del escaneo del repositorio en la fase de construcción (CI/CD) también se sincronicen con los clústeres downstream, primero habilítalo editando la configuración del clúster principal (maestro) como se muestra a continuación.
+
+image:fed_primary_config.png[master_settings]
+
+image:fed_reg_sync.png[fed_sync]

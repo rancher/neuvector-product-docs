@@ -1,0 +1,56 @@
+= ビルドフェーズイメージスキャン
+:revdate: 2025-01-10
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/03.build/03.build.md
+:page-opendocs-slug:  /スキャン/ビルド
+
+== CI/CD ビルドフェーズ脆弱性スキャン
+
+パイプラインのビルドフェーズ中に、 https://plugins.jenkins.io/neuvector-vulnerability-scanner/[Jenkins]、 https://github.com/neuvector/azure-vsts[Azure Devops]、 https://github.com/neuvector/scan-action[Github Action]、 https://gitlab.com/neuvector/gitlab-plugin[gitlab]、Bamboo、および https://github.com/neuvector/circleci-orb[CircleCI]などのプラグインを使用して脆弱性をスキャンするか、REST APIを使用します。{product-name}は、レジストリスキャンとローカルスキャンの2種類のビルドフェーズスキャンをサポートしています。レジストリスキャンの場合、{product-name}コントローラーとスキャナーは、イメージをプルするためにレジストリに接続できる必要があります。
+
+ビルドフェーズスキャンをトリガーするには、プラグイン（例：Jenkins）がコントローラーまたはAllinoneに接続できる必要があります。注意:プラグインがスキャナーを呼び出すためのデフォルトのREST APIポートは10443です。このポートは、Kubernetesのサービスを介してAllinoneまたはコントローラーを通じて公開する必要があります。または、Dockerの実行またはコンポーズファイルでポートマップ（例：- 10443:10443）を使用します。
+
+{product-name}スキャナーコンテナがデプロイされ、Allinoneまたはコントローラーに接続するように適切に構成されていることを確認してください。4.0以降では、neuvector/scannerコンテナはallinoneまたはコントローラーとは別にデプロイする必要があり、サンプルデプロイメント yaml ファイルに含まれています。
+
+Jenkinsプラグインマネージャーからプラグインをダウンロードできます。他のプラグインは、ビルドツールのカタログまたは https://github.com/neuvector[{product-name} github]ページでアクセスできます。Bambooスキャナーは https://github.com/neuvector/bamboo-plugin/releases/tag/1.0.1.で入手可能で、CircleCI ORBは https://github.com/neuvector/circleci-orbで入手可能で、CircleCI ORBカタログを通じて利用できます。
+
+=== ローカルビルドフェーズスキャン
+
+ローカルスキャンの場合、{product-name}スキャナーはローカルホスト（またはリモートホストのDockerコマンドで到達可能なホスト）上のイメージをスキャンしようとします。
+
+KubernetesまたはOpenShiftベースのローカルスキャンの場合、xref:kubernetes.adoc#_deploy_using_kubernetes[デプロイメント{product-name}]セクションに示されているサンプルスキャナーデプロイメントyamlファイルのコメントアウトされたセクションを削除します。コメントアウトされたセクションは次のようになります：
+
+[,yaml]
+----
+          env:
+# Commented out sections are required only for local build-phase scanning
+#            - name: SCANNER_DOCKER_URL
+#              value: tcp://192.168.1.10:2376
+            - name: CLUSTER_JOIN_ADDR
+              value: neuvector-svc-controller.neuvector
+            - name: CLUSTER_ADVERTISED_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: CLUSTER_BIND_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+#          volumeMounts:
+#            - mountPath: /var/run/docker.sock
+#              name: docker-sock
+#              readOnly: true
+#      volumes:
+#        - name: docker-sock
+#          hostPath:
+#            path: /var/run/docker.sock
+      restartPolicy: Always
+----
+
+Dockerネイティブのローカルスキャンの場合、スキャナーのxref:docker.adoc#_deploy_the_suse_security_scanner_container[Dockerプロダクションデプロイメント]セクションのDockerスキャナーデプロイメントに関する指示に従ってください。
+
+=== ローカルビルドフェーズスキャン - スキャナーのみ（コントローラーは不要）
+
+{product-name}は、ローカルイメージスキャンのためのスタンドアロンスキャナーデプロイメントをサポートしています（コントローラーは不要です）。CircleCI ORBのような特定のプラグインには、ビルドジョブがイメージスキャンを必要とする際にスキャナーを動的にデプロイし、結果がORBを通じて返送された後にスキャナーを削除するオプションがあります。これらの動的スキャナーデプロイメントは、プラグインがサポートしている場合、自動的に呼び出されます。
+
+スタンドアロンスキャナーに関する詳細は、xref:scanners.adoc[スキャナーセクション]をご覧ください。

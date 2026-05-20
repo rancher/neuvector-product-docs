@@ -1,0 +1,55 @@
+= Assinatura de imagem OCI
+:revdate: 2026-02-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/03.admission/01.sigstore/03.ociimagesigning.md
+:page-opendocs-slug:  /política/admissão/assinaturadeimagemoci
+
+== Verifique as imagens da Coleção de Aplicativos SUSE Rancher com o Sigstore
+
+A Coleção de Aplicativos SUSE Rancher utiliza um registro baseado em OCI onde todos os aplicativos são assinados pelo Sigstore. Os usuários podem verificar os aplicativos na Coleção de Aplicativos com os Verificadores Sigstore em {product-name}.
+
+Você precisa da chave pública do Cosign da Coleção de Aplicativos SUSE Rancher com antecedência, então os Verificadores Sigstore podem ser configurados em {product-name}.
+
+image:oci_image_1.png[Adicionar Verificador Sigstore]
+
+Siga estas etapas para configurar a verificação do Sigstore para imagens na Coleção de Aplicativos SUSE Rancher.
+
+. Crie um token de acesso seguindo o guia de autenticação:
++
+https://docs.apps.rancher.io/get-started/authentication/
+
+. Recupere a chave pública do Cosign (`ap-pubkey.pem`) seguindo o guia de verificação de assinatura:
++
+https://docs.apps.rancher.io/howto-guides/verify-signatures-with-cosign/
+
+. Na interface web {product-name}, crie uma raiz de confiança do Sigstore.
++
+--
+* Vá para *Ativos* > *Verificadores Sigstore*.
+* Crie um novo verificador.
+* Adicione a chave pública do Cosign como um verificador de par de chaves.
+--
+
+. Configure o registro e inicie uma varredura.
++
+--
+* Vá para *Ativos* > *Registros*.
+* Crie um novo registro com os seguintes valores:
++
+[source,text]
+----
+Registry: https://dp.apps.rancher.io/
+Filter: containers/openjdk:21.0.4-build7
+Username: <your SUSE username>
+Password: <access token created earlier>
+----
+--
++
+A imagem filtrada é uma imagem OCI publicada na Coleção de Aplicativos SUSE Rancher.
+
+. Revise os resultados da varredura para confirmar a verificação da assinatura.
+
+
+image:oci_image_2.png[Resultado da Varredura do Verificador]
+
+Após a conclusão da verificação, {product-name} exibe os detalhes do verificador Sigstore nos resultados da verificação, confirmando que a assinatura da imagem foi validada com sucesso.

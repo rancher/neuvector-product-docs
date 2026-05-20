@@ -1,0 +1,218 @@
+= Systemanforderungen
+:revdate: 2025-06-02
+:page-revdate: {revdate}
+:page-opendocs-origin: /01.basics/02.requirements/02.requirements.md
+:page-opendocs-slug: /grundlagen/anforderungen
+
+== Systemanforderungen
+
+[cols="1,1,1,1,4", options="header"]
+|===
+| Komponente | Anzahl der Instanzen | Empfohlene vCPU | Mindestspeicher | Anmerkungen
+
+| Controller
+| min. 1 +
+3 für HA (nur ungerade Zahlen)
+| 1
+| 1GB
+| vCPU-Kern kann geteilt werden
+
+| Enforcer
+| 1 pro Knoten/VM
+| 1+
+| 1GB
+| Einen oder mehrere dedizierte vCPU für einen höheren Netzwerkdurchsatz im Schutzmodus
+
+| Scanner
+| min. 1 +
+2+ für HA/Leistung
+| 1
+| 1GB
+| CPU-Kerne können für Standardlasten geteilt werden. +
+Widmen Sie 1 oder mehr CPUs für Hochvolumen (10k+) Bildscans. +
+Die Registrierung von Bildscans wird vom Scanner durchgeführt und vom Controller verwaltet, und das Bild wird vom Scanner abgerufen und im Speicher entpackt. +
+Die Mindestempfehlung für den Speicher geht davon aus, dass die zu scannenden Bilder nicht größer als 0,5 GB sind. +
+Beim Scannen von Bildern, die größer als 1 GB sind, sollte der Speicher des Scanners berechnet werden, indem die größte Bildgröße genommen und 0,5 GB hinzugefügt wird. +
+Beispiel - größte Bildgröße = 1,3 GB, der Speicher des Scanner-Containers sollte 1,8 GB betragen
+
+| manager
+| min 1 +
+2+ für HA
+| 1
+| 1GB
+| vCPU-Kern kann geteilt werden
+|===
+
+* Für die Sicherung der Konfiguration/HA ist ein RWX PVC von 1Gi oder mehr erforderlich. Siehe xref:production.adoc#_backups_and_persistent_data[Abschnitt Backups und persistente Daten] für weitere Details.
+* Empfohlener Browser: Chrome für bessere Leistung
+
+== Unterstützte Plattformen
+
+* Offiziell unterstützte Linux-Distributionen: SUSE Linux, Ubuntu, CentOS/Red Hat (RHEL), Debian, CoreOS, AWS Bottlerocket und Photon.
+* AMD64- und ARM-Architekturen
+* CoreOS wird unterstützt (November 2023) für CVE-Scans über die von RedHat bereitgestellte RHEL-Mapping-Tabelle. Sobald ein offizieller Feed von RedHat für CoreOS veröffentlicht wird, wird es unterstützt.
+* Offiziell unterstützte Kubernetes- und Docker-konforme Containerverwaltungssysteme. Die folgenden Plattformen werden mit jeder Veröffentlichung von {product-name} getestet: Kubernetes 1.19-1.32, SUSE Rancher (RKE, RKE2, K3s usw.), RedHat OpenShift 4.6-4.16 (3.x bis 4.12 wurden vor {product-name} 5.2.x unterstützt), Google GKE, Amazon EKS, Microsoft Azure AKS, IBM IKS, natives Docker, Docker Swarm. Die folgenden Kubernetes- und Docker-konformen Plattformen werden unterstützt und wurden auf die Funktionalität mit {product-name} überprüft: VMware Photon und Tanzu, SUSE CaaS, Oracle OKE, Mirantis Kubernetes Engine, Nutanix Kubernetes Engine, Docker UCP/DataCenter, Docker Cloud.
+* Docker-Laufzeitversion: 1.9.0 und höher; Docker-API-Version: 1.21, CE und EE.
+* Containerd- und CRI-O-Laufzeiten (erfordert Änderungen an den Volumenpfaden in den Beispiel-YAMLs). Siehe erforderliche Änderungen für Containerd im Abschnitt zur Kubernetes-Bereitstellung und CRI-O im Abschnitt zur OpenShift-Bereitstellung.
+* {product-name} ist mit den meisten kommerziell unterstützten CNIs kompatibel. Offiziell getestet und unterstützt sind OpenShift OVS (Subnetz/Multi-Tenant), Calico, Flannel, Cilium, Antrea und Public Clouds (GKE, AKS, IKS, EKS). Die Unterstützung für Multus wurde in v5.4.0 hinzugefügt.
+* Konsole: Chrome oder Firefox-Browser empfohlen. IE 11 wird aufgrund von Leistungsproblemen nicht unterstützt.
+* Minikube wird für eine einfache erste Bewertung unterstützt, jedoch nicht für einen vollständigen Proof of Concept. Siehe unten für die erforderlichen Änderungen, damit die All-in-One-YAML auf Minikube ausgeführt werden kann.
+
+AWS Bottlerocket Hinweis: Der Pfad des containerd-Sockets, der spezifisch für Bottleneck ist, muss geändert werden. Bitte siehe den Abschnitt zur Kubernetes-Bereitstellung für Details.
+
+== Nicht unterstützt
+
+* GKE Autopilot.
+* AWS ECS wird nicht mehr unterstützt. (HINWEIS: Es wurden keine Funktionen aktiv entfernt, um {product-name} auf ECS-Bereitstellungen auszuführen. Allerdings wird das Testen auf ECS von SUSE nicht mehr durchgeführt. Während das Schützen von ECS-Arbeitslasten mit {product-name} wahrscheinlich wie erwartet funktioniert, werden Probleme nicht untersucht.)
+* Docker auf Mac
+* Docker auf Windows
+* Rkt (Container-Linux) von CoreOS
+* AppArmor in K3S / SLES-Umgebungen. Bestimmte Konfigurationen können mit {product-name} in Konflikt stehen und Scannerfehler verursachen; AppArmor sollte beim Bereitstellen von {product-name} deaktiviert werden.
+* IPv6 wird nicht unterstützt.
+* VMWare integrierte Container (VIC) außer im verschachtelten Modus
+* CloudFoundry
+* Konsole: IE 11 wird aufgrund von Leistungsproblemen nicht unterstützt.
+* Verschachtelter Container-Host in einem Container-Tool, das für einfache Tests verwendet wird. Zum Beispiel die Bereitstellung eines Kubernetes-Clusters mit 'kind' https://kind.sigs.k8s.io/docs/user/configuration/.
+
+[NOTE]
+====
+PKS ist im Feld getestet und erfordert die Aktivierung privilegierter Container im Plan/Tile sowie die Änderung des yaml hostPath wie folgt für Allinone, Controller, Enforcer:
+
+[,yaml]
+----
+            hostPath:
+            path: /var/vcap/sys/run/docker/docker.sock
+----
+====
+
+[NOTE]
+====
+{product-name} unterstützt das Ausführen auf linux-basierten VMs unter Mac/Windows mit Vagrant, VirtualBox, VMware oder anderen virtualisierten Umgebungen.
+====
+
+
+== Minikube
+
+Bitte nehmen Sie die folgenden Änderungen an der Allinone-Bereitstellungs-yaml vor.
+
+[,yaml]
+----
+apiVersion: apps/v1 <<-- required for k8s 1.19
+kind: DaemonSet
+metadata:
+ name: neuvector-allinone-pod
+ namespace: neuvector
+spec:
+ selector: <-- Added
+ matchLabels: <-- Added
+ app: neuvector-allinone-pod <-- Added
+ minReadySeconds: 60
+...
+ nodeSelector: <-- DELETE THIS LINE
+ nvallinone: "true" <-- DELETE THIS LINE
+apiVersion: apps/v1 <<-- required for k8s 1.19
+kind: DaemonSet
+metadata:
+ name: neuvector-enforcer-pod
+ namespace: neuvector
+spec:
+ selector: <-- Added
+ matchLabels: <-- Added
+ app: neuvector-enforcer-pod <-- Added
+----
+
+== Leistung und Skalierung
+
+Wie immer hängt die Leistungsplanung für {product-name} Container von mehreren Faktoren ab, einschließlich:
+
+* (Controller & Scanner) Anzahl und Größe der Bilder im Registry, die zunächst (vom Scanner) gescannt werden sollen
+* (Enforcer) Dienstmodus (Entdecken, Überwachen, Schützen), wobei der Schützenmodus als Inline-Firewall läuft
+* (Enforcer) Art der Netzwerkverbindungen für Arbeitslasten im Schützenmodus
+
+Im Überwachungsmodus (Netzwerkfilterung ähnlich einem Mirror/Tap) gibt es keine Leistungseinbußen, und der Enforcer verarbeitet den Datenverkehr mit voller Geschwindigkeit und generiert bei Bedarf Warnungen. Im Schützenmodus (Inline-Firewall) benötigt der Enforcer CPU und Speicher, um Verbindungen mit tiefgehender Paketinspektion zu filtern und zu halten, um zu bestimmen, ob sie blockiert oder verworfen werden sollen. Im Allgemeinen sollte der Enforcer mit 1 GB Speicher und einer gemeinsamen CPU in der Lage sein, die meisten Umgebungen im Schützenmodus zu bewältigen.
+
+Für Durchsatz- oder Latenz-empfindliche Umgebungen können zusätzlicher Speicher und/oder ein dedizierter CPU-Kern dem {product-name} Enforcer-Container zugewiesen werden.
+
+Für die Leistungsoptimierung des Controllers und Scanners für das Scannen der Registry siehe die oben genannten Systemanforderungen.
+
+Für zusätzliche Ratschläge zu Leistung und Dimensionierung siehe den Abschnitt xref:production.adoc#_best_practices_tips_qa_for_deploying_and_managing_suse_security[Onboarding/Beste Praktiken].
+
+=== Durchsatz
+
+Wie die folgende Tabelle zeigt, zeigten grundlegende Durchsatz-Benchmark-Tests einen maximalen Durchsatz von 1,3 Gbps pro Knoten auf einer kleinen Public Cloud-Instanz mit 4 CPU-Kernen. Ein 10-Knoten-Cluster könnte dann maximal 13 Gbps Durchsatz für alle Dienste im Schutzmodus im gesamten Cluster verarbeiten.
+
+image:throughput.png[Durchsatz]
+
+Dieser Durchsatz wird voraussichtlich steigen, wenn eine dedizierte CPU dem Enforcer zugewiesen wird, oder sich die CPU-Geschwindigkeit ändert und/oder zusätzlicher Speicher zugewiesen wird. Die Skalierung hängt erneut von der Art des Netzwerk-/Anwendungsverkehrs der Arbeitslasten ab.
+
+=== Latenz
+
+Die Latenz ist eine weitere Leistungskennzahl, die von der Art der Netzwerkverbindungen abhängt. Ähnlich wie beim Durchsatz ist die Latenz im Überwachungsmodus nicht betroffen, sondern nur für Dienste im Schutzmodus (Inline-Firewall). Kleine Pakete oder einfache/schnelle Dienste erzeugen eine höhere Latenz um {product-name} Prozent, während größere Pakete oder Dienste, die komplexe Verarbeitung erfordern, einen niedrigeren Prozentsatz an zusätzlicher Latenz durch den {product-name} Enforcer aufweisen.
+
+Die folgende Tabelle zeigt die durchschnittliche Latenz von 2-10%, die mit dem Redis-Benchmark-Tool gemessen wurde. Der Redis-Benchmark verwendet recht kleine Pakete, sodass die Latenz mit größeren Paketen voraussichtlich niedriger sein wird.
+
+|===
+| Test | Monitor | Schützen | Latenz
+
+| PING_INLINE
+| 34.904
+| 31.603
+| 9,46%
+
+| SET
+| 38.618
+| 36.157
+| 6,37%
+
+| GET
+| 36.055
+| 35.184
+| 2,42%
+
+| LPUSH
+| 39.853
+| 35.994
+| 9,68%
+
+| RPUSH
+| 37.685
+| 36.010
+| 4,45%
+
+| LPUSH (LRANGE-Benchmark)
+| 37.399
+| 35.220
+| 5,83%
+
+| LRANGE_100
+| 25.539
+| 23.906
+| 6,39%
+
+| LRANGE_300
+| 13.082
+| 12.277
+| 6,15%
+|===
+
+Der obige Benchmark zeigt die durchschnittlichen TPS im Protect-Modus im Vergleich zum Monitor-Modus und die für den Protect-Modus hinzugefügte Latenz für mehrere Tests im Benchmark. Der Hauptweg, um die tatsächliche Latenz (Mikrosekunden) im Protect-Modus zu senken, besteht darin, auf einem System mit einer schnelleren CPU zu arbeiten. Weitere Details zu diesem Open-Source-Redis-Benchmark-Tool finden Sie unter https://redis.io/topics/benchmarks.
+
+=== Hinzufügen von Skalierungsbeschränkungen für große Arbeitslastumgebungen
+
+Während der NeuVector-Installation kann es vorkommen, dass die NeuVector Enforcer-Pods nicht starten, wenn Ihr Host-Betriebssystem eine große Anzahl von Arbeitslasten aufweist, da beim Versuch, das große Volumen an Dateien zu öffnen, die Host-Überwachung durch die Pods zu einem Fehler führen kann. Dies kann auch zu RKE2-Server-Fehlern führen, aufgrund der großen Anzahl offener Dateien.
+
+Als Workaround für Umgebungen mit hoher Arbeitslast müssen Sie eine Datei wie `example-fs-max.conf` im Verzeichnis `/etc/sysctl.d/` erstellen und Skalierungsbeschränkungen mit der folgenden Konfiguration hinzufügen.
+
+[,shell]
+----
+fs.inotify.max_user_instances=8192
+fs.inotify.max_user_watches=524288
+fs.filemax=5000
+----
+
+Stellen Sie dann sicher, dass die Konfiguration mit einem Neustart über den folgenden Befehl angewendet wird.
+
+[,shell]
+----
+systemctl restart systemd-sysctl
+----

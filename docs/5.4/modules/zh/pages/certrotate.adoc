@@ -1,0 +1,64 @@
+= 轮换内部自签名证书
+
+此功能允许用户自动更新/轮换NeuVector内部证书。
+
+启用后，控制器 Pod 新添加的 init 容器将创建一个 Kubernetes Job 资源以执行内部证书的轮换。升级作业也可以通过CronJob对象触发，因此内部证书将定期轮换。
+
+要启用自动轮换，```internal.autoRotateCert```必须设置为```true```。（默认情况下禁用）。
+
+== 当internal.autoRotateCert启用时的预期行为
+=== 全新安装
+
+1. 当所有容器开始运行时，控制器的 init 容器将运行并创建一个升级作业。
++
+image:cert_rotate_01.png[certrotate]
++
+2. 升级器将运行并初始化新的内部 secret。与此同时，各组件正在等待 secret 初始化。
++
+image:cert_rotate_02.png[certrotate]
++
+3. 在内部 secret 初始化后，所有组件读取 secret 并按照正常流程进行。
++
+image:cert_rotate_03.png[certrotate]
+
+=== 升级
+
+1. 旧的部署已经在运行。
++
+image:cert_rotate_04.png[certrotate]
++
+2. 运行helm upgrade后，滚动更新将开始。控制器的 init 容器将创建一个升级作业。
++
+image:cert_rotate_05.png[certrotate]
++
+3. 升级作业将等待直到滚动更新完成。
++
+image:cert_rotate_06.png[certrotate]
++
+4. 然后，升级器将更新内部证书。每个组件将通过k8s Secret读取更新的证书。
++
+image:cert_rotate_07.png[certrotate]
+
+如果`internal.autoRotateCert`为假，升级作业仍然会启动，但不会执行任何操作。将遵循原始行为，即在所有情况下都不会有 init 容器，并且仍将使用内置证书。
+
+== HELM 图表中的新选项
+在 helm 图表中，添加了以下选项：
+[source, yaml]
+---
+internal.autoGenerateCert (default true): Control whether to automatically generate internal certificate.
+internal.autoRotateCert (default false): Control whether the auto rotation is on/off.
+controller.upgrader.env (default []): Control upgrader's environment variables.
+controller.upgrader.imagePullPolicy (default IfNotPresent): Upgrader's pull policy.
+controller.upgrader.schedule (default "0 0 1 * *"): Upgrader's cronjob schedule.
+---
+
+== 在配置中轮换敏感字段
+
+当设备加密密钥被轮换时，NeuVector 不会立即重新加密现有的敏感配置字段。这些字段仅在轮换后被更新或修改时才会重新加密。
+
+每次轮换加密密钥时，其版本号增加一。NeuVector 使用此版本控制来安全地跟踪和管理多个代的加密密钥。
+
+[NOTE]
+====
+NeuVector 团队建议您定期备份位于 `neuvector` 名称空间中的 Kubernetes secret `neuvector-store-secret` 的数据。
+====

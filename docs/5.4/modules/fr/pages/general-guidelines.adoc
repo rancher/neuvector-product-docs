@@ -1,0 +1,39 @@
+= Règles générales
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /13.special/01.general/01.general.md
+:page-opendocs-slug:  /special/general
+
+== Test {product-name} en utilisant le conteneur Allinone
+
+Les exemples de cette section montrent comment déployer les conteneurs Allinone et Enforcer. Cette configuration est utile pour tester {product-name} dans des environnements non-Kubernetes. Pour les déploiements Kubernetes, utilisez le dernier {product-name} chart Helm. Pour plus d'informations, référez-vous à xref:./production.adoc[Planification des déploiements].
+
+[IMPORTANT]
+====
+L'équipe {product-name} déconseille fortement d'utiliser cette configuration dans des environnements de production, et elle n'est pas prise en charge pour un usage en production.
+====
+
+== Directives générales pour le déploiement
+
+Préparez votre environnement hôte pour une installation correcte. Assurez-vous que les conteneurs {product-name} peuvent communiquer entre eux entre les hôtes. Ensuite, examinez et modifiez les fichiers d'exemple pour votre environnement.
+
+En général, il est important de faire ce qui suit{nbsp}:
+
+. Étiquetez les nœuds de manière appropriée. Si vous utilisez des étiquettes de nœud pour contrôler où l'allinone ou le contrôleur est déployé, étiquetez-les avant le déploiement.
+. Assurez-vous que les volumes peuvent être mappés correctement. Exemple :
++
+[,yaml]
+----
+volumes:
+        - /var/neuvector:/var/neuvector
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup:/host/cgroup:ro
+----
+
+. Ouvrez les ports requis sur les hôtes. Assurez-vous que les ports requis sont correctement mappés et ouverts sur l'hôte. L'allinone nécessite 8443 (si vous utilisez la console), 18300, 18301, 18400 et 18401. L'Enforcer nécessite 18301 et 18401.
+. Modifier l'adresse CLUSTER_JOIN_ADDR. Trouvez l'adresse IP du nœud, le nom du nœud (si vous utilisez un serveur de noms) ou la variable du nœud (si vous utilisez des outils d'orchestration) pour l'allinone (contrôleur) à utiliser pour le "`node IP`" dans les fichiers d'exemple pour l'allinone et l'enforcer.
+
+== Accéder à la console
+
+Veuillez consulter la première section Bases -> Connexion au gestionnaire pour les options permettant de désactiver https ou d'accéder à la console via une passerelle de périmètre de sécurité d'entreprise qui n'autorise pas le port 8443 pour l'accès à la console.

@@ -1,0 +1,25 @@
+= {product-name} Fluxo de trabalho
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /11.automation/01.ci_workflow/01.ci_workflow.md
+:page-opendocs-slug:  /automation/ci_workflow
+
+== {product-name} Integração no Fluxo de Trabalho CI/CD
+
+{product-name} suporta todo o processo CI/CD e pode ser facilmente integrado ao fluxo de trabalho para fornecer segurança durante todo o processo de desenvolvimento e implantação.
+
+=== Fluxo de Trabalho de Dev e Integração Contínua
+
+{product-name} pode ser integrado aos processos de Dev e CI para automatizar a varredura de vulnerabilidades. O uso do plug-in {product-name} Jenkins e das funções de varredura de Registro permite a varredura de imagens durante esta fase.
+
+image:ci_workflow.png[integração]
+
+Além disso, {product-name} pode ser usado durante os testes automatizados de aplicativo para analisar conexões de rede e o comportamento de contêiner para antecipar quaisquer problemas em homologação ou produção.
+
+=== Fluxo de Trabalho de Implantação Contínua e Produção
+
+{product-name} pode realizar testes de conformidade pré-implantação e auditoria de segurança antes da produção, bem como durante a produção.
+
+image:cd_workflow.png[produção]
+
+A plataforma de segurança multivetorial é capaz de combinar segurança de rede, inspeções de contêineres e segurança de host para proteger contêineres em tempo de execução.

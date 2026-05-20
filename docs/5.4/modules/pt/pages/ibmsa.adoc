@@ -1,0 +1,40 @@
+= IBM Security Advisor
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/09.ibmsa/09.ibmsa.md
+:page-opendocs-slug:  /integration/ibmsa
+
+== Integração com o IBM Security Advisor
+
+{product-name} Integra-se com o IBM Security Advisor na IBM Cloud.
+
+Para gerar a URL de registro necessária, faça login no console {product-name} como administrador e vá para Configurações -> Configuração.
+
+. Ative "Integrar com o IBM Security Advisor" -> Enviar
+. Clique em "Obter URL" -> Copiar para a área de transferência
+
+image:ibmsa_config_new.png[ibmconfigure]
+
+Em seguida, retorne ao console do IBM Security Advisor e, em "Digite a URL de configuração {product-name}", digite "https://{{product-name} hostname/IP do controlador}:{port}" e cole o que foi copiado nas etapas acima. Para a porta, use a porta da API REST {product-name} exposta (o padrão é 10443). Para ambientes de múltiplos clusters, este também é o serviço 'fed-worker' que expõe esta porta.
+
+O IBM Security Advisor se comunicará com o controlador do cluster {product-name} através do hostname ou IP fornecido. Nota: Isso pode precisar ser exposto como um serviço para acesso de fora do cluster Kubernetes, semelhante a como a API REST é exposta como um serviço.
+
+=== Verificando a Conexão
+
+Quando a conexão for criada com sucesso entre o IBM Security Advisor e {product-name}, você verá o ícone verde "Conectado em {date, time}" ao lado de "Integrar com o IBM Security Advisor" no Console {product-name}.
+
+image:ibmsa_connected.png[conectado]
+
+=== Revisando Eventos de Segurança no IBM Security Advisor
+
+Um cartão resumo com informações sobre eventos de segurança é exibido.
+
+image:ibm_sa_threat_summary.png[ameaças]
+
+Cada evento de segurança pode ser investigado em mais detalhes, conforme mostrado abaixo:
+
+image:ibm_sa_findings.png[constatações]
+
+== Removendo a Integração
+
+Se você excluir uma {product-name} conexão de integração em sua conta do IBM Cloud, lembre-se de também desativar a "integração IBM SA" para aquele {product-name} cluster em Configurações -> Configuração.

@@ -1,0 +1,139 @@
+= Informes y notificaciones
+:revdate: 2025-05-02
+:page-revdate: {revdate}
+:page-opendocs-origin: /07.reporting/01.reporting/01.reporting.md
+:page-opendocs-slug:  /reporting/reporting
+
+== Generación de informes
+
+Los informes se pueden ver y descargar desde varios menús en la consola {product-name}. El panel de control muestra un resumen de seguridad que se puede descargar como un PDF. La descarga en PDF se puede filtrar por un espacio de nombres si se desea.
+
+image:3_0_Dashboard.png[Panel de control]
+
+Los resultados del escaneo de vulnerabilidades y del benchmark CIS para registros, contenedores, nodos y plataformas también se pueden descargar como archivos CSV desde sus respectivos menús en las secciones del menú de Activos.
+
+El menú de Riesgos de Seguridad proporciona correlación avanzada, filtrado e informes para vulnerabilidades y comprobaciones de cumplimiento. Las vistas filtradas se pueden exportar en formatos CSV o PDF.
+
+image:security_risks_4.png[Informes]
+
+Los informes de cumplimiento para PCI, HIPAA, RGPD y otras regulaciones se pueden filtrar, ver y exportar seleccionando la regulación en el popup de filtro avanzado en Riesgos de Seguridad -> Cumplimiento.
+
+image:gdpr_report.png[Informes]
+
+=== Informes de eventos.
+
+Todos los eventos, como seguridad, administración, admisión, escaneo y riesgo, son registrados por {product-name} y también se pueden ver en la consola en el menú de notificaciones. Vea a continuación para más detalles.
+
+==== Límites de eventos
+
+Todos los eventos se almacenan en memoria para su visualización en el panel de control y en las pantallas de notificaciones. Se espera que los eventos se envíen a través de SYSLOG, webhook u otros medios para ser almacenados y gestionados por un sistema SIEM. Actualmente hay un límite de 4K en cada tipo de evento a continuación:
+
+* Informes de riesgo (escaneo, encontrados en Notificaciones -> Informes de riesgo)
+* Eventos generales (administración, encontrados en las Notificaciones -> Eventos)
+* Violaciones (violaciones de red, encontradas en Notificaciones -> Eventos de Seguridad)
+* Amenazas (ataques a la red y problemas de conexión, encontrados en Notificaciones -> Eventos de Seguridad)
+* Incidentes (violaciones de procesos y archivos, encontrados en Notificaciones -> Eventos de Seguridad)
+
+Por eso, una vez alcanzado el límite, solo se muestran los 4K eventos más recientes de ese tipo. Esto afecta a las listas de Notificaciones así como a las visualizaciones en el panel de control.
+
+== SIEM y SYSLOG
+
+Puedes configurar el servidor SYSLOG y las notificaciones de webhook en la {product-name} consola en el menú de Configuración -> Configuración. Elige el nivel de registro, TCP o UDP, y el formato si se desea JSON. Los datos CVE pueden enviarse individualmente para cada CVE y/o incluir resultados de escaneos en capas. También puedes optar por enviar eventos al registro del pod del controlador en lugar de o además de syslog. Ten en cuenta que los eventos solo se envían al registro del pod del controlador principal.
+
+Luego puedes usar tus herramientas de informes favoritas para monitorizar {product-name} eventos.
+
+Además, puedes configurar tu servidor syslog a través de la CLI de la siguiente manera:
+
+[,shell]
+----
+> set system syslog_server <ip>[:port]
+----
+
+La API REST también se puede utilizar para la configuración.
+
+=== Salida de ejemplo de SYSLOG
+
+==== Violación de Red
+
+[,shell]
+----
+2020-01-24T21:39:34Z neuvector-controller-pod-575f94dccf-rccmt /usr/local/bin/controller 12 neuvector - notification=violation,level=Warning,reported_timestamp=1579901965,reported_at=2020-01-24T21:39:25Z,cluster_name=cluster.local,client_id=edf1c28d3411a9686e6e0374a9325b6a3626619938d3cf435a9d90075a1ef653,client_name=k8s_POD_node-pod-7c57bdbf5d-dxkn4_default_cdd9cf23-488d-439c-9408-ed98f838c67b_0,client_domain=default,client_image=k8s.gcr.io/pause:3.1,client_service=node-pod.default,server_id=external,server_name=external,server_port=80,ip_proto=6,applications=[HTTP],servers=[],sessions=1,policy_action=violate,policy_id=0,client_ip=192.168.35.69,server_ip=172.217.5.110
+----
+
+==== Violación de Proceso
+
+[,shell]
+----
+2020-01-24T21:39:29Z neuvector-controller-pod-575f94dccf-rccmt /usr/local/bin/controller 12 neuvector - notification=incident,name=Process.Profile.Violation,level=Warning,reported_timestamp=1579901965,reported_at=2020-01-24T21:39:25Z,cluster_name=cluster.local,host_id=k43:HF45:AJC6:5RYO:O5OA:KACD:KRT2:M3O6:P3VQ:IC4I:FSRD:P3HJ:ETLS,host_name=k43,enforcer_id=90822bad25eea14180c0942bf30197528bdab8c8237f307cc3059e6bbdb91f7a,enforcer_name=k8s_neuvector-enforcer-pod_neuvector-enforcer-pod-cg8jp_neuvector_d4ef187e-041c-4bc2-9cdc-c563a3feac6c_0,workload_id=d1be6d14f1f2782029d0944040ea8c0ba581991de99df86041205e15abc80209,workload_name=k8s_node-pod_node-pod-7c57bdbf5d-dxkn4_default_cdd9cf23-488d-439c-9408-ed98f838c67b_0,workload_domain=default,workload_image=nvbeta/node:latest,workload_service=node-pod.default,proc_name=curl,proc_path=/usr/bin/curl,proc_cmd=curl google.com,proc_effective_uid=1000,proc_effective_user=neuvector,client_ip=,server_ip=,client_port=0,server_port=0,server_conn_port=0,ether_type=0,ip_proto=0,conn_ingress=false,proc_parent_name=docker-runc,proc_parent_path=/usr/bin/docker-runc,action=violate,group=nv.node-pod.default,aggregation_from=1579901965,count=1,message=Process profile violation
+----
+
+==== Control de Admisión
+
+[,shell]
+----
+2020-01-24T21:48:31Z neuvector-controller-pod-575f94dccf-rccmt /usr/local/bin/controller 12 neuvector - notification=audit,name=Admission.Control.Violation,level=Warning,reported_timestamp=1579902506,reported_at=2020-01-24T21:48:26Z,cluster_name=cluster.local,host_id=,host_name=,enforcer_id=,enforcer_name=,workload_domain=default,workload_image=nvbeta/swarm_nginx,base_os=,high_vul_cnt=0,medium_vul_cnt=0,cvedb_version=,message=Creation of Kubernetes ReplicaSet resource (nginx-pod-695cd4b87b) violates Admission Control deny rule id 1000 but is allowed in monitor mode [Notice: the requested image(s) are not scanned: nvbeta/swarm_nginx],user=kubernetes-admin,error=,aggregation_from=1579902506,count=1,platform=,platform_version=
+----
+
+Para capturar la salida de SYSLOG:
+
+[,bash]
+----
+nc -l -p 8514 -o syslog-dump.hex | tee syslog-messages.txt
+----
+
+Captura mensajes en pantalla, los registra en un archivo y registra un volcado hexadecimal.
+
+=== Integración con Splunk
+
+Puedes integrar con Splunk utilizando SYSLOG para capturar eventos de seguridad de contenedores y reportar en Splunk.
+
+== Notificaciones y registros
+
+En la {product-name} consola en el menú de Notificaciones puedes encontrar notificaciones para Eventos de Seguridad, Eventos de Riesgo (Escaneo y Cumplimiento) y eventos generales del sistema.
+
+Las notificaciones se pueden descargar como CSV o PDF desde los menús de Notificaciones. Además, las capturas de paquetes se pueden descargar para ataques de red, y los resultados de vulnerabilidades se pueden descargar desde el menú de informes de Riesgo de Notificaciones -> para cada resultado de escaneo.
+
+También puedes mostrar los registros utilizando la CLI o la API REST.
+
+=== Security Events
+
+Las violaciones son conexiones que violan las Reglas de la lista blanca o coinciden con una Regla de la lista negra. Las violaciones de red se capturan y las IPs de origen se pueden investigar más a fondo. Los eventos de violación de la lista blanca de red aparecen como "La Regla de Denegación Implícita ha sido violada" para indicar que la conexión de red no coincidió con ninguna regla de la lista blanca.
+
+image:Security_Events321.png[Eventos]
+
+En esta vista, puedes revisar eventos de red, de proceso y de archivos y añadir fácilmente una regla de lista blanca para falsos positivos haciendo clic en el botón Revisar Regla. El Filtro Avanzado te permite seleccionar el tipo de evento a mostrar.
+
+image:security_events_addrule.png[AñadirRegla]
+
+{product-name} también monitoriza continuamente todos los contenedores para ataques conocidos como DNS, DDoS, HTTP-smuggling, tunneling, etc. Cuando se detecta un ataque, se registra aquí y se bloquea (si el contenedor/servicio está configurado para proteger), y el paquete se captura automáticamente. Puedes ver los detalles del paquete, por ejemplo:
+
+image:ping_capture.png[Captura]
+
+==== Añadir Nuevas Reglas para Eventos de Seguridad
+
+Puedes añadir fácilmente reglas (Directiva de Seguridad) para permitir o denegar el evento detectado seleccionando el botón Revisar Regla y desplegando una nueva regla.
+
+image:security_events_review.png[RevisarRegla]
+
+Esto es útil si ocurren falsos positivos o si se debería haber descubierto un comportamiento de red/proceso pero no ocurrió durante el modo de descubrimiento.
+
+==== Filtros avanzados
+
+Crea un filtro avanzado para ver o exportar eventos seleccionando cada tipo general o introduciendo palabras clave.
+
+* Relaciones. Eventos de red como violaciones (reglas de denegación implícitas), amenazas.
+* Proceso. Violaciones de la lista blanca de proceso o procesos sospechosos detectados como NMAP, SSH, etc.
+* Paquete. Un paquete ha sido actualizado o instalado en el contenedor, por lo tanto, esto generó un evento de seguridad.
+* Túnel. Se ha detectado una violación de túnel. El tunneling, típicamente el tunneling DNS, se utiliza para robar datos. Esta detección se realiza al ver un proceso de túnel iniciar y correlacionarlo con una actividad de red con el protocolo DNS. Ver muestra de evento a continuación.  Descripción del túnel iodine https://github.com/yarrick/iodine
+* Archivo. Violación de acceso al archivo. O bien se ha accedido a un archivo/directorio sensible monitorizado (ver lista de monitorización por defecto) o se ha activado una regla de monitorización de archivo personalizada. Consulta la página xref:./filerules.adoc[Reglas de Acceso a Archivos] para más información.
+* Privilegio. Se ha detectado una escalación de privilegios en el contenedor o el host. Las escalaciones de privilegios se pueden realizar de muchas maneras y no son 100% detectables, por lo que esta es una condición difícil de probar.
+
+=== Informes de Riesgo
+
+Esta sección contiene eventos para escaneos de vulnerabilidades (imagen, registro, tiempo de ejecución, contenedor, host, plataforma), escaneos de cumplimiento (benchmarks CIS, scripts personalizados) y eventos de control de admisión (permitido, denegado).
+
+== Otras Integraciones
+
+{product-name} ha publicado un exportador de Prometheus con un panel de Grafana en la cuenta de GitHub {product-name} https://github.com/neuvector/prometheus-exporter, que se puede personalizar para cada instalación.  Además, las integraciones de muestra con Fluentd también están disponibles a petición.
+
+Las alertas de webhook se pueden enviar configurando el punto final del webhook en Configuración -> de configuración. Luego, crea la(s) regla(s) de respuesta apropiada(s) en el menú de reglas de respuesta de la directiva -> para seleccionar el tipo de evento y el webhook como acción.

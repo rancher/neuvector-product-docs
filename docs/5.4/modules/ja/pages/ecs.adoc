@@ -1,0 +1,349 @@
+= Amazon ECS
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/09.ecs/09.ecs.md
+:page-opendocs-slug: /deploying/ecs
+
+== 重要:Amazon ECSのデプロイメントはサポートが終了しました。
+
+以下の参照セクションは維持されていません。ただし、ECS上でオールインワンをデプロイする方法を理解するのに役立つかもしれません。
+
+== ECSを使用してAWSにデプロイする
+
+これは、ECSを使用して{product-name}をデプロイする方法の例です。
+
+[NOTE]
+====
+EKSのKubernetesの例をご覧ください。
+====
+
+. DockerエンジンとECSエージェントコンテナがビルトインされた複数のAmazon ECSインスタンスを準備します。管理コンソール用に1つのノードを選択します。次に、クライアントブラウザからのアクセスのために、TCPポート8443（{product-name}のデフォルト管理コンソールポート）を許可するセキュリティグループルールを定義します。
+. TCPおよびUDPポート18300、18301、18400、18401を許可するセキュリティグループを定義します。これは、{product-name}のエンフォーサーがコントローラー／オールインワンと通信するために使用されます。このセキュリティグループを、{product-name}のエンフォーサーおよびコントローラー／オールインワンをデプロイするすべてのECSインスタンスに適用します。
+. {product-name}のオールインワンまたはコントローラーコンテナをデプロイしたいノードに属性を設定します。たとえば、コントローラーHAモードで{product-name}を実行したい場合は、少なくとも3つのノードを選択し、3つのノードすべてに属性を追加することをお勧めします。
++
+--
+ECSインスタンスに属性を追加する方法は次のとおりです：
+
+インスタンスを選択し、次にアクションのドロップダウンメニューから"`View/Edit Attributes`"を選択します。
+
+image:1viewattributes.png[属性]
+
+次に、新しい属性を追加します。例えば"`allinone-node`"、値"`true`"を使用します。
+
+image:2addattribute.png[AddAttributes]
+--
+. Allinoneタスク定義を作成します。Allinoneコンテナの新しいタスク定義を作成します。ECSインターフェースを使用して手動で作成するか、サンプルJSONファイルを貼り付けることができます（サンプルは下記参照）。Allinoneの設定方法については、これらのドキュメントのセクション"`1. Deploying {product-name}`"を参照してください。
++
+--
+配置制約を入力してください。例えば、上記の属性ラベリングを使用した場合は、制約にこれを入力してください。
+
+[,json]
+----
+attribute:allinone-node=~true
+----
+
+image:3taskdef.png[AllinoneTask]
+
+[NOTE]
+====
+更新されたJSONファイルを今確認すると、配置制約が追加されているのがわかります。
+====
+--
+. Allinoneタスクの新しいサービスを作成します。"`Placement Templates`"を"`One Task Per Host`"に設定して、任意のホストで1つのAllinone/Controllerのみが実行できるようにします。制約が"`memberOf(attribute:allinone-node=~true)"として使用されることがわかります。これは、そのノードがその属性を持つ必要があることを要求します。
++
+--
+image:3taskplacement.png[AllinonePlace]
+--
+. これでAllinoneサービスをデプロイできます。"`Number of tasks`"を希望するAllinone/Controllerの数に設定します。これで、選択したノードで{product-name}のAllinoneまたはControllerコンテナが実行され始めます。Allinoneが実行を開始した後、ポート8443でHTTPSを通じて{product-name}コンソールに接続できるはずです。
+. エンフォーサータスク定義を作成します。これはAllinoneタスクに似ています。ECSコンソールを通じて手動で設定するか、以下のJSONサンプルを使用してください。
++
+--
+エンフォーサーの配置制約では、エンフォーサーがオールインワンと同じノードに存在しないことが必要です。
+
+[,json]
+----
+attribute:allinone-node!~true
+----
+
+image:4enforcertask.png[EnforcerTask]
+--
+. エンフォーサータスクのために新しいサービスを作成してください。再度、タスク配置を"`One Task Per Host`"に設定し、各ホストに1つのエンフォーサーがデプロイされるようにします。追加の制約は、allinoneノードへの展開を防ぐことを示す必要があります。
++
+--
+image:5taskplacement.png[EnforcerPlacement]
+
+このサービスを、"`Number of tasks`"における希望の数のエンフォーサーノードでデプロイしてください。すぐにすべてのEnforcerが稼働を開始します。{product-name}コンソールから、Enforcerが検出されているすべてのノードを見ることができます。
+--
+
+== サンプルECS JSONタスク定義
+
+以下のサンプルを、{product-name}コンテナのタスク定義を設定するための出発点として使用できます。
+
+新しいタスク定義を作成し、下部の「JSONで設定」をクリックしてください。以下のjsonを貼り付ける前に、IPアドレスとイメージパスを置き換えてください（サンプル内のREPLACEを見つけてください）。通常、IPアドレスは、allinoneが実行されるAWSインスタンスのプライベートIPアドレスになります。jsonの下部で、my-allinone/my-enforcerとは異なるファミリ名を指定することもできます。
+
+サンプルAllinone jsonファイル：
+
+.詳しくは、ここをクリックしてください。
+[%collapsible]
+====
+[,json]
+----
+{
+    "networkMode": "bridge",
+    "taskRoleArn": null,
+    "pidMode": "host",
+    "containerDefinitions": [
+        {
+            "volumesFrom": [],
+            "memory": null,
+            "extraHosts": null,
+            "dnsServers": null,
+            "disableNetworking": null,
+            "dnsSearchDomains": null,
+            "portMappings": [
+                {
+                    "hostPort": 18300,
+                    "containerPort": 18300,
+                    "protocol": "tcp"
+                },
+                {
+                    "hostPort": 18301,
+                    "containerPort": 18301,
+                    "protocol": "tcp"
+                },
+                {
+                    "hostPort": 18400,
+                    "containerPort": 18400,
+                    "protocol": "tcp"
+                },
+                {
+                    "hostPort": 18401,
+                    "containerPort": 18401,
+                    "protocol": "tcp"
+                },
+                {
+                    "hostPort": 18301,
+                    "containerPort": 18301,
+                    "protocol": "udp"
+                },
+                {
+                    "hostPort": 8443,
+                    "containerPort": 8443,
+                    "protocol": "tcp"
+                },
+                {
+                    "hostPort": 1443,
+                    "containerPort": 10443,
+                    "protocol": "tcp"
+                }
+            ],
+            "hostname": null,
+            "essential": true,
+            "entryPoint": null,
+            "mountPoints": [
+                {
+                    "containerPath": "/lib/modules",
+                    "sourceVolume": "modules",
+                    "readOnly": null
+                },
+                {
+                    "containerPath": "/var/run/docker.sock",
+                    "sourceVolume": "dockersock",
+                    "readOnly": null
+                },
+                {
+                    "containerPath": "/host/proc",
+                    "sourceVolume": "proc",
+                    "readOnly": true
+                },
+                {
+                    "containerPath": "/host/cgroup",
+                    "sourceVolume": "cgroup",
+                    "readOnly": true
+                }
+            ],
+            "name": "allinone",
+            "ulimits": null,
+            "dockerSecurityOptions": null,
+            "environment": [
+                {
+                    "name": "CLUSTER_JOIN_ADDR",
+                    "value": "REPLACE: Private IP"
+                }
+            ],
+            "links": null,
+            "workingDirectory": null,
+            "readonlyRootFilesystem": false,
+            "image": "REPLACE: Image Path/Name",
+            "command": null,
+            "user": null,
+            "dockerLabels": {
+                "com.myself.name": "neuvector"
+            },
+            "logConfiguration": null,
+            "cpu": 0,
+            "privileged": true,
+            "memoryReservation": 768
+        }
+    ],
+    "volumes": [
+        {
+            "host": {
+                "sourcePath": "/lib/modules"
+            },
+            "name": "modules"
+        },
+        {
+            "host": {
+                "sourcePath": "/var/run/docker.sock"
+            },
+            "name": "dockersock"
+        },
+        {
+            "host": {
+                "sourcePath": "/proc"
+            },
+            "name": "proc"
+        },
+        {
+            "host": {
+                "sourcePath": "/sys/fs/cgroup"
+            },
+            "name": "cgroup"
+        }
+    ],
+    "family": "my-allinone",
+    "placementConstraints": []
+}
+----
+====
+
+サンプルEnforcer jsonファイル：
+
+.詳しくは、ここをクリックしてください。
+[%collapsible]
+====
+[,json]
+----
+{
+    "networkMode": "bridge",
+    "taskRoleArn": null,
+    "pidMode": "host",
+    "containerDefinitions": [
+        {
+            "volumesFrom": [],
+            "memory": null,
+            "extraHosts": null,
+            "dnsServers": null,
+            "disableNetworking": null,
+            "dnsSearchDomains": null,
+            "portMappings": [
+                {
+                    "hostPort": 18301,
+                    "containerPort": 18301,
+                    "protocol": "tcp"
+                },
+                {
+                    "hostPort": 18401,
+                    "containerPort": 18401,
+                    "protocol": "tcp"
+                },
+                {
+                    "hostPort": 18301,
+                    "containerPort": 18301,
+                    "protocol": "udp"
+                }
+            ],
+            "hostname": null,
+            "essential": true,
+            "entryPoint": null,
+            "mountPoints": [
+                {
+                    "containerPath": "/lib/modules",
+                    "sourceVolume": "modules",
+                    "readOnly": null
+                },
+                {
+                    "containerPath": "/var/run/docker.sock",
+                    "sourceVolume": "dockersock",
+                    "readOnly": null
+                },
+                {
+                    "containerPath": "/host/proc",
+                    "sourceVolume": "proc",
+                    "readOnly": true
+                },
+                {
+                    "containerPath": "/host/cgroup",
+                    "sourceVolume": "cgroup",
+                    "readOnly": true
+                }
+            ],
+            "name": "enforcer",
+            "ulimits": null,
+            "dockerSecurityOptions": null,
+            "environment": [
+                {
+                    "name": "CLUSTER_JOIN_ADDR",
+                    "value": "REPLACE: Private IP"
+                }
+            ],
+            "links": null,
+            "workingDirectory": null,
+            "readonlyRootFilesystem": false,
+            "image": "REPLACE: Image Path/Name",
+            "command": null,
+            "user": null,
+            "dockerLabels": {
+                "com.myself.name": "neuvector"
+            },
+            "logConfiguration": null,
+            "cpu": 0,
+            "privileged": true,
+            "memoryReservation": 512
+        }
+    ],
+    "volumes": [
+        {
+            "host": {
+                "sourcePath": "/lib/modules"
+            },
+            "name": "modules"
+        },
+        {
+            "host": {
+                "sourcePath": "/var/run/docker.sock"
+            },
+            "name": "dockersock"
+        },
+        {
+            "host": {
+                "sourcePath": "/proc"
+            },
+            "name": "proc"
+        },
+        {
+            "host": {
+                "sourcePath": "/sys/fs/cgroup"
+            },
+            "name": "cgroup"
+        }
+    ],
+    "family": "my-enforcer",
+    "placementConstraints": []
+}
+----
+====
+
+== ライブ更新 {product-name}
+
+サービスを中断することなく、ECS内の{product-name}コンテナをライブで更新することができます。{product-name}のサービスも、実行中のサービスを中断することなく簡単に更新することやアップグレードすることができます。Amazon ECSでそれを行うには：
+
+. 複数のコントローラーまたはオールインワンがクラスターとしてデプロイされている場合は、このステップを無視してください。システムに単一のオールインワン／コントローラーしか存在しない場合は、新しいECSインスタンスを用意し、その上に2番目のオールインワン／コントローラーコンテナをデプロイしてください（{product-name}オールインワン／コントローラー ECSデプロイ手順に従ってください）。デプロイ後、{product-name}管理コンソールで、この新しいコントローラーが稼働しているのが見えます（リソース > コントローラーの下）。これは、すべての状態を持つデータがコントローラー間で複製されるために必要です。
+. ECSサービスで、古いオールインワン/コントローラーサービスをリセットして削除します。更新された{product-name}イメージを手動でプルするか、AWS ECSにDockerhubまたはプライベートレジストリからオールインワン/コントローラーコンテナの新しいバージョンをプルさせます。
+. オールインワン/コントローラータスクの新しいリビジョンを作成し、"`CLUSTER_JOIN_ADDR`"を2番目のオールインワン/コントローラーのプライベートノードIPアドレスに更新します。
+. この新しいタスクをデプロイするための新しいサービスを作成します（ECSでデプロイするための同じ手順に従ってください）。完了後、オールインワン/コントローラーの新しいバージョンが稼働しているはずです。{product-name}管理コンソールから、すべてのログとポリシーはまだそこにあるはずです。オプションとして、元のノードでオールインワン/コントローラーが起動しているはずなので、今すぐ2番目のオールインワン/コントローラーコンテナを停止できます。
+. ECSサービスから、エンフォーサーをシャットダウンして更新します。手動または自動で新しいエンフォーサーイメージのプルをトリガーします。その後、すべてのノードでエンフォーサーを再起動または更新します。{product-name}コンソールから、すべてのエンフォーサーが最新であることがわかります。
+. オールインワンの代わりに別のマネージャーコンテナを使用している場合（すでにマネージャーが含まれている）、古いマネージャーコンテナをシャットダウンして削除します。その後、新しいマネージャーバージョンをプルし、CLUSTER_JOIN_ADDRをコントローラーのIPに向けてデプロイします。
+
+すべての{product-name}コンテナは現在ライブで更新されています。すべてのポリシー、ログ、および設定は影響を受けません。ライブグラフビューは、コンテナ間で新しいライブトラフィックが流れるとすぐに自動的に再生成されます。

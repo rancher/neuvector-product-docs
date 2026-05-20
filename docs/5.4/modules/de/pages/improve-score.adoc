@@ -1,0 +1,76 @@
+= Sicherheitsrisikowert verbessern
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /04.navigation/03.improve_score/03.improve_score.md
+:page-opendocs-slug:  /navigation/improve_score
+
+== Verbesserung des Sicherheitsrisikowerts
+
+Der Sicherheitsrisikowert im Dashboard bietet einen Wert zwischen 0 und 100.
+
+* 0-20 Gut
+* 21-50 Befriedigend
+* 51-100 Schlecht
+
+Der Wert ist die Summe der folgenden Metriken, die jeweils als Maximalwert angezeigt werden, mit einem Maximum von 100:
+
+* {product-name} Schutzmodus - 30
+* Eingangs-/Ausgangsrisiko - 42
+* Privilegierte Container - 4
+* Root-Container - 4
+* Zulassungskontrollen - 4
+* Schwachstellen - 16 (Container - 8, Host - 6, Orchestrierungsplattform - 2)
+
+Standardmäßig umfasst {product-name} alle Container, einschließlich Systemcontainer, im Sicherheitsrisikowert. Dies kann für jede gelernte Containergruppe angepasst werden, um bestimmte Container von der Berechnung des Sicherheitsrisikowerts auszuschließen, wie unten gezeigt.
+
+=== Wie man den Sicherheitsrisikowert verbessert
+
+==== {product-name} Schutzmodus
+
+. Ändern Sie den neuen Dienstschutzmodus in den Einstellungen -> Konfiguration auf Überwachen oder Schützen
+. Ändern Sie alle '`learned`' Gruppen in Richtlinie -> Gruppen in Überwachen oder Schützen
+
+oder
+
+. Klicken Sie auf das Werkzeug-Symbol, um dem Assistenten zu folgen und die obigen Schritte auszuführen
+
+==== Eingangs-/Ausgangsrisiko
+
+. Klicken Sie auf das Werkzeug-Symbol, um dem Assistenten zu folgen und Eingangs- und Ausgangsverbindungen zu überprüfen
+. Überprüfen Sie alle Eingangs- und Ausgangsverbindungen, um sicherzustellen, dass sie erlaubt sind
+. Schalten Sie alle Dienste, die sich noch im Entdeckungsmodus befinden, auf Überwachen oder Schützen
+. Überprüfen und löschen Sie alle Bedrohungen, Verstöße und Sitzungsverläufe, indem Sie auf das Löschen-/Papierkorb-Symbol für jeden einzelnen klicken
+
+==== Privilegierte und/oder Root-Container
+
+. Entfernen Sie privilegierte Container
+. Entfernen Sie Root-Container
+
+
+[NOTE]
+====
+Dies ist möglicherweise nicht möglich aufgrund Ihrer erforderlichen Container, jedoch zählen diese jeweils nur 4 Punkte.
+====
+
+==== Zulassungskontrollen
+
+. Stellen Sie sicher, dass in einer Kubernetes/OpenShift-Umgebung die Zulassungskontrolle aktiviert ist und mindestens eine aktive Regel in der Richtlinie -> Zulassungskontrolle vorhanden ist
+
+==== Risiken
+
+. Stellen Sie sicher, dass alle Nicht-System-Container im Überwachen- oder Schützen-Modus in der Richtlinie -> Gruppen sind
+. Entfernen/Beheben von Host-Sicherheitsanfälligkeiten
+. Entfernen/Beheben von Sicherheitsanfälligkeiten der Orchestrierungsplattform (z. B. Kubernetes, OpenShift)
+
+=== So passen Sie an, welche Containergruppen in den Sicherheitsrisikowert einbezogen werden
+
+Um zu aktivieren oder zu deaktivieren, welche Containergruppen in den Sicherheitsrisikowert einbezogen werden, gehen Sie zum Menü Richtlinie -> Gruppen und wählen Sie die Gruppe aus, die Sie ändern möchten. Die Zusammenfassungs-Spalte auf der rechten Seite hat ein 'Bewertbar'-Symbol, das anzeigt, welche Gruppen für die Bewertung verwendet werden.
+
+image:risk_scorable.png[bewertbar]
+
+Wählen Sie das Kontrollkästchen "Bewertbar" in der oberen rechten Ecke für die ausgewählte Gruppe, um es zu aktivieren oder zu deaktivieren.
+
+[NOTE]
+====
+Nur "gelernte Gruppen" (z. B. solche, die mit "nv." beginnen) können bearbeitet werden, nicht reservierte Gruppen oder benutzerdefinierte Gruppen.
+====

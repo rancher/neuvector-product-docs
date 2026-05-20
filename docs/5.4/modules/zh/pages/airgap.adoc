@@ -1,0 +1,125 @@
+= 隔离 {product-name}
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/09.airgap/09.airgap.md
+:page-opendocs-slug: /deploying/airgap
+
+== 所需工具
+
+我们需要安装三个工具来下载 {product-name} 的所有组件。
+
+* https://helm.sh/[Helm] - 应用程序生命周期管理器
+* https://github.com/containers/skopeo[Skopeo] - 镜像/注册表工具
+* https://github.com/facebook/zstd[ZStandard] - 压缩算法
+
+[,bash]
+----
+# install helm
+curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+# install skopeo - rocky linux based
+yum install zstd skopeo -y
+----
+
+== 获取镜像和图表
+
+为了获取所有镜像，我们将使用图表本身。使用 https://helm.sh/[Helm]，我们来添加仓库并下载图表。我们还将使用 https://github.com/containers/skopeo[skopeo] 进行下载和上传。
+
+[,bash]
+----
+# make a directory
+mkdir -p neuvector/images
+
+# add repo
+helm repo add neuvector https://neuvector.github.io/neuvector-helm/
+
+# update local chart
+helm repo update
+
+# pull
+helm pull neuvector/core -d neuvector
+----
+
+现在你应该能看到一个像 `core-2.4.0.tgz` 的文件。版本可能会有所不同，但这是正确的。这是下载的图表。现在我们需要镜像。好在我们可以使用图表来解决这个问题。
+
+[,bash]
+----
+# create image list
+helm template neuvector/core-*.tgz | awk '$1 ~ /image:/ {print $2}' | sed -e 's/\"//g' > neuvector/images/list.txt
+
+# get images
+for i in $(cat neuvector/images/list.txt); do
+  skopeo copy docker://$i docker-archive:neuvector/images/$(echo $i| awk -F/ '{print $3}'|sed 's/:/_/g').tar:$(echo $i| awk -F/ '{print $3}')
+done
+----
+
+太好了，我们应该有一个看起来像这样的目录：
+
+[,bash]
+----
+[root@flux ~]# ls -lR neuvector
+neuvector:
+total 16
+-rw-r--r--. 1 root root 15892 Jan  8 14:33 core-2.4.0.tgz
+drwxr-xr-x. 2 root root   153 Jan  8 14:35 images
+
+neuvector/images:
+total 953920
+-rw-r--r--. 1 root root 236693504 Jan  8 14:35 controller_5.3.2.tar
+-rw-r--r--. 1 root root 226704384 Jan  8 14:35 enforcer_5.3.2.tar
+-rw-r--r--. 1 root root       176 Jan  8 14:34 list.txt
+-rw-r--r--. 1 root root 331550208 Jan  8 14:35 manager_5.3.2.tar
+-rw-r--r--. 1 root root 169589760 Jan  8 14:35 scanner_latest.tar
+-rw-r--r--. 1 root root  12265472 Jan  8 14:35 updater_latest.tar
+----
+
+我们可以压缩并移动所有内容。
+
+== 压缩和移动
+
+压缩相对简单。我们将使用 `tar` 以 ZST 格式进行最大压缩。
+
+[,bash]
+----
+# compress
+tar -I zstd -vcf neuvector_airgap.zst neuvector
+----
+
+现在只需将 400M `neuvector_airgap.zst` 移动到您的网络。
+
+== 解压并加载
+
+我们现在需要做的就是使用类似的命令进行解压。以下内容将输出到名为 `neuvector` 的目录。
+
+[,bash]
+----
+tar -I zstd -vxf neuvector_airgap.zst
+----
+
+将镜像加载到注册表中需要了解您的内部网络。对于本文件，我们使用 "registry.awesome.sauce" 作为 DNS 名称。使用 `skopeo` 加载镜像相对简单。请确保它已安装在 "内部" 机器上。您可能需要使用 `skopeo login` 进行身份验证以使其正常工作。
+
+[,bash]
+----
+# skopeo load
+export REGISTRY=registry.awesome.sauce
+for file in $(ls neuvector/images | grep -v txt ); do
+     skopeo copy docker-archive:neuvector/images/$file docker://$(echo $file | sed 's/.tar//g' | awk -F_ '{print "'$REGISTRY'/neuvector/"$1":"$2}')
+done
+----
+
+所有镜像加载到注册表后，我们可以使用 Helm 进行安装。
+
+== 使用 Helm 部署
+
+使用 Helm 部署相对简单。有一些值是必需的，以确保镜像从本地注册表中拉取。这是一个很好的例子。您可能需要调整一些设置。请遵循 `values.yaml` 的 Helm 最佳实践。注意 `imagePullSecrets` 字段。这是您的集群与注册表进行身份验证的秘密。
+
+[,bash]
+----
+# helm install example
+# variables
+export REGISTRY=registry.awesome.sauce  # registry URL
+export NEU_URL=neuvector.awesome.sauce   # neuvector URL
+
+# helm all the things -- read all the options being set
+helm upgrade -i neuvector --namespace neuvector neuvector/core --create-namespace  --set imagePullSecrets=regsecret --set k3s.enabled=true --set k3s.runtimePath=/run/k3s/containerd/containerd.sock  --set manager.ingress.enabled=true --set controller.pvc.enabled=true --set controller.pvc.capacity=10Gi --set manager.svc.type=ClusterIP --set registry=$REGISTRY --set tag=5.3.2 --set controller.image.repository=neuvector/controller --set enforcer.image.repository=neuvector/enforcer --set manager.image.repository=neuvector/manager --set cve.updater.image.repository=neuvector/updater --set manager.ingress.host=$NEU_URL
+----

@@ -1,0 +1,55 @@
+= OCIイメージ署名
+:revdate: 2026-02-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/03.admission/01.sigstore/03.ociimagesigning.md
+:page-opendocs-slug:  /policy/admission/ociimagesigning
+
+== Sigstoreを使用してSUSE Rancherアプリケーションコレクションのイメージを検証する
+
+SUSE Rancherアプリケーションコレクションは、すべてのアプリケーションがSigstoreによって署名されたOCIベースのレジストリを使用しています。ユーザーは、{product-name}のSigstore Verifiersを使用してアプリケーションコレクション内のアプリを検証できます。
+
+事前にSUSE Rancherアプリケーションコレクションからcosign公開鍵を取得する必要があります。その後、{product-name}でSigstore Verifiersを設定できます。
+
+image:oci_image_1.png[Sigstore Verifierを追加]
+
+SUSE Rancherアプリケーションコレクション内のイメージに対してSigstore検証を設定するための手順は次のとおりです。
+
+. 認証ガイドに従ってアクセストークンを作成します：
++
+https://docs.apps.rancher.io/get-started/authentication/
+
+. 署名検証ガイドに従ってCosign公開鍵（`ap-pubkey.pem`）を取得します：
++
+https://docs.apps.rancher.io/howto-guides/verify-signatures-with-cosign/
+
+. {product-name}のWeb UIで、Sigstoreの信頼のルートを作成します。
++
+--
+* *Assets* > *Sigstore Verifiers*に移動します。
+* 新しい Sigstore Verifier を作成します。
+* Cosign公開鍵をキー・ペア Sigstore Verifier として追加します。
+--
+
+. レジストリを設定し、スキャンを開始します。
++
+--
+* *Assets* > *Registries*に移動します。
+* 次の値を使用して新しいレジストリを作成します：
++
+[source,text]
+----
+Registry: https://dp.apps.rancher.io/
+Filter: containers/openjdk:21.0.4-build7
+Username: <your SUSE username>
+Password: <access token created earlier>
+----
+--
++
+フィルタリングされたイメージは、SUSE Rancherアプリケーションコレクションに公開されたOCIイメージです。
+
+. 署名検証が正しく行われたかどうかを確認するため、スキャン結果を確認します。
+
+
+image:oci_image_2.png[Sigstore Verifierスキャン結果]
+
+スキャンが完了すると、{product-name}はスキャン結果に Sigstore Verifier の詳細を表示し、イメージ署名が正常に検証されたことを確認します。

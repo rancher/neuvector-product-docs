@@ -1,0 +1,177 @@
+= Integration mit Rancher RBAC
+:revdate: 2026-02-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/12.rancher_sso_rbac.md
+:page-opendocs-slug:  /integration/12.rancher_sso_rbac
+
+
+Beginnend mit {product-name} 5.4 wurde die vollständige Kompatibilität und Integration von {product-name} mit Rancher RBAC aufgenommen. Dies bietet den Benutzern die Möglichkeit, spezifische Berechtigungen basierend auf dem Profil des Benutzers oder der Gruppe, die auf {product-name} zugreifen soll, anzupassen.
+
+In der Rancher-Konsole, *Benutzer & Authentifizierung* -> *Rollenvorlagen* Seite können Kunden globale, Cluster-, Projekt- und Namespace-Rollen mit spezifischen {product-name} Verben, Ressourcen und API-Gruppen erstellen. Wenn eine solche Rancher-Rolle einem Rancher-Benutzer zugewiesen wird, wird der {product-name} SSO-Sitzung des Benutzers entsprechend unterschiedlichen {product-name} Berechtigungen zugewiesen. Dies dient dazu, SSO-Benutzern benutzerdefinierte Rollen (das heißt, Rollen, die von den reservierten Rollen admin, reader, fedAdmin und fedReader abweichen) bereitzustellen.
+
+== Unterstützte benutzerdefinierte {product-name} Rollenabbildungen in Rancher SSO
+
+Im Folgenden sind unterstützte Rollenabbildungen für {product-name} Verben, Ressourcen und API-Gruppen aufgeführt, die in der Rancher-Benutzeroberfläche unter *Benutzer & Authentifizierung* -> *Rollenvorlagen* -> *Globale, Cluster- oder Projektrollen-Vorlage erstellen* verwendet werden.
+
+* APIGruppe: `permission.neuvector.com`
+
+* Verben:
+** `get` -> nur-lesend (anzeigen)
+** `*` -> Lese/Schreib- (modifizieren)
+
+* Ressourcen (cluster-spezifisch):
+** AdmissionControl
+** Authentifizierung
+** CI-Scan
+** Cluster
+** Zusammenschluss
+** Vulnerability
+
+* Ressourcen (namespaced):
+** AuditEvents
+** Autorisierung
+** Compliance
+** Ereignisse
+** Namespace
+** RegistryScan
+** RuntimePolicy
+** RuntimeScan
+** SecurityEvents
+** SystemConfig
+
+=== Ressourcendarstellung und logische Namenszuordnung
+
+Die folgende Tabelle veranschaulicht die logischen Namen der Ressourcen.
+
+|===
+| Ressourcendarstellung | Logischer Name
+
+| Alle Berechtigungen | nv-perm.all-permissions
+| Zulassungssteuerung | nv-perm.admctrl
+| Audit für Ereignisse durchführen | nv-perm.audit-events
+| Authentifizierung | nv-perm.authentication
+| Autorisierung | nv-perm.authorization
+| CI-Scan | nv-perm.ci-scan
+| Compliance | nv-perm.compliance
+| Ereignisse | nv-perm.events
+| Zusammenschluss | nv-perm.fed
+| Registry-Scan | nv-perm.reg-scan
+| Laufzeitrichtlinie | nv-perm.rt-policy
+| Laufzeitscan | nv-perm.rt-scan
+| Sicherheitsereignisse | nv-perm.security-events
+| Systemkonfiguration | nv-perm.config
+| Schwachstellenprofil | nv-perm.vulnerability
+|===
+
+[NOTE]
+====
+Diese Integration unterstützt Rollen auf globaler, Cluster-, Projekt- und Namespace-Ebene. Benutzer müssen Regeln anpassen und erstellen, basierend auf ihren Anforderungen und Berechtigungen für SSO.
+====
+
+== Definitionen und Erwartungen mit globalen, Cluster- und Projekt/Namespace-Rollen
+
+* Cluster-Ressource mit `*` Verb auf einer globalen Rancher-Rolle:
+** Zugeordnet zur {product-name} `fedAdmin` Rolle im {product-name} Föderations-Master-Cluster (Benutzer können eine globale Rancher-Rolle nicht einer {product-name} `admin` Rolle zuordnen, wenn {product-name} auf einem Föderations-Master-Cluster bereitgestellt wird.)
+** Zugeordnet zur {product-name} `admin` Rolle auf {product-name} föderationsverwalteten Clustern
+
+* Cluster-Ressource mit `*` Verb auf Rancher Cluster-Rollen:
+** Immer zugeordnet zur {product-name} `cluster-admin` Rolle
+
+* Namespace-Ressource mit `*` Verb auf Rancher Projekt-Rollen:
+** Immer zugeordnet zur {product-name} `namespace-admin` Rolle
+
+== Anwendungsfälle und Beispiele
+
+=== Anwendungsfall 1
+
+* Verwenden Sie eine globale Rolle, um Laufzeitscans aus einer {product-name} SSO-Sitzung auf allen von Rancher Manager verwalteten Clustern außer dem lokalen Cluster durchzuführen. Benutzer müssen Clusterrollen erstellen, um die globale Rolle auf alle Downstream-Cluster zu propagieren.
+
+** Erstellen Sie eine Cluster-Rollenvorlage mit den folgenden Parametern:
++
+[source,yaml]
+----
+Verb: *
+Resource: RuntimeScan
+API: permission.neuvector.com
+----
+
+** Erstellen Sie eine Projekt- oder Namespace-Rolle, um den UI-Zugriff zu ermöglichen und SSO zu aktivieren. Sie müssen diese Rolle dem Projekt hinzufügen, damit es korrekt funktioniert:
++
+[source,yaml]
+----
+Verb: get, patch, create
+Resource: services/proxy
+API: neuvector.com
+----
+
+** Erstellen Sie eine globale Rolle, um die Cluster-Rolle über Downstream-Cluster zu erben:
++
+[source,yaml]
+----
+apiVersion: management.cattle.io/v3
+kind: GlobalRole
+displayName: All Downstream NV RT scan
+metadata:
+  name: all-downstream-nvrtscan
+inheritedClusterRoles:
+- rt-gpmbs
+----
+
+** Erstellen Sie einen Standardbenutzer und weisen Sie die globale Rolle zu.
+** Erstellen Sie eine Projektrollenbindung für alle Downstream-Cluster für das Projekt, das den `cattle-neuvector-system` Namespace enthält.
+** Melden Sie sich bei Rancher Manager an und starten Sie {product-name} von einem beliebigen Downstream-Cluster.
+  Der Benutzer kann Laufzeitscan-Aufgaben wie Container-Scans, Knoten-Scans und das Durchsuchen von Schwachstellen durchführen. Dies gilt auch für neu hinzugefügte Cluster.
+
+=== Anwendungsfall 2
+
+* Erstellen Sie einen FedAdmin-Benutzer. Melden Sie sich immer als FedAdmin über den Föderations-Master-Cluster an. Wenn die Umgebung nicht föderiert ist, werden die Rollen auf Leser oder Administrator herabgestuft.
+
+** Erstellen Sie eine globale Rolle:
++
+[source,yaml]
+----
+Verb: *
+Resource: All permissions
+API: nv-perm.all-permissions
+----
+
+** Erstellen Sie eine Projekt- oder Namespace-Rolle, um den UI-Zugriff zu ermöglichen und SSO zu aktivieren:
++
+[source,yaml]
+----
+Verb: get, patch, create
+Resource: services/proxy
+API: neuvector.com
+----
+
+** Erstellen Sie einen Standardbenutzer und weisen Sie die globale Rolle zu.
+** Gehen Sie in der Rancher UI zu *Master Cluster* -> *Cluster- und Projektmitglieder* -> *Projektmitgliedschaft* -> *Hinzufügen*.
+   Fügen Sie den Benutzer hinzu und weisen Sie die UI-Proxy-Projektrolle zu.
+** Melden Sie sich bei Rancher Manager an und starten Sie {product-name} von einem Downstream-Cluster. {product-name} liest die globale Rancher-Rolle und weist die entsprechende Berechtigung zu (FedAdmin).
+
+[NOTE]
+====
+Um zwischen FedAdmin und FedReader zu wechseln, ändern Sie das Verb von `*` zu `get`. Das `get` Verb bietet nur Lesezugriff.
+====
+
+=== Anwendungsfall 3
+
+Ein Benutzer kann eine begrenzte Anzahl von Leseaufgaben ausführen und eine begrenzte Anzahl von Aufgaben in einem Cluster ändern.
+
+=== Anwendungsfall 4
+
+Ein Benutzer kann Leseaufgaben in ausgewählten Domänen ausführen und Aufgaben in anderen Domänen innerhalb eines Clusters ändern.
+
+=== Anwendungsfall 5
+
+Ein Benutzer erhält Berechtigungen, indem er globale, Cluster- und Projektrollen kombiniert.
+
+== Zusätzliche Überlegungen
+
+* Verwenden Sie diese Dokumentation und Parameter als Referenz, wenn Sie SSO- und RBAC-Regeln erstellen.
+* Bei Fehlern oder erweiterten Anwendungsfällen wenden Sie sich an den SUSE-Support über SCC.
+* {product-name} 5.4 ist rückwärtskompatibel mit SSO-Rollenabbildungen vor 5.4. Für die vorherige Struktur siehe https://github.com/horantj/rancher-nv-rbac.
+
+Beginnend mit {product-name} 5.4 wurde die vollständige Kompatibilität und Integration von {product-name} mit Rancher RBAC aufgenommen. Dies bietet den Benutzern die Möglichkeit, spezifische Berechtigungen basierend auf dem Profil des Benutzers oder der Gruppe, die auf {product-name} zugreifen soll, anzupassen.
+
+In der Rancher-Konsole, *Benutzer & Authentifizierung* -> *Rollenvorlagen* Seite können Kunden globale, Cluster-, Projekt- und Namespace-Rollen mit spezifischen {product-name} Verben, Ressourcen und API-Gruppen erstellen. Wenn eine solche Rancher-Rolle einem Rancher-Benutzer zugewiesen wird, wird der {product-name} SSO-Sitzung des Benutzers entsprechend unterschiedlichen {product-name} Berechtigungen zugewiesen. Dies dient dazu, SSO-Benutzern benutzerdefinierte Rollen (das heißt, Rollen, die von den reservierten Rollen admin, reader, fedAdmin und fedReader abweichen) bereitzustellen.

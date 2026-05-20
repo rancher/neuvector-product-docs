@@ -1,0 +1,228 @@
+= Déploiement de {product-name}
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/01.production/01.production.md
+:page-opendocs-slug: /deploying/production
+
+== Planification du déploiement
+
+Les conteneurs {product-name} dans un déploiement par défaut incluent le contrôleur, le gestionnaire, l'exécuteur, le scanner et le metteur à jour. Le placement de ces conteneurs (sur quels nœuds) doit être pris en compte, et des étiquettes, des taints ou des tolérances appropriés doivent être créés pour les contrôler.
+
+L'exécuteur doit être déployé sur chaque hôte/nœud où des conteneurs d'application destinés à être surveillés et protégés par {product-name} fonctionnent.
+
+Le contrôleur gère le cluster d'exécuteurs et peut être déployé sur le même nœud qu'un exécuteur ou sur un nœud de gestion séparé. Le gestionnaire doit être déployé sur le nœud où le contrôleur fonctionne, et il offrira un accès à la console du contrôleur. D'autres conteneurs {product-name} requis tels que le gestionnaire, le scanner et l'updater sont décrits plus en détail dans le guide des meilleures pratiques référencé ci-dessous.
+
+Si vous ne l'avez pas encore fait, tirez les images du {product-name} Docker Hub.
+
+Les images sont sur le {product-name} registre Docker Hub. Utilisez le tag de version approprié pour le gestionnaire, le contrôleur, l'exécuteur, et laissez la version comme 'latest' pour le scanner et le metteur à jour. Par exemple :
+
+* neuvector/manager:5.3.2
+* neuvector/controller:5.3.2
+* neuvector/enforcer:5.3.2
+* neuvector/scanner:latest
+* neuvector/updater:latest
+
+Veuillez vous assurer de mettre à jour les références d'image dans les fichiers yaml appropriés.
+
+Si vous déployez avec le {product-name} chart Helm actuel (v1.8.9+), les modifications suivantes doivent être apportées à values.yml{nbsp}:
+
+* Mettez à jour le registre vers docker.io
+* Mettez à jour les noms/étiquettes d'image vers la version actuelle sur Docker Hub, comme indiqué ci-dessus
+* Laissez les imagePullSecrets vides
+
+=== Meilleures pratiques, conseils, questions-réponses pour le déploiement et la gestion de {product-name}
+
+// Download and review xref:attachment$NV_Onboarding_5.0.pdf[Deployment Best Practices document] for tips, such as performance and sizing, best practices, and frequently asked questions about deployments.
+
+== Déploiement à l'aide de Helm ou d'Opérateurs
+
+Le déploiement automatisé à l'aide de Helm peut être trouvé à https://github.com/neuvector/neuvector-helm.
+
+Le déploiement à l'aide d'un Opérateur, y compris l'Opérateur certifié RedHat et l'opérateur de la communauté Kubernetes, est pris en charge, avec une description générale xref:operators.adoc[ici]. L'opérateur RedHat {product-name} est à https://access.redhat.com/containers/#/registry.connect.redhat.com/neuvector/neuvector-operator, et l'opérateur de la communauté à https://operatorhub.io/operator/neuvector-operator.
+
+== Déploiement à l'aide de ConfigMap
+
+Le déploiement automatisé sur Kubernetes est pris en charge à l'aide d'un ConfigMap. Veuillez consulter la section xref:configmap.adoc[Déploiement à l'aide de ConfigMap] pour plus de détails.
+
+== Déploiement des contrôleurs
+
+Nous recommandons de faire fonctionner plusieurs contrôleurs pour une configuration de haute disponibilité (HA). Les contrôleurs utilisent le protocole RAFT basé sur le consensus pour élire un leader et, si le leader tombe, pour élire un autre leader. En raison de cela, le nombre de contrôleurs actifs doit être impair, par exemple 3, 5, 7, etc.
+
+== Haute disponibilité du contrôleur
+
+Les contrôleurs synchroniseront toutes les données entre eux, y compris la configuration, la stratégie, les conversations, les événements et les notifications.
+
+Si le contrôleur actif principal tombe, un nouveau leader sera automatiquement élu et prendra le relais.
+
+Prenez des précautions particulières pour vous assurer qu'il y a toujours un contrôleur en fonctionnement et prêt, surtout pendant les mises à jour et redémarrages du système d'exploitation hôte ou de la plateforme d'orchestration.
+
+== Sauvegardes et Données Persistantes
+
+Assurez-vous d'exporter périodiquement le fichier de configuration depuis la console et de le sauvegarder.
+
+Si vous exécutez plusieurs contrôleurs dans une configuration HA, tant qu'un contrôleur est toujours opérationnel, toutes les données seront synchronisées entre les contrôleurs.
+
+Si vous souhaitez sauvegarder des journaux tels que des violations, des menaces, des vulnérabilités et des événements, veuillez activer le serveur SYSLOG dans les Paramètres.
+
+{product-name} prend en charge les données persistantes pour {product-name} la stratégie et la configuration. Cela configure une sauvegarde en temps réel pour monter un volume à /var/neuvector/ depuis le pod contrôleur. Le cas d'utilisation principal est que lorsque le volume persistant est monté, la configuration et la stratégie sont stockées pendant l'exécution sur le volume persistant. En cas de défaillance totale du cluster, la configuration est automatiquement restaurée lorsque le nouveau cluster est créé. La configuration et la stratégie peuvent également être restaurées ou supprimées manuellement du volume /var/neuvector/.
+
+[IMPORTANT]
+====
+Si un volume persistant n'est pas monté, {product-name} ne stocke PAS la configuration ou la stratégie en tant que données persistantes. Assurez-vous de sauvegarder la configuration et la stratégie du contrôleur avant d'interrompre le conteneur allinone ou contrôleur. Cela peut être fait dans `Settings -> Configuration`. Alternativement, le contrôleur peut être déployé dans une configuration HA avec 3 ou 5 contrôleurs en cours d'exécution, auquel cas la stratégie persistera avec d'autres contrôleurs pendant qu'un est mis à jour.
+====
+
+=== Exemple de volume persistant
+
+Le PersistentVolume défini dans le cluster est requis pour le support des volumes persistants. L'exigence pour {product-name} est que le mode d'accès doit être ReadWriteMany(RWX). Tous les types de stockage ne prennent pas en charge le mode d'accès RWX. Par exemple, sur GKE, vous devrez peut-être créer un volume persistant RWX en utilisant le stockage NFS.
+
+Une fois le PersistentVolume créé, un PersistentVolumeClaim doit être créé comme ci-dessous pour le contrôleur. Actuellement, le volume persistant est utilisé uniquement pour les {product-name} fichiers de sauvegarde de la configuration dans le contrôleur (stratégies, règles, données utilisateur, intégrations, etc.) et les résultats de scan du registre.
+
+[,yaml]
+----
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: neuvector-data
+  namespace: neuvector
+spec:
+  accessModes:
+    - ReadWriteMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 1Gi
+----
+
+Voici un exemple pour IBM Cloud{nbsp}:
+
+[,yaml]
+----
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: neuvector-data
+  namespace: neuvector
+  labels:
+    billingType: "hourly"
+    region: us-south
+    zone: sjc03
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+      iops: "100"
+  storageClassName: ibmc-file-retain-custom
+----
+
+Après la création du Persistent Volume Claim, modifiez le {product-name} fichier yaml d'exemple comme indiqué ci-dessous (ancienne section commentée){nbsp}:
+
+[,yaml]
+----
+...
+spec:
+  template:
+    spec:
+      volumes:
+        - name: nv-share
+#         hostPath:                        // replaced by persistentVolumeClaim
+#           path: /var/neuvector        // replaced by persistentVolumeClaim
+          persistentVolumeClaim:
+            claimName: neuvector-data
+----
+
+Ajoutez également la variable d'environnement suivante dans les fichiers yaml d'exemple du contrôleur ou d'allinone pour le support des volumes persistants. Cela fera en sorte que le contrôleur lise la sauvegarde de configuration au démarrage.
+
+[,yaml]
+----
+            - name: CTRL_PERSIST_CONFIG
+----
+
+=== ConfigMaps et stockage persistant
+
+Les ConfigMaps et la sauvegarde de stockage persistant ne sont lus que lorsqu'un nouveau {product-name} cluster est déployé, ou lorsque le cluster échoue et redémarre. Ils ne sont pas utilisés lors des mises à jour progressives.
+
+La sauvegarde de configuration de stockage persistant est lue en premier, puis les ConfigMaps sont appliqués, de sorte que les paramètres de ConfigMap ont la priorité. Tous les paramètres de ConfigMap (par exemple, les mises à jour) seront également enregistrés dans le stockage persistant.
+
+Pour plus d'informations, voir la section xref:configmap.adoc[ConfigMaps].
+
+== Mise à jour de la base de données des vulnérabilités CVE en production.
+
+Veuillez consulter chaque section d'exemple pour des instructions sur la façon de maintenir la base de données CVE à jour.
+
+La version de la base de données CVE peut être vue dans la Console dans l'onglet Vulnérabilités. Vous pouvez également inspecter l'image du conteneur Updater.
+
+[,shell]
+----
+docker inspect neuvector/updater
+----
+
+[,json]
+----
+"Labels": {
+                "neuvector.image": "neuvector/updater",
+                "neuvector.role": "updater",
+                "neuvector.vuln_db": "1.255"
+            }
+----
+
+Après avoir exécuté la mise à jour, inspectez les journaux du contrôleur/allinone pour « version ». Par exemple dans Kubernetes{nbsp}:
+
+[,shell]
+----
+kubectl logs neuvector-controller-pod-777fdc5668-4jkjn -n neuvector | grep version
+
+...
+2019-07-29T17:04:02.43 |DEBU|SCN|main.dbUpdate: New DB found - create=2019-07-24T11:59:13Z version=1.576
+2019-07-29T17:04:02.454|DEBU|SCN|memdb.ReadCveDb: New DB found - update=2019-07-24T11:59:13Z version=1.576
+2019-07-29T17:04:12.224|DEBU|SCN|main.scannerRegister: - version=1.576
+----
+
+== Accéder à la Console
+
+Par défaut, la console est exposée en tant que service sur le port 8443, ou nodePort avec un port aléatoire sur chaque hôte. Veuillez consulter la première section Basics -> xref:rest-api.adoc[Connecter au Manager] pour les options permettant de désactiver HTTPS ou d'accéder à la console via une passerelle de périmètre de sécurité d'entreprise qui n'autorise pas le port 8443 pour l'accès à la console.
+
+== Gestion des mises à jour d'hôte ou des nœuds à mise à l'échelle automatique avec un budget de perturbation de pod.
+
+Les activités de maintenance ou de mise à l'échelle peuvent affecter les contrôleurs sur les nœuds. Les fournisseurs de cloud public prennent en charge la capacité de mise à l'échelle automatique des nœuds, ce qui peut évincer dynamiquement des pods, y compris les {product-name} contrôleurs. Pour éviter les perturbations des contrôleurs, un {product-name} budget de perturbation de pod peut être créé.
+
+Par exemple, créez le fichier ci-dessous nv_pdb.yaml pour garantir qu'il y a au moins 2 contrôleurs en cours d'exécution à tout moment.
+
+[,yaml]
+----
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: neuvector-controller-pdb
+  namespace: neuvector
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: neuvector-controller-pod
+----
+
+Procédez comme suit
+
+[,shell]
+----
+kubectl create -f nv_pdb.yaml
+----
+
+Pour plus de détails{nbsp}: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+
+== Déployer sans mode privilégié
+
+Sur certains systèmes, le déploiement sans utiliser le mode privilégié est pris en charge. Ces systèmes doivent prendre en charge les capacités seccomp et définir le profil apparmor.
+
+Voir la section sur xref:docker.adoc[le déploiement Docker] pour des fichiers compose d'exemple.
+
+== Architecture multi-sites, multi-clusters
+
+Pour les entreprises ayant plusieurs emplacements et où un {product-name} cluster séparé peut être déployé pour chaque emplacement, l'architecture de référence suivante est proposée. Chaque cluster a son propre ensemble de contrôleurs et est géré séparément.
+
+image:multisite.png[Multi-Site]
+
+Voir une description plus détaillée dans ce fichier >
+xref:attachment$multisite.pdf[{product-name} Architecture multi-sites]

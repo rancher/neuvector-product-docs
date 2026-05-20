@@ -1,0 +1,211 @@
+= Atualizando {product-name}
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /10.atualizando/01.atualizando/01.atualizando.md
+:page-opendocs-slug:  /atualizando/atualizando
+
+== Atualizando {product-name} Componentes
+
+É super fácil atualizar seus {product-name} contêineres. Se houver uma nova versão disponível, faça o pull dela a partir do Docker Hub. É recomendado usar uma estratégia '`rolling update`' para manter pelo menos um contêiner Allinone ou Controller em execução a qualquer momento durante uma atualização.
+
+[IMPORTANT]
+====
+Atualizações do sistema operacional do host, reinicializações e atualizações do orquestrador podem causar a expulsão ou parada de pods. Se um Controller for afetado, e não houver outros Controllers ativos para manter o estado, os Controllers podem ficar indisponíveis por algum tempo enquanto novos Controllers são iniciados, um cluster é formado com um líder e tenta-se acessar o backup de armazenamento persistente da configuração para restaurar o cluster. Tenha cuidado ao agendar atualizações e reinicializações do host ou do orquestrador, que podem afetar o número de Controllers disponíveis a qualquer momento. Veja o Orçamento de Disrupção de Pods abaixo para possíveis maneiras de mitigar isso.
+
+Se a implantação foi feita usando os {product-name} gráficos Helm, a atualização cuidará de serviços adicionais, rolebindings ou outros requisitos de atualização.
+
+Se as atualizações forem feitas manualmente ou houver apenas um Allinone ou Controller em execução, observe que os dados atuais de conexão de rede NÃO são armazenados e serão perdidos quando o {product-name} contêiner for parado.
+
+{product-name} suporta dados persistentes para a {product-name} política e configuração. Isso configura um backup em tempo real para montar um volume em /var/neuvector/. O caso de uso principal é quando o volume persistente está montado, a configuração e a política são armazenadas durante o tempo de execução no volume persistente. No caso de falha total do cluster, a configuração é restaurada automaticamente quando o novo cluster é criado. A configuração e a política também podem ser restauradas ou removidas manualmente do volume /var/neuvector/.
+====
+
+[IMPORTANT]
+====
+Se um volume persistente não estiver montado, {product-name} NÃO armazena a configuração ou política como dados persistentes. Certifique-se de fazer backup da configuração e da política do Controller antes de parar o contêiner Allinone ou do Controller. Isso pode ser feito em Configurações -> Configuração. Alternativamente, o Controller pode ser implantado em uma configuração HA com 3 ou 5 Controllers em execução, caso em que a política persistirá com outros Controllers enquanto um estiver sendo atualizado.
+====
+
+Para atualizar manualmente {product-name} usando docker-compose:
+
+[,shell]
+----
+sudo docker-compose -f <filename> down
+----
+
+[TIP]
+====
+Se nenhum nome de arquivo for especificado, o arquivo docker-compose.yml será utilizado.
+====
+
+Certifique-se de que o docker-compose.yml ou outro arquivo apropriado seja editado com a versão da imagem desejada, se necessário, então:
+
+[,shell]
+----
+$sudo docker-compose -f <filename> up -d
+----
+
+[NOTE]
+====
+Recomendamos que todos os {product-name} componentes sejam atualizados para a versão mais recente ao mesmo tempo. A compatibilidade retroativa é suportada por pelo menos uma versão menor anterior. Embora a maioria das versões mais antigas seja compatível retroativamente, pode haver exceções que causem comportamentos inesperados.
+====
+
+== Atualizações Gradativas
+
+Ferramentas de orquestração como Kubernetes, RedHat OpenShift e Rancher suportam atualizações gradativas com políticas configuráveis. Você pode usar esse recurso para atualizar os {product-name} contêineres. O mais importante será garantir que haja pelo menos um Allinone/Controlador em execução para que políticas, logs e dados de conexão não sejam perdidos. Certifique-se de que haja um mínimo de 30 segundos entre as atualizações dos contêineres para que um novo líder possa ser eleito e os dados sincronizados entre os Controllers.
+
+=== Exemplo de Atualização Gradativa do Kubernetes
+
+Se sua implantação ou DaemonSet já estiver em execução, você pode alterar o arquivo yaml para a nova versão e, em seguida, aplicar a atualização:
+
+[,shell]
+----
+kubectl apply -f <yaml file>
+----
+
+Para atualizar para uma nova versão de {product-name} a partir da linha de comando.
+
+[,shell]
+----
+kubectl set image deployment/neuvector-controller-pod neuvector-controller-pod=neuvector/controller:4.2.2 -n neuvector
+kubectl set image deployment/neuvector-manager-pod neuvector-manager-pod=neuvector/manager:4.2.2 -n neuvector
+kubectl set image DaemonSet/neuvector-enforcer-pod neuvector-enforcer-pod=neuvector/enforcer:4.2.2 -n neuvector
+----
+
+Para verificar o status da atualização gradativa:
+
+[,shell]
+----
+kubectl rollout status -n neuvector ds/neuvector-enforcer-pod
+kubectl rollout status -n neuvector deployment/neuvector-controller-pod  # same for manager, scanner etc
+----
+
+Para fazer rollback da atualização:
+
+[,shell]
+----
+kubectl rollout undo -n neuvector ds/neuvector-enforcer-pod
+kubectl rollout undo -n neuvector deployment/neuvector-controller-pod  # same for manager, scanner etc
+----
+
+== Atualizando o Banco de Dados de Vulnerabilidade CVE
+
+A {product-name} imagem do Scanner é atualizada regularmente no neuvector com novas atualizações do banco de dados CVE, usando a tag 'latest'.
+
+A implantação padrão do {product-name} inclui a implantação de pods do scanner, bem como um trabalho cron do Updater para atualizar os scanners todos os dias.
+
+Por favor, veja a seção xref:updating.adoc[Atualizando o Banco de Dados CVE] para mais detalhes.
+
+A versão do banco de dados CVE pode ser vista no Console na aba de Vulnerabilidades. Você também pode inspecionar a imagem do contêiner Updater. O número da versão mais recente do banco de dados também pode ser encontrado listado https://raw.githubusercontent.com/neuvector/manifests/main/versions/scanner[aqui].
+
+[,shell]
+----
+docker inspect neuvector/updater
+----
+
+[,json]
+----
+"Labels": {
+                "neuvector.image": "neuvector/updater",
+                "neuvector.role": "updater",
+                "neuvector.vuln_db": "1.255"
+            }
+----
+
+Você também pode inspecionar os logs do Controller/Allinone para 'versão'. Por exemplo, no Kubernetes:
+
+[,bash]
+----
+kubectl logs neuvector-controller-pod-777fdc5668-4jkjn -n neuvector | grep version
+----
+
+[,shell]
+----
+2019-07-29T17:04:02.43 |DEBU|SCN|main.dbUpdate: New DB found - create=2019-07-24T11:59:13Z version=1.576
+2019-07-29T17:04:02.454|DEBU|SCN|memdb.ReadCveDb: New DB found - update=2019-07-24T11:59:13Z version=1.576
+2019-07-29T17:04:12.224|DEBU|SCN|main.scannerRegister: - version=1.576
+----
+
+== Orçamento de Disrupção de Pods
+
+Um recurso do Kubernetes permite garantir que um número mínimo de Controllers esteja em execução a qualquer momento. Isso é útil para drenagem de nós ou outras atividades de manutenção que podem remover os pods do Controller. Por exemplo, crie e aplique o arquivo abaixo nv_pdb.yaml para garantir que haja pelo menos 2 Controllers em execução a qualquer momento.
+
+[,yaml]
+----
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: neuvector-controller-pdb
+  namespace: neuvector
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: neuvector-controller-pod
+----
+
+== Atualizando de {product-name} 4.x para 5.1.x
+
+Faça upgrade primeiro para uma versão 5.1.x, como 5.1.3, e depois veja a xref:kubernetes.adoc[seção de implantação do Kubernetes] para atualizar para 5.2.x+ para mudanças importantes nas contas de serviços e vinculações.
+
+Para usuários do Helm, faça upgrade para o {product-name} Helm chart 2.0.0 ou posterior (antes de {product-name} 5.2.0). Se estiver fazendo upgrade de um Operator ou instalação do Helm no OpenShift, veja a nota abaixo.
+
+. Exclua a definição de clusterrole neuvector-binding-customresourcedefinition antiga.
++
+[,shell]
+----
+kubectl delete clusterrole neuvector-binding-customresourcedefinition
+----
+
+. Aplique o novo verbo de atualização para a definição de clusterrole neuvector-binding-customresourcedefinition.
++
+[,shell]
+----
+kubectl create clusterrole neuvector-binding-customresourcedefinition --verb=watch,create,get,update --resource=customresourcedefinitions
+----
+
+. Exclua o esquema crd antigo para Kubernetes 1.19+
++
+[,shell]
+----
+kubectl delete -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/crd-k8s-1.19.yaml
+----
+
+. Crie um novo esquema crd para Kubernetes 1.19+
++
+[,shell]
+----
+kubectl apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.0.0/crd-k8s-1.19.yaml
+kubectl apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.0.0/waf-crd-k8s-1.19.yaml
+kubectl apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.0.0/dlp-crd-k8s-1.19.yaml
+kubectl apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.0.0/admission-crd-k8s-1.19.yaml
+----
+
+. Crie um novo DLP, WAP, clusterrole de Admission e clusterrolebinding
++
+[,shell]
+----
+kubectl create clusterrole neuvector-binding-nvwafsecurityrules --verb=list,delete --resource=nvwafsecurityrules
+kubectl create clusterrolebinding neuvector-binding-nvwafsecurityrules --clusterrole=neuvector-binding-nvwafsecurityrules --serviceaccount=neuvector:default
+kubectl create clusterrole neuvector-binding-nvadmissioncontrolsecurityrules --verb=list,delete --resource=nvadmissioncontrolsecurityrules
+kubectl create clusterrolebinding neuvector-binding-nvadmissioncontrolsecurityrules --clusterrole=neuvector-binding-nvadmissioncontrolsecurityrules --serviceaccount=neuvector:default
+kubectl create clusterrole neuvector-binding-nvdlpsecurityrules --verb=list,delete --resource=nvdlpsecurityrules
+kubectl create clusterrolebinding neuvector-binding-nvdlpsecurityrules --clusterrole=neuvector-binding-nvdlpsecurityrules --serviceaccount=neuvector:default
+----
+
+. Atualize os nomes e caminhos das imagens para puxar as {product-name} imagens do Docker Hub (docker.io).
+As imagens estão no {product-name} registro do Docker Hub. Use a tag de versão apropriada para o manager, controller, enforcer e deixe a versão como 'latest' para o scanner e updater. Por exemplo:
+* neuvector/manager:5.1.3
+* neuvector/controller:5.1.3
+* neuvector/enforcer:5.1.3
+* neuvector/scanner:latest
+* neuvector/updater:latest
+
+Opcionalmente, remova quaisquer referências à {product-name} licença e segredos nos charts Helm, yaml de implantação, configmap, scripts etc., pois estes não são mais necessários para baixar as imagens ou para começar a usar {product-name}.
+
+=== Nota sobre SCC e Atualização via Operator/Helm
+
+O SCC privilegiado é adicionado à Conta de Serviço especificada no yaml de implantação pela versão 1.3.4 do Operator e acima em novas implantações. No caso de atualizar o {product-name} Operator de uma versão anterior para 1.3.4 ou Helm para 2.0.0, por favor, exclua o SCC privilegiado antes de atualizar.
+
+[,shell]
+----
+oc delete rolebinding -n neuvector system:openshift:scc:privileged
+----

@@ -1,0 +1,171 @@
+= パブリッククラウド上にSUSE Securityをデプロイする
+:revdate: 2025-06-25
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/08.publick8s/08.publick8s.md
+:page-opendocs-slug: /deploying/publick8s
+
+== パブリッククラウドKubernetesサービスに{product-name}をデプロイする
+
+AWS EKS、Azure AKS、IBM Cloud K8s、Google Cloud、Alibaba Cloud、またはOracle Cloudなどの任意のパブリッククラウドK8sサービスに{product-name}をデプロイします。{product-name}はAmazon EKS Anywhereの適合性および検証フレームワークを通過しており、検証済みのソリューションであり、AWSコンソールを通じてSnowball EdgeデバイスのEKS-Anywhere用アドオンとして利用可能です。
+
+まず、K8sクラスターを作成し、`kubectl get nodes`へのアクセスを確認してください。
+
+{product-name}をデプロイするには、Production DeploymentのKubernetesセクションからサンプルデプロイ手順と例を使用してください。ローカルまたはクラウドレジストリ（ECRやACRなど）から{product-name}イメージを取得する場合は、サンプルyamlを編集してください。
+
+一部のクラウドプロバイダーは、`Type: LoadBalancer` webuiのために、NodePortの代わりに{product-name}を使用して簡単にデプロイできる統合ロードバランサーを提供しています。
+
+{product-name}は、 https://github.com/neuvector/neuvector-helm.にあるHelmチャートを使用したHelmベースのデプロイもサポートしています。
+
+=== ネットワークアクセス
+
+内部および外部のインバウンドアクセスが適切に構成されていることを確認してください。NodePortサービスの場合、3xxxx範囲のランダムポートは、外部からワーカーまたはマスターノードのパブリックIPでアクセス可能でなければなりません。任意のワーカーノードのパブリックIPアドレスとそのポート（NodePort）、またはロードバランサーのパブリックIPとデフォルトポート8443を使用してコンソールにアクセスできます。IP/ポートは次のように表示できます：
+
+[,shell]
+----
+kubectl get svc -n neuvector
+----
+
+ほとんどのK8sサービスは、ノード間のすべてのポッド間/クラスター間通信を自動的に有効にし、{product-name}コンテナ（強制者、コントローラー、マネージャー）がクラスター内で通信できるようにします。
+
+サンプルKubernetes yamlファイルは、1つのマネージャーと3つのコントローラーをデプロイします。すべてのノードにデーモンセットとして強制者をデプロイします。注意:セッション状態の問題の可能性があるため、ロードバランサーの背後に1つ以上のマネージャーをデプロイ（スケール）することは推奨されません。
+
+== Microsoft Azure AKS
+
+AzureにK8sクラスターを展開する際、Kubernetes RBACのデフォルトはオフです。RBACを有効にしてクラスター管理者のクラスター役割を有効にしてください。そうしないと、Helmベースの展開をサポートするために後で手動で作成する必要があります。
+
+== Google Cloud Platform / GKE
+
+NodePortの代わりに'`Type: LoadBalancer`'を使用することで、{product-name}のwebuiに対してデプロイが簡単な統合ロードバランサーを利用できます。RWM（読み書き多数）タイプの永続ストレージを構成するには、{product-name}をデプロイする前にNFSなどのストレージサービスを作成する必要がある場合があります。
+
+{product-name}には、flannel、weave、またはcalicoなどのSDNプラグインが必要です。
+
+環境変数NV_PLATFORM_INFOに値platform=Kubernetes:GKEを設定することで、{product-name}がGKE特有のアクション（例えば、GKE Kubernetes CISベンチマークの実行）を行えるようになります。
+
+== GKE Autopilot サポート
+
+GKE Autopilot サポートは、NeuVector v5.4.3以降で利用可能です。以下の手順に従って、Autopilot クラスターにNeuVectorをデプロイしてください。
+
+NeuVectorをデプロイする前に、クラスターに`AllowlistSynchronizer`を作成する必要があります。こちらが`allowlistPath`を含む設定YAMLとYAMLを適用するためのコマンドです：
+
+YAMLを適用するためのコマンドの例：
+
+[,shell]
+----
+kubectl apply -f allowlist.yaml
+----
+
+設定YAMLの例：
+
+[,yaml]
+----
+apiVersion: auto.gke.io/v1
+kind: AllowlistSynchronizer
+metadata:
+  name: neuvector-allowlist
+spec:
+  allowlistPaths:
+  - SUSE/neuvector-enforcer/v1.0.0/suse-neuvector-enforcer.yaml
+  - SUSE/neuvector-scanner/v1.0.0/suse-neuvector-scanner.yaml
+----
+
+コマンド`kubectl apply -f <YAML file>`を実行した後、`AllowlistSynchronizer`が準備完了かどうかを確認してください。
+
+コマンドの例：
+
+[,shell]
+----
+kubectl get AllowlistSynchronizer neuvector-allowlist -o yaml
+----
+
+YAML構成の例：
+
+[,yaml]
+----
+apiVersion: auto.gke.io/v1
+kind: AllowlistSynchronizer
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"auto.gke.io/v1","kind":"AllowlistSynchronizer","metadata":{"annotations":{},"name":"neuvector-allowlist"},"spec":{"allowlistPaths":["SUSE/neuvector-enforcer/v1.0.0/suse-neuvector-enforcer.yaml","SUSE/neuvector-scanner/v1.0.0/suse-neuvector-scanner.yaml"]}}
+  creationTimestamp: "2025-04-28T18:17:16Z"
+  generation: 1
+  name: neuvector-allowlist
+  resourceVersion: "13326"
+  uid: 3e425c28-9bef-4459-b769-381d974f17f6
+spec:
+  allowlistPaths:
+  - SUSE/neuvector-enforcer/v1.0.0/suse-neuvector-enforcer.yaml
+  - SUSE/neuvector-scanner/v1.0.0/suse-neuvector-scanner.yaml
+status:
+  conditions:
+  - lastTransitionTime: "2025-04-28T18:17:17Z"
+    message: Synchronization completed successfully; allowlists up to date
+    observedGeneration: 1
+    reason: SyncSuccessful
+    status: "True"
+    type: Ready
+  lastSyncAttempt: "2025-04-28T18:17:17Z"
+  managedAllowlistStatus:
+  - filePath: SUSE/neuvector-enforcer/v1.0.0/suse-neuvector-enforcer.yaml
+    generation: 1
+    lastSuccessfulSync: "2025-04-28T18:17:16Z"
+    phase: Installed
+  - filePath: SUSE/neuvector-scanner/v1.0.0/suse-neuvector-scanner.yaml
+    generation: 1
+    lastSuccessfulSync: "2025-04-28T18:17:17Z"
+    phase: Installed
+----
+
+以下の`override.yaml`ファイルは、Helmを使用してGKE Autopilot クラスターにNeuVectorをデプロイするために使用する必要があります。
+
+[,yaml]
+----
+cve:
+  scanner:
+    podLabels:
+      # The scanner allowlist should be mapped with scanner deployment workload.
+      cloud.google.com/matching-allowlist: suse-neuvector-scanner
+    resources:
+      # Below are the tested limits for scanner deployment in GKE Auto-Pilot cluster for scanner pod.
+      limits:
+        ephemeral-storage: "3Gi"
+      requests:
+        ephemeral-storage: "2Gi"
+enforcer:
+  podLabels:
+     # The enforcer allowlist should be mapped with the enforcer daemon set workload.
+    cloud.google.com/matching-allowlist: suse-neuvector-enforcer
+----
+
+YAMLデプロイメントを使用する場合は、`enforcer`および`scanner`のYAML設定に`podLabels`とリソース制限を追加してください。
+
+`allowlistSynchronizer`について詳しく知りたい場合は、 https://cloud.google.com/kubernetes-engine/docs/how-to/run-autopilot-partner-workloads[GKEドキュメント]をご覧ください。
+
+== ポッド中断予算を使用したオートスケーリングノードの管理
+
+パブリッククラウドプロバイダーは、ノードを自動スケールする機能をサポートしており、{product-name}コントローラーを含むポッドを動的に追い出すことができます。コントローラーへの中断を防ぐために、{product-name}ポッド中断予算を作成できます。
+
+例えば、以下のnv_pdr.yamlファイルを作成して、常に少なくとも2つのコントローラーが実行されていることを確認してください。
+
+[,yaml]
+----
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: neuvector-controller-pdb
+  namespace: neuvector
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: neuvector-controller-pod
+----
+
+入力する情報
+
+[,shell]
+----
+kubectl create -f nv_pdr.yaml
+----
+
+詳細については: https://kubernetes.io/docs/tasks/run-application/configure-pdb/

@@ -1,0 +1,76 @@
+= Améliorer le score de risque de sécurité
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /04.navigation/03.improve_score/03.improve_score.md
+:page-opendocs-slug:  /navigation/improve_score
+
+== Amélioration du score de risque de sécurité
+
+Le score de risque de sécurité dans le tableau de bord fournit un score entre 0 et 100.
+
+* 0-20 Bon
+* 21-50 Passable
+* 51-100 Médiocre
+
+Le score est la somme des métriques suivantes, chacune affichée comme une valeur maximale, avec un maximum de 100{nbsp}:
+
+* {product-name} Mode de protection - 30
+* Ingress/Egress Risk - 42
+* Conteneurs privilégiés - 4
+* Conteneurs racine - 4
+* Contrôles d'admission - 4
+* Vulnérabilités - 16 (Conteneurs - 8, Hôte - 6, Plateforme d'orchestration - 2)
+
+Par défaut, {product-name} inclut tous les conteneurs, y compris les conteneurs système, dans le score de risque. Cela peut être personnalisé pour chaque groupe de conteneurs appris afin de désactiver certains conteneurs de l'inclusion dans le calcul du score de risque, comme indiqué ci-dessous.
+
+=== Comment améliorer le score
+
+==== {product-name} Mode de protection
+
+. Changer le mode de protection du nouveau service dans les paramètres -> Configuration pour surveiller ou protéger
+. Changez tous les groupes '`learned`' dans la stratégie -> en groupes de surveillance ou de protection
+
+Ou
+
+. Cliquez sur l'icône Outil pour suivre l'Assistant afin d'effectuer les étapes ci-dessus
+
+==== Ingress/Egress Risk
+
+. Cliquez sur l'icône Outil pour suivre l'Assistant afin de passer en revue l'Ingress et l'Egress
+. Examinez toutes les connexions d'Ingress et d'Egress pour vous assurer qu'elles doivent être autorisées
+. Changez tous les services qui sont encore en mode Découverte en mode Surveillance ou Protection
+. Examinez et supprimez toutes les menaces, violations et l'historique des sessions en cliquant sur l'icône Supprimer/Poubelle pour chacune d'elles
+
+==== Conteneurs privilégiés et/ou racine
+
+. Supprimez les conteneurs privilégiés
+. Supprimez les conteneurs racine
+
+
+[NOTE]
+====
+Cela peut ne pas être possible en raison de vos conteneurs requis, cependant chacun d'eux ne représente que 4 points.
+====
+
+==== Contrôles d'admission
+
+. Assurez-vous que, dans un environnement Kubernetes/OpenShift, le contrôle d'admission est activé et qu'il y a au moins une règle active dans le contrôle d'admission de la stratégie ->
+
+==== Vulnérabilités
+
+. Assurez-vous que tous les conteneurs non système sont en mode Surveillance ou Protection, dans les groupes de la stratégie ->
+. Supprimez/remédiez aux vulnérabilités de l'hôte
+. Supprimez/remédiez aux vulnérabilités de la plateforme d'orchestration (par exemple, Kubernetes, OpenShift)
+
+=== Comment personnaliser les groupes de conteneurs inclus dans le score
+
+Pour activer ou désactiver les groupes de conteneurs inclus dans le score de risque de sécurité, allez dans le menu des groupes de la stratégie -> et sélectionnez le groupe à modifier. La colonne de résumé à droite a une icône 'Scorable' qui indique quels groupes sont utilisés pour le scoring.
+
+image:risk_scorable.png[scorable]
+
+Sélectionnez ou désélectionnez la case à cocher Scorable en haut à droite pour le groupe sélectionné.
+
+[NOTE]
+====
+Seuls les groupes appris (par exemple, ceux qui commencent par « nv. ») peuvent être modifiés, pas les groupes réservés ou les groupes personnalisés.
+====

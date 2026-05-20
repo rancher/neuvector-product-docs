@@ -1,0 +1,35 @@
+= Visão Geral do Status de Segurança
+:page-opendocs-origin: /15.ui_extension/01.dashboard/01.dashboard.md
+:page-opendocs-slug:  /ui_extension/dashboard
+
+Na extensão da interface do usuário no portal Rancher, o **Painel NeuVector** funciona de maneira semelhante à sua página independente. Ele fornece fatores de pontuação de risco de segurança para informar os usuários sobre o status de segurança de seus clusters. No painel inferior, ele fornece 4 abas para permitir que os usuários alternem os gráficos para monitorar diferentes categorias.
+
+Na aba **Eventos de Segurança**, o gráfico de linhas mostra a contagem de eventos baseada em datas em uma linha do tempo. O gráfico de barras superior de Eventos de Segurança exibe os 5 principais pontos finais de origem e destino.
+
+image:dashboard_security_events.png[Painel]
+
+Na aba **Exposição de Ingress e Egress**, o gráfico de barras empilhadas mostra a quantidade de pontos finais expostos por ações. No lado direito, as tabelas de exposição mostram serviços de pontos finais de egress e ingress com informações de varredura.
+
+image:dashboard_exposure.png[Painel]
+
+Clicar em uma linha da tabela de egress/ingress mostra conversas sobre serviços específicos. O nome FQDN / endereço IP é exibido com uma bandeira nacional baseada na localização geográfica no campo **Host Externo**.
+
+image:dashboard_conversations.png[Painel]
+
+Clicar no **Host Externo** redireciona para whois.com para mostrar as informações detalhadas do endereço IP.
+
+image:whois.png[Painel]
+
+Na aba **Modo de Política**, os gráficos de pizza mostram a proporção e os números de pods / serviços sob diferentes modos de política.
+
+image:dashboard_policy_mode.png[Painel]
+
+Na aba **Principais Ativos Vulneráveis**, os gráficos de barras mostram os 5 principais pods / nós que contêm vulnerabilidades de alta ou média gravidade.
+
+image:dashboard_top_vul_assets.png[Painel]
+
+== Funções Não Incluídas ao Comparar com a Página Independente do NeuVector
+
+* Caixa de diálogo de melhoria de pontuação.
+* Protocolos de aplicativo detectados e protegidos por regras de rede de Camada 7.
+* Relatórios em PDF baseados em namespace.

@@ -1,0 +1,111 @@
+= Compliance & CIS Benchmarks
+:revdate: 2025-01-16
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/01.scanning/02.compliance/02.compliance.md
+:page-opendocs-slug:  /scanning/scanning/compliance
+
+== Verwaltung von Compliance und CIS Benchmarks
+
+Die Compliance-Prüfung mit {product-name} umfasst CIS Benchmarks, benutzerdefinierte Prüfungen, Geheimnisse-Prüfung und branchenspezifische Vorlagen für PCI, DSGVO und andere Vorschriften.
+
+CIS Benchmarks, die automatisch von {product-name} ausgeführt werden, umfassen:
+
+* Kubernetes
+* Docker
+* Red Hat OpenShift Entwurf 'Inspiriert von CIS' Benchmarks
+* Google GKE
+
+Die Ergebnisse des Compliance-Scans können für einzelne Assets in den Menüs Registries (für Images), Nodes und Container angezeigt werden, indem das relevante Asset ausgewählt und auf die Registerkarte Compliance geklickt wird.
+
+Das Menü Sicherheitsrisiken -> Compliance ermöglicht konsolidierte Compliance-Berichterstattung, ähnlich wie das Menü Schwachstellen funktioniert.
+
+=== Sicherheitsrisiken - Compliance und Compliance-Profil
+
+Die Compliance-Ergebnisse werden in der Liste nach Kategorie und Name angezeigt. Die Kategorien umfassen Docker, Kubernetes, OpenShift und Benutzerdefiniert. Die Namen jedes Elements entsprechen dem CIS-Benchmark. Zum Beispiel entspricht K.4.2.3 dem Kubernetes CIS-Benchmark 4.2.3. Docker-Benchmarks werden mit 'D' vorangestellt, mit Ausnahme von Image-bezogenen Benchmarks, die mit 'I' vorangestellt sind.
+
+Verwenden Sie den erweiterten Filter, um Compliance-Prüfungen basierend auf Plattform, Host, Namespace oder branchenspezifischen Standards auszuwählen, wie unten gezeigt.
+
+image:compliance_4.png[compliance]
+
+Nach Anwendung des Filters werden nur die relevanten CIS-Benchmarks und benutzerdefinierten Prüfungen angezeigt, und ein Bericht kann erstellt und heruntergeladen werden. So können Berichte für Standards wie PCI, HIPAA, DSGVO und andere erstellt werden.
+
+Der folgende Screenshot zeigt ein Beispiel für ein Geheimnis, das in einem Image-Scan gefunden wurde.
+
+image:secret_compliance_4.png[Geheimnisse]
+
+=== Anpassung von Compliance-Vorlagen für PCI, DSGVO, HIPAA, NIST, PCIv4 und DISA STIG
+
+Das Compliance-Profilmenü ermöglicht die Anpassung der integrierten Vorlagen für Branchenstandards wie PCI, DSGVO, HIPAA, NIST, PCIv4 und DISA STIG. Diese Berichte können aus dem Sicherheitsrisiken -> Compliance-Menü generiert werden, indem einer der Standards zum Filtern ausgewählt und dann exportiert wird. Das NIST-Profil ist für https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-190.pdf[NIST SP 800-190].
+
+Um ein Compliance-Profil anzupassen, wählen Sie den Branchenstandard (z. B. PCI) aus und aktivieren oder deaktivieren Sie spezifische Prüfungen für diesen Standard. Betrachten Sie diese als Compliance-'Tags', die auf jede Prüfung angewendet werden, um einen Compliance-Bericht für diesen Branchenstandard zu erstellen.
+
+Verwenden Sie die Schaltfläche Aktion, um ein Compliance-Tag von dieser Prüfung hinzuzufügen oder zu entfernen.
+
+image:compliance_profile_4.png[Profil]
+
+Darüber hinaus können Sie auswählen, welche 'Assets' als Teil der Compliance-Berichte betrachtet werden, indem Sie auf die Registerkarte Assets klicken. Standardmäßig werden alle Compliance-Vorlagen auf Bilder, Knoten und Container angewendet.
+
+image:profile_assets_4.png[compliance_assets]
+
+Verwenden Sie die Schaltfläche Aktion, um Compliance-Vorlagen für Assets hinzuzufügen oder zu entfernen.
+
+* Bilder. Wählen Sie den/die Standard(e) aus, die für Bilder berichtet werden sollen.
+* Knoten. Wählen Sie den/die Standard(e) aus, die für Knoten (Hosts) berichtet werden sollen.
+* Container. Wählen Sie den/die Standard(e) aus, die für Container berichtet werden sollen.
+
+Alternativ können Compliance-Vorlagen anstelle der oben genannten Kriterien auf bestimmte Namespaces beschränkt werden. Wenn dieses Kästchen aktiviert ist und Namespace(s) hinzugefügt werden, werden Berichte für alle Assets erstellt, die auf diese Namespaces zutreffen. Dies kann nützlich sein, wenn beispielsweise die PCI-Vorlage nur über Assets berichten soll, die für Namespaces gelten, die PCI-relevante (anwendbare) Container-Workloads enthalten.
+
+image:DocheckASSETSEnableNS.png[namespace]
+
+Nachdem die Vorlagen und Assets im Menü Sicherheitsrisiken -> Compliance-Profile angepasst wurden (falls gewünscht), können Berichte im Menü Sicherheitsrisiken -> Compliance erstellt werden, indem der erweiterte Filter geöffnet und die gewünschte Compliance-Vorlage ausgewählt wird. Wenn Sie beispielsweise DSGVO auswählen, wird die Anzeige und die Berichte nur für das DSGVO-Profil gefiltert.
+
+=== Beispiel für die Helm-Installation mit Prime Compliance
+
+Das Folgende ist ein Beispiel für einen Helm-Installationsbefehl zur Installation von SUSE Security 5.4.0 mit Prime Compliance. Benutzer können die Installationsversion auf 5.4.0 oder höher ändern, da Prime Compliance mit 5.4.0 beginnt. Nach der Installation können Prime-Benutzer die verfügbaren Vorschriften im SUSE Security-Web-UI **Compliance > Vorschriften** Registerkarte anzeigen.
+
+[,shell]
+----
+helm install neuvector -n neuvector ./ --set controller.prime.enabled=true --set
+controller.prime.image.repository=nvlab/compliance_config,controller.prime.image.tag=1.
+0.0 --set
+tag=5.4.0-b2,controller.image.repository=nvpublic/co,enforcer.image.repository=nvpublic/
+en,manager.image.repository=nvpublic/ma
+----
+
+=== Geheimnisse-Auditierung
+
+{product-name} überprüft über 40 gängige Arten von Geheimnissen im Rahmen der Bild-Compliance-Scans und Laufzeitscans. Darüber hinaus können xref:customcompliance.adoc[benutzerdefinierte Compliance-Skripte] für Container oder Hosts konfiguriert werden, und die xref:dlp.adoc[DLP-Paketinspektion] Funktion kann verwendet werden, um nach Geheimnissen in Netzwerk-Payloads zu suchen.
+
+Die Ergebnisse der Geheimnisse-Auditierung finden Sie im Compliance-Bereich der Bildscans (Assets -> Registries), Container (Assets -> Container), Knoten (Assets -> Knoten) und im Menü zur Compliance-Verwaltung (Sicherheitsrisiken -> Compliance).
+
+Das Folgende ist ein Beispiel dafür, wie entdeckte Geheimnisse in einem Bildscan angezeigt werden.
+
+image:secrets_image_4.png[Geheimnisse]
+
+Hier ist eine Liste der Arten von Geheimnissen, die erkannt werden.
+
+* Allgemeine private Schlüssel
+* Allgemeine Erkennung von Anmeldeinformationen einschließlich 'apikey', 'api_key', 'password', 'secret', 'passwd' usw.
+* Allgemeine Passwörter in YAML-Dateien einschließlich 'password', 'passwd', 'api_token' usw.
+* Allgemeine Geheimnisschlüssel in Schlüssel/Wert-Paaren
+* Putty-Privatschlüssel
+* XML Privater Schlüssel
+* AWS https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html[Anmeldeinformationen / IAM]
+* Facebook Client-Geheimnis
+* Facebook Endpunkt-Geheimnis
+* Facebook App-Geheimnis
+* Twitter Client-ID
+* Twitter Geheimschlüssel
+* Github Geheimnis
+* Square Produkt-ID
+* Stripe Zugriffsschlüssel
+* Slack API-Token
+* Slack Webhooks
+* LinkedIn Client-ID
+* LinkedIn Geheimschlüssel
+* Google API-Schlüssel
+* SendGrid API-Schlüssel
+* Twilio API-Schlüssel
+* Heroku API-Schlüssel
+* MailChimp API-Schlüssel
+* MailGun API-Schlüssel

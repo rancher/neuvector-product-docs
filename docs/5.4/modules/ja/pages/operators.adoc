@@ -1,0 +1,230 @@
+= オペレーターを使用してデプロイする
+:revdate: 2025-06-02
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/01.production/02.operators/02.operators.md
+:page-opendocs-slug: /デプロイ/プロダクション/オペレーター
+
+== オペレータ
+
+オペレーターは、人間の運用知識をソフトウェアにエンコードし、消費者とより簡単に共有できるようにします。オペレーターは、別のソフトウェアを実行する際の運用の複雑さを軽減するソフトウェアの一部です。より技術的には、オペレーターはKubernetesアプリケーションをパッケージ化、デプロイ、および管理する方法です。
+
+== {product-name} オペレーター
+
+{product-name} オペレーターは{product-name} Helmチャートに基づいています。{product-name} RedHat OpenShiftオペレーターは、OpenShiftコンテナプラットフォームで実行され、{product-name} セキュリティクラスターコンポーネントをデプロイおよび管理します。{product-name} オペレーターには、Helmチャートを使用して{product-name}をデプロイするために必要なすべての情報が含まれています。OpenShift埋め込みオペレーターハブから{product-name}オペレーターをインストールし、{product-name}インスタンスを作成するだけです。
+
+最新の{product-name}コンテナバージョンをデプロイするには、オペレーターハブからlink:https://catalog.redhat.com/search?searchType=software&deployed_as=Operator&partnerName={product-name}&p=1[Red Hat Certified Operator]またはlink:https://github.com/redhat-openshift-ecosystem/community-operators-prod/tree/main/operators/neuvector-community-operator[コミュニティオペレーター]を使用してください。コミュニティオペレーターのドキュメントは https://github.com/neuvector/neuvector-operator[{product-name}オペレーター]で見つけることができます。
+
+[NOTE]
+.SCCとアップグレードに関する注意事項
+====
+
+特権SCCは、新しいデプロイメントにおいて、オペレーターのバージョン1.3.4以上でデプロイメントyamlに指定されたサービスアカウントに追加されます。{product-name}オペレーターを以前のバージョンから1.3.4にアップグレードする場合は、アップグレード前に特権SCCを削除してください。
+
+[,shell]
+----
+oc delete rolebinding -n neuvector system:openshift:scc:privileged
+----
+====
+
+[IMPORTANT]
+====
+{product-name}認定オペレーターのバージョンは{product-name}製品バージョンに関連付けられており、各新しいバージョンは公開される前にRed Hatとの認証プロセスを経る必要があります。5.3.xの認定オペレーターのバージョンは、helmバージョン2.7.2および{product-name}アプリバージョン5.3.2に関連付けられています。認定オペレーターのバージョン1.3.9は、{product-name}バージョン5.2.0に関連付けられています。認定オペレーターのバージョン1.3.7は、{product-name}バージョン5.1.0に関連付けられています。バージョン1.3.4のオペレーターのバージョンは、{product-name} 5.0.0に関連付けられています。{product-name} コンテナのバージョンタグを変更できるようにしたい場合は、コミュニティ版を使用してください。
+====
+
+.認定オペレーターを使用してデプロイする
+[%collapsible]
+======
+*Operator Hub から Red Hat 認定オペレーターを使用してデプロイ*
+
+[IMPORTANT]
+====
+{product-name} オペレーターのバージョンは {product-name} 製品のバージョンに関連付けられており、各新しい製品バージョンは公開される前に Red Hat との認証プロセスを経る必要があります。
+====
+
+*技術ノート*
+
+* {product-name} コンテナイメージは、RedHat マーケットプレイスのイメージプルシークレットを使用して registry.connect.redhat.com からプルされます。
+* {product-name} マネージャー UI は通常、ドメイン上の OpenShift パススルールートを介して公開されます。例えば、IBM Cloud neuvector-route-webui-neuvector.(cluster_name)-(random_hash)-0000.(region).containers.appdomain.cloud のようになります。また、ノードポートアドレスまたはパブリック IP を介して neuvector-service-webui サービスとして公開することもできます。
+* OpenShift バージョン >=4.6。
+
+. プロジェクト neuvector を作成
++
+--
+[,shell]
+----
+oc new-project neuvector
+----
+--
+. Operator Hub から RedHat 認定オペレーターをインストール 
+** OpenShift コンソール UI で OperatorHub に移動 
+** {product-name} オペレーターを検索し、コミュニティまたはマーケットプレイスのバッジが付いていないリストを選択 
+** ［Install (インストール)］をクリックします。
+. 更新チャネルを構成 
+** 現在の最新チャネルはベータですが、将来的に安定版に移行される可能性があります。 
+** 利用可能な場合は安定版を選択
+. インストールモードとインストールされたネームスペースを構成 
+** クラスター上の特定のネームスペースを選択 
+** インストールされたネームスペースとして neuvector を選択 
+** 承認戦略を設定する
+. インストールを確認する
+. 以下のサンプル画面に示されているように、{product-name}インストールのためのYAML設定値を準備します。OpenShiftコンソールに表示されるYAMLは、すべての利用可能な設定オプションとそのデフォルト値を提供します。
++
+image:operator_cert.png[]
+. オペレーターがインストールされ、使用可能な状態になると、{product-name}インスタンスをインストールできます。
+** オペレーターのインストール後に「オペレーターを表示」をクリックするか、インストールされたオペレーターのビューから{product-name}オペレーターを選択します。 
+** 「インスタンスを作成」をクリックします。 
+** YAMLビュー経由で設定を選択します。 
+** 準備したYAML設定値を貼り付けます。 
+** ［作成］をクリックします。
+. {product-name}インスタンスのインストールを確認します。 
+** {product-name}オペレーターのオペレーター詳細に移動します。 
+** {product-name}タブを開きます。 
+** neuvector-defaultインスタンスを選択します。 
+** リソースタブを開きます。 
+** リソースが「作成済み」または「実行中」の状態であることを確認します。
+
+{product-name}プラットフォームをクラスターに正常にデプロイした後、`https://neuvector-route-webui-neuvector.(OC_INGRESS)`で{product-name}コンソールにログインします。 
+* 初期のユーザー名adminとパスワードadminでログインします。 
+* {product-name}ライセンス条項に同意します。 
+* adminユーザーのパスワードを変更します。オプションで、設定の ->ユーザーと役割メニューで追加のユーザーを作成することもできます。これで、{product-name}コンソールをナビゲートして脆弱性スキャンを開始し、実行中のアプリケーションポッドを観察し、コンテナにセキュリティ保護を適用する準備が整いました。
+
+*アップグレード {product-name}*
+
+希望する{product-name}バージョンに関連付けられたオペレーターのバージョンを更新することで、{product-name}バージョンをアップグレードできます。
+======
+
+.コミュニティオペレーターを使用してデプロイする
+[%collapsible]
+======
+*OperatorHubから{product-name}コミュニティオペレーターをデプロイする*
+
+*技術ノート*
+
+* {product-name}コンテナイメージは{product-name}アカウントのDocker Hubからプルされます。
+* {product-name}マネージャーUIは通常、ドメイン上のOpenShiftパススルールートを介して公開されます。例えば、IBM Cloud neuvector-route-webui-neuvector.(cluster_name)-(random_hash)-0000.(region).containers.appdomain.cloud のようになります。また、ノードポートアドレスまたはパブリック IP を介して neuvector-service-webui サービスとして公開することもできます。
+* OpenShift version 4.6+ 
+* {product-name}インスタンス作成前に、yaml値を変更して{product-name}インストール設定を確認および修正することをお勧めします。例としては、imagePullSecrets名、タグバージョン、ingress/consoleアクセス、マルチクラスター連携、永続ボリュームPVCなどがあります。インストール中に変更可能な値については、 https://github.com/neuvector/neuvector-helmのHelmの指示を参照してください。
+
+. プロジェクト neuvector を作成
++
+--
+[,shell]
+----
+oc new-project neuvector
+----
+--
+. OperatorHubから{product-name}コミュニティオペレーターをインストールします。 
+** OpenShift コンソール UI で OperatorHub に移動 
+** {product-name}オペレーターを検索し、コミュニティバッジのあるリストを選択します。 
+** ［Install (インストール)］をクリックします。 
+** 更新チャネルを構成します。現在の最新チャネルはベータですが、将来的には安定版に移行される可能性があります。利用可能な場合は安定版を選択してください。
+** インストールモードとインストールされたネームスペースを構成 
+** クラスター上の特定のネームスペースを選択 
+** インストールされたネームスペースとして neuvector を選択 
+** 承認戦略を設定する 
+** インストールを確認する
+. {product-name}コンテナレジストリにアクセスするための資格情報を含むKubernetesシークレットマニフェストをダウンロードします。YAMLマニフェストファイルを./neuvector-secret-registry.yamlに保存します。
+. レジストリ資格情報を含むKubernetesシークレットマニフェストを適用します。
++
+--
+[,shell]
+----
+kubectl apply -n neuvector -f ./neuvector-secret-registry.yaml
+----
+--
+. 以下のYAMLスニペットから始めて、{product-name}インストールのためのYAML設定値を準備します。'tag'値に希望する{product-name}バージョンを指定することを忘れないでください。{product-name} Helmチャートの値のリファレンスを確認して、利用可能な設定オプションを取得してください。YAMLで構成可能な他のHelmの値もあり、マスター（連携マスター）やリモート（連携ワーカー）サービスを公開して、クラスターでマルチクラスター管理を許可するかどうかを設定できます。
++
+--
+[,yaml]
+----
+apiVersion: apm.neuvector.com/v1alpha1
+kind: Neuvector
+metadata:
+  name: neuvector-default
+  namespace: neuvector
+spec:
+  openshift: true
+  tag: 4.3.0
+  registry: docker.io
+  exporter:
+    image:
+      repository: prometheus-exporter
+      tag: 0.9.0
+  manager:
+    enabled: true
+    env:
+      ssl: true
+    image:
+      repository: manager
+    svc:
+      type: ClusterIP
+      route:
+        enabled: true
+        termination: passthrough
+  enforcer:
+    enabled: true
+    image:
+      repository: enforcer
+  cve:
+    updater:
+      enabled: true
+      image:
+        repository: updater
+        tag: latest
+      schedule: 0 0 * * *
+    scanner:
+      enabled: true
+      replicas: 3
+      image:
+        repository: scanner
+        tag: latest
+  controller:
+    enabled: true
+    image:
+      repository: controller
+    replicas: 3
+----
+--
+. オペレーターがインストールされ、使用可能な状態になると、{product-name}インスタンスをインストールできます。
+** オペレーターのインストール後に「オペレーターを表示」をクリックするか、インストールされたオペレーターのビューから{product-name}オペレーターを選択します。 
+** 「インスタンスの作成」をクリックします。 
+** YAMLビュー経由で設定を選択します。 
+** 準備したYAML設定値を貼り付けます。 
+** ［作成］をクリックします。
+. {product-name}インスタンスのインストールを確認します。
+** {product-name}オペレーターの詳細に移動します。 
+** {product-name}タブを開きます。 
+** neuvector-defaultインスタンスを選択します。 
+** リソースタブを開きます。 
+** リソースが「作成済み」または「実行中」の状態であることを確認します。
+. {product-name}プラットフォームをクラスターに正常にデプロイした後、`https://neuvector-route-webui-neuvector.(INGRESS_DOMAIN)`で{product-name}コンソールにログインしてください。
+** 初期のユーザー名adminとパスワードadminでログインします。
+** {product-name}ライセンス条項に同意します。
+** adminユーザーのパスワードを変更します。
+** 任意で、設定の->ユーザーと役割メニューで追加のユーザーを作成することもできます。
+
+これで、{product-name}コンソールを操作して脆弱性スキャンを開始し、実行中のアプリケーションポッドを監視し、コンテナにセキュリティ保護を適用する準備が整いました。
+
+*アップグレード {product-name}*
+
+. Operators > Installed Operators > {product-name} Operator 
++
+image:1_Installed.png[]
+. {product-name}をクリックしてインスタンスを一覧表示します。 
++
+image:2_Instance.png[]
+. YAMLをクリックしてパラメータを編集します。 
++
+image:3_YAML.png[]
+. タグを更新して保存をクリックします。 
++
+image:4_tag_save.png[]
+======
+
+=== トラブルシューティング
+
+* デプロイされたyamlファイルでOperatorのデプロイメント値を確認します。
+* ステップ2で{product-name}のセキュリティコンテキスト制約(SCC)が正常に追加されたことを確認します。
+* {product-name} Helmチャートの値を確認します。
+* レジストリパスとバージョンタグが正しく設定されていることを確認してください（コミュニティオペレーター; 認定されたものはデフォルトを使用します）。
+* {product-name}マネージャーサービスneuvector-route-webuiへのルートが設定されていることを確認してください。

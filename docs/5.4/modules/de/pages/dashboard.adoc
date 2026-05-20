@@ -1,0 +1,35 @@
+= Übersicht über den Sicherheitsstatus
+:page-opendocs-origin: /15.ui_extension/01.dashboard/01.dashboard.md
+:page-opendocs-slug:  /ui_extension/dashboard
+
+In der UI-Erweiterung im Rancher-Portal funktioniert das **NeuVector Dashboard** ähnlich wie seine eigenständige Seite. Es bietet Sicherheitsrisikofaktoren, um den Benutzern den Sicherheitsstatus ihrer Cluster mitzuteilen. Im unteren Bereich bietet es 4 Registerkarten, mit denen Benutzer zwischen den Diagrammen zur Überwachung verschiedener Kategorien wechseln können.
+
+In der Registerkarte **Security Events** zeigt das Liniendiagramm eine datumsbasierte Ereigniszählung auf einer Zeitachse. Das obere Balkendiagramm der Sicherheitsereignisse zeigt die 5 wichtigsten Quell- und Zielendpunkte.
+
+image:dashboard_security_events.png[Dashboard]
+
+In der Registerkarte **Ingress and Egress Exposure** zeigt das gestapelte Balkendiagramm die Anzahl der exponierten Endpunkte nach Aktionen. Auf der rechten Seite zeigen die Expositionstabellen Egress- und Ingress-Endpunktdienste mit Scaninformationen.
+
+image:dashboard_exposure.png[Dashboard]
+
+Ein Klick auf eine Zeile der Egress-/Ingress-Tabelle zeigt Gespräche über spezifische Dienste an. Der FQDN-Name bzw. die IP-Adresse wird im Feld **External Host** zusammen mit einer nationalen Flagge angezeigt, die den geografischen Standort repräsentiert.
+
+image:dashboard_conversations.png[Dashboard]
+
+Ein Klick auf den **External Host** leitet zu whois.com weiter, um die detaillierten Informationen zur IP-Adresse anzuzeigen.
+
+image:whois.png[Dashboard]
+
+In der Registerkarte **Policy Mode** zeigen die Kreisdiagramme das Verhältnis und die Anzahl der Pods / Dienste unter verschiedenen Richtlinienmodi.
+
+image:dashboard_policy_mode.png[Dashboard]
+
+In der Registerkarte **Top Vulnerable Assets** zeigen die Balkendiagramme die 5 wichtigsten Pods / Knoten, die Schwachstellen mit hoher oder mittlerer Schwere aufweisen.
+
+image:dashboard_top_vul_assets.png[Dashboard]
+
+== Funktionen, die im Vergleich zur eigenständigen NeuVector-Seite nicht enthalten sind.
+
+* Dialogfeld zur Verbesserung des Scores.
+* Anwendungsprotokolle, die durch Schicht 7-Netzwerkregeln erkannt und geschützt werden.
+* Namespace-basierte PDF-Berichte.

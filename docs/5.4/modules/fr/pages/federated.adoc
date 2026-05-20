@@ -1,0 +1,70 @@
+= Stratégie fédérée
+:revdate: 2024-09-25
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/12.federated/12.federated.md
+:page-opendocs-slug:  /policy/federated
+
+== Stratégie fédérée
+
+Après la création d'un cluster Maître, des règles Fédérées peuvent être créées dans le Maître et sont automatiquement propagées à chaque cluster. Ceci est utile pour créer des règles globales qui doivent être appliquées à chaque cluster, telles que des règles de réseau globales. Les règles Fédérées apparaîtront dans chaque cluster en lecture seule et ne peuvent PAS être supprimées ou modifiées par l'administrateur local du cluster.
+
+Pour configurer les règles fédérées, cliquez sur la stratégie fédérée dans le menu déroulant en haut à droite. Vous verrez des onglets pour Groupes, Contrôle d'Admission, Règles de Réseau et d'autres règles qui peuvent être fédérées. Sélectionnez l'onglet et créez un nouveau Groupe ou une nouvelle règle. Dans l'exemple ci-dessous, deux groupes Fédérés ont été créés, qui seront propagés à chaque cluster.
+
+image:fed_group.png[Groupe fédéré]
+
+Et la règle de Réseau Fédéré suivante a été créée pour permettre l'accès SSL des pods de démon à google.com.
+
+image:fed_network.png[Réseau fédéré]
+
+Après que ces règles et groupes aient été propagés aux clusters distants, ils apparaîtront comme des règles et groupes Fédérés dans la console du cluster local.
+
+image:fed_rule_remote.png[Règle fédérée distante]
+
+Dans l'exemple ci-dessus, la règle fédérée est affichée, et elle diffère des règles apprises ainsi que des règles créées par l'utilisateur dans le cluster local. La règle créée par l'utilisateur 1 peut être sélectionnée pour modification ou suppression, tandis que la règle fédérée ne peut pas être modifiée ni supprimée. De plus, les règles de réseau fédérées apparaîtront toujours en haut de la liste, prenant ainsi la priorité sur d'autres règles.
+
+D'autres règles telles que Contrôle d'Admission, Réponse, Traiter et Fichier se comporteront de la même manière, sauf que l'ordre des règles n'est pertinent que pour les règles de réseau.
+
+Notez que la configuration des règles de Traiter et de Fichier nécessite la sélection d'un groupe fédéré, car celles-ci doivent être appliquées à un groupe cible tel que défini dans l'onglet Groupe fédéré. Après qu'un nouveau groupe a été configuré dans les groupes fédérés ->, il apparaîtra comme une option sélectionnable lors de la configuration d'un groupe dans les règles de Traiter ou de Fichier.
+
+== Stratégie fédérée d'exportation/importation
+
+Les politiques de Fédération—y compris *Groupes*, *Contrôle d'Admission*, *Capteurs DLP*, *Capteurs WAF*, *Règles de Réponse*, et *Configuration*—peuvent être importées et exportées.
+
+Vous pouvez sélectionner une ou plusieurs entrées et cliquer sur **Exporter** pour télécharger le fichier YAML localement ou l'exporter vers un dépôt distant.
+
+Les politiques de Fédération ne peuvent être importées que sur le cluster principal. Après l'importation, le cluster principal déploie les stratégies sur tous les clusters gérés.
+
+L'exemple suivant démontre comment exporter un groupe fédéré.
+
+. Sélectionnez un ou plusieurs groupes fédérés et cliquez sur **Exporter la Stratégie de Groupe**.
++
+image::select-group.png[Sélectionnez le groupe fédéré]
+
+. Sélectionnez **Télécharger sur local**, puis cliquez sur **Soumettre** pour télécharger le fichier YAML.
++
+image::download-to-local.png[Télécharger sur local]
+
+. Sélectionnez **Exporter vers le Dépôt Distant**, puis cliquez sur **Soumettre** pour exporter le fichier YAML vers le dépôt distant configuré.
++
+[NOTE]
+====
+L'option **Exporter vers le Dépôt Distant** est désactivée jusqu'à ce qu'un dépôt distant soit configuré sous *Paramètres > Configuration*.
+====
++
+image::Remote-repo-configurations.png[Configuration du dépôt distant]
+
+. Après une exportation réussie, le message de réponse affiche le chemin et le nom du fichier exporté.
+
+Si le champ *Destination* est vide, NeuVector génère un nom de fichier par défaut et l'affiche dans la réponse.
+
+image::response-for-empty-destination.png[Réponse pour destination vide]
+
+Si vous spécifiez un nom de fichier personnalisé, le message de réponse affiche le nom fourni.
+
+* Définissez un nom personnalisé pour le fichier exporté:
++
+image::define-name-for-exported-file.png[Définir le nom du fichier exporté]
+
+* Réponse pour une destination personnalisée{nbsp}:
++
+image::response-for-customized-destination.png[Réponse pour destination personnalisée]

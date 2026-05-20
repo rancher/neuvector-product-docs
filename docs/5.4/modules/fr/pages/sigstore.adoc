@@ -1,0 +1,50 @@
+= Vérificateurs de signatures Sigstore Cosign
+:revdate: 2025-05-08
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/03.admission/01.sigstore/01.sigstore.md
+:page-opendocs-slug:  /policy/admission/sigstore
+
+== Configuration des vérificateurs Sigstore/Cosign pour exiger la signature des images
+
+{product-name} permet à un utilisateur d'effectuer une logique de vérification de signature en intégrant les signatures d'images générées par l'outil cosign de Sigstore.
+
+[NOTE]
+====
+NeuVector prend actuellement en charge l'analyse des signatures d'images générées uniquement avec cosign v2. Les signatures créées avec cosign v3 ne déclenchent pas la vérification de Sigstore.
+====
+
+Voici un exemple de configuration de contrôle d'admission qui exige qu'une image de déploiement soit signée par une clé ou une identité appropriée.
+
+Tout d'abord, configurez une racine de confiance. Cela peut être une racine de confiance publique ou privée, selon le déploiement de Sigstore utilisé pour générer les signatures. Si vous avez déployé vos propres instances des services de Sigstore, sélectionnez l'option de racine de confiance privée.
+
+Une racine de confiance publique n'a besoin d'aucune configuration supplémentaire en dehors de lui donner un nom facilement référencé.
+
+image:1configure-public-root-of-trust.png[sigstore]
+
+Une racine de confiance privée nécessite les clés et/ou certificats de vos instances de services Sigstore déployées en privé.
+
+image:2configure-private-root-of-trust.png[sigstore]
+
+Ensuite, pour une racine de confiance donnée, configurez chacun des vérificateurs que vous souhaitez utiliser lors du contrôle d'admission. Il existe deux types de vérificateurs{nbsp}: par paire de clés et sans clé. Un vérificateur par paire de clés serait utilisé pour vérifier une image signée par une clé privée définie par l'utilisateur. Un vérificateur sans clé serait utilisé lors de la vérification d'une signature générée par le modèle sans clé de Sigstore. Plus d'informations sur les méthodes de signature de Sigstore peuvent être référencées dans la documentation https://docs.sigstore.dev/quickstart/quickstart-cosign/[Vue d'ensemble de la signature Sigstore].
+
+Pour configurer un vérificateur par paire de clés, fournissez un nom et une clé publique correspondant à une clé privée cible.
+
+image:3add-keypair-verifier-for-public-root-of-trust.png[sigstore]
+
+Pour configurer un vérificateur sans clé, fournissez l'émetteur OIDC et l'identité utilisée lors de la signature.
+
+image:4add-keyless-verifier-for-public-root-of-trust.png[sigstore]
+
+Notez qu'après la configuration de la racine de confiance et des vérificateurs, une image doit être analysée afin de déterminer auxquels ses signatures répondent.
+
+Les vérificateurs configurés auxquels l'image répond peuvent être consultés dans la section supérieure droite des résultats d'analyse d'une image, dans Assets->Registries. Si une image n'est pas signée par un vérificateur, elle n'apparaîtra pas dans ses résultats d'analyse.
+
+image:6new_show_verifiers.scanresults.png[sigstore]
+
+Pour référencer une racine de confiance et un vérificateur particuliers dans une règle de contrôle d'admission, joignez les deux noms avec une barre oblique comme suit{nbsp}: `my-root-of-trust/my-verifier`.
+
+image:5new_admission_rule_signature.png[sigstore]
+
+Pour exiger qu'une image soit signée dans une règle de contrôle d'admission, définissez la valeur Vrai/Faux pour les critères Image Signée.
+
+image:7image_signed.png[sigstore]

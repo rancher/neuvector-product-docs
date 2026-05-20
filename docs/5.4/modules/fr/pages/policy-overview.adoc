@@ -1,0 +1,67 @@
+= Aperçu de la stratégie de sécurité
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/01.overview/01.overview.md
+:page-opendocs-slug:  /stratégie/aperçu
+
+== {product-name} Stratégie de sécurité
+
+Pour détecter les violations du comportement normal, {product-name} maintient une stratégie de sécurité qui peut être gérée depuis l'interface graphique, la CLI, le CRD ou l'API REST.
+
+=== Groupes
+
+Cela fournit la vue principale des groupes de services et des groupes personnalisés pour définir le mode (Découvrir, Surveiller, Protéger) pour chaque service et gérer les règles. Les groupes sont automatiquement créés par {product-name}, mais des groupes personnalisés peuvent être ajoutés. Les règles pour chaque groupe sont automatiquement créées par {product-name} lorsque les conteneurs commencent à s'exécuter. Les groupes de conteneurs peuvent avoir un mode de stratégie fractionnée où les règles de processus/fichier se trouvent dans un mode d'imposition différent de celui des règles réseau, comme décrit xref:modes.adoc#_network_service_policy_mode[ici].
+
+Pour sélectionner un groupe à afficher ou à gérer, cochez la case à côté de celui-ci. C'est ici que les règles de profil de processus, les règles d'accès aux fichiers, DLP et les vérifications de conformité personnalisées sont gérées. Les règles réseau peuvent être consultées ici mais sont gérées dans un menu séparé.
+Les règles réseau et de réponse dans {product-name} sont créées à l'aide d'un champ '`from`' et '`to`', qui nécessite un groupe comme entrée. Un groupe peut être une application, dérivée des étiquettes d'image, du nom DNS ou d'un autre regroupement personnalisé. Les sous-domaines DNS sont pris en charge, par exemple *.foo.com. Les adresses IP ou les sous-réseaux peuvent également être utilisés, ce qui est utile pour contrôler l'entrée et la sortie des charges de travail non conteneurisées.
+
+image:groups_node_demo.png[groupes]
+
+Les noms de groupes réservés créés automatiquement par {product-name} incluent{nbsp}:
+
+* Conteneurs. Tous les conteneurs en cours d'exécution.
+* Externe. Connexions entrant dans le cluster (ingress).
+* Noeud. Nœuds ou hôtes identifiés par {product-name}.
+
+Le menu Groupes est également l'endroit où l'"Exportation de la stratégie de groupe" peut être effectuée. Cela exporte la stratégie de sécurité (règles) pour les groupes sélectionnés sous forme de fichier yaml au format de la définition de ressource personnalisée {product-name} (CRD) qui peut être examinée puis déployée dans d'autres clusters.
+
+Notez que le statut des conteneurs d'un Groupe est affiché dans Stratégie -> Groupes -> Membres, ce qui indique le mode de protection {product-name} (Découvrir, Surveiller, Protéger). Si le conteneur est affiché dans un état 'abandonner', il est toujours sur l'hôte mais est arrêté. La suppression du conteneur le retirera d'un état 'abandonner'.
+
+=== Règles réseau
+
+Une liste de règles de liste blanche et de liste noire pour {product-name} à appliquer. {product-name} peut auto-découvrir et créer un ensemble de règles de liste blanche en mode Découverte. Des règles peuvent être ajoutées manuellement si désiré.
+
+{product-name} crée automatiquement des règles de liste blanche de couche 7 (couche Application) lorsqu'il est en mode Découvrir, en observant les connexions réseau et en créant des règles qui appliquent les protocoles d'application.
+
+{product-name} dispose également d'une détection intégrée des attaques réseau qui est activée tout le temps, quel que soit le mode (Découvrir, Surveiller, Protéger). Les menaces réseau détectées incluent les attaques DDoS, le tunneling et l'injection SQL. Veuillez consulter la section Règles Réseau pour une liste complète des menaces détectées par le système intégré.
+
+Des règles DLP (Prévention de la Perte de Données) peuvent également être appliquées aux Groupes de conteneurs pour inspecter la charge utile réseau à la recherche de vols de données potentiels ou de violations de la vie privée telles que des données de carte de crédit non chiffrées. Les violations peuvent être bloquées. Veuillez consulter la section sur DLP pour des détails sur la façon de créer et d'appliquer des filtres DLP.
+
+=== Profil de processus et Règles d'Accès aux Fichiers
+
+{product-name} dispose d'une détection intégrée des processus suspects et de l'activité des fichiers ainsi que d'une technologie de baselining pour les conteneurs. La détection intégrée comprend des processus tels que le scan de ports (par exemple, NMAP), le shell inversé et même les escalades de privilèges vers le root. Les fichiers et répertoires système sont automatiquement surveillés. Chaque service découvert par {product-name} créera une base de référence du comportement des processus et des fichiers '`normal`' pour ce service de conteneur. Ces règles peuvent être personnalisées si désiré.
+
+=== Règles de réponse
+
+Les règles de réponse permettent aux utilisateurs de définir des actions pour répondre aux événements de sécurité. Les événements incluent les menaces, les violations, les incidents et les résultats des scans de vulnérabilité. Les actions incluent la mise en quarantaine des conteneurs, les webhooks et la suppression des alertes.
+
+Les règles de réponse fournissent un moteur de règles flexible et personnalisable pour automatiser les réponses aux événements de sécurité importants.
+
+=== Règles de contrôle d'admission
+
+Les règles de contrôle d'admission permettent ou bloquent les déploiements. Plus de détails peuvent être trouvés dans cette section sous Contrôles d'admission.
+
+=== Capteurs DLP et WAF
+
+La prévention des pertes de données (Data Leak Protection) et les règles WAF peuvent être activées sur tout groupe de conteneurs sélectionné. Cela utilise l'inspection approfondie des paquets pour appliquer un appariement basé sur des expressions régulières à la charge utile réseau entrant ou sortant du groupe de conteneurs sélectionné. Des capteurs intégrés pour les cartes de crédit et les numéros de sécurité sociale américains sont inclus à titre d'exemple, et des expressions régulières personnalisées peuvent être ajoutées.
+
+=== Migration, Sauvegarde, Import/Export
+
+La migration de la stratégie de sécurité peut être réalisée par CRD, API REST ou import/export. Par exemple, les règles apprises et personnalisées peuvent générer un ou plusieurs fichiers yaml CRD dans un environnement de staging pour déploiement dans l'environnement de production.
+
+La stratégie de sécurité pour {product-name} peut être exportée et importée dans les paramètres -> Configuration. Il est recommandé de sauvegarder toute la configuration avant toute mise à jour de {product-name} vers une nouvelle version.
+
+[IMPORTANT]
+====
+L'importation de TOUT (configuration et stratégie) écrasera tout, y compris les identifiants de connexion principaux de l'administrateur. Assurez-vous de connaître les identifiants de connexion principaux de l'administrateur pour le fichier importé avant d'importer.
+====

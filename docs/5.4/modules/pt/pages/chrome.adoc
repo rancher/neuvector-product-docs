@@ -1,0 +1,75 @@
+= Upload de Certificado do Chrome - MacOS
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /03.configuration/01.console/02.chrome/02.chrome.md
+:page-opendocs-slug: /configuração/console/chrome
+
+== Habilitando Navegadores Chrome para Aceitar o Certificado Autoassinado {product-name} no MacOS
+
+Sob certas circunstâncias, o navegador Chrome se recusará a aceitar um certificado autoassinado {product-name}.  Uma possível razão pode ser que o certificado ainda não foi importado para o armazenamento de certificados de login do macOS.  Outra possibilidade é que um certificado existente ainda não foi configurado para ser confiável.  Isso impedirá o usuário de aceitá-lo e prosseguir para a página de login {product-name} usando o Chrome, conforme ilustrado no exemplo mostrado abaixo:
+
+image:chrome1.png[chrome]
+
+Passos corretivos podem ser tomados para habilitar o Chrome a aceitar o certificado autoassinado colocado no armazenamento do Keychain do macOS.  Isso pode ser feito configurando o certificado {product-name} para ser confiável usando o aplicativo Acesso às Chaves do Mac.  Isso parte da suposição de que o certificado realmente existe no armazenamento do Acesso às Chaves do macOS.  Primeiro, veremos como exportar um certificado de um nó {product-name} existente de um sistema e, posteriormente, importá-lo para outro sistema.   Existem 2 maneiras de exportar o certificado, que abordaremos abaixo.  Elas são, usando o navegador Chrome e usando o aplicativo Acesso às Chaves do macOS.
+
+=== Exportação de certificado usando o Chrome
+
+A captura de tela abaixo ilustra como acessar o certificado {product-name} usando o Chrome.
+
+image:chrome2.png[chrome]
+
+Para exportar o certificado, arraste e solte o certificado em um local de sua escolha.
+
+image:chrome3.png[chrome]
+
+=== Exportação de certificado usando o Acesso às Chaves do macOS
+
+Inicie o aplicativo Acesso às Chaves do macOS pressionando simultaneamente as teclas ⌘ + F em um teclado Mac, pesquise por 'Acesso às Chaves' e clique duas vezes no aplicativo.
+Isso inicia o aplicativo Acesso às Chaves.  Selecione o certificado {product-name} e escolha Exportar "`{product-name}`" no menu suspenso.  Isso permitirá a exportação do certificado para um local de sua escolha.
+
+image:chrome4.png[chrome]
+
+=== Iniciando o aplicativo Acesso às Chaves do macOS
+
+Existem duas maneiras de iniciar o aplicativo Acesso às Chaves do macOS.  Isso pode ser feito pesquisando no macOS, conforme descrito nos passos acima, ou usando o navegador Chrome.
+
+=== Iniciando o Acesso às Chaves a partir do navegador Chrome
+
+Configurações > Avançado > Gerenciar certificados
+
+image:chrome5.png[chrome]
+
+Clicar em Gerenciar certificados, conforme mostrado acima, inicia o aplicativo Acesso às Chaves do macOS, conforme mostrado abaixo.
+
+image:chrome6.png[chrome]
+
+=== Importação de certificado no armazenamento Acesso às Chaves do macOS
+
+Inicie o aplicativo Acesso às Chaves do macOS pressionando simultaneamente as teclas ⌘ + F em um teclado Mac, pesquise por Acesso às Chaves e clique no aplicativo.  Em seguida, importe o certificado arrastando e soltando um certificado {product-name} (exemplo: nvcertificate.cer) no painel direito de Certificado do aplicativo Acesso às Chaves.  Agora que o certificado foi importado, ele ainda não é confiável.
+O seguinte é um exemplo mostrando as configurações de confiança padrão após o certificado de um {product-name} ter sido importado para o aplicativo Acesso às Chaves.
+
+image:chrome7.png[chrome]
+
+Observe que nenhum dos parâmetros foi configurado e ele não é confiável por padrão.  É necessário configurá-lo para ser confiável para permitir que o usuário acesse a página de login usando o navegador Chrome.
+
+=== Habilitando a confiança para o Certificado {product-name}
+
+Os passos a seguir detalham como habilitar a confiança para o certificado {product-name} no armazenamento do Acesso às Chaves do macOS.
+
+image:chrome8.png[chrome]
+
+Clicar duas vezes no certificado {product-name} da captura de tela acima abrirá outra caixa de diálogo que permite configurar as permissões de confiança para diferentes parâmetros.  Configure Secure Sockets Layer (SSL) para "`Always Trust`".
+
+image:chrome9.png[chrome]
+
+Feche a caixa de diálogo e clique em '\`Atualizar configurações`' após inserir a senha do usuário de logon do Mac na caixa de diálogo a seguir.
+
+image:chrome10.png[chrome]
+
+Isso finaliza as configurações de confiança.  Em seguida, limpe todo o cache do navegador Chrome, feche todos os navegadores Chrome e reinicie o navegador Chrome.  Em seguida, visite a página de login {product-name} e, ao clicar no link "`Advanced`", o link Prosseguir para ... (inseguro) será exibido.  Clicar em Prosseguir para ... (inseguro) permitirá que o usuário prossiga para a página de login de nome de usuário e senha.
+
+image:chrome11.png[chrome]
+
+Abaixo está uma captura de tela que permite ao usuário prosseguir para a página de login {product-name} após o link Prosseguir para ... (Inseguro) ser clicado.
+
+image:chrome12.png[chrome]

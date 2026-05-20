@@ -1,0 +1,76 @@
+= Melhorar a Pontuação de Risco de Segurança
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /04.navigation/03.improve_score/03.improve_score.md
+:page-opendocs-slug:  /navigation/improve_score
+
+== Melhorando a Pontuação de Risco de Segurança
+
+A Pontuação de Risco de Segurança no Painel fornece uma pontuação entre 0 e 100.
+
+* 0-20 Bom
+* 21-50 Aceitável
+* 51-100 Insatisfatório
+
+A pontuação é a soma das seguintes métricas, cada uma mostrada como um valor máximo, com um máximo de 100:
+
+* {product-name} Modo de Proteção - 30
+* Risco de Entrada/Saída - 42
+* Contêineres Privilegiados - 4
+* Contêineres Raiz - 4
+* Controles de Admissão - 4
+* Vulnerabilidades - 16 (Contêineres - 8, Host - 6, Plataforma Orquestradora - 2)
+
+Por padrão, {product-name} inclui todos os contêineres, incluindo contêineres de sistema, na pontuação de risco. Isso pode ser personalizado para cada Grupo de contêineres aprendidos para desabilitar certos contêineres de serem incluídos no cálculo da pontuação de risco, conforme mostrado abaixo.
+
+=== Como Melhorar a Pontuação
+
+==== {product-name} Modo de Proteção
+
+. Altere o Novo Modo de Proteção de Serviço nas Configurações -> Configuração para Monitorar ou Proteger
+. Altere todos os '`learned`' Grupos na Política -> Grupos para Monitorar ou Proteger
+
+Ou
+
+. Clique no ícone da Ferramenta para seguir o Assistente e realizar as etapas acima
+
+==== Risco de Entrada/Saída
+
+. Clique no ícone da Ferramenta para seguir o Assistente e revisar Entrada e Saída
+. Revise todas as Conexões de Entrada e Saída para garantir que devem ser permitidas
+. Mude todos os serviços que ainda estão no modo Descobrir para Monitorar ou Proteger
+. Revise e Limpe todas as ameaças, violações e histórico de sessões clicando no ícone de Excluir/Lixeira para cada um
+
+==== Contêineres Privilegiados e/ou Raiz
+
+. Remova contêineres privilegiados
+. Remova Contêineres Raiz
+
+
+[NOTE]
+====
+Isso pode não ser possível devido aos contêineres exigidos, no entanto, cada um deles conta apenas 4 pontos.
+====
+
+==== Controles de Admissão
+
+. Certifique-se de que, em um ambiente Kubernetes/OpenShift, o Controle de Admissão está habilitado e há pelo menos uma regra ativa na Política -> Controle de Admissão
+
+==== Vulnerabilidades
+
+. Certifique-se de que todos os contêineres não-sistema estão no modo Monitorar ou Proteger, na Política -> Grupos
+. Remova/remedie vulnerabilidades do host
+. Remova/remedie vulnerabilidades da plataforma orquestradora (por exemplo, Kubernetes, OpenShift)
+
+=== Como Personalizar Quais Grupos de Contêineres Estão Incluídos na Pontuação
+
+Para habilitar ou desabilitar quais Grupos de contêineres estão incluídos na Pontuação de Risco de Segurança, vá ao menu Política -> Grupos e selecione o Grupo a modificar. A coluna de resumo à direita tem um ícone 'Pontuável' que indica quais grupos são usados para pontuação.
+
+image:risk_scorable.png[scorable]
+
+Selecione ou desmarque a caixa de seleção Pontuável no canto superior direito para o Grupo selecionado.
+
+[NOTE]
+====
+Apenas os 'grupos aprendidos' (por exemplo, aqueles que começam com 'nv.') podem ser editados; grupos reservados ou grupos personalizados não podem.
+====

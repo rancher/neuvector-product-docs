@@ -1,0 +1,157 @@
+= SAML (ADFS)
+:revdate: 2025-05-08
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/06.adfs/06.adfs.md
+:page-opendocs-slug:  /integration/adfs
+
+== ADFSと{product-name}の統合設定
+
+このセクションでは、最初にADFSの設定手順を説明し、その後{product-name}コンソールの設定を説明します。
+
+=== ADFSの設定
+
+. AD FS管理から、"`Relying Party Trusts`"を右クリックし、"`Add Relying Party Trust...`"を選択します。
++
+image:adfs1.png[adfsSetup]
+
+. ウェルカムステップから"`Start`"ボタンを選択します。
++
+image:adfs2.png[adfsSetup]
+
+. "`Enter data about the relying party manually`"を選択し、"`Next`"を選択します。
++
+image:adfs3.png[adfsSetup]
+
+. 表示名フィールドにユニークな名前を入力し、"`Next`"を選択します。
++
+image:adfs4.png[adfsSetup]
+
+. トークン暗号化をスキップするには、"`Next`"を選択します。
++
+image:adfs5.png[adfsSetup]
+
+. "`Enable support for the SAML 2.0 WebSSO protocol`"を確認し、{product-name}の設定>SAML設定ページからSAMLリダイレクトURIを"`Relying party SAML 2.0 SSO service URL`"フィールドに入力します。 続行するには"`Next`"を選択します。
++
+image:adfs6.png[adfsSetup]
+
+. 同じSAMLリダイレクトURIを"`Relying party trust identifier`"フィールドに入力し、"`Add`"をクリックします。その後、続行するには"`Next`"を選択します。
++
+image:adfs7.png[adfsSetup]
+
+. アクセス制御をカスタマイズし、その後"`Next`"を選択して続行します。
++
+image:adfs8.png[adfsSetup]
+
+. 続行するには"`Next`"を選択します。
++
+image:adfs9.png[adfsSetup]
+
+. 完了するには"`Close`"を選択します。
+. クレーム発行ポリシーの編集を選択します...
++
+image:adfs10-11.png[adfsSetup]
+
+. "`Add Rule...`"を選択し、"`Send LDAP Attributes as Claims`"を選択します。その後、"`Next`"を選択します。 ルールに名前を付け、属性ストアとしてActive Directoryを選択します。デフォルトのロールが設定されている場合、認証にはユーザー名の送信クレームのみが必要です。それ以外の場合、ロールマッピングにはグループが必要です。 メールは任意です。
++
+--
+* SAMアカウント名 -> ユーザー名
+* Eメールアドレス -> メール
+* トークングループ -- 未資格名 -> グループ
+
+image:adfs11-12.png[adfsSetup]
+--
+. "`Add Rule...`"を選択し、"`Transform an Incoming Claim`"を選択します。その後、"`Next`"を選択します。 ルールに名前を付け、以下のスクリーンショットにキャプチャされたフィールドを設定してください。 送信者名ID形式は、一時識別子である必要があります。
++
+image:adfs12-13.png[adfsSetup]
+
+=== {product-name} セットアップ
+
+. アイデンティティプロバイダ シングルサインオンURL
+* AD FS管理 > サービスからエンドポイントを表示し、"`SAML 2.0/WS-Federation`"エンドポイントURLを使用します。
+* 例: `https://<adfs-fqdn>/adfs/ls`
+
+. アイデンティティプロバイダ発行者
+* AD FS管理コンソールのAD FSを右クリックし、"`Edit Federation Service Properties...`"を選択します; "`Federation Service identifier`"を使用します。
+* 例: `http://<adfs-fqdn>/adfs/services/trust`
+
+. X.509証明書
+* AD FS管理から、サービス > 証明書を選択し、トークン署名証明書を右クリックして"`View Certificate...`"を選択します。
+* 詳細タブを選択し、"`Copy to File`"をクリックします。
+* Base-64エンコードされたx.509（.CER）ファイルとして保存します。
+* ファイルの内容をコピーして、X.509証明書フィールドに貼り付けます。
+
+. グループクレーム
+* グループのための送信クレーム名を入力してください。
+* 例: グループ
+
+. デフォルトロール
+* 認証されたユーザーにデフォルトの役割を許可したくない限り、"`None`"であることをお勧めします。
+
+. 役割マップ
+* 適切な役割のユーザーのグループ名を設定します。 （以下のスクリーンショット例を参照してください。）
++
+image:nv_adfs1.png[NVadfsSetup]
+
+=== グループを役割とネームスペースにマッピングする
+
+グループをプリセットおよびカスタム役割、ならびに{product-name}のネームスペースにマッピングする方法については、xref:users.adoc#_mapping_groups_to_roles_and_namespaces[ユーザーと役割]セクションをご覧ください。
+
+== トラブルシューティング
+
+. ADFS SamlResponseSignatureは、MessageOnlyまたはMessageAndAssertionのいずれかである必要があります。 Get-AdfsRelyingPartyTrustコマンドを使用して、それを確認または更新します。
++
+image:nv_adfs2.png[adfsTroubleshooting]
+
+. KubernetesノードとADFSサーバー間の時間同期
+
+成功した認証のためには、KubernetesノードとADFSサーバー間の時間が同じである必要があり、時間同期やクロックドリフトの問題を避けることができます。
+
+すべてのサーバーで同じ時間設定を持つ https://en.wikipedia.org/wiki/Network_Time_Protocol[NTPサーバー]の使用をお勧めします。
+
+ADFSと{product-name}ホストの両方が同期されており、潜在的な遅延が10秒を超えないことを確認してください。LinuxおよびWindowsコマンドを使用して、日付、時刻、NTPサーバーのアクティビティを確認できます。
+
+[TIP]
+====
+次のように、{product-name} UIで設定を無効にして再度有効にすることで、認証時間を再読み込みできます。
+
+* 管理者ユーザーで{product-name}にログインします。
+* 設定に移動します。
+* SAML設定を無効にして再度有効にするボタンをクリックします。
+** *設定を保持することを確認してください！*
+
+設定が再度有効になったら、ADFSユーザーでログインを試みることができます。これが機能すれば、問題はKubernetesノードとADFSサーバー間の時間同期エラーによるものであることが確認されます。
+====
+
+. SAML文字は{product-name} UIで大文字と小文字を区別する必要があります。
++
+属性名は大文字と小文字を区別します。ここに設定されたSAML属性名がアプリケーション設定と完全に一致することを確認してください。SAMLは認証のために正しいURLを指す必要があります。
++
+`{product-name} UI -> Settings -> SAML Settings`のすべてのフィールドは大文字と小文字を区別します。
++
+{product-name}コントローラーログには、ADFSサーバーとの認証に関する関連情報と、根本原因を特定するのに役立つエラーが含まれています。失敗したログイン条件を再現し、ログを確認することをお勧めします。
+
+. 正しいグループ、証明書、およびプロトコルを入力してください。
++
+SAML設定は以下の設定と一致する必要があります：
++
+|===
+| 設定 | 値
+
+| アイデンティティプロバイダ シングルサインオンURL
+| HTTPSプロトコルが必要です。
+
+| アイデンティティプロバイダ発行者
+| HTTPプロトコルが必要です。
+
+| ADFS SamlResponseSignature
+| MessageOnlyまたはMessageAndAssertionのいずれかである必要があります。
+|===
+
+[CAUTION]
+====
+これらの設定は、あなたのADFSサーバーと{product-name} UIで検証する必要があります。
+====
+
+選択した証明書は有効で正しく生成されている必要があり、その`CA Root`と`Intermediate Certificates`を含む必要があります。信頼できる証明書機関、Windows、または https://letsencrypt.org/[LetsEncrypt]のような自動化ツールを使用して生成できます。
+
+これらのパラメータのいずれかが不正確な場合、SAML認証を使用してADFSユーザーで{product-name}にログインしようとすると、`Authentication Failed`エラーが発生します。

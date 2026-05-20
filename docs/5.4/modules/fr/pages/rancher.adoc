@@ -1,0 +1,345 @@
+= Déploiement de Rancher
+:revdate: 2024-12-03
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/03.rancher/03.rancher.md
+:page-opendocs-slug: /deploying/rancher
+
+== Déployer et gérer {product-name} via les extensions Rancher ou Apps et Marketplace
+
+{product-name} peut être déployé facilement soit via les extensions Rancher pour les clients Prime, soit via Apps et Marketplace de Rancher. Le déploiement par défaut (basé sur Helm) de {product-name} déploiera {product-name} conteneurs dans l’espace de noms cattle-neuvector-system.
+
+[NOTE]
+====
+Seuls les déploiements de {product-name} via les extensions Rancher ({product-name}) de la version 2.7.0+ de Rancher, ou Apps et Marketplace de la version 2.6.5+ de Rancher peuvent être gérés directement (authentification unique à la console {product-name}) via Rancher. Si des clusters sont ajoutés à Rancher avec {product-name} déjà déployé, ou si {product-name} a été déployé directement sur le cluster, ces clusters ne seront pas activés pour l’intégration SSO.
+====
+
+=== {product-name} Extension UI pour Rancher
+
+Les clients Prime de Rancher peuvent facilement déployer {product-name} et l’extension UI {product-name} pour Rancher. Cela permettra aux utilisateurs Prime de surveiller et de gérer certaines fonctions et événements de {product-name} directement via l'interface utilisateur de Rancher. Pour les utilisateurs de la communauté, veuillez consulter la section Déployer {product-name} ci-dessous pour déployer depuis Apps et Marketplace de Rancher.
+
+. La première étape consiste à activer la capacité des extensions Rancher globalement si elle n’est pas déjà activée.
++
+--
+image:ui0_extensions.png[extensions]
+
+image:ui1_enable.png[activer]
+--
+. Installez l’extension {product-name}-UI à partir de la liste des extensions disponibles
++
+--
+image:ui2_installext.png[installer]
+--
+. Rechargez l’extension une fois l’installation terminée
++
+--
+image:ui3reload.png[recharger]
+--
+. Sur votre cluster sélectionné, installez l’App {product-name} à partir de l’onglet {product-name} si l’App {product-name} n’est pas déjà installée. Cela devrait vous amener aux étapes d’installation de l’App. Pour plus de détails sur ce processus d’installation, consultez la section Déployer {product-name} ci-dessous.
++
+--
+image:ui5installnv.png[install_nv]
+--
+. Le {product-name} tableau de bord devrait maintenant être affiché depuis le menu {product-name} pour ce cluster. Depuis ce tableau de bord, un résumé de la santé de la sécurité du cluster peut être surveillé. Il y a des éléments interactifs dans le tableau de bord, tels que l’invocation d’un assistant pour améliorer votre score (risque de sécurité), y compris la possibilité d’activer la numérisation automatisée des vulnérabilités si elle n’est pas activée.
++
+--
+image:ui6dashboard.png[tableau de bord]
+
+De plus, les liens en haut à droite du tableau de bord fournissent des liens pratiques de connexion unique (SSO) vers la console complète {product-name} pour une analyse et une configuration plus détaillées.
+--
+. Pour désinstaller l’extension, retournez à la page des extensions
++
+--
+image:ui7uninstall.png[désinstaller]
+
+[NOTE]
+====
+La désinstallation de l’extension UI {product-name} ne désinstallera PAS l’App {product-name} de chaque cluster. Le menu {product-name} reviendra à fournir un lien SSO vers la console {product-name}.
+====
+--
+
+=== Déployer {product-name}
+
+Tout d'abord, trouvez le chart {product-name} dans les charts Rancher, sélectionnez-le et examinez les instructions et les différentes valeurs de configuration. (Optionnel) Créez un projet dans lequel déployer si désiré, par exemple {product-name}. Remarque : Si vous voyez plus d'un chart {product-name}, ne sélectionnez pas celui qui est destiné à mettre à niveau les déploiements de charts Helm {product-name} 4.x hérités.
+
+image:rancher_chart.png[rancher_chart]
+
+Déployez le chart {product-name}, en configurant d'abord des valeurs appropriées pour un déploiement Rancher, telles que{nbsp}:
+
+* Type d'exécution de conteneur, par exemple docker pour RKE et containerd pour RKE2, ou sélectionnez la valeur K3s si vous utilisez K3s.
+* Type de service du gestionnaire{nbsp}: changez en LoadBalancer si disponible sur les déploiements dans le cloud public. Si l'accès est uniquement souhaité via Rancher, toute valeur autorisée fonctionnera ici. Voir la note importante ci-dessous concernant le changement du mot de passe administrateur par défaut dans {product-name}.
+* Indiquez si ce cluster sera soit un primaire fédéré multi-cluster, soit distant (ou sélectionnez les deux si l'une ou l'autre option est souhaitée).
+* Volume persistant pour les sauvegardes de configuration
+
+image:rancher_chart_values.png[nv_values]
+
+Cliquez sur 'Installer' après avoir examiné et mis à jour les valeurs du chart.
+
+Après un déploiement {product-name} réussi, vous verrez un résumé des déploiements, des ensembles de daemon et des tâches cron pour {product-name}. Vous pourrez également voir les services déployés dans le menu Découverte des services à gauche.
+
+image:nv_deployed.png[déployé]
+
+=== Gérer {product-name}
+
+Vous verrez maintenant un élément de menu {product-name} à gauche, et en le sélectionnant, vous afficherez un bouton/tile {product-name}, qui, lorsqu'il est cliqué, vous amènera à la console {product-name}, dans un nouvel onglet.
+
+image:nv_access.png[nv_console]
+
+Lorsque cette méthode d'accès par SSO (Single Sign On) est utilisée pour la première fois, un utilisateur correspondant dans le cluster {product-name} est créé pour la connexion de l'utilisateur Rancher. Le même nom d'utilisateur que l'utilisateur connecté de Rancher sera créé dans {product-name}, avec un rôle d'administrateur ou de fedAdmin, et le fournisseur d'identité comme Rancher.
+
+image:nv_admin.png[utilisateurs]
+
+Notez dans la capture d'écran ci-dessus que deux utilisateurs Rancher, admin et gkosaka, ont été automatiquement créés pour le SSO. Si un autre utilisateur est créé manuellement dans {product-name}, le fournisseur d'identité sera listé comme {product-name}, comme indiqué ci-dessous. Cet utilisateur local peut se connecter directement à la console {product-name} sans passer par Rancher.
+
+image:local_admin.png[local]
+
+[IMPORTANT]
+====
+Il est recommandé de se connecter directement à la console {product-name} en tant qu'admin/admin pour changer manuellement le mot de passe administrateur en un mot de passe fort. Cela ne changera que le mot de passe de l'utilisateur administrateur du fournisseur d'identité {product-name} (vous pouvez voir un autre utilisateur administrateur dont le fournisseur d'identité est Rancher). Alternativement, incluez un xref:configmap.adoc#_protect_sensitive_data_using_a_secret[ConfigMap comme secret] dans le déploiement initial depuis Rancher (voir les valeurs du chart pour les paramètres de ConfigMap) pour définir le mot de passe administrateur par défaut sur un mot de passe fort.
+====
+
+=== Ressources de permission SSO NeuVector/Rancher
+
+L'interface utilisateur de Rancher v2.9.2 permet de sélectionner des ressources de permission NeuVector lors de la création de `Global/Cluster/Project/Namespaces` rôles. Lorsqu'un utilisateur de Rancher se voit attribuer un rôle avec une ressource de permission NeuVector, la session SSO NeuVector de l'utilisateur se voit attribuer la permission NeuVector respective en conséquence. Cela vise à fournir aux utilisateurs SSO des rôles personnalisés autres que les rôles réservés `admin/reader/fedAdmin/fedReader`.
+
+Voici les ressources de permission mappées utilisées avec les rôles `Global/Cluster/Project/Namespaces` applicables.
+
+==== Ressources de permission mappées pour le rôle `Global/Cluster`
+
+[NOTE]
+====
+Les utilisateurs devront ajouter manuellement * (Verbes) / services/proxy (Ressource) aux rôles `Global/Cluster` liés à NeuVector.
+====
+
+Groupes API{nbsp}:
+
+`permission.neuvector.com`
+
+Verbes{nbsp}:
+
+[,shell]
+----
+get    // for read-only(i.e. view)
+*      // for read/write(i.e. modify)
+----
+
+Ressources :
+
+NeuVector, à portée de cluster
+
+[,shell]
+----
+AdmissionControl
+Authentication
+CI Scan
+Cluster
+Federation
+Vulnerability
+----
+
+NeuVector, dans un espace de noms
+
+[,shell]
+----
+AuditEvents
+Authorization
+Compliance
+Events
+Namespace
+RegistryScan
+RuntimePolicy
+RuntimeScan
+SecurityEvents
+SystemConfig
+----
+
+==== Ressources de permission mappées pour le rôle `Project/Namespace`
+
+[NOTE]
+====
+Les utilisateurs devront ajouter manuellement * (Verbes) / services/proxy (Ressource) aux rôles `Project/Namespace` liés à NeuVector.
+====
+
+Groupes API{nbsp}:
+
+`permission.neuvector.com`
+
+Verbes{nbsp}:
+
+[,shell]
+----
+get    // for read-only(i.e. view)
+*      // for read/write(i.e. modify)
+----
+
+Ressources :
+
+NeuVector, dans un espace de noms
+
+[,shell]
+----
+AuditEvents
+Authorization
+Compliance
+Events
+Namespace
+RegistryScan
+RuntimePolicy
+RuntimeScan
+SecurityEvents
+SystemConfig
+----
+
+=== Désactivation de {product-name}/Rancher SSO
+
+Pour désactiver la possibilité de se connecter à {product-name} depuis Rancher Manager, allez dans Paramètres -> Configuration.
+
+image:rancher_sso.png[rancher_sso]
+
+=== Déploiements Hérités de Rancher
+
+Le fichier d'exemple déploiera un gestionnaire et 3 contrôleurs. Il déploiera un enforceur sur chaque nœud. Voir la section inférieure pour spécifier des nœuds de gestionnaire ou de contrôleur dédiés en utilisant des étiquettes de nœud. Remarque : Il n'est pas recommandé de déployer (mettre à l'échelle) plus d'un gestionnaire derrière un équilibreur de charge en raison de problèmes potentiels d'état de session.
+
+[NOTE]
+====
+Le déploiement sur Rancher 2.x/Kubernetes doit suivre la section de référence Kubernetes et/ou le déploiement basé sur Helm.
+====
+
+. Déployez le catalogue docker-compose-dist.yml, les contrôleurs seront déployés sur les nœuds étiquetés, les enforceurs seront déployés sur le reste des nœuds. (Le fichier d'exemple peut être modifié afin que les enforceurs ne soient déployés que sur les nœuds spécifiés.)
+. Choisissez l'un des contrôleurs pour que le gestionnaire se connecte. Modifiez le fichier de catalogue du gestionnaire docker-compose-manager.yml, définissez CTRL_SERVER_IP sur l'IP du contrôleur, puis déployez le catalogue du gestionnaire.
+
+Voici les fichiers compose d'exemple. Si vous souhaitez déployer uniquement un ou deux des composants, utilisez simplement cette section du fichier.
+
+Fichier d'exemple Compose pour Rancher Manager/Controller/Enforcer{nbsp}:
+
+[,yaml]
+----
+manager:
+   scale: 1
+   image: neuvector/manager
+   restart: always
+   environment:
+     - CTRL_SERVER_IP=controller
+   ports:
+     - 8443:8443
+controller:
+   scale: 3
+   image: neuvector/controller
+   restart: always
+   privileged: true
+   environment:
+     - CLUSTER_JOIN_ADDR=controller
+   volumes:
+     - /var/run/docker.sock:/var/run/docker.sock
+     - /proc:/host/proc:ro
+     - /sys/fs/cgroup:/host/cgroup:ro
+     - /var/neuvector:/var/neuvector
+enforcer:
+   image: neuvector/enforcer
+   pid: host
+   restart: always
+   privileged: true
+   environment:
+     - CLUSTER_JOIN_ADDR=controller
+   volumes:
+     - /lib/modules:/lib/modules
+     - /var/run/docker.sock:/var/run/docker.sock
+     - /proc:/host/proc:ro
+     - /sys/fs/cgroup/:/host/cgroup/:ro
+   labels:
+     io.rancher.scheduler.global: true
+----
+
+== Déployer sans mode privilégié
+
+Sur certains systèmes, le déploiement sans utiliser le mode privilégié est pris en charge. Ces systèmes doivent prendre en charge la possibilité d'ajouter des capacités en utilisant le paramètre cap_add et de définir le profil apparmor.
+
+Consultez les sections sur le déploiement avec Docker-Compose, Docker UCP/Datacenter pour obtenir des exemples de fichiers Compose.
+
+Voici un fichier Rancher Compose d'exemple pour un déploiement sans mode privilégié{nbsp}:
+
+[,yaml]
+----
+manager:
+   scale: 1
+   image: neuvector/manager
+   restart: always
+   environment:
+     - CTRL_SERVER_IP=controller
+   ports:
+     - 8443:8443
+controller:
+   scale: 3
+   image: neuvector/controller
+   pid: host
+   restart: always
+   cap_add:
+     - SYS_ADMIN
+     - NET_ADMIN
+     - SYS_PTRACE
+   security_opt:
+     - apparmor=unconfined
+     - seccomp=unconfined
+     - label=disable
+   environment:
+     - CLUSTER_JOIN_ADDR=controller
+   volumes:
+     - /var/run/docker.sock:/var/run/docker.sock
+     - /proc:/host/proc:ro
+     - /sys/fs/cgroup:/host/cgroup:ro
+     - /var/neuvector:/var/neuvector
+enforcer:
+   image: neuvector/enforcer
+   pid: host
+   restart: always
+   cap_add:
+     - SYS_ADMIN
+     - NET_ADMIN
+     - SYS_PTRACE
+     - IPC_LOCK
+   security_opt:
+     - apparmor=unconfined
+     - seccomp=unconfined
+     - label=disable
+   environment:
+     - CLUSTER_JOIN_ADDR=controller
+   volumes:
+     - /lib/modules:/lib/modules
+     - /var/run/docker.sock:/var/run/docker.sock
+     - /proc:/host/proc:ro
+     - /sys/fs/cgroup/:/host/cgroup/:ro
+   labels:
+     io.rancher.scheduler.global: true
+----
+
+== Utilisation des étiquettes de nœud pour les nœuds de gestionnaire et de contrôleur
+
+Pour contrôler sur quels nœuds le gestionnaire et le contrôleur sont déployés, étiquetez chaque nœud. Choisissez les nœuds où les contrôleurs doivent être déployés. Étiquetez-les avec "nvcontroller=true". Avec le fichier d'exemple actuel, pas plus d'un contrôleur ne peut s'exécuter sur le même nœud.
+
+Pour le nœud du gestionnaire, étiquetez-le "`nvmanager=true`".
+
+Ajoutez des étiquettes dans le fichier yaml. Par exemple, pour le gestionnaire{nbsp}:
+
+[,yaml]
+----
+   labels:
+     io.rancher.scheduler.global: true
+     io.rancher.scheduler.affinity:host_label: "nvmanager=true"
+----
+
+Pour le contrôleur{nbsp}:
+
+[,yaml]
+----
+   labels:
+     io.rancher.scheduler.global: true
+     io.rancher.scheduler.affinity:host_label: "nvcontroller=true"
+----
+
+Pour l'exécuteur, afin d'empêcher son exécution sur un nœud de contrôleur (si désiré){nbsp}:
+
+[,yaml]
+----
+  labels:
+     io.rancher.scheduler.global: true
+     io.rancher.scheduler.affinity:host_label_ne: "nvcontroller=true"
+----

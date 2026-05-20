@@ -1,0 +1,40 @@
+= IBMセキュリティアドバイザー
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/09.ibmsa/09.ibmsa.md
+:page-opendocs-slug:  /integration/ibmsa
+
+== IBMセキュリティアドバイザーとの統合
+
+{product-name}はIBM Cloud上のIBMセキュリティアドバイザーと統合します。
+
+必要な登録URLを生成するには、{product-name}コンソールに管理者としてログインし、設定 -> 設定に移動してください。
+
+. 「IBMセキュリティアドバイザーと統合」を有効にする->送信
+. 「URLを取得」をクリック->クリップボードにコピー
+
+image:ibmsa_config_new.png[ibmconfigure]
+
+その後、IBMセキュリティアドバイザーコンソールに戻り、「{product-name}セットアップURLを入力」の下に「 https://{{product-name}コントローラーホスト名/IP}:{port}」と入力し、上記の手順からコピーしたものを貼り付けます。ポートには、公開された{product-name} REST APIポート（デフォルトは10443）を使用します。マルチクラスター環境では、これがこのポートを公開する「fed-worker」サービスでもあります。
+
+IBMセキュリティアドバイザーは、提供されたホスト名またはIPを通じて、あなたの{product-name}クラスターコントローラーと通信します。注意:これは、Kubernetesクラスターの外部からのアクセスのためにサービスとして公開する必要がある場合があります。REST APIがサービスとして公開されるのと同様です。
+
+=== 接続の確認
+
+IBMセキュリティアドバイザーと{product-name}の間に接続が正常に作成されると、{product-name}コンソールの「IBMセキュリティアドバイザーと統合」の横に緑の「{date, time}で接続済み」アイコンが表示されます。
+
+image:ibmsa_connected.png[接続済み]
+
+=== IBMセキュリティアドバイザーでのセキュリティイベントのレビュー
+
+セキュリティイベント情報を含む要約カードが表示されます。
+
+image:ibm_sa_threat_summary.png[脅威]
+
+各セキュリティイベントは、以下のように詳細に調査できます。
+
+image:ibm_sa_findings.png[発見]
+
+== 統合の削除
+
+IBM Cloud アカウントで{product-name}の統合接続を削除する場合、同時にその{product-name}クラスターに対する「IBM SA 統合」も設定->設定から無効にすることを忘れないでください。

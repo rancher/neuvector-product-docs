@@ -1,0 +1,72 @@
+= OpenID Connect (OIDC) pour ADFS
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/08.oidc_adfs/08.oidc_adfs.md
+:page-opendocs-slug:  /integration/oidc_adfs
+
+== Intégration avec OpenID Connect (OIDC) pour ADFS
+
+Depuis la gestion AD FS, cliquez sur "Groupes d'applications" puis cliquez sur "Ajouter un groupe d'application..."
+
+image:adfs1.png[adfs]
+
+Entrez un nom, sélectionnez "Application serveur accédant à une API web" puis cliquez sur Suivant
+
+image:adfs2.png[adfs]
+
+Entrez l'URI de redirection depuis la page Paramètres > Paramètres OpenID Connect de {product-name} puis cliquez sur Suivant
+
+image:adfs3.png[adfs]
+
+Cochez la case "Générer un secret partagé" puis cliquez sur Suivant
+
+image:adfs4.png[adfs]
+
+Entrez l'identifiant créé à l'étape précédente puis cliquez sur Suivant
+
+image:adfs5.png[adfs]
+
+image:adfs6.png[adfs]
+
+Activez les portées allatclaims, email, openid et profil puis cliquez sur Suivant
+
+image:adfs7.png[adfs]
+
+image:adfs8.png[adfs]
+
+image:adfs9.png[adfs]
+
+Double-cliquez sur un groupe d'applications que vous venez de créer précédemment
+
+image:adfs10.png[adfs]
+
+Double-cliquez sur l'API Web puis cliquez sur l'onglet Règles de transformation d'émission
+
+image:adfs11.png[adfs]
+
+Cliquez sur Ajouter une règle... et sélectionnez "Envoyer des attributs LDAP en tant que revendications" puis cliquez sur Suivant
+
+image:adfs12.png[adfs]
+
+Entrez un nom de règle de revendication, choisissez Active Directory comme magasin d'attributs et fournissez le mappage des attributs LDAP aux types de revendications sortants comme ci-dessous
+
+* Groupes de token -- Noms non qualifiés -> groupes
+* Nom principal de l'utilisateur -> nom d'utilisateur préféré
+* Adresse e-mail -> email
+
+image:adfs13.png[adfs]
+
+image:adfs14.png[adfs]
+
+=== {product-name} Configuration
+
+* Émetteur du fournisseur d'identité{nbsp}: "https://<adfs-fqdn>/adfs"
+* ID client : C'est un "Identifiant de client" affiché dans la boîte de dialogue "Application serveur" dans l'"Assistant d'ajout de groupe d'applications"
+* Secret client{nbsp}: C'est un secret affiché dans la boîte de dialogue "Configurer les identifiants d'application" dans l'"Assistant d'ajout de groupe d'applications"
+* Revendication de groupe{nbsp}: groupes
+
+image:adfs15.png[adfs]
+
+image:adfs16.png[adfs]
+
+image:adfs17.png[adfs]

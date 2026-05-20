@@ -1,0 +1,23 @@
+= Azure DevOps
+:revdate: 2025-05-08
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/03.build/04.azuredevops/04.azuredevops.md
+:page-opendocs-slug:  /scanning/build/azuredevops
+
+== Analyser la présence de vulnérabilités dans le pipeline de build Azure DevOps
+
+Le scanner {product-name} peut être déclenché depuis le pipeline Azure DevOps en utilisant l'extension {product-name} publiée dans le Marketplace Azure DevOps.
+
+image:azure_devops.png[AzureDevOps]
+
+L'extension prend en charge à la fois l'analyse à distance et locale, où le contrôleur {product-name} peut analyser à distance une image dans un registre pendant la construction, ou démarrer dynamiquement un contrôleur local pour analyser l'image sur la machine virtuelle de l'agent Azure.
+
+De plus, assurez-vous qu'un conteneur de scanner {product-name} est déployé et configuré pour se connecter à l'Allinone ou au Contrôleur. Dans la version 4.0 et ultérieure, le conteneur neuvector/scanner doit être déployé séparément de l'allinone ou du contrôleur.
+
+* La tâche d'analyse d'image avec {product-name} intègre le scanner de vulnérabilités {product-name} dans un pipeline Azure DevOps.
+* Effectuez des analyses de vulnérabilités d'une image de conteneur après la construction de l'image sur une instance de contrôleur {product-name} externe ou sur une instance de contrôleur {product-name} locale qui fonctionne dans un conteneur de service à l'intérieur d'un pipeline.
+* Définissez des seuils pour faire échouer les builds en fonction du nombre de vulnérabilités détectées de différentes gravités.
+* Fournissez un rapport détaillé d'analyse d'image pour l'onglet de résumé du build.
+* Les instances de contrôleur {product-name} externes sont définies comme des points de terminaison de service pour découpler les définitions de pipeline Azure DevOps des paramètres de connexion et des identifiants.
+
+Un aperçu avec des écrans d'exemple peut être trouvé à https://marketplace.visualstudio.com/items?itemName=NeuVector.neuvector-vsts.

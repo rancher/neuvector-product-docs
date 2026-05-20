@@ -1,0 +1,192 @@
+= Reglas del Perfil de Proceso
+:revdate: 2025-03-31
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/06.processrules/06.processrules.md
+:page-opendocs-slug:  /directiva/reglas-de-proceso
+
+== Directiva -> Grupos -> Reglas del Perfil de Proceso
+
+Existen dos tipos de protecciones de Proceso/Archivo en {product-name}. Una es el Zero-drift, donde la actividad permitida de procesos y archivos se determina automáticamente en función de la imagen del contenedor, y la segunda se basa en el aprendizaje conductual. Cada uno puede ser personalizado (reglas añadidas manualmente) si se desea.
+
+[NOTE]
+====
+Hay una limitación al ejecutarse en sistemas con el sistema de archivos AUFS, donde se puede experimentar una condición de carrera y las reglas de procesos no se aplican para el bloqueo (modo de Protección). Sin embargo, estas violaciones aún se informan en los registros de eventos de seguridad.
+====
+
+=== Protección de Proceso Zero-drift
+
+Este es el modo predeterminado para las protecciones de procesos y archivos. Zero-drift permite automáticamente solo los procesos que se originan del proceso padre que está en la imagen original del contenedor, y no permite actualizaciones de archivos ni la instalación de nuevos archivos. Cuando esté en modo Descubrimiento o Monitorización, zero-drift alertará sobre cualquier actividad sospechosa de procesos o archivos. En modo de Protección, bloqueará dicha actividad. Zero-drift no requiere que los procesos sean aprendidos o añadidos a una lista de permitidos. Desactivar zero-drift para un grupo hará que las reglas de proceso y archivo listadas para el grupo entren en efecto en su lugar.
+
+[NOTE]
+====
+(1) Las reglas de proceso/archivo listadas para cada grupo siempre se aplican, incluso cuando zero-drift está habilitado. Esto ofrece una forma de añadir excepciones de permitir/denegar a las protecciones base de zero-drift. Ten en cuenta que si un grupo comienza en modo Descubrimiento, las reglas de proceso/archivo pueden añadirse automáticamente a la lista, y deben revisarse y editarse antes de pasar a los modos Monitorización o Protección.
+
+(2) Se recomienda establecer espacios de nombres de confianza del sistema (de facto) (sistema y complemento de red) como protección BÁSICA. Ejemplos de namespaces a establecer son "kube-system", "openshift-ovn-kubernetes", "ovn-*" etc. Establecer otros pods de aplicación como cero-drift.
+====
+
+La capacidad de habilitar/deshabilitar el modo cero-drift se encuentra en la consola en Grupos de Políticas ->. Se pueden seleccionar múltiples grupos para alternar esta configuración para todos los grupos seleccionados.
+
+=== Protección de Proceso en Modo Básico
+
+El cero-drift se puede deshabilitar, cambiando a la protección de proceso básica. La protección básica aplica la actividad de procesos/archivos basada en las reglas de procesos y/o archivos listadas para cada Grupo. Esto significa que debe haber una lista de reglas de procesos y/o reglas de archivos en su lugar para que ocurra la protección. Las reglas pueden crearse automáticamente mediante el Aprendizaje Comportamental mientras se encuentra en modo Descubrimiento, crearse manualmente a través de la consola o la API REST, o crearse programáticamente al aplicar un CRD. Con la protección básica habilitada, si no hay reglas en su lugar, toda actividad será alertada o bloqueada mientras se encuentre en los modos Monitorización o Protección.
+
+=== Protección de Proceso Basada en Aprendizaje Comportamental
+
+Las reglas del perfil de proceso utilizan el aprendizaje base para determinar qué procesos deben estar permitidos para ejecutarse en un grupo de contenedores (es decir, un Grupo). En condiciones normales, en un entorno de microservicios para contenedores con una imagen determinada, solo se ejecutarían un conjunto limitado de procesos de usuarios específicos. Si el contenedor es atacado, el atacante malicioso probablemente iniciaría algunos nuevos programas que comúnmente no se ven en este contenedor. Estos eventos anormales pueden ser detectados por {product-name} y se generarán alertas y acciones (ver también Reglas de Respuesta).
+
+La información de referencia del proceso se aprenderá y registrará cuando el grupo de servicio esté en modo Descubrimiento (modo de aprendizaje). Cuando se encuentre en modo Monitorización o Protección, si se inicia un proceso que no se ha visto antes, o si un proceso antiguo es iniciado por un usuario distinto al anterior, se detectará el evento y se alertará como un proceso sospechoso en modo Monitorización o se alertará y bloqueará en modo Protección. Los usuarios pueden modificar el perfil aprendido para permitir o denegar (lista blanca o lista negra) procesos manualmente si es necesario.
+
+Tenga en cuenta que, además de los procesos de referencia, {product-name} tiene detección integrada de procesos sospechosos comunes como nmap, shell inverso, etc. Estos serán detectados y alertados/bloqueados a menos que se incluyan explícitamente en la lista blanca para cada servicio de contenedor.
+
+[IMPORTANT]
+====
+Las sondas de vivacidad de Kubernetes se permiten automáticamente y se añaden a las reglas de proceso aprendidas, incluso en modo Monitorización o Protección.
+====
+
+=== Reglas de Proceso para Nodos
+
+El grupo reservado especial 'nodos' puede configurarse para hacer cumplir las reglas del perfil de proceso en cada nodo (host) del clúster. Selecciona el grupo 'nodos' y revisa las reglas de proceso, editando si es necesario. Luego cambia el modo de protección a Monitorización o Protección. La lista de reglas de proceso 'local' (aprendida) es una combinación de todos los procesos de todos los nodos en el clúster mientras está en modo Descubrimiento.
+
+=== Reglas de Proceso para Grupos Personalizados
+
+Para los Grupos personalizados definidos por el usuario, las reglas de proceso, si se desea, deben añadirse manualmente. Los Grupos personalizados no aprenden reglas de proceso automáticamente.
+
+=== Precedencia de las Reglas de Proceso
+
+Las reglas de proceso pueden existir para Grupos personalizados definidos por el usuario así como para Grupos aprendidos automáticamente. Las reglas creadas para Grupos personalizados tienen precedencia sobre las reglas para Grupos aprendidos automáticamente.
+
+Para la lista de reglas de proceso dentro de cualquier Grupo, el orden de las reglas en la consola determina su precedencia. Las reglas superiores listadas se comparan primero antes que las que están por debajo.
+
+Las reglas de proceso con nombre y vía que contienen comodines tienen precedencia sobre otras reglas para la acción Permitir. No se permite una acción Denegar con ambos comodines para evitar bloquear todos los procesos.
+
+Las reglas de proceso con una acción Denegar y comodín en el nombre tendrán precedencia sobre las acciones Permitir con comodín en el nombre.
+
+=== Modo Descubrimiento
+
+* Todos los nuevos procesos se perfilan con la acción de permitir.
+* Los usuarios pueden cambiar la acción a 'denegar' para generar alertas o bloquear cuando se inicia el mismo nuevo proceso.
+* Los usuarios pueden crear un perfil para un proceso con acción permitir o denegar.
+* Las reglas del perfil de proceso pueden contener nombre y/o vía
+* El comodín &#42; se puede utilizar para coincidir con todo para nombre o vía
+
+[NOTE]
+====
+Un proceso sospechoso (detección integrada), como nmap, ncat, etc., se informa como un evento de proceso sospechoso y NO será aprendido. Si un servicio necesita este proceso, el proceso debe ser añadido con una regla de perfil 'permitir' explícitamente.
+====
+
+=== Modo de Monitorización/Protección (nuevo contenedor iniciado en modo de monitorización o protección)
+
+* Cada nuevo proceso genera una alerta
+* Las reglas del perfil de proceso pueden contener nombre y/o vía
+* El comodín &#42; se puede utilizar para coincidir con todo para nombre o vía
+
+Si a) el proceso coincide con una regla de denegar, o b) el proceso no está en la lista de reglas de permitir, entonces:
+
+* En modo de Monitorización, se generarán alertas
+* En modo de Protección, los procesos serán bloqueados y se generarán alertas
+
+[NOTE]
+====
+Las plataformas de contenedores con el controlador de almacenamiento AUFS introducirán un retraso en el mecanismo de bloqueo debido a las limitaciones del controlador.
+====
+
+[NOTE]
+====
+En modo de Protección, los contenedores del sistema, como los de Kubernetes, no habilitarán la acción de bloqueo pero generarán un evento de violación de proceso si hay una violación de proceso.
+====
+
+=== Creando reglas de perfil de proceso
+
+Se pueden crear múltiples reglas para el mismo proceso. Las reglas se ejecutan secuencialmente y la primera regla que coincida será ejecutada.
+
+* Haz clic en Añadir regla (+) desde la pestaña de reglas del perfil de proceso
+* Las reglas del perfil de proceso pueden contener nombre y/o vía
+* El comodín &#42; se puede utilizar para coincidir con todo para nombre o vía
+
+Ejemplo:  Para permitir que el proceso ping se ejecute desde cualquier directorio
+
+image:ping.png[pingRule]
+
+Las violaciones se registrarán en Notificaciones -> Eventos de Seguridad.
+
+image:process_event.png[violación]
+
+=== Detección de Procesos Sospechosos Integrada
+
+Las siguientes detecciones integradas están habilitadas automáticamente en {product-name}.
+
+|===
+| Proceso | Dirección | Nombre reportado
+
+| nmap
+| salientes
+| escáner de puertos
+
+| nc
+| salientes
+| proceso de netcat
+
+| ncat
+| salientes
+| proceso de netcat
+
+| netcat
+| salientes
+| proceso de netcat
+
+| sshd
+| entrantes
+| ssh desde remoto
+
+| ssh
+| salientes
+| ssh a remoto
+
+| scp
+| salientes
+| copia segura
+
+| telnet
+| salientes
+| telnet a remoto
+
+| in.telnetd
+| entrantes
+| telnet desde remoto
+
+| iodine
+| salientes
+| túnel dns
+
+| iodined
+| entrantes
+| túnel dns
+
+| dnscat
+| salientes
+| túnel dns
+
+| dns2tcpc
+| salientes
+| túnel dns
+
+| dns2tcpd
+| entrantes
+| túnel dns
+
+| socat
+| salientes
+| proceso de retransmisión
+|===
+
+Además, las siguientes detecciones están habilitadas:
+
+* docker cp
+* escalada de privilegios de root (rol de usuario a rol de root)
+* túnel: shell inverso (activado cuando stdin y stdout se redirigen al mismo socket)
+
+Los procesos sospechosos generan alertas cuando se encuentran en modo Descubrimiento o Monitorización, y se bloquean en modo Protección. La detección se aplica a contenedores así como a hosts, con la excepción de 'sshd' que no se considera sospechoso en hosts. Los procesos listados anteriormente pueden añadirse a la lista de permisos para contenedores (grupos), incluyendo los hosts, si se deben permitir.
+
+== Protecciones de Proceso/Archivo en Modo Dividido
+
+Los Grupos de Contenedores pueden tener reglas de Proceso/Archivo en un modo diferente al de las reglas de Red, como se describe xref:modes.adoc#_network_service_policy_mode[aquí].

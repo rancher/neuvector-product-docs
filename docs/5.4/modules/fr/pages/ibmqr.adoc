@@ -1,0 +1,68 @@
+= IBM QRadar
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/10.ibmqr/10.ibmqr.md
+:page-opendocs-slug:  /integration/ibmqr
+
+== Intégration avec IBM QRadar
+
+Le système de gestion des informations et des événements de sécurité (SIEM) IBM® QRadar® aide les équipes de sécurité à détecter et à prioriser avec précision les menaces à travers l'entreprise, et il fournit des informations intelligentes qui permettent aux équipes de réagir rapidement pour réduire l'impact des incidents. En consolidant les événements de journal et les données de flux réseau provenant de milliers de dispositifs, de points de terminaison et d'applications répartis dans votre réseau, QRadar corrèle toutes ces informations différentes et agrège les événements connexes en alertes uniques pour accélérer l'analyse et la remédiation des incidents. QRadar SIEM est disponible sur site et dans un environnement cloud.
+
+{product-name} est une plateforme de sécurité des conteneurs tout au long de leur cycle de vie qui prend entièrement en charge l'intégration avec QRadar. Cette intégration permet à QRadar de collecter des événements, des journaux et des informations sur les incidents pour les environnements de conteneurs et Kubernetes. En utilisant le DSM de {product-name} pour QRadar, les clients pourront normaliser les données de journal de sécurité {product-name} dans QRadar, puis analyser, rapporter ou remédier aux événements de sécurité des conteneurs.
+
+=== IBM QRadar et {product-name} DSM
+
+Le DSM {product-name} pour l'intégration avec IBM QRadar est publié et validé par IBM sur le site Web IBM X-Force / App Exchange. Il est disponible en téléchargement https://exchange.xforce.ibmcloud.com/hub/extension/f6dcde294cac1237ce08bcd4dfbc9142[ici] depuis le site Web App Exchange.
+
+Il est également disponible en téléchargement depuis ce site xref:attachment$NeuVectorDSM_1.0.2.zip[ici]
+
+=== Comment intégrer {product-name} avec QRadar
+
+Avant d'importer le DSM {product-name} dans QRadar, nous vous recommandons de vérifier/modifier ces configurations QRadar pour vous assurer que tout fonctionnera comme prévu{nbsp}:
+
+. IBM QRadar version 7.3.1 et ultérieure
+. Configurez QRadar "`System Settings`" pour vous assurer que la longueur de la charge utile Syslog est suffisamment grande, par exemple{nbsp}:
++
+image:Qradar1.png[QRadar]
+
+=== Configurez {product-name} pour envoyer Syslog à QRadar
+
+Activez la configuration Syslog dans les paramètres -> Configuration. L'adresse IP/URL du serveur et le port doivent pointer vers l'adresse IP et le port du service QRadar, et le port Syslog par défaut sera 514. Utilisez le protocole UDP et le format de journal "`In Json`". Sélectionnez le niveau de journal et les catégories à signaler. Dans un environnement multi-cluster {product-name}, pour collecter les journaux de tous les clusters, ce paramètre doit être activé dans chaque cluster. Vous pouvez configurer le nom du cluster sur cette page pour distinguer les événements des clusters les uns des autres.
+
+image:Qradar_syslog2.png[QRadar]
+
+=== Configurez QRadar pour analyser les journaux {product-name}.
+
+. Activez ou importez le DSM {product-name} dans QRadar. Lorsque vous ajoutez une nouvelle source de journal QRadar, si "`{product-name}`" apparaît dans le type de source de journal QRadar, veuillez ignorer les instructions d'importation de la source de journal ci-dessous et passez à l'étape suivante "`Add and enable log sources for {product-name}`".
+
+image:Qradar3.png[QRadar]
+
+Si le type de source de journal "`{product-name}`" n'a pas été trouvé dans QRadar, veuillez vous référer au manuel de l'utilisateur QRadar pour installer le DSM {product-name} via Admin > Gestion des extensions.
+
+image:Qradar4.png[QRadar]
+
+. Ajoutez et activez les sources de journal pour {product-name}.
+
+Nous pouvons maintenant ajouter une nouvelle source de journal pour les journaux {product-name}{nbsp}:
+
+image:Qradar5.png[QRadar]
+
+"`Log Source Identifier`" doit être le nom du pod du contrôleur principal. Le nom du pod du contrôleur principal de {product-name} peut être trouvé dans les données de journal brutes de QRadar ou dans la console de gestion de {product-name} "`Assets\Controllers`" comme ci-dessous{nbsp}:
+
+image:Qradar6.png[QRadar]
+
+Plusieurs sources de journal doivent être ajoutées s'il y a plusieurs clusters {product-name} en cours d'exécution. La source de journal {product-name} est ajoutée et activée{nbsp}:
+
+image:Qradar7.png[QRadar]
+
+=== Vérifiez les activités de journal
+
+Générez quelques journaux {product-name}, par exemple des violations de stratégie réseau, des événements de changement de configuration ou effectuez des analyses de vulnérabilité sur des conteneurs/nœuds. Ces journaux d'incidents ou d'événements seront envoyés à QRadar en quelques secondes. Et les journaux {product-name} devraient être normalisés dans la console QRadar. Cela peut également être vérifié via l'éditeur DSM de QRadar{nbsp}:
+
+image:Qradar8.png[QRadar]
+
+image:Qradar9.png[QRadar]
+
+=== Résumé de l'intégration
+
+Avec l'intégration terminée, les événements de sécurité et de gestion {product-name} peuvent être gérés via QRadar avec les données d'événements d'autres sources. QRadar sert de stockage permanent des événements pour {product-name} événements, tandis que le contrôleur {product-name} effectue des réponses de sécurité en temps réel et un stockage de cluster à court terme pour les événements. QRadar peut effectuer une corrélation avancée et des alertes pour des événements de sécurité critiques liés aux conteneurs et à Kubernetes.

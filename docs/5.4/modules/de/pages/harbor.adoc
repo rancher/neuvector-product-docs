@@ -1,0 +1,43 @@
+= Harbor Pluggable Scanner Module
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/02.registry/01.harbor/01.harbor.md
+:page-opendocs-slug:  /scanning/registry/harbor
+
+== Scannen von Harbor Registries mit dem Pluggable Scanner
+
+{product-name} unterstützt das Aufrufen des {product-name} Scanners von Harbor Registries über die https://github.com/goharbor/pluggable-scanner-spec[pluggable scanner] Schnittstelle. Dies erfordert die Konfiguration der Verbindung zum Controller (exponierte API). Der Harbor-Adapter ruft den Controller-Endpunkt auf, um einen Scan auszulösen, der automatisch beim Pushen durchgeführt wird. Abfragedienste können für regelmäßige Scans verwendet werden. Scanergebnisse von Federation Primary Controllern WERDEN an entfernte Cluster propagiert.
+
+[NOTE]
+====
+Es gibt ein Problem mit dem HTTPS-basierten Adapter-Endpunktfehler: Bitte ignorieren Sie den Testverbindungsfehler, es funktioniert, auch wenn ein Fehler angezeigt wird (Zertifikatsvalidierung überspringen).
+====
+
+
+=== Bereitstellen des {product-name} Registry-Adapters
+
+Das 5.2 Helm-Chart enthält Optionen zur Bereitstellung des https://github.com/neuvector/neuvector-helm/blob/master/charts/core/templates/registry-adapter.yaml[Registry-Adapters] für Harbor. Es kann auch manuell aus dem neuvector/registry-adapter Repo auf Docker Hub heruntergeladen werden. Die Optionen umfassen auch die Einstellung des Anforderungsprotokolls der Harbor-Registry und des Namens des Basisauthentifizierungsgeheimnisses.
+
+Nach der Bereitstellung des Adapters ist es notwendig, dies in Harbor zu konfigurieren.
+
+image:5_2_adapter_configuration.png[Harbor]
+
+Der Adapter-Endpunkt muss eingegeben werden, und der Adapter verbindet sich mit dem Controller, der typischerweise extern als Dienst exponiert ist, damit der Adapter sich damit verbinden kann. Darüber hinaus müssen Authentifizierungsanmeldeinformationen für einen gültigen {product-name} Benutzer eingegeben werden.
+
+=== Scannen von Bildern aus einer Harbor-Registry
+
+Nach erfolgreicher Bereitstellung und Verbindung zu einem Controller kann ein Bildscan manuell oder automatisch aus Harbor ausgelöst werden.
+
+image:2_Scan_image.png[Harbor]
+
+Periodische Scans (geplant) können über die Interrogation Services in Harbor konfiguriert werden, um sicherzustellen, dass die neueste CVE-Datenbank verwendet wird, um Bilder in Registries erneut zu scannen.
+
+image:4_interrogation.png[Harbor]
+
+Scanergebnisse können direkt in Harbor angezeigt werden.
+
+image:3_scanresults.png[Ergebnisse]
+
+=== Beispiel Deployment Yaml
+
+Beispiele für https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.3.0/neuvector-registry-adapter-k8s.yaml[Kubernetes] und https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.3.0/neuvector-registry-adapter-oc.yaml[OpenShift]

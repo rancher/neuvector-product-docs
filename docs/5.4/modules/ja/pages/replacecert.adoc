@@ -1,0 +1,143 @@
+= 自己署名証明書の置き換え
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /03.configuration/01.console/01.replacecert/01.replacecert.md
+:page-opendocs-slug: /configuration/console/replacecert
+
+== 外部アクセス用の自己署名証明書をPKCS証明書で置き換える
+
+ブラウザからマネージャーへの外部アクセスやコントローラーへのREST API用に使用されるビルトインの自己署名証明書は、サポートされているPKCS証明書に置き換えることができます。これらは、マネージャーとコントローラーの両方のデプロイメントで置き換える必要があります。注意:コントローラー、エンフォーサー、スキャナー間の内部通信用に含まれている証明書を置き換えるには、xref:internal.adoc[このセクション]を参照してください。
+
+{product-name}ウェブコンソールは、PKCS8（プライベートキー情報構文標準）とPKCS1（RSA暗号標準）の2種類の自己署名証明書タイプをサポートしています。 自己署名証明書は、これらのPKCSタイプのいずれかに置き換えることができます。
+
+以下に、PKCSメソッドのいずれかを使用して生成されたキーと証明書から{product-name}のウェブコンソールで使用されるシークレットを生成する手順を示します。 ここでの重要な注意点は、キーと証明書の作成中に代替サブジェクト名パラメータの一部としてDNSのワイルドカードを使用することで、選択した名前を管理コンソールのIPアドレスにマッピングできるようになり、特定のCNに制限されないことです。
+
+=== 自己署名証明書PKCS8またはPKCS1を生成して使用する
+
+. キーと証明書を作成する
++
+--
+[tabs]
+======
+PKCS8::
++
+====
+[,shell]
+----
+openssl req -x509 -nodes -days 730 -newkey rsa:2048 -keyout tls.key -out tls.pem -config ca.cfg -extensions 'v3_req'
+Sample ca.cfg
+[req]
+distinguished_name = req_distinguished_name
+x509_extensions = v3_req
+prompt = no
+[req_distinguished_name]
+C = US
+ST = California
+L = San Jose
+O = {product-name} Inc.
+OU = Neuvector
+CN = Neuvector
+[v3_req]
+keyUsage = keyEncipherment, dataEncipherment
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = *
+----
+====
+
+PKCS1::
++
+====
+[,shell]
+----
+openssl genrsa -out tls.key 2048
+openssl req -x509 -nodes -days 730 -config openssl.cnf  -new -key tls.key -out tls.pem
+Sample openssl.cnf
+[req]
+distinguished_name = req_distinguished_name
+x509_extensions = v3_req
+prompt = no
+[req_distinguished_name]
+C = US
+ST = California
+L = San Jose
+O = {product-name} Inc.
+OU = Neuvector
+CN = Neuvector(PKCS#1)
+[v3_req]
+keyUsage = keyEncipherment, dataEncipherment
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = *
+----
+====
+======
+--
+. 上記の生成されたキーと証明書ファイルからシークレットを作成する
++
+--
+[,shell]
+----
+kubectl create secret generic https-cert -n neuvector --from-file=tls.key --from-file=tls.pem
+----
+--
+. マネージャーとコントローラーのデプロイメントのためにyamlを直接編集してマウントを追加する
++
+--
+[,yaml]
+----
+spec:
+  template:
+    spec:
+      containers:
+        volumeMounts:
+        - mountPath: /etc/neuvector/certs/ssl-cert.key
+          name: cert
+          readOnly: true
+          subPath: tls.key
+        - mountPath: /etc/neuvector/certs/ssl-cert.pem
+          name: cert
+          readOnly: true
+          subPath: tls.pem
+      volumes:
+      - name: cert
+        secret:
+          defaultMode: 420
+          secretName: https-cert
+----
+
+または、同様のvalues.yamlでhelmチャートを更新する
+
+[,yaml]
+----
+manager:
+  certificate:
+    secret: https-cert
+    keyFile: tls.key
+    pemFile: tls.pem
+  ingress:
+    enabled: true
+    host:  %CHANGE_HOST_NAME%
+    ingressClassName: ""
+    path: "/"  # or this could be "/api", but might need "rewrite-target" annotation
+    annotations:
+      ingress.kubernetes.io/protocol: https
+    tls: true
+    secretName: https-cert
+controller:
+  certificate:
+    secret: https-cert
+    keyFile: tls.key
+    pemFile: tls.pem
+----
+
+次に、`helm upgrade -i neuvector ...`で更新します。参考までに、すべての値は https://github.com/neuvector/neuvector-helm/tree/master/charts/core.に記載されています。
+--
+
+=== チェーン証明書をサポートする
+
+エンドツーエンドTLSをサポートするために、一部のイングレス/アプリケーションゲートウェイは、信頼できるバックエンドサーバーのみをサポートします。{product-name}は、バージョン3.2.2でチェーン証明書のサポートを追加しました。 Microsoftのアプリケーションゲートウェイは、あまり知られていないCAを使用する際にチェーン証明書を必要とするアプリケーションゲートウェイの一例です。
+
+チェーン証明書を追加するには、例のtls.pemファイルは証明書の連結である必要があります。
