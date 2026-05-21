@@ -166,7 +166,7 @@ spec:
 
 Você precisará alterar a anotação para o endereço de ingress de ingress.mycloud.net para o seu endereço apropriado. 
 
-Este exemplo usa a URL cloud.neuvector.com. Após o serviço de ingress ser criado, você pode encontrar seu IP externo. Você pode então configurar o arquivo hosts para apontar cloud.neuvector.com para esse IP. Depois disso, você deve ser capaz de acessar `https://cloud.neuvector.com` (a URL que você escolher usar). 
+Este exemplo usa a URL cloud.neuvector.com. Após o serviço de ingress ser criado, você pode encontrar seu IP externo. Você pode então configurar o arquivo hosts para apontar cloud.neuvector.com para esse IP. Depois disso, você deve ser capaz de acessar `\https://cloud.neuvector.com` (a URL que você escolher usar). 
 
 === Usando SSL Passthrough em vez de Redirecionar 
 

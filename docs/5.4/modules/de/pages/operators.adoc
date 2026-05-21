@@ -83,7 +83,7 @@ image:operator_cert.png[]
 ** Öffnen Sie die Registerkarte Ressourcen 
 ** Überprüfen Sie, ob die Ressourcen den Status 'Created' oder 'Running' haben.
 
-Nachdem Sie die {product-name} Plattform erfolgreich in Ihrem Cluster bereitgestellt haben, melden Sie sich bei der {product-name} Konsole unter `https://neuvector-route-webui-neuvector.(OC_INGRESS)` an. 
+Nachdem Sie die {product-name} Plattform erfolgreich in Ihrem Cluster bereitgestellt haben, melden Sie sich bei der {product-name} Konsole unter `\https://neuvector-route-webui-neuvector.(OC_INGRESS)` an. 
 * Melden Sie sich mit dem ursprünglichen Benutzernamen admin und dem Passwort admin an. 
 * Akzeptieren Sie den {product-name} Endbenutzer-Lizenzvertrag. 
 * Ändern Sie das Passwort des Admin-Benutzers. Optional können Sie auch zusätzliche Benutzer im Menü Einstellungen -> Benutzer & Rollen erstellen. Jetzt sind Sie bereit, die {product-name} Konsole zu verwenden, um Schwachstellenscans durchzuführen, laufende Anwendungspods zu beobachten und Sicherheitsmaßnahmen für Container anzuwenden.
@@ -197,7 +197,7 @@ spec:
 ** Wählen Sie die neuvector-default Instanz aus 
 ** Öffnen Sie die Registerkarte Ressourcen 
 ** Überprüfen Sie, ob die Ressourcen den Status 'Created' oder 'Running' haben.
-. Nachdem Sie die {product-name} Plattform erfolgreich in Ihrem Cluster bereitgestellt haben, melden Sie sich bei der {product-name} Konsole unter `https://neuvector-route-webui-neuvector.(INGRESS_DOMAIN)` an. 
+. Nachdem Sie die {product-name} Plattform erfolgreich in Ihrem Cluster bereitgestellt haben, melden Sie sich bei der {product-name} Konsole unter `\https://neuvector-route-webui-neuvector.(INGRESS_DOMAIN)` an. 
 ** Melden Sie sich mit dem initialen Benutzernamen admin und dem Passwort admin an. 
 ** Akzeptieren Sie den Endbenutzer-Lizenzvertrag für {product-name}. 
 ** Ändern Sie das Passwort des Admin-Benutzers. 

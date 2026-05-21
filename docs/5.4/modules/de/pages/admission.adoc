@@ -164,7 +164,7 @@ Die folgenden Kriterien stehen im Zusammenhang mit den Ergebnissen in {product-n
 Image, imageScanned, cveHighCount, cveMediumCount, Verstöße gegen die Bildkonformität, cveNames und andere.
 
 Bevor {product-name} die Übereinstimmung mit den Zulassungskontrollregeln durchführt, ruft {product-name} die Bildinformationen (zum Beispiel 10.1.127.3:5000/neuvector/toolbox/iperf:latest) vom Cluster-APIServer ab
-(Bitte beachten Sie den Abschnitt "Anfrage vom APIServer" unten). Das Bild setzt sich aus dem Registry-Server (`https://10.1.127.3:5000`), dem Repository (neuvector/toolbox/iperf) und dem Tag (latest) zusammen.
+(Bitte beachten Sie den Abschnitt "Anfrage vom APIServer" unten). Das Bild setzt sich aus dem Registry-Server (`\https://10.1.127.3:5000`), dem Repository (neuvector/toolbox/iperf) und dem Tag (latest) zusammen.
 
 {product-name} verwendet diese Informationen, um die Ergebnisse auf der Seite {product-name} Assets -> Registry-Scan abzugleichen und sammelt die entsprechenden Informationen wie CVE-Name, CVE-Hoch- oder Mittelanzahl usw. Verstöße gegen die Bildkonformität werden als jedes Bild betrachtet, das Geheimnisse oder setuid/setgid-Verstöße aufweist.
 Wenn Benutzer das Bild aus der Docker-Registry verwenden, um eine Cluster-Ressource zu erstellen, ist normalerweise die Registry-Server-Information leer oder docker.io, und derzeit verwendet {product-name} die folgenden fest kodierten Registry-Server, um das Ergebnis des Registry-Scans abzugleichen, anstatt eine leere oder docker.io-Zeichenfolge. Natürlich kann {product-name} die Ergebnisse des Registry-Scans nicht erfolgreich abrufen, wenn es mehr als die folgenden unterstützten Docker-Registry-Server gibt, die auf der Seite des Registry-Scans definiert sind.

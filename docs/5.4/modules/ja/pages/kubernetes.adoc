@@ -287,7 +287,7 @@ kubectl apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kube
 kubectl create -f neuvector.yaml 
 ----
 
-それで終わりです！{product-name}コンソールに接続し、admin:adminでログインできるはずです。例えば、`https://<public-ip>:8443`のように。
+それで終わりです！{product-name}コンソールに接続し、admin:adminでログインできるはずです。例えば、`\https://<public-ip>:8443`のように。
 --
 
 [NOTE]

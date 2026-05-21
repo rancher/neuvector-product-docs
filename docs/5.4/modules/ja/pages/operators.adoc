@@ -83,7 +83,7 @@ image:operator_cert.png[]
 ** リソースタブを開きます。 
 ** リソースが「作成済み」または「実行中」の状態であることを確認します。
 
-{product-name}プラットフォームをクラスターに正常にデプロイした後、`https://neuvector-route-webui-neuvector.(OC_INGRESS)`で{product-name}コンソールにログインします。 
+{product-name}プラットフォームをクラスターに正常にデプロイした後、`\https://neuvector-route-webui-neuvector.(OC_INGRESS)`で{product-name}コンソールにログインします。 
 * 初期のユーザー名adminとパスワードadminでログインします。 
 * {product-name}ライセンス条項に同意します。 
 * adminユーザーのパスワードを変更します。オプションで、設定の ->ユーザーと役割メニューで追加のユーザーを作成することもできます。これで、{product-name}コンソールをナビゲートして脆弱性スキャンを開始し、実行中のアプリケーションポッドを観察し、コンテナにセキュリティ保護を適用する準備が整いました。
@@ -197,7 +197,7 @@ spec:
 ** neuvector-defaultインスタンスを選択します。 
 ** リソースタブを開きます。 
 ** リソースが「作成済み」または「実行中」の状態であることを確認します。
-. {product-name}プラットフォームをクラスターに正常にデプロイした後、`https://neuvector-route-webui-neuvector.(INGRESS_DOMAIN)`で{product-name}コンソールにログインしてください。
+. {product-name}プラットフォームをクラスターに正常にデプロイした後、`\https://neuvector-route-webui-neuvector.(INGRESS_DOMAIN)`で{product-name}コンソールにログインしてください。
 ** 初期のユーザー名adminとパスワードadminでログインします。
 ** {product-name}ライセンス条項に同意します。
 ** adminユーザーのパスワードを変更します。

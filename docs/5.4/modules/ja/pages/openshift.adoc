@@ -404,7 +404,7 @@ oc create -f <compose file>
 ----
 --
 
-以上です！{product-name}コンソールに接続し、admin:adminでログインできるはずです。例：`https://<public-ip>:8443`
+以上です！{product-name}コンソールに接続し、admin:adminでログインできるはずです。例：`\https://<public-ip>:8443`
 
 neuvector-webuiサービスのコンソールにアクセスする方法を確認するには：
 

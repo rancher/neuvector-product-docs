@@ -404,7 +404,7 @@ oc create -f <compose file>
 ----
 --
 
-É isso aí! Você deve ser capaz de se conectar ao {product-name} console e fazer login com admin:admin, por exemplo, `https://<public-ip>:8443`.
+É isso aí! Você deve ser capaz de se conectar ao {product-name} console e fazer login com admin:admin, por exemplo, `\https://<public-ip>:8443`.
 
 Para ver como acessar o console do serviço neuvector-webui:
 

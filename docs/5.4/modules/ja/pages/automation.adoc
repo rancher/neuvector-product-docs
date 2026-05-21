@@ -649,7 +649,7 @@ curl -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" "https:/
 === マスターおよびリモート（ワーカー）クラスターのフェデレーションを管理する
 
 一般的に、フェデレーションメンバーの一覧を取得するには、次のエンドポイントにGETリクエストを送信できます（特定の構文についてはサンプルを参照してください）： +
-`https://neuvector-svc-controller.neuvector:10443/v1/fed/member`
+`\https://neuvector-svc-controller.neuvector:10443/v1/fed/member`
 
 ConfigMapを通じたフェデレーションの自動化に関する情報は、xref:configmap.adoc#_federated_configmap_examples_fedinitcfg_yaml[フェデレーションConfigMapの例]のドキュメントをご覧ください。
 

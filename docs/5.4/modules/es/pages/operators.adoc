@@ -83,7 +83,7 @@ image:operator_cert.png[]
 ** Abre la pestaña Recursos 
 ** Verifica que los recursos estén en estado Creado o Ejecutándose
 
-Después de haber desplegado con éxito la {product-name} plataforma en tu clúster, inicia sesión en la {product-name} consola en `https://neuvector-route-webui-neuvector.(OC_INGRESS)`. * Inicia sesión con el nombre de usuario inicial admin y la contraseña admin. * Acepta {product-name} los términos de licencia. * Cambia la contraseña del usuario admin. Opcionalmente, también puede crear usuarios adicionales en el menú Configuración -> Usuarios y Roles. Ahora estás listo para navegar por la {product-name} consola para comenzar el escaneo de vulnerabilidades, observar los pods de aplicaciones en ejecución y aplicar protecciones de seguridad a los contenedores.
+Después de haber desplegado con éxito la {product-name} plataforma en tu clúster, inicia sesión en la {product-name} consola en `\https://neuvector-route-webui-neuvector.(OC_INGRESS)`. * Inicia sesión con el nombre de usuario inicial admin y la contraseña admin. * Acepta {product-name} los términos de licencia. * Cambia la contraseña del usuario admin. Opcionalmente, también puede crear usuarios adicionales en el menú Configuración -> Usuarios y Roles. Ahora estás listo para navegar por la {product-name} consola para comenzar el escaneo de vulnerabilidades, observar los pods de aplicaciones en ejecución y aplicar protecciones de seguridad a los contenedores.
 
 *Actualizando {product-name}*.
 
@@ -194,7 +194,7 @@ spec:
 ** Selecciona la instancia neuvector-default 
 ** Abre la pestaña Recursos 
 ** Verifica que los recursos estén en estado Creado o Ejecutándose
-. Después de haber desplegado con éxito la {product-name} Plataforma en tu clúster, inicia sesión en la {product-name} consola en `https://neuvector-route-webui-neuvector.(INGRESS_DOMAIN)`. 
+. Después de haber desplegado con éxito la {product-name} Plataforma en tu clúster, inicia sesión en la {product-name} consola en `\https://neuvector-route-webui-neuvector.(INGRESS_DOMAIN)`. 
 ** Inicia sesión con el nombre de usuario inicial admin y la contraseña admin. 
 ** Acepta {product-name} los términos de licencia. 
 ** Cambia la contraseña del usuario admin. 

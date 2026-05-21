@@ -68,11 +68,11 @@ image:adfs12-13.png[adfsSetup]
 
 . 身份提供者单点登录 URL
 * 从 AD FS 管理 > 服务查看端点并使用 "`SAML 2.0/WS-Federation`" 端点 URL。
-* 示例： `https://<adfs-fqdn>/adfs/ls`
+* 示例： `\https://<adfs-fqdn>/adfs/ls`
 
 . 身份提供者发行者
 * 在 AD FS 管理控制台中右键单击 AD FS 并选择 "`Edit Federation Service Properties...`"；使用 "`Federation Service identifier`"。
-* 示例：`http://<adfs-fqdn>/adfs/services/trust`
+* 示例：`\http://<adfs-fqdn>/adfs/services/trust`
 
 . X.509 证书
 * 从 AD FS 管理中选择服务 > 证书，右键单击令牌签名证书并选择 "`View Certificate...`"

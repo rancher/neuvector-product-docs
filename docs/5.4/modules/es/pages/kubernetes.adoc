@@ -287,7 +287,7 @@ O, si modificas cualquiera de los yaml anteriores o muestras de abajo:
 kubectl create -f neuvector.yaml 
 ----
 
-Es así de sencillo. Deberías poder conectarte a la {product-name} consola e iniciar sesión con admin:admin, por ejemplo, `https://<public-ip>:8443`.
+Es así de sencillo. Deberías poder conectarte a la {product-name} consola e iniciar sesión con admin:admin, por ejemplo, `\https://<public-ip>:8443`.
 --
 
 [NOTE]

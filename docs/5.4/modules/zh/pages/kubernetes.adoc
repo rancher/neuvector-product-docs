@@ -287,7 +287,7 @@ kubectl apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kube
 kubectl create -f neuvector.yaml 
 ----
 
-就这样！您应该能够连接到 {product-name} 控制台，并使用 admin:admin 登录，例如 `https://<public-ip>:8443`。
+就这样！您应该能够连接到 {product-name} 控制台，并使用 admin:admin 登录，例如 `\https://<public-ip>:8443`。
 --
 
 [NOTE]

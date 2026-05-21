@@ -649,7 +649,7 @@ Salida:
 === Gestionar la Federación para Clústeres Maestros y Remotos (Trabajadores)
 
 En general, listar los miembros de la Federación puede utilizar un GET al siguiente endpoint (ver ejemplos para la sintaxis específica):
-`https://neuvector-svc-controller.neuvector:10443/v1/fed/member`
+`\https://neuvector-svc-controller.neuvector:10443/v1/fed/member`
 
 Para información sobre la automatización de la Federación a través de ConfigMap, consulta la documentación de xref:configmap.adoc#_federated_configmap_examples_fedinitcfg_yaml[Ejemplos de ConfigMap Federados].
 

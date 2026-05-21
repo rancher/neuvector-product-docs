@@ -68,11 +68,11 @@ image:adfs12-13.png[adfsSetup]
 
 . Identifique a URL de SSO do Provedor
 * Visualize os Endpoints em AD FS Management > Serviço e use a URL do endpoint "`SAML 2.0/WS-Federation`".
-* Exemplo: `https://<adfs-fqdn>/adfs/ls`
+* Exemplo: `\https://<adfs-fqdn>/adfs/ls`
 
 . Emissor do Provedor de Identidade
 * Clique com o botão direito em AD FS no console de gerenciamento do AD FS e selecione "`Edit Federation Service Properties...`"; use o "`Federation Service identifier`".
-* Exemplo: `http://<adfs-fqdn>/adfs/services/trust`
+* Exemplo: `\http://<adfs-fqdn>/adfs/services/trust`
 
 . Certificado X.509
 * No gerenciamento do AD FS, selecione Serviço > Certificado, clique com o botão direito no certificado de assinatura de token e escolha "`View Certificate...`"

@@ -649,7 +649,7 @@ Saída:
 === Gerenciar a federação para clusters mestres e remotos (trabalhadores)
 
 Geralmente, listar os membros da Federação pode usar um GET para o seguinte endpoint (veja os exemplos para a sintaxe específica):
-`https://neuvector-svc-controller.neuvector:10443/v1/fed/member`
+`\https://neuvector-svc-controller.neuvector:10443/v1/fed/member`
 
 Para informações sobre automação da Federação via ConfigMap, consulte a documentação xref:configmap.adoc#_federated_configmap_examples_fedinitcfg_yaml[Exemplos de ConfigMap Federados].
 

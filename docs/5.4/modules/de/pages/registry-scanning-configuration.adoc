@@ -186,7 +186,7 @@ image:10-redhat.png[redhat]
 * Wählen Sie das OpenShift Registry als Typ aus.
 * Geben Sie dem Registry einen eindeutigen Namen.
 * Geben Sie die URL des Registry ein (erhalten Sie sie aus der Ausgabe des Befehls "oc get is" im OpenShift-Netzwerk, wenn sie von der Standard-URL abweicht).
-** Standard-Registry-URL `https://docker-registry.default.svc:5000/`
+** Standard-Registry-URL `\https://docker-registry.default.svc:5000`
 * Geben Sie den Benutzernamen und das Passwort des Kontos an, das zur Verwaltung des Registry verwendet wird.
 * Fügen Sie das Repository im folgenden Format als Filter hinzu
 ** Organisation/Repository:Tag
@@ -201,7 +201,7 @@ image:1a_openshift.png[openshift]
 * Wählen Sie das OpenShift Registry als Typ aus.
 * Geben Sie dem Registry einen eindeutigen Namen.
 * Geben Sie die URL des Registry ein (erhalten Sie sie aus der Ausgabe des Befehls "oc get is" im OpenShift-Netzwerk, wenn sie von der Standard-URL abweicht).
-** Standard-Registry-URL `https://docker-registry.default.svc:5000/`
+** Standard-Registry-URL `\https://docker-registry.default.svc:5000/`
 * Geben Sie das Token des Dienstkontos an, das Zugriff auf alle Namespaces hat
 ** Überprüfen Sie die folgende Notiz, um ein Servicekonto zu erstellen und ein Token zu erhalten.
 ** Servicekonto erstellen
@@ -348,7 +348,7 @@ Für das Scannen der NeuVector-Registry mit einer JFrog-Registry im Subdomain-Mo
 
 **Standard-JFrog-Subdomain-Beispiel**
 
-JFrog-Registry-URL: `https://mysubdomain.myhost.com`
+JFrog-Registry-URL: `\https://mysubdomain.myhost.com`
 
 * **mysubdomain**: Subdomain
 * **myhost.com**: JFrog-Registry-Hostname
@@ -359,7 +359,7 @@ Beispiel für einen Registry-Filter: `mysubdomain/docker-service-broker-tmp-loca
 
 Wenn Sie eine modifizierte Subdomain in der Registry-URL verwenden.
 
-JFrog-Registry-URL: `https://artifact-mysubdomain.myhost.com`
+JFrog-Registry-URL: `\https://artifact-mysubdomain.myhost.com`
 
 * **artifact-mysubdomain**: modifizierte Subdomain, die nur in der Registry-URL verwendet wird
 * **mysubdomain**: tatsächliche Subdomain im JFrog-Server
@@ -376,7 +376,7 @@ NeuVector unterstützte zuvor diese Umgebungen. Die Unterstützung brach jedoch 
 
 Wenn die Subdomain nicht das Präfix der JFrog-Registry-Server-URL ist, müssen Sie den Registry-Filter in diesem Format konfigurieren:
 
-JFrog-Registry-URL: `https://artifact-mysubdomain.myhost.com`
+JFrog-Registry-URL: `\https://artifact-mysubdomain.myhost.com`
 
 Registry-Filter: `<mysubdomain>/docker-service-broker-tmp-local/devop/test/joe/*` 
 
@@ -445,7 +445,7 @@ image:20-azure.png[azure]
 
 * Wählen Sie Azure-Registry als Typ aus
 * Geben Sie der Registry einen eindeutigen Namen
-* Geben Sie die Registry-URL ein. Beispiel `https://neuvector.azure.io` (vom Azure-Portal)
+* Geben Sie die Registry-URL ein. Beispiel `\https://neuvector.azure.io` (vom Azure-Portal)
 ** Container-Registry->Benutzer->Übersicht->Anmeldeserver
 * Benutzername und Passwort hinzufügen
 ** Azure-Container-Registry -> Benutzer-> Zugriffsschlüssel->Passwort
@@ -615,7 +615,7 @@ Um die GHCR in NeuVector zu konfigurieren, gehen Sie zu **Add Registry** und wä
 | Ein Name zur Identifizierung dieser Registrierungskonfiguration.
 
 | **Registrierung**
-| Die GHCR Registrierungs-URL. Beispiel: `https://ghcr.io/`.
+| Die GHCR Registrierungs-URL. Beispiel: `\https://ghcr.io/`.
 
 | **Benutzername**
 | Ihr GitHub-Benutzername.

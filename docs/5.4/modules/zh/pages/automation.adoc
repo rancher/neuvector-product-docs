@@ -649,7 +649,7 @@ curl -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" "https:/
 === 管理主集群和远程（工作）集群的联合
 
 通常，列出联合成员可以使用 GET 请求以下端点（请参见示例以获取特定语法）：
-`https://neuvector-svc-controller.neuvector:10443/v1/fed/member`
+`\https://neuvector-svc-controller.neuvector:10443/v1/fed/member`
 
 有关通过 ConfigMap 进行联邦自动化的信息，请查看 xref:configmap.adoc#_federated_configmap_examples_fedinitcfg_yaml[联邦 ConfigMap 示例] 文档。
 

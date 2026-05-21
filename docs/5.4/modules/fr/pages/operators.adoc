@@ -83,7 +83,7 @@ image:operator_cert.png[]
 ** Ouvrez l'onglet Ressources 
 ** Vérifiez que les ressources sont en statut Créé ou En cours d'exécution
 
-Après avoir déployé avec succès la plateforme {product-name} sur votre cluster, connectez-vous à la console {product-name} à `https://neuvector-route-webui-neuvector.(OC_INGRESS)`. 
+Après avoir déployé avec succès la plateforme {product-name} sur votre cluster, connectez-vous à la console {product-name} à `\https://neuvector-route-webui-neuvector.(OC_INGRESS)`. 
 * Connectez-vous avec le nom d'utilisateur initial admin et le mot de passe admin. 
 * Acceptez le Contrat de Licence Utilisateur Final {product-name}. 
 * Changez le mot de passe de l'utilisateur admin. En option, vous pouvez également créer des utilisateurs supplémentaires dans le menu Paramètres -> Utilisateurs et rôles. Vous êtes maintenant prêt à naviguer dans la console {product-name} pour commencer l'analyse des vulnérabilités, observer les pods d'application en cours d'exécution et appliquer des protections de sécurité aux conteneurs.
@@ -197,7 +197,7 @@ spec:
 ** Sélectionnez l'instance neuvector-default 
 ** Ouvrez l'onglet Ressources 
 ** Vérifiez que les ressources sont en statut Créé ou En cours d'exécution
-. Après avoir déployé avec succès la plateforme {product-name} sur votre cluster, connectez-vous à la console {product-name} à l'adresse `https://neuvector-route-webui-neuvector.(INGRESS_DOMAIN)`. 
+. Après avoir déployé avec succès la plateforme {product-name} sur votre cluster, connectez-vous à la console {product-name} à l'adresse `\https://neuvector-route-webui-neuvector.(INGRESS_DOMAIN)`. 
 ** Connectez-vous avec le nom d'utilisateur initial admin et le mot de passe admin. 
 ** Acceptez le Contrat de Licence Utilisateur Final {product-name}. 
 ** Changez le mot de passe de l'utilisateur administrateur. 

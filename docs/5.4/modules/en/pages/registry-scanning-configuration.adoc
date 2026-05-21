@@ -186,7 +186,7 @@ image:10-redhat.png[redhat]
 * Choose OpenShift registry as type
 * Give unique name to the registry
 * Type registry URL (obtain from the output of "oc get is" command in OpenShift network if it is different than default)
-** Default registry URL `+https://docker-registry.default.svc:5000/+`
+** Default registry URL `\https://docker-registry.default.svc:5000/`
 * Provide username and password of the account used for managing registry
 * Add repository as filter in the below format
 ** Organization/repository:tag
@@ -201,7 +201,7 @@ image:1a_openshift.png[openshift]
 * Choose OpenShift registry as type
 * Give unique name to the registry
 * Type registry URL (obtain from the output of "oc get is" command in OpenShift network if it is different than default)
-** Default registry URL `+https://docker-registry.default.svc:5000/+`
+** Default registry URL `\https://docker-registry.default.svc:5000/`
 * Provide token of the service account which has access to all namespaces
 ** Check below note to create service account and get token.
 ** Create service account
@@ -235,7 +235,7 @@ image:12-jfrog.png[jfrog]
 
 * Choose JFrog Artifactory as type
 * Give a unique name to the registry
-** Type the registry URL with port, for example `+http://10.1.7.122:8081/+`
+** Type the registry URL with port, for example `\http://10.1.7.122:8081/`
 * Provide a username and password if required by the registry
 * Add the repository as a filter in the below format
 ** Organization/repository:tag
@@ -254,7 +254,7 @@ Add JFrog Artifactory registry (Docker Access method -- subdomain)
 
 * Choose JFrog Artifactory as type
 * Give a unique name to the registry
-* Type the registry URL with port, for example `+http://10.1.7.122:8081/+`
+* Type the registry URL with port, for example `\http://10.1.7.122:8081/`
 * Choose Subdomain as JFrog Docker Access Method
 * Provide a username and password if required by the registry
 * Add the repository as a filter in the below format
@@ -293,7 +293,7 @@ image:jfrogport3.png[jfrogport]
 
 * Choose JFrog Artifactory as type
 * Give a unique name to the registry
-* Type the registry URL with port, for example `+http://10.1.7.122:8181/+`
+* Type the registry URL with port, for example `\http://10.1.7.122:8181/`
 ** Every Registry name has unique port
 * Choose Port as JFrog Docker Access Method
 * Provide a username and password if required by the registry
@@ -348,7 +348,7 @@ For NeuVector registry scanning with a JFrog registry in subdomain mode, the sub
 
 **Standard JFrog Subdomain Example**
 
-JFrog registry URL: `+https://mysubdomain.myhost.com+`
+JFrog registry URL: `\https://mysubdomain.myhost.com`
 
 * **mysubdomain**:  subdomain
 * **myhost.com**: JFrog registry hostname
@@ -359,7 +359,7 @@ Registry filter example: `mysubdomain/docker-service-broker-tmp-local/devop/test
 
 When you use a modified subdomain in the registry URL.
 
-JFrog registry URL: `+https://artifact-mysubdomain.myhost.com+`
+JFrog registry URL: `\https://artifact-mysubdomain.myhost.com`
 
 * **artifact-mysubdomain**: modified subdomain used only in the registry URL
 * **mysubdomain**: actual subdomain in the JFrog server
@@ -376,7 +376,7 @@ NeuVector previously supported these environments. However, support broke after 
 
 If subdomain is not the prefix of the JFrog registry server URL, you must configure the registry filter using this format:
 
-JFrog registry URL: `+https://artifact-mysubdomain.myhost.com+`
+JFrog registry URL: `\https://artifact-mysubdomain.myhost.com`
 
 Registry filter: `<mysubdomain>/docker-service-broker-tmp-local/devop/test/joe/*` 
 
@@ -445,7 +445,7 @@ image:20-azure.png[azure]
 
 * Choose Azure registry as type
 * Give unique name to the registry
-* Type registry URL. Sample `+https://neuvector.azure.io+` (obtain from azure portal)
+* Type registry URL. Sample `\https://neuvector.azure.io` (obtain from azure portal)
 ** Container registry->user->Overview->Login Server
 * Add username and password
 ** Azure container registry -> user-> access keys->password

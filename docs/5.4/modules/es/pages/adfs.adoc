@@ -68,11 +68,11 @@ image:adfs12-13.png[adfsSetup]
 
 . Identifica la URL de inicio de sesión único del proveedor de identidad
 * Ver puntos finales desde la gestión de AD FS > Servicio y usar la URL del punto final "`SAML 2.0/WS-Federation`".
-* Ejemplo: `https://<adfs-fqdn>/adfs/ls`
+* Ejemplo: `\https://<adfs-fqdn>/adfs/ls`
 
 . Emisor del proveedor de identidad
 * Haz clic derecho en AD FS desde la consola de gestión de AD FS y selecciona "`Edit Federation Service Properties...`"; usa el "`Federation Service identifier`".
-* Ejemplo: `http://<adfs-fqdn>/adfs/services/trust`
+* Ejemplo: `\http://<adfs-fqdn>/adfs/services/trust`
 
 . Certificado X.509
 * Desde la gestión de AD FS, selecciona Servicio > Certificado, haz clic derecho en el certificado de firma de token y elige "`View Certificate...`"

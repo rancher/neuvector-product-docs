@@ -404,7 +404,7 @@ oc create -f <compose file>
 ----
 --
 
-就这些！您应该能够连接到{product-name}控制台并使用admin:admin登录，例如`https://<public-ip>:8443`。
+就这些！您应该能够连接到{product-name}控制台并使用admin:admin登录，例如`\https://<public-ip>:8443`。
 
 要查看如何访问neuvector-webui服务的控制台：
 

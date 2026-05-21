@@ -83,7 +83,7 @@ image:operator_cert.png[]
 ** Abra a guia Recursos 
 ** Verifique se os recursos estão com status Criado ou Em execução
 
-Após implantar com sucesso a Plataforma {product-name} em seu cluster, faça login no console {product-name} em `https://neuvector-route-webui-neuvector.(OC_INGRESS)`. 
+Após implantar com sucesso a Plataforma {product-name} em seu cluster, faça login no console {product-name} em `\https://neuvector-route-webui-neuvector.(OC_INGRESS)`. 
 * Faça login com o nome de usuário inicial admin e a senha admin. 
 * Aceite os termos de licença {product-name}. 
 * Altere a senha do usuário admin. Opcionalmente, você também pode criar usuários adicionais no menu Configurações -> Usuários e Funções. Agora você está pronto para navegar no console {product-name} para iniciar a varredura de vulnerabilidades, observar os pods de aplicação em execução e aplicar proteções de segurança aos contêineres.
@@ -197,7 +197,7 @@ spec:
 ** Selecione a instância neuvector-default 
 ** Abra a guia Recursos 
 ** Verifique se os recursos estão com status Criado ou Em execução
-. Após implantar com sucesso a Plataforma {product-name} em seu cluster, faça login no console {product-name} em `https://neuvector-route-webui-neuvector.(INGRESS_DOMAIN)`. 
+. Após implantar com sucesso a Plataforma {product-name} em seu cluster, faça login no console {product-name} em `\https://neuvector-route-webui-neuvector.(INGRESS_DOMAIN)`. 
 ** Faça login com o nome de usuário inicial admin e a senha admin. 
 ** Aceite os termos de licença {product-name}. 
 ** Altere a senha do usuário admin. 

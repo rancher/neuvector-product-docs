@@ -68,11 +68,11 @@ image:adfs12-13.png[adfsSetup]
 
 . アイデンティティプロバイダ シングルサインオンURL
 * AD FS管理 > サービスからエンドポイントを表示し、"`SAML 2.0/WS-Federation`"エンドポイントURLを使用します。
-* 例: `https://<adfs-fqdn>/adfs/ls`
+* 例: `\https://<adfs-fqdn>/adfs/ls`
 
 . アイデンティティプロバイダ発行者
 * AD FS管理コンソールのAD FSを右クリックし、"`Edit Federation Service Properties...`"を選択します; "`Federation Service identifier`"を使用します。
-* 例: `http://<adfs-fqdn>/adfs/services/trust`
+* 例: `\http://<adfs-fqdn>/adfs/services/trust`
 
 . X.509証明書
 * AD FS管理から、サービス > 証明書を選択し、トークン署名証明書を右クリックして"`View Certificate...`"を選択します。

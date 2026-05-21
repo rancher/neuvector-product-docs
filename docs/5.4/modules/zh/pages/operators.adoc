@@ -83,7 +83,7 @@ image:operator_cert.png[]
 ** 打开资源选项卡 
 ** 验证资源状态为已创建或正在运行
 
-在成功将 {product-name} 平台部署到您的集群后，请登录到地址为 `https://neuvector-route-webui-neuvector.(OC_INGRESS)` 的 {product-name} 控制台。 +
+在成功将 {product-name} 平台部署到您的集群后，请登录到地址为 `\https://neuvector-route-webui-neuvector.(OC_INGRESS)` 的 {product-name} 控制台。 +
 * 使用初始用户名 admin 和密码 admin 登录。 +
 * 接受 {product-name} 最终用户许可协议。 +
 * 更改 admin 用户的密码。可选地，您还可以在设置 -> 用户与角色菜单中创建其他用户。现在您可以导航到 {product-name} 控制台，开始漏洞扫描，观察正在运行的应用程序 pod，并对容器应用安全保护。
@@ -197,7 +197,7 @@ spec:
 ** 选择 neuvector-default 实例 
 ** 打开资源选项卡 
 ** 验证资源状态为已创建或正在运行
-. 在成功将 {product-name} 平台部署到您的集群后，请登录到地址为 `https://neuvector-route-webui-neuvector.(INGRESS_DOMAIN)` 的 {product-name} 控制台。
+. 在成功将 {product-name} 平台部署到您的集群后，请登录到地址为 `\https://neuvector-route-webui-neuvector.(INGRESS_DOMAIN)` 的 {product-name} 控制台。
 ** 使用初始用户名 admin 和密码 admin 登录。
 ** 接受 {product-name} 最终用户许可协议。
 ** 更改管理员用户的密码。

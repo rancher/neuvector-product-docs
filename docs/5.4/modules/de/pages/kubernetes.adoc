@@ -287,7 +287,7 @@ Oder, wenn Sie eines der oben genannten YAML oder Beispiele von unten ändern:
 kubectl create -f neuvector.yaml 
 ----
 
-Fertig. Sie sollten in der Lage sein, sich mit der {product-name} Konsole zu verbinden und sich mit admin:admin anzumelden, z. B. `https://<public-ip>:8443`.
+Fertig. Sie sollten in der Lage sein, sich mit der {product-name} Konsole zu verbinden und sich mit admin:admin anzumelden, z. B. `\https://<public-ip>:8443`.
 --
 
 [NOTE]

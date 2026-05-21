@@ -649,7 +649,7 @@ Sortie :
 === Gérer la fédération pour les clusters principaux et distants (travailleurs)
 
 En général, l'énumération des membres de la fédération peut utiliser une requête GET vers le point de terminaison suivant (voir les exemples pour la syntaxe spécifique){nbsp}:
-`https://neuvector-svc-controller.neuvector:10443/v1/fed/member`
+`\https://neuvector-svc-controller.neuvector:10443/v1/fed/member`
 
 Pour des informations sur l'automatisation de la fédération via ConfigMap, consultez la documentation xref:configmap.adoc#_federated_configmap_examples_fedinitcfg_yaml[Exemples de ConfigMap fédérés].
 

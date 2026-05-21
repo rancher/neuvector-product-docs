@@ -186,7 +186,7 @@ image:10-redhat.png[redhat]
 * Elegir registro de OpenShift como tipo
 * Dar un nombre único al registro
 * Escribir URL del registro (obtener de la salida del comando "oc get is" en la red de OpenShift si es diferente del predeterminado)
-** URL del registro predeterminado `https://docker-registry.default.svc:5000/`
+** URL del registro predeterminado `\https://docker-registry.default.svc:5000/`
 * Proporcionar nombre de usuario y contraseña de la cuenta utilizada para gestionar el registro
 * Añadir repositorio como filtro en el siguiente formato
 ** Organización/repositorio:etiqueta
@@ -201,7 +201,7 @@ image:1a_openshift.png[openshift]
 * Elegir registro de OpenShift como tipo
 * Dar un nombre único al registro
 * Escribir URL del registro (obtener de la salida del comando "oc get is" en la red de OpenShift si es diferente del predeterminado)
-** URL del registro predeterminado `https://docker-registry.default.svc:5000/`
+** URL del registro predeterminado `\https://docker-registry.default.svc:5000/`
 * Proporcionar token de la cuenta de servicio que tiene acceso a todos los espacios de nombres
 ** Consultar la nota a continuación para crear la cuenta de servicio y obtener el token.
 ** Crear cuenta de servicio
@@ -348,7 +348,7 @@ Para el escaneo del registro de NeuVector con un registro de JFrog en modo subdo
 
 **Ejemplo estándar de subdominio de JFrog**
 
-URL del registro de JFrog: `https://mysubdomain.myhost.com`
+URL del registro de JFrog: `\https://mysubdomain.myhost.com`
 
 * **mysubdomain**: subdominio
 * **myhost.com**: nombre de host del registro de JFrog
@@ -359,7 +359,7 @@ Ejemplo de filtro de registro: `mysubdomain/docker-service-broker-tmp-local/devo
 
 Cuando utilizas un subdominio modificado en la URL del registro.
 
-URL del registro de JFrog: `https://artifact-mysubdomain.myhost.com`
+URL del registro de JFrog: `\https://artifact-mysubdomain.myhost.com`
 
 * **artifact-mysubdomain**: subdominio modificado utilizado solo en la URL del registro
 * **mysubdomain**: subdominio real en el servidor de JFrog
@@ -376,7 +376,7 @@ NeuVector anteriormente soportaba estos entornos. Sin embargo, el soporte se rom
 
 Si el subdominio no es el prefijo de la URL del servidor de registro de JFrog, debes configurar el filtro de registro utilizando este formato:
 
-URL del registro de JFrog: `https://artifact-mysubdomain.myhost.com`
+URL del registro de JFrog: `\https://artifact-mysubdomain.myhost.com`
 
 Filtro de registro: `<mysubdomain>/docker-service-broker-tmp-local/devop/test/joe/*` 
 
@@ -445,7 +445,7 @@ image:20-azure.png[azure]
 
 * Elegir el registro de Azure como tipo
 * Dar un nombre único al registro
-* Escribir URL del registro. Ejemplo `https://neuvector.azure.io` (obtenido del portal de Azure)
+* Escribir URL del registro. Ejemplo `\https://neuvector.azure.io` (obtenido del portal de Azure)
 ** Registro de contenedores -> usuario -> Resumen -> Servidor de inicio de sesión
 * Añadir nombre de usuario y contraseña
 ** Registro de contenedores de Azure -> usuario-> claves de acceso-> contraseña
@@ -615,7 +615,7 @@ Para configurar el GHCR en NeuVector, ve a **Añadir Registro** y selecciona **R
 | Un nombre para identificar esta configuración de registro.
 
 | **Registro (UDDI)**
-| La URL del registro GHCR. Ejemplo: `https://ghcr.io/`.
+| La URL del registro GHCR. Ejemplo: `\https://ghcr.io/`.
 
 | **Nombre de usuario**
 | Tu nombre de usuario de GitHub.

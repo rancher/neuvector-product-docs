@@ -166,7 +166,7 @@ spec:
 
 イングレスアドレスのアノテーションをingress.mycloud.netから適切なアドレスに変更する必要があります。
 
-この例では、URL cloud.neuvector.comを使用しています。イングレスサービスが作成された後、その外部IPを見つけることができます。次に、hostsファイルを構成してcloud.neuvector.comをそのIPにポイントできます。その後、`https://cloud.neuvector.com`(選択したURL)にアクセスできるはずです。
+この例では、URL cloud.neuvector.comを使用しています。イングレスサービスが作成された後、その外部IPを見つけることができます。次に、hostsファイルを構成してcloud.neuvector.comをそのIPにポイントできます。その後、`\https://cloud.neuvector.com`(選択したURL)にアクセスできるはずです。
 
 === リダイレクトの代わりにSSLパススルーを使用する 
 

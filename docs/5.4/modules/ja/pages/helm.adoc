@@ -41,7 +41,7 @@ kubectl label namespace cattle-neuvector-system pod-security.kubernetes.io/enfor
 ----
 
 . すでにカスタム`values.yaml`ファイルをお持ちの場合は、次の値が設定されていることを確認してください。必要に応じて、次の{chart-version-url}values.yaml[`release-v2.13`チャート]にある`values.yaml`ファイルをテンプレートとして使用できます。
-.. `global.cattle.url`は、`https://your-rancher-url.com`のような形式でRancherのURLに設定されています。
+.. `global.cattle.url`は、`\https://your-rancher-url.com`のような形式でRancherのURLに設定されています。
 .. `controller.federation.managedsvc.type`の値が`NodePort`に設定されていることを確認してください。
 .. `global.cattle.systemDefaultRegistry`は`<Prime-Registry-URL>`に設定されています。
 +

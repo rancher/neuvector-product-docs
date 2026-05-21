@@ -649,7 +649,7 @@ Ausgabe:
 === Verwalten von Föderationen für Master- und Remote- (Arbeits-)Cluster
 
 Im Allgemeinen kann das Auflisten von Föderationsmitgliedern ein GET an den folgenden Endpunkt verwenden (siehe Beispiele für spezifische Syntax):
-`https://neuvector-svc-controller.neuvector:10443/v1/fed/member`
+`\https://neuvector-svc-controller.neuvector:10443/v1/fed/member`
 
 Für Informationen zur Automatisierung der Föderation über ConfigMap siehe die Dokumentation xref:configmap.adoc#_federated_configmap_examples_fedinitcfg_yaml[Beispiele für föderierte ConfigMaps].
 

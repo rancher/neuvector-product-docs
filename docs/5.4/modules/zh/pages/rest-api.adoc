@@ -166,7 +166,7 @@ spec:
 
 您需要将 Ingress 地址的注解从 ingress.mycloud.net 更改为您自己的地址。
 
-此示例使用的URL是cloud.neuvector.com。创建 Ingress 服务后，您可以找到它的外部 IP。然后，您可以配置hosts文件，将cloud.neuvector.com指向该IP。之后，您应该能够浏览到`https://cloud.neuvector.com`（您选择使用的URL）。
+此示例使用的URL是cloud.neuvector.com。创建 Ingress 服务后，您可以找到它的外部 IP。然后，您可以配置hosts文件，将cloud.neuvector.com指向该IP。之后，您应该能够浏览到`\https://cloud.neuvector.com`（您选择使用的URL）。
 
 === 使用SSL直通而不是重定向 
 

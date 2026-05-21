@@ -164,7 +164,7 @@ image:ac_environment.png[Admission]
 イメージ、imageScanned、cveHighCount、cveMediumCount、イメージコンプライアンス違反、cveNames など。
 
 {product-name} がアドミッションコントロールルールに対して一致を実行する前に、{product-name} はクラスターのapiserverからイメージ情報 (例：10.1.127.3:5000/neuvector/toolbox/iperf:latest) を取得します。
-（以下の apiserver からのリクエストセクションを参照してください）。イメージは、レジストリサーバー (`https://10.1.127.3:5000`)、リポジトリ (neuvector/toolbox/iperf)、およびタグ (latest) で構成されています。
+（以下の apiserver からのリクエストセクションを参照してください）。イメージは、レジストリサーバー (`\https://10.1.127.3:5000`)、リポジトリ (neuvector/toolbox/iperf)、およびタグ (latest) で構成されています。
 
 {product-name} はこの情報を使用して、{product-name} アセット -> レジストリスキャンページの結果と一致させ、cve 名、cve 高または中のカウントなどの対応する情報を収集します。イメージのコンプライアンス違反は、秘密やsetuid/setgidの違反があるイメージと見なされます。
 ユーザーがdockerレジストリからクラスターリソースを作成するために画像を使用している場合、通常、レジストリサーバー情報は空であるかdocker.ioであり、現在{product-name}は空またはdocker.io文字列の代わりにレジストリスキャン結果に一致する以下のハードコーディングされたレジストリサーバーを使用しています。もちろん、レジストリスキャンページに定義されている以下のサポートされているdockerレジストリサーバー以外に他のサーバーがある場合、{product-name}はレジストリスキャン結果を正常に取得することができません。
