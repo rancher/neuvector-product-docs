@@ -1,0 +1,527 @@
+= API Reference Manual
+:revdate: 2026-05-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /14.reference/01.API reference/01.api-reference/01.api-reference.md
+:page-opendocs-slug: /reference/api-reference
+
+[[security-architecture-gateway-authentication-definitions]]
+== Security Architecture & Gateway Authentication Definitions
+All transactions dispatched to NeuVector endpoints must execute valid cryptographic parameters inside incoming HTTP header vectors. Missing tokens fallback directly into a **HTTP 401 Unauthorized** block state configuration.
+
+[cols="2a,1a,2a,1a", options="header", frame="all", grid="all"]
+|===
+| Security System Token | Delivery Context Layer | Destination HTTP Header Field | Cryptographic Type Baseline
+| *ApiKeyAuth* | header | ++X-Auth-Apikey++ | ++apiKey++
+| *TokenAuth* | header | ++X-Auth-Token++ | ++apiKey++
+|===
+
+[[api-interface-route-dictionary-contracts]]
+== API Interface Route Dictionary Contracts
+
+[[uri-route-gateway-path-node-v1-admission-options]]
+=== URI Route Gateway Path Node: /v1/admission/options
+
+[[handler-method-http-get-get-a-list-of-admission-options]]
+==== Handler Method: HTTP GET — Get a list of admission options
+Functional Boundary Domain Tag:: ++Admission++
+Enforced Authorization Constraints:: ++ApiKeyAuth++, ++TokenAuth++
+Contextual Posture Criteria:: Operational scenario contract definition missing.
+
+[[downstream-response-return-frame-boundaries-admission-options-get]]
+===== Downstream Response Return Frame Boundaries
+
+[cols="1,4,3", options="header"]
+|===
+| HTTP Code | Context Execution State Mapping Meaning | Bound Data Response Contract Schema Entity
+| HTTP 200 | Success | <<_schema_restadmissionconfigdata,RESTAdmissionConfigData>>
+|===
+
+[[uri-route-gateway-path-node-v1-admission-rule-id]]
+=== URI Route Gateway Path Node: /v1/admission/rule/{id}
+
+[[handler-method-http-get-show-an-admission-rule]]
+==== Handler Method: HTTP GET — Show an admission rule
+Functional Boundary Domain Tag:: ++Admission++
+Enforced Authorization Constraints:: ++ApiKeyAuth++, ++TokenAuth++
+Contextual Posture Criteria:: Operational scenario contract definition missing.
+
+[[expected-input-signature-parameters-matrix-admission-rule-id-get]]
+===== Expected Input Signature Parameters Matrix
+
+[cols="2,2,3,2,4", options="header"]
+|===
+| Parameter Token Key | Injection Context (in) | Structural Data Type | Compliance Requirement | System Behavioral Functional Description
+| id | path | string | *Required Core Parameter* | Rule ID
+|===
+
+[[downstream-response-return-frame-boundaries-admission-rule-id-get]]
+===== Downstream Response Return Frame Boundaries
+
+[cols="1,4,3", options="header"]
+|===
+| HTTP Code | Context Execution State Mapping Meaning | Bound Data Response Contract Schema Entity
+| HTTP 200 | Success | <<_schema_restadmissionruledata,RESTAdmissionRuleData>>
+|===
+
+[[handler-method-http-delete-delete-an-admission-rule]]
+==== Handler Method: HTTP DELETE — Delete an admission rule
+Functional Boundary Domain Tag:: ++Admission++
+Enforced Authorization Constraints:: ++ApiKeyAuth++, ++TokenAuth++
+Contextual Posture Criteria:: Operational scenario contract definition missing.
+
+[[expected-input-signature-parameters-matrix-admission-rule-id-delete]]
+===== Expected Input Signature Parameters Matrix
+
+[cols="2,2,3,2,4", options="header"]
+|===
+| Parameter Token Key | Injection Context (in) | Structural Data Type | Compliance Requirement | System Behavioral Functional Description
+| id | path | string | *Required Core Parameter* | Rule ID
+|===
+
+[[downstream-response-return-frame-boundaries-admission-rule-id-delete]]
+===== Downstream Response Return Frame Boundaries
+
+[cols="1,4,3", options="header"]
+|===
+| HTTP Code | Context Execution State Mapping Meaning | Bound Data Response Contract Schema Entity
+| HTTP 200 | Success | Empty Data Frame Frame
+|===
+
+[[uri-route-gateway-path-node-v1-admission-rule]]
+=== URI Route Gateway Path Node: /v1/admission/rule
+
+[[handler-method-http-post-add-admission-control-rule]]
+==== Handler Method: HTTP POST — Add admission control rule
+Functional Boundary Domain Tag:: ++Admission++
+Enforced Authorization Constraints:: ++ApiKeyAuth++, ++TokenAuth++
+Contextual Posture Criteria:: Operational scenario contract definition missing.
+
+[[expected-input-signature-parameters-matrix-admission-rule-post]]
+===== Expected Input Signature Parameters Matrix
+
+[cols="2,2,3,2,4", options="header"]
+|===
+| Parameter Token Key | Injection Context (in) | Structural Data Type | Compliance Requirement | System Behavioral Functional Description
+| body | body | <<_schema_restadmissionruleconfigdata,RESTAdmissionRuleConfigData>> | *Required Core Parameter* | Admission rule data
+|===
+
+[[downstream-response-return-frame-boundaries-admission-rule-post]]
+===== Downstream Response Return Frame Boundaries
+
+[cols="1,4,3", options="header"]
+|===
+| HTTP Code | Context Execution State Mapping Meaning | Bound Data Response Contract Schema Entity
+| HTTP 200 | Success | <<_schema_restadmissionruledata,RESTAdmissionRuleData>>
+|===
+
+[[handler-method-http-patch-update-admission-rule]]
+==== Handler Method: HTTP PATCH — Update admission rule
+Functional Boundary Domain Tag:: ++Admission++
+Enforced Authorization Constraints:: ++ApiKeyAuth++, ++TokenAuth++
+Contextual Posture Criteria:: Operational scenario contract definition missing.
+
+[[expected-input-signature-parameters-matrix-admission-rule-patch]]
+===== Expected Input Signature Parameters Matrix
+
+[cols="2,2,3,2,4", options="header"]
+|===
+| Parameter Token Key | Injection Context (in) | Structural Data Type | Compliance Requirement | System Behavioral Functional Description
+| body | body | <<_schema_restadmissionruleconfigdata,RESTAdmissionRuleConfigData>> | *Required Core Parameter* | Admission rule data
+|===
+
+[[downstream-response-return-frame-boundaries-admission-rule-patch]]
+===== Downstream Response Return Frame Boundaries
+
+[cols="1,4,3", options="header"]
+|===
+| HTTP Code | Context Execution State Mapping Meaning | Bound Data Response Contract Schema Entity
+| HTTP 200 | Success | Empty Data Frame Frame
+|===
+
+[[uri-route-gateway-path-node-v1-admission-rule-promote]]
+=== URI Route Gateway Path Node: /v1/admission/rule/promote
+
+[[handler-method-http-post-promote-admission-control-rule]]
+==== Handler Method: HTTP POST — Promote admission control rule
+Functional Boundary Domain Tag:: ++Admission++
+Enforced Authorization Constraints:: ++ApiKeyAuth++, ++TokenAuth++
+Contextual Posture Criteria:: Operational scenario contract definition missing.
+
+[[expected-input-signature-parameters-matrix-admission-rule-promote-post]]
+===== Expected Input Signature Parameters Matrix
+
+[cols="2,2,3,2,4", options="header"]
+|===
+| Parameter Token Key | Injection Context (in) | Structural Data Type | Compliance Requirement | System Behavioral Functional Description
+| body | body | <<_schema_restadmctrlpromoterequestdata,RESTAdmCtrlPromoteRequestData>> | *Required Core Parameter* | Admission control rule data
+|===
+
+[[downstream-response-return-frame-boundaries-admission-rule-promote-post]]
+===== Downstream Response Return Frame Boundaries
+
+[cols="1,4,3", options="header"]
+|===
+| HTTP Code | Context Execution State Mapping Meaning | Bound Data Response Contract Schema Entity
+| HTTP 200 | Success | Empty Data Frame Frame
+|===
+
+[[uri-route-gateway-path-node-v1-admission-rules]]
+=== URI Route Gateway Path Node: /v1/admission/rules
+
+[[handler-method-http-get-get-a-list-of-admission-rules]]
+==== Handler Method: HTTP GET — Get a list of admission rules
+Functional Boundary Domain Tag:: ++Admission++
+Enforced Authorization Constraints:: ++ApiKeyAuth++, ++TokenAuth++
+Contextual Posture Criteria:: Operational scenario contract definition missing.
+
+[[expected-input-signature-parameters-matrix-admission-rules-get]]
+===== Expected Input Signature Parameters Matrix
+
+[cols="2,2,3,2,4", options="header"]
+|===
+| Parameter Token Key | Injection Context (in) | Structural Data Type | Compliance Requirement | System Behavioral Functional Description
+| scope | query | string | Optional Parameter | When set to fed, returned fed admission rules. When set to local, returned local admission rules.
+|===
+
+[[downstream-response-return-frame-boundaries-admission-rules-get]]
+===== Downstream Response Return Frame Boundaries
+
+[cols="1,4,3", options="header"]
+|===
+| HTTP Code | Context Execution State Mapping Meaning | Bound Data Response Contract Schema Entity
+| HTTP 200 | Success | <<_schema_restadmissionrulesdata,RESTAdmissionRulesData>>
+|===
+
+[[handler-method-http-delete-delete-all-admission-rules]]
+==== Handler Method: HTTP DELETE — Delete all admission rules
+Functional Boundary Domain Tag:: ++Admission++
+Enforced Authorization Constraints:: ++ApiKeyAuth++, ++TokenAuth++
+Contextual Posture Criteria:: Operational scenario contract definition missing.
+
+[[expected-input-signature-parameters-matrix-admission-rules-delete]]
+===== Expected Input Signature Parameters Matrix
+
+[cols="2,2,3,2,4", options="header"]
+|===
+| Parameter Token Key | Injection Context (in) | Structural Data Type | Compliance Requirement | System Behavioral Functional Description
+| scope | query | string | Optional Parameter | When set to fed, fed admission rules get removed.
+|===
+
+[[downstream-response-return-frame-boundaries-admission-rules-delete]]
+===== Downstream Response Return Frame Boundaries
+
+[cols="1,4,3", options="header"]
+|===
+| HTTP Code | Context Execution State Mapping Meaning | Bound Data Response Contract Schema Entity
+| HTTP 200 | Success | Empty Data Frame Frame
+|===
+
+[[uri-route-gateway-path-node-v1-admission-state]]
+=== URI Route Gateway Path Node: /v1/admission/state
+
+[[handler-method-http-get-get-admission-state]]
+==== Handler Method: HTTP GET — Get admission state
+Functional Boundary Domain Tag:: ++Admission++
+Enforced Authorization Constraints:: ++ApiKeyAuth++, ++TokenAuth++
+Contextual Posture Criteria:: Operational scenario contract definition missing.
+
+[[downstream-response-return-frame-boundaries-admission-state-get]]
+===== Downstream Response Return Frame Boundaries
+
+[cols="1,4,3", options="header"]
+|===
+| HTTP Code | Context Execution State Mapping Meaning | Bound Data Response Contract Schema Entity
+| HTTP 200 | Success | <<_schema_restadmissionconfigdata,RESTAdmissionConfigData>>
+| HTTP 404 | Operation not allowed | <<_schema_resterror,RESTError>>
+|===
+
+[[handler-method-http-patch-update-admission-state]]
+==== Handler Method: HTTP PATCH — Update admission state
+Functional Boundary Domain Tag:: ++Admission++
+Enforced Authorization Constraints:: ++ApiKeyAuth++, ++TokenAuth++
+Contextual Posture Criteria:: Operational scenario contract definition missing.
+
+[[expected-input-signature-parameters-matrix-admission-state-patch]]
+===== Expected Input Signature Parameters Matrix
+
+[cols="2,2,3,2,4", options="header"]
+|===
+| Parameter Token Key | Injection Context (in) | Structural Data Type | Compliance Requirement | System Behavioral Functional Description
+| body | body | <<_schema_restadmissionconfigdata,RESTAdmissionConfigData>> | *Required Core Parameter* | Admission config state data
+|===
+
+[[downstream-response-return-frame-boundaries-admission-state-patch]]
+===== Downstream Response Return Frame Boundaries
+
+[cols="1,4,3", options="header"]
+|===
+| HTTP Code | Context Execution State Mapping Meaning | Bound Data Response Contract Schema Entity
+| HTTP 200 | Success | Empty Data Frame Frame
+| HTTP 404 | Operation not allowed | <<_schema_resterror,RESTError>>
+|===
+
+[[uri-route-gateway-path-node-v1-admission-stats]]
+=== URI Route Gateway Path Node: /v1/admission/stats
+
+[[handler-method-http-get-get-admission-control-statistics]]
+==== Handler Method: HTTP GET — Get admission control statistics
+Functional Boundary Domain Tag:: ++Admission++
+Enforced Authorization Constraints:: ++ApiKeyAuth++, ++TokenAuth++
+Contextual Posture Criteria:: Operational scenario contract definition missing.
+
+[[downstream-response-return-frame-boundaries-admission-stats-get]]
+===== Downstream Response Return Frame Boundaries
+
+[cols="1,4,3", options="header"]
+|===
+| HTTP Code | Context Execution State Mapping Meaning | Bound Data Response Contract Schema Entity
+| HTTP 200 | Success | <<_schema_restadmissionstatsdata,RESTAdmissionStatsData>>
+|===
+
+[[uri-route-gateway-path-node-v1-assess-admission-rule]]
+=== URI Route Gateway Path Node: /v1/assess/admission/rule
+
+[[handler-method-http-post-test-admission-control-rules]]
+==== Handler Method: HTTP POST — Test admission control rules
+Functional Boundary Domain Tag:: ++Admission++
+Enforced Authorization Constraints:: ++ApiKeyAuth++, ++TokenAuth++
+Contextual Posture Criteria:: Testing admission control rules. The payload body is the content of a resource yaml file.
+
+[[expected-input-signature-parameters-matrix-assess-admission-rule-post]]
+===== Expected Input Signature Parameters Matrix
+
+[cols="2,2,3,2,4", options="header"]
+|===
+| Parameter Token Key | Injection Context (in) | Structural Data Type | Compliance Requirement | System Behavioral Functional Description
+| body | body | string | *Required Core Parameter* | Resource yaml file
+|===
+
+[[downstream-response-return-frame-boundaries-assess-admission-rule-post]]
+===== Downstream Response Return Frame Boundaries
+
+[cols="1,4,3", options="header"]
+|===
+| HTTP Code | Context Execution State Mapping Meaning | Bound Data Response Contract Schema Entity
+| HTTP 200 | Success | <<_schema_restadmctrlrulestestresults,RESTAdmCtrlRulesTestResults>>
+|===
+
+[[uri-route-gateway-path-node-v1-auth]]
+=== URI Route Gateway Path Node: /v1/auth
+
+[[handler-method-http-post-login-authentication]]
+==== Handler Method: HTTP POST — Login Authentication
+Functional Boundary Domain Tag:: ++Authentication++
+Enforced Authorization Constraints:: ++Public Access Zone++
+Contextual Posture Criteria:: Operational scenario contract definition missing.
+
+[[expected-input-signature-parameters-matrix-auth-post]]
+===== Expected Input Signature Parameters Matrix
+
+[cols="2,2,3,2,4", options="header"]
+|===
+| Parameter Token Key | Injection Context (in) | Structural Data Type | Compliance Requirement | System Behavioral Functional Description
+| body | body | <<_schema_restauthdata,RESTAuthData>> | *Required Core Parameter* | User login data
+|===
+
+[[downstream-response-return-frame-boundaries-auth-post]]
+===== Downstream Response Return Frame Boundaries
+
+[cols="1,4,3", options="header"]
+|===
+| HTTP Code | Context Execution State Mapping Meaning | Bound Data Response Contract Schema Entity
+| HTTP 200 | Success | <<_schema_resttokendata,RESTTokenData>>
+| HTTP 401 | Authentication failed | <<_schema_resterror,RESTError>>
+|===
+
+[[uri-route-gateway-path-node-v1-bench-host-id-docker]]
+=== URI Route Gateway Path Node: /v1/bench/host/{id}/docker
+
+[[handler-method-http-get-docker-bench]]
+==== Handler Method: HTTP GET — Docker bench
+Functional Boundary Domain Tag:: ++Compliance++
+Enforced Authorization Constraints:: ++ApiKeyAuth++, ++TokenAuth++
+Contextual Posture Criteria:: Operational scenario contract definition missing.
+
+[[expected-input-signature-parameters-matrix-bench-host-id-docker-get]]
+===== Expected Input Signature Parameters Matrix
+
+[cols="2,2,3,2,4", options="header"]
+|===
+| Parameter Token Key | Injection Context (in) | Structural Data Type | Compliance Requirement | System Behavioral Functional Description
+| id | path | string | *Required Core Parameter* | Host ID
+|===
+
+[[downstream-response-return-frame-boundaries-bench-host-id-docker-get]]
+===== Downstream Response Return Frame Boundaries
+
+[cols="1,4,3", options="header"]
+|===
+| HTTP Code | Context Execution State Mapping Meaning | Bound Data Response Contract Schema Entity
+| HTTP 200 | Success | <<_schema_restbenchreport,RESTBenchReport>>
+|===
+
+[[uri-route-gateway-path-node-v1-log-audit]]
+=== URI Route Gateway Path Node: /v1/log/audit
+
+[[handler-method-http-get-get-a-list-of-audits]]
+==== Handler Method: HTTP GET — Get a list of audits
+Functional Boundary Domain Tag:: ++Log++
+Enforced Authorization Constraints:: ++ApiKeyAuth++, ++TokenAuth++
+Contextual Posture Criteria:: Operational scenario contract definition missing.
+
+[[downstream-response-return-frame-boundaries-log-audit-get]]
+===== Downstream Response Return Frame Boundaries
+
+[cols="1,4,3", options="header"]
+|===
+| HTTP Code | Context Execution State Mapping Meaning | Bound Data Response Contract Schema Entity
+| HTTP 200 | Success | <<_schema_restauditsdata,RESTAuditsData>>
+|===
+
+[[uri-route-gateway-path-node-v1-scan-config]]
+=== URI Route Gateway Path Node: /v1/scan/config
+
+[[handler-method-http-get-retrieve-scan-configuration]]
+==== Handler Method: HTTP GET — Retrieve scan configuration
+Functional Boundary Domain Tag:: ++Scan++
+Enforced Authorization Constraints:: ++ApiKeyAuth++, ++TokenAuth++
+Contextual Posture Criteria:: Operational scenario contract definition missing.
+
+[[downstream-response-return-frame-boundaries-scan-config-get]]
+===== Downstream Response Return Frame Boundaries
+
+[cols="1,4,3", options="header"]
+|===
+| HTTP Code | Context Execution State Mapping Meaning | Bound Data Response Contract Schema Entity
+| HTTP 200 | Success | <<_schema_restscanconfigresp,RESTScanConfigResp>>
+|===
+
+[[handler-method-http-patch-configure-auto-scan-settings]]
+==== Handler Method: HTTP PATCH — Configure auto-scan settings
+Functional Boundary Domain Tag:: ++Scan++
+Enforced Authorization Constraints:: ++ApiKeyAuth++, ++TokenAuth++
+Contextual Posture Criteria:: Operational scenario contract definition missing.
+
+[[expected-input-signature-parameters-matrix-scan-config-patch]]
+===== Expected Input Signature Parameters Matrix
+
+[cols="2,2,3,2,4", options="header"]
+|===
+| Parameter Token Key | Injection Context (in) | Structural Data Type | Compliance Requirement | System Behavioral Functional Description
+| body | body | <<_schema_restscanconfigdata,RESTScanConfigData>> | *Required Core Parameter* | Scan configure data
+|===
+
+[[downstream-response-return-frame-boundaries-scan-config-patch]]
+===== Downstream Response Return Frame Boundaries
+
+[cols="1,4,3", options="header"]
+|===
+| HTTP Code | Context Execution State Mapping Meaning | Bound Data Response Contract Schema Entity
+| HTTP 200 | Success | Empty Data Frame Frame
+|===
+
+[[uri-route-gateway-path-node-v1-workload]]
+=== URI Route Gateway Path Node: /v1/workload
+
+[[handler-method-http-get-get-container-list]]
+==== Handler Method: HTTP GET — Get container list
+Functional Boundary Domain Tag:: ++Container++
+Enforced Authorization Constraints:: ++ApiKeyAuth++, ++TokenAuth++
+Contextual Posture Criteria:: Operational scenario contract definition missing.
+
+[[downstream-response-return-frame-boundaries-workload-get]]
+===== Downstream Response Return Frame Boundaries
+
+[cols="1,4,3", options="header"]
+|===
+| HTTP Code | Context Execution State Mapping Meaning | Bound Data Response Contract Schema Entity
+| HTTP 200 | Success | <<_schema_restworkloadsdata,RESTWorkloadsData>>
+|===
+
+[[data-dictionary-component-schema-blueprint-models]]
+== Data Dictionary Component Schema Blueprint Models
+
+[[_schema_audit]]
+=== Schema Registry Identity Token Blueprint: Audit
+Root Data Layout Composition Representation Base Type:: ++object++
+
+[cols="2,2,2,4,2", options="header", frame="all", grid="rows"]
+|===
+| Property Node Field Key | Data Representation Type | Validation Posture | Contextual Mapping Meaning | Mock Payload Sample
+| ++name++ | string | Optional Variable | Classification label context. | ++Container.Managed++
+| ++level++ | string | *Strictly Required Field* | Severity scale metric tracking indicator. | ++INFO++
+| ++reported_timestamp++ | integer (int64) | *Strictly Required Field* | Epoch timestamp when the verification scenario triggered. | ++1516832670++
+| ++message++ | string | *Strictly Required Field* | System state diagnostic description log phrase. | ++Audit log framework text description entry++
+|===
+
+[[_schema_resterror]]
+=== Schema Registry Identity Token Blueprint: RESTError
+Root Data Layout Composition Representation Base Type:: ++object++
+
+[cols="2,2,2,4,2", options="header", frame="all", grid="rows"]
+|===
+| Property Node Field Key | Data Representation Type | Validation Posture | Contextual Mapping Meaning | Mock Payload Sample
+| ++code++ | integer | *Strictly Required Field* | Internal tracking system fault transaction identifier code. | ++3++
+| ++error++ | string | *Strictly Required Field* | Standard framework error classification phrase text. | ++Request failed++
+| ++message++ | string | *Strictly Required Field* | Runtime framework execution constraint exception logs. | ++Invalid format++
+|===
+
+[[_schema_restadmissionconfigdata]]
+=== Schema Registry Identity Token Blueprint: RESTAdmissionConfigData
+Root Data Layout Composition Representation Base Type:: ++object++
+
+[cols="2,2,2,4,2", options="header", frame="all", grid="rows"]
+|===
+| Property Node Field Key | Data Representation Type | Validation Posture | Contextual Mapping Meaning | Mock Payload Sample
+| ++k8s_env++ | boolean | *Strictly Required Field* | Orchestrator environment presence indicator flag state. | ++false++
+|===
+
+[[_schema_restadmissionruledata]]
+=== Schema Registry Identity Token Blueprint: RESTAdmissionRuleData
+Root Data Layout Composition Representation Base Type:: ++object++
+
+[cols="2,2,2,4,2", options="header", frame="all", grid="rows"]
+|===
+| Property Node Field Key | Data Representation Type | Validation Posture | Contextual Mapping Meaning | Mock Payload Sample
+| ++rule++ | object | *Strictly Required Field* | Instantiated admission policy parameter contract model layout container. | ++N/A++
+|===
+
+[[_schema_restadmissionrulesdata]]
+=== Schema Registry Identity Token Blueprint: RESTAdmissionRulesData
+Root Data Layout Composition Representation Base Type:: ++object++
+
+[cols="2,2,2,4,2", options="header", frame="all", grid="rows"]
+|===
+| Property Node Field Key | Data Representation Type | Validation Posture | Contextual Mapping Meaning | Mock Payload Sample
+| ++rules++ | Array < object > | *Strictly Required Field* | Multi-node operational rules container tracking layout structures array. | ++N/A++
+|===
+
+[[_schema_resttokendata]]
+=== Schema Registry Identity Token Blueprint: RESTTokenData
+Root Data Layout Composition Representation Base Type:: ++object++
+
+[cols="2,2,2,4,2", options="header", frame="all", grid="rows"]
+|===
+| Property Node Field Key | Data Representation Type | Validation Posture | Contextual Mapping Meaning | Mock Payload Sample
+| ++token++ | object | *Strictly Required Field* | Cryptographic authentication identity frame metadata container properties. | ++N/A++
+|===
+
+[[_schema_restauditsdata]]
+=== Schema Registry Identity Token Blueprint: RESTAuditsData
+Root Data Layout Composition Representation Base Type:: ++object++
+
+[cols="2,2,2,4,2", options="header", frame="all", grid="rows"]
+|===
+| Property Node Field Key | Data Representation Type | Validation Posture | Contextual Mapping Meaning | Mock Payload Sample
+| ++audits++ | Array < <<_schema_audit,Audit>> > | *Strictly Required Field* | Collection tracking structural audit log data records entries. | ++N/A++
+|===
+
+[[_schema_restworkloadsdata]]
+=== Schema Registry Identity Token Blueprint: RESTWorkloadsData
+Root Data Layout Composition Representation Base Type:: ++object++
+
+[cols="2,2,2,4,2", options="header", frame="all", grid="rows"]
+|===
+| Property Node Field Key | Data Representation Type | Validation Posture | Contextual Mapping Meaning | Mock Payload Sample
+| ++workloads++ | Array < object> | *Strictly Required Field* | Runtime container environment profile configurations framework block. | N/A
+|===
