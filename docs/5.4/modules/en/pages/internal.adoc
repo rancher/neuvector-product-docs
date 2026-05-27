@@ -21,6 +21,7 @@ These certificates can be replaced by your own to further harden communication. 
 Replacing certificates is recommended to be performed only during initial deployment of {product-name}. Replacing on a running cluster (even with rolling upgrade) may result in an unstable state where {product-name} pods are unable to communicate with each other due to a mismatch in certificates, and DATA LOSS may occur.
 ====
 
+[[#_replacing_certificates_used_in_internal_communications_of_suse_security]]
 === Replacing Certificates Used in Internal Communications of {product-name}
 
 Replace the internal encryption files `ca.crt`, `tls.key`, `tls.crt` as follows:

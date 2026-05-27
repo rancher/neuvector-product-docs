@@ -53,6 +53,7 @@ image:roles_4.png[roles]
 * Security Event. Access Notifications -> Security Events logs.
 * System Config. Allow configuration of Settings -> Configuration.
 
+[[#_mapping_groups_to_roles_and_namespaces]]
 === Mapping Groups to Roles and Namespaces
 
 Groups can be mapped to preset or custom roles in {product-name}. In addition, a role can be restricted to one or more namespaces.

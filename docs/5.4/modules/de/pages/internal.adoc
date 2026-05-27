@@ -21,6 +21,7 @@ Diese Zertifikate können durch eigene ersetzt werden, um die Kommunikation weit
 Es wird empfohlen, den Austausch von Zertifikaten nur während der initialen Implementierung von {product-name} durchzuführen. Der Austausch in einem laufenden Cluster (auch mit Rolling Upgrade) kann zu einem instabilen Zustand führen, in dem {product-name} Pods aufgrund eines Zertifikatsmismatch nicht miteinander kommunizieren können, was zu DATENVERLUST führen kann.
 ====
 
+[[Replacing Certificates Used in Internal Communications of {product-name}]]
 === Austausch von Zertifikaten, die in der internen Kommunikation von {product-name} verwendet werden
 
 Ersetzen Sie die internen Verschlüsselungsdateien `ca.crt`, `tls.key`, `tls.crt` wie folgt:

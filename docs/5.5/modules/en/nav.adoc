@@ -112,6 +112,7 @@
 * Reference
 ** xref:details.adoc[Environment Variables]
 ** xref:cli.adoc[Command Line Reference]
+** xref:syslog_fields.adoc[Syslog Fields]
 
 * Release Notes
 ** xref:5x.adoc[5.x Release Notes]

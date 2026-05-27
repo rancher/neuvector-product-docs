@@ -92,7 +92,7 @@ Requires privileged mode!
 ----
 docker run --rm --privileged --pid=host neuvector/scanner -n neuvector
 ----
-
+[_manual_deployment_of_multiple_scanners_on_kubernetes]
 === Manual Deployment of Multiple Scanners on Kubernetes
 
 To manually deploy scanners as part of an existing Kubernetes deployment, create a new role binding:
