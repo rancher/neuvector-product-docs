@@ -1,5 +1,5 @@
 = 5.x Release Notes
-:revdate: 2026-03-18
+:revdate: 2026-04-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /14.releasenotes/01.5x/01.5x.md
 :page-opendocs-slug:  /releasenotes/5x
