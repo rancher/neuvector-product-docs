@@ -58,6 +58,7 @@ NeuVector is committed to informing the community about security issues. The fol
 | https://github.com/neuvector/neuvector/releases/tag/v5.4.1[NeuVector v5.4.1]
 |===
 
+[#_openid-connect-is-vulnerable-to-mitm]
 == OpenID Connect is vulnerable to MITM
 
 * **CVE ID:** https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H&version=3.1[CVE-2025-66001 (AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H)]
@@ -114,6 +115,7 @@ To manually enable TLS verification:
 
 ---
 
+[#_neuvector-is-shipping-cryptographic-material-into-its-binary]
 == NeuVector is shipping cryptographic material into its binary
 
 * **CVE ID:** CVE-2025-54471  
@@ -141,7 +143,7 @@ If the controller lacks RBAC permissions to access the Kubernetes secret, it log
 and exits.
 
 Device encryption keys rotate every 3 months. For more details, see:  
-xref:certrotate.adoc#_rotating_sensitive_field_in_configuration[Rotating sensitive field in configuration].
+xref:certrotate.adoc#_rotating-sensitive-field-in-configuration[Rotating sensitive field in configuration].
 
 === Patches
 
@@ -161,6 +163,7 @@ No workarounds are available. Upgrade to a patched version as soon as possible.
 
 ---
 
+[#_telemetry-sender-is-vulnerable-to-mitm-and-dos]
 == Telemetry sender is vulnerable to MITM and DoS
 
 * **CVE ID:** CVE-2025-54470  
@@ -212,6 +215,7 @@ Disabling this setting prevents NeuVector from sending telemetry data, reducing 
   ** https://www.suse.com/suse-neuvector/support-matrix/all-supported-versions/neuvector-v-all-versions/[NeuVector Support Matrix]  
   ** https://www.suse.com/lifecycle/#suse-security[Product Support Lifecycle]
 
+[#_sensitive-information-exposure-in-neuvector-manager-container-logs]
 == Sensitive Information Exposure in NeuVector Manager Container Logs
 
 *CVEs:* CVE-2025-46808 +

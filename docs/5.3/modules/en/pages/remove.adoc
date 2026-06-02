@@ -4,6 +4,7 @@
 :page-opendocs-origin: /02.deploying/10.remove/10.remove.md
 :page-opendocs-slug: /deploying/remove
 
+[#_removing-product-deployment-containers]
 == Removing {product-name} Deployment / Containers
 
 To remove the {product-name} deployment on Kubernetes, use the same yaml file for deployment in the delete command.
@@ -17,6 +18,7 @@ This will remove the services and container deployments of {product-name}. You m
 
 If you deployed {product-name} using a Helm chart or operator you should delete {product-name} using Helm or the appropriate operator command.
 
+[#_resetting-product-to-an-initial-state]
 == Resetting {product-name} to an Initial State
 
 In addition to deleting as discussed above and redeploying {product-name}, the following steps can be taken in Kubernetes to reset {product-name}, which will remove learned rules, groups, and other configuration but leave the {product-name} deployment intact.
@@ -25,6 +27,7 @@ In addition to deleting as discussed above and redeploying {product-name}, the f
 . (Optional) if a Persistent Volume is used, delete the persistent volume backup and registry folders created.
 . Scale the controller deployment to 3.
 
+[#_resetting-the-admin-password]
 == Resetting the Admin Password
 
 The admin password is the key to administering the {product-name} deployment and view the cluster network activities.  It is important to change the password upon install and keep it safely guarded.  Sometimes, the password is guarded too well and become loss or the administrator leaves the company.  If you have kubectl access to the cluster, you can reset the admin password to the default using the following steps.

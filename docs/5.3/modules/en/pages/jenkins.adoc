@@ -4,6 +4,7 @@
 :page-opendocs-origin: /06.scanning/03.build/01.jenkins/01.jenkins.md
 :page-opendocs-slug:  /scanning/build/jenkins
 
+[#_detailed-configuration-for-the-jenkins-plugin]
 == Detailed Configuration for the Jenkins Plugin
 
 Containers provide an easy and efficient way to deploy applications. But container images may contain open source code over which you don't have a full control. Many vulnerabilities in open source projects have been reported, and you may decide to use these libraries with vulnerabilities or not after scanning the images and reviewing the vulnerability information for them.
@@ -21,6 +22,7 @@ For the standalone scanner mode, the Docker run-time must be installed on the sa
 sudo usermod -aG docker jenkins
 ----
 
+[#_jenkins-plugin-installation]
 === Jenkins Plugin Installation
 
 First, go to Jenkins in your browser to search for the {product-name} plug-in. This can be found in:
@@ -38,6 +40,7 @@ There are two scenarios for image scanning, local and registry scanning.
 . *Local Image Scan*. If you use the plugin to scan local images (before pushing to any registries), you can scan on the same host as the controller/scanner or configure the scanner to access the docker engine on a remote host.
 . *Registry Image Scan*. If you use the plugin to scan registry images (after pushing to any registries, but as part of the Jenkins build process), the {product-name} Scanner can be installed on any node in the network with connectivity between the registry, {product-name} Scanner, and Jenkins.
 
+[#_global-configuration-in-jenkins]
 === Global Configuration in Jenkins
 
 After installing the plugin, find the '`{product-name} Vulnerability Scanner`' section in the global configuration page (Jenkins '`Configure System`'). Enter values for the {product-name} Controller IP, port, username, and password. You may click the '`Test Connection`' button to validate the values. It will show '`Connection Success`' or an error message.
@@ -56,6 +59,7 @@ For global registry configuration, follow the instructions above for local, then
 
 image:registry_console.png[global-registry]
 
+[#_standalone-scanner]
 ==== Standalone Scanner
 
 Running Jenkins scan in standalone mode is a lightweight way to scan image vulnerabilities in the pipeline. Scanner is dynamically invoked and no installaton of controller setup is required. This is especially useful when scaning an image before it is pushed to a registry. It also has no limit on how many scan tasks can run at the same time.
@@ -64,8 +68,10 @@ In order to run vulnerability scan in standalone mode, the Jenkins plugin need p
 
 The scan result can also be submitted to the controler and used in the admission control function. In this case, you do need a controller setup and specify how to connect to the controller in {product-name} plugin configuration page.
 
+[#_local-configuration-for-scanning-a-remote-docker-host]
 === Local Configuration for scanning a remote Docker Host
 
+[#_prerequisites-for-local-scan-on-a-remote-docker-host]
 ==== Prerequisites for Local Scan on a Remote Docker Host
 
 To enable {product-name} to scan an image that is not on the same host as the controller/allinone:
@@ -73,6 +79,7 @@ To enable {product-name} to scan an image that is not on the same host as the co
 * Make sure the docker run-time api socket is exposed via TCP
 * Add the following environment variable to the controller/allinone: SCANNER_DOCKER_URL=tcp://192.168.1.10:2376
 
+[#_project-configuration]
 === Project Configuration
 
 In your project, choose the '{product-name} Vulnerability Scanner' plugin from the drop down menu in the 'Add build step.' Check the box "Scan with Standalone scanner" if you want to do the scan in the standalone scanner mode. By default, it uses "Controller & Scanner" mode to do the scan.
@@ -89,6 +96,7 @@ Scenario 2: registry configuration example
 
 image:jenkins_registry.png[local-registry]
 
+[#_jenkins-pipeline]
 === Jenkins Pipeline
 
 For the Jenkins pipeline project, you may write your own pipeline script directly, or click the '`pipeline syntax`' to generate the script if you are new to the pipeline style task.
@@ -123,6 +131,7 @@ Scenario 2: Simple registry pipeline script example (to insert into your pipelin
 ...
 ----
 
+[#_additional-stages]
 === Additional Stages
 
 Add your own pre- and post- image scan stages, for example in the Pipeline stage view example below.
@@ -131,6 +140,7 @@ image:jenkins7a.png[stages]
 
 You are now ready to start your Jenkins builds and trigger the {product-name} Vulnerability Scanner to report any vulnerabilities!
 
+[#_openshift-route-and-registry-token-example]
 == OpenShift Route and Registry Token Example
 
 To configure the plug-in using an OpenShift route for ingress to the controller, add the route into the controller IP field.
@@ -139,6 +149,7 @@ image:rhos_jenkins_route.png[openshift]
 
 To use token based authentication to the OpenShift registry, use NONAME as the user and enter the token in the password.
 
+[#_special-use-case-for-jenkins-in-the-same-kubernetes-cluster]
 == Special Use Case for Jenkins in the Same Kubernetes Cluster
 
 To do build-phase scanning where the Jenkins software is running in the same Kubernetes cluster as the scanner, make sure the scanner and Jenkins are set to run on the same node. The node needs to be labeled so the Jenkins and scanner containers run on the same node because the scanner needs access to the local node's docker.sock to access the image.

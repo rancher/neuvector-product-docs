@@ -4,6 +4,7 @@
 :page-opendocs-origin: /14.releasenotes/01.5x/01.5x.md
 :page-opendocs-slug:  /releasenotes/5x
 
+[#_release-notes-for-5x]
 == Release Notes for 5.x
 
 [NOTE]
@@ -11,6 +12,7 @@
 To receive email notifications of new releases, please subscribe to this SUSE mailing list: https://lists.suse.com/mailman/listinfo/neuvector-updates
 ====
 
+[#_549-february-2026]
 == 5.4.9 February 2026
 
 === New Features
@@ -37,6 +39,7 @@ To receive email notifications of new releases, please subscribe to this SUSE ma
 * **NVSHAS-10222**: [Manager] After a cluster successfully joins fed, UI doesn't auto-refresh
 * **NVSHAS-10247**: Disable the access to subpath for some manager APIs
 
+[#_548-december-2025]
 == 5.4.8 December 2025
 
 === New Features
@@ -79,6 +82,7 @@ To receive email notifications of new releases, please subscribe to this SUSE ma
 
 * https://github.com/neuvector/neuvector/security/advisories/GHSA-4jj9-cgqc-x9h5[OpenID Connect is vulnerable to man-in-the-middle (MITM)]
 
+[#_neuvector-v547-october-2025]
 == NeuVector v5.4.7 (October 2025)
 
 === New Features
@@ -299,7 +303,7 @@ In the NeuVector 5.4.2 release, support is discontinued for deployments using th
 
 ===== Using YAML:
 
-- Provide an xref:internal.adoc#_replacing_certificates_used_in_internal_communications_of_suse_security[internal certificate using the existing methods].
+- Provide an xref:internal.adoc#_replacing-certificates-used-in-internal-communications-of-product[internal certificate using the existing methods].
 
 ==== Upgrading from Previous Versions to 5.4.2:
 
@@ -758,7 +762,7 @@ The 5.3.1 version has been removed from docker hub in order to prevent the upgra
 
 ==== {product-name} UI Extension v. 1.0 for Rancher March 2024
 
-* After installation of {product-name}, xref:rancher.adoc#_suse_security_ui_extension_for_rancher[enabling/installing] the {product-name} UI Extension from Rancher will display a Dashboard for the cluster, including links to SSO to the full {product-name} cluster. NOTE: The extension may display as Third Party, which will be fixed in a future release. Also, after installation, Rancher 2.7.x users may see two {product-name} UI Ext icons in the list (bug). One icon will say Uninstall (meaning it is installed), and the other should say Install. This can be left as is, ie, don't Install again if the extension is already installed.
+* After installation of {product-name}, xref:rancher.adoc#_product-ui-extension-for-rancher[enabling/installing] the {product-name} UI Extension from Rancher will display a Dashboard for the cluster, including links to SSO to the full {product-name} cluster. NOTE: The extension may display as Third Party, which will be fixed in a future release. Also, after installation, Rancher 2.7.x users may see two {product-name} UI Ext icons in the list (bug). One icon will say Uninstall (meaning it is installed), and the other should say Install. This can be left as is, ie, don't Install again if the extension is already installed.
 
 === 5.2.4-s2 February 2024
 
@@ -1289,7 +1293,7 @@ neuvector-scanner-pod-87474dcff-s8vgt       1/1     Running   0          114s   
 
 [NOTE]
 ====
-The instructions below apply to upgrades to 5.0.x and 5.1.x. For 5.2.x, service accounts and bindings have changed, and should be xref:kubernetes.adoc#_deploy_suse_security[reviewed] to plan upgrades.
+The instructions below apply to upgrades to 5.0.x and 5.1.x. For 5.2.x, service accounts and bindings have changed, and should be xref:kubernetes.adoc#_deploy-product[reviewed] to plan upgrades.
 ====
 
 

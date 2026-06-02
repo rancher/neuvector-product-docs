@@ -4,6 +4,7 @@
 :page-opendocs-origin: /05.policy/03.admission/01.sigstore/03.ociimagesigning.md
 :page-opendocs-slug:  /policy/admission/ociimagesigning
 
+[#_verify-suse-rancher-application-collection-images-with-sigstore]
 == Verify SUSE Rancher Application Collection images with Sigstore
 
 SUSE Rancher Application Collection uses an OCI-based registry where all applications are signed by Sigstore. Users can verify the apps in the Application Collection with Sigstore Verifiers in {product-name}.

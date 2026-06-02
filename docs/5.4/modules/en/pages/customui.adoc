@@ -4,6 +4,7 @@
 :page-opendocs-origin: /03.configuration/03.customui/03.customui.md
 :page-opendocs-slug: /configuration/customui
 
+[#_customizing-the-console-ui-component]
 == Customizing the Console (UI) Component
 
 This guide will help you customize the console with the following options:

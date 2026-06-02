@@ -4,6 +4,7 @@
 :page-opendocs-origin: /08.integration/08.oidc_adfs/08.oidc_adfs.md
 :page-opendocs-slug:  /integration/oidc_adfs
 
+[#_integrating-with-openid-connect-oidc-for-adfs]
 == Integrating with OpenID Connect (OIDC) for ADFS
 
 From AD FS Management, click on "Application Groups" and then click on "Add Application Group..."
@@ -58,6 +59,7 @@ image:adfs13.png[adfs]
 
 image:adfs14.png[adfs]
 
+[#_product-setup]
 === {product-name} Setup
 
 * Identity Provider Issuer: "https://<adfs-fqdn>/adfs"

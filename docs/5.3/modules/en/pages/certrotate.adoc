@@ -6,7 +6,9 @@ After enabled, a newly added init-container of controller pod will create a Kube
 
 To enable auto-rotation, ```internal.autoRotateCert``` has to be set to ```true```. (disabled by default).
 
+[#_expected-behavior-when-internalautorotatecert-is-enabled]
 == Expected behavior when internal.autoRotateCert is enabled
+[#_fresh-install]
 === Fresh install
 
 1. When all containers start running, controller's init containers will run and create an upgrader job.
@@ -21,6 +23,7 @@ image:cert_rotate_02.png[certrotate]
 +
 image:cert_rotate_03.png[certrotate]
 
+[#_upgrade]
 === Upgrade
 
 1. Old deployment is already running.
@@ -41,6 +44,7 @@ image:cert_rotate_07.png[certrotate]
 
 If `internal.autoRotateCert` is false, the upgrader job will still start but no actions will be performed. The original behavior will be followed, i.e., no init containers and the built-in certificates will still be used in all cases.
 
+[#_new-options-in-helm-chart]
 == New options in HELM chart
 In helm charts, these options are added:
 [source, yaml]
@@ -52,6 +56,7 @@ controller.upgrader.imagePullPolicy (default IfNotPresent): Upgrader's pull poli
 controller.upgrader.schedule (default "0 0 1 * *"): Upgrader's cronjob schedule.
 ---
 
+[#_rotating-sensitive-field-in-configuration]
 == Rotating sensitive field in configuration
 
 When the device encryption key is rotated, NeuVector does not immediately re-encrypt existing sensitive configuration fields. These fields are re-encrypted only when they are updated or modified after the rotation. 

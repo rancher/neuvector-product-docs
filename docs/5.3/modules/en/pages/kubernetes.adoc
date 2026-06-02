@@ -4,6 +4,7 @@
 :page-opendocs-origin: /02.deploying/02.kubernetes/02.kubernetes.md
 :page-opendocs-slug: /deploying/kubernetes
 
+[#_deploy-using-kubernetes]
 == Deploy Using Kubernetes
 
 You can use Kubernetes to deploy separate manager, controller and enforcer containers and make sure that all new nodes have an enforcer deployed. {product-name} requires and supports Kubernetes network plugins such as flannel, weave, or calico.
@@ -14,7 +15,7 @@ See the bottom section for specifying dedicated manager or controller nodes usin
 
 [NOTE]
 ====
-It is not recommended to deploy (scale) more than one manager behind a load balancer due to potential session state issues. If you plan to use a PersistentVolume claim to store the backup of {product-name} config files, please see the general Backup/Persistent Data section in the xref:production.adoc#_backups_and_persistent_data[Deploying {product-name}] overview.
+It is not recommended to deploy (scale) more than one manager behind a load balancer due to potential session state issues. If you plan to use a PersistentVolume claim to store the backup of {product-name} config files, please see the general Backup/Persistent Data section in the xref:production.adoc#_backups-and-persistent-data[Deploying {product-name}] overview.
 ====
 
 If your deployment supports an integrated load balancer, change type NodePort to LoadBalancer for the console in the yaml file below.
@@ -23,6 +24,7 @@ If your deployment supports an integrated load balancer, change type NodePort to
 
 There is a separate section for OpenShift instructions, and Docker EE on Kubernetes has some special steps described in the Docker section.
 
+[#_product-images-on-docker-hub]
 === {product-name} Images on Docker Hub
 
 The images are on the {product-name} Docker Hub registry. Use the appropriate version tag for the manager, controller, enforcer, and leave the version as 'latest' for scanner and updater. For example:
@@ -47,6 +49,7 @@ If deploying from the Rancher Manager 2.6.5+ {product-name} chart, images are pu
 ====
 
 
+[#_deploy-product]
 == Deploy {product-name}
 
 . Create the {product-name} namespace and the required service accounts: 
@@ -335,6 +338,7 @@ spec:
           value: myvalue
 ----
 
+[#_using-node-labels-for-manager-and-controller-nodes]
 == Using Node Labels for Manager and Controller Nodes
 
 To control which nodes the Manager and Controller are deployed on, label each node. Replace nodename with the appropriate node name ('`kubectl get nodes`'). Note: By default Kubernetes will not schedule pods on the master node.
@@ -373,12 +377,14 @@ To prevent the enforcer from being deployed on a controller node, if it is a ded
       imagePullSecrets:
 ----
 
+[#_rolling-updates]
 == Rolling Updates
 
 Orchestration tools such as Kubernetes, RedHat OpenShift, and Rancher support rolling updates with configurable policies. You can use this feature to update the {product-name} containers. The most important will be to ensure that there is at least one Controller (or Allinone) running so that policies, logs, and connection data is not lost. Make sure that there is a minimum of 120 seconds between container updates so that a new leader can be elected and the data synchronized between controllers.
 
 The provided sample deployment yamls already configure the rolling update policy. If you are updating via the {product-name} Helm chart, please pull the latest chart to properly configure new features such as admission control, and delete the old cluster role and cluster role binding for {product-name}. If you are updating via Kubernetes you can manually update to a new version with the sample commands below.
 
+[#_sample-kubernetes-rolling-update]
 === Sample Kubernetes Rolling Update
 
 For upgrades which just need to update to a new image version, you can use this simple approach.
@@ -422,6 +428,7 @@ kubectl rollout undo -n neuvector ds/neuvector-enforcer-pod
 kubectl rollout undo -n neuvector deployment/neuvector-controller-pod
 ----
 
+[#_expose-rest-api-in-kubernetes]
 == Expose REST API in Kubernetes
 
 To expose the REST API for access from outside of the Kubernetes cluster, here is a sample yaml file:
@@ -445,6 +452,7 @@ spec:
 
 Please see the Automation section for more info on the REST API.
 
+[#_kubernetes-deployment-in-non-privileged-mode]
 == Kubernetes Deployment in Non-Privileged Mode
 
 The following instructions can be used to deploy {product-name} without using privileged mode containers. The controller is already in non-privileged mode and enforcer deployment should be changed, which is shown in the excerpted snippets below.
@@ -823,6 +831,7 @@ spec:
 ----
 ====
 
+[#_pks-change]
 == PKS Change
 
 [NOTE]

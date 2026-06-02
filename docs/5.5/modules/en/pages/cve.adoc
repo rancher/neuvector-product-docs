@@ -4,6 +4,7 @@
 
 NeuVector is committed to informing the community about security issues. The following table lists published security advisories and CVEs (Common Vulnerabilities and Exposures) for resolved issues.
 
+[#_cve-list]
 == CVE List
 
 [cols="1,4,1,1", options="header"]
@@ -15,6 +16,7 @@ NeuVector is committed to informing the community about security issues. The fol
 | https://github.com/neuvector/neuvector/releases/tag/v5.5.0[NeuVector v5.5.0]
 |===
 
+[#_potential-information-leakage-from-manager-network-graph-api]
 == Potential information leakage from manager `/network/graph` API
 
 * **Advisory ID:** https://github.com/neuvector/manager/security/advisories/GHSA-hx45-873x-74qv[CVE-2026-25703]
@@ -59,6 +61,7 @@ As a temporary mitigation:
 
 *Recommendation:* Upgrade to version `5.5.0` or later as soon as possible.
 
+[#_questions-and-support]
 == Questions and Support
 
 * Contact the https://github.com/rancher/rancher/security/policy[SUSE Rancher Security team].

@@ -4,8 +4,10 @@
 :page-opendocs-origin: /02.deploying/01.production/03.details/03.details.md
 :page-opendocs-slug: /deploying/production/details
 
+[#_environment-variables]
 == Environment Variables
 
+[#_for-both-controller-allinone-and-enforcer]
 === For Both Controller (Allinone) and Enforcer
 
 * CLUSTER_JOIN_ADDR
@@ -44,6 +46,7 @@ ____
 (Optional) Set value to 1 to enable collection of memory profile data to help investigate memory pressure issues.
 ____
 
+[#_controller]
 === Controller
 
 * CTRL_PERSIST_CONFIG
@@ -82,6 +85,7 @@ ____
 (Optional) When enabled (value=1) icmp traffic can be learned in discover mode, and policy can be generated. If there is no network policy in monitor or protect mode for the group, an implicit violation will be generated for icmp traffic.
 ____
 
+[#_manager]
 === Manager
 
 * CTRL_SERVER_IP
@@ -108,6 +112,7 @@ ____
 (Optional) Manager by default uses and HTTPS/SSL connection. Set the value to "`off`" to use HTTP.
 ____
 
+[#_enforcer]
 === Enforcer
 
 * CONTAINER_NET_TYPE
@@ -158,6 +163,7 @@ ____
 (Optional) Specify what groups or namespaces that {product-name} considers to be 'system containers', separated by semi-colons. For example, for Rancher-based apps and the default namespace, NV_SYSTEM_GROUPS=__cattle-system;__default. These values are translated in regex. System containers (which also include {product-name} and Kubernetes system containers) operate only in Monitor mode (alert only) even if the group is set to Protect mode.
 ____
 
+[#_open-ports]
 == Open Ports
 
 * CLUSTER_RPC_PORT - on controller and all-in-one. Default 18300.

@@ -4,6 +4,7 @@
 :page-opendocs-origin: /08.integration/11.splunk/11.splunk.md
 :page-opendocs-slug:  /integration/splunk
 
+[#_integrating-with-splunk-with-the-product-splunk-app]
 == Integrating with Splunk with the {product-name} Splunk App
 
 The {product-name} Splunk App can be found in the splunkbase catalog https://splunkbase.splunk.com/app/6205/[here] or by searching for {product-name}.
@@ -12,46 +13,58 @@ The {product-name} Security dashboard helps to identify security events such as 
 
 Below are sample screens displayed in the Splunk app.
 
+[#_image-vulnerabilities]
 === Image Vulnerabilities
 
 image:vulnerable_images.png[vulnerabilities]
 
+[#_admission-control-and-security-events]
 === Admission Control and Security Events
 
 image:admission_security_events.png[admission_security]
 
+[#_network-violations-by-pod-service-deployments]
 === Network Violations by Pod/Service (Deployments)
 
 image:network_violations.png[network]
 
+[#_egress-connection-summary]
 === Egress Connection Summary
 
 image:egress_destinations.png[egress]
 
+[#_product-login-activity-dashboard]
 === {product-name} Login Activity Dashboard
 
 image:login_summary.png[logins]
 
+[#_setup-and-configuration]
 == Setup and Configuration
 
+[#_getting-the-app]
 === Getting the app
 
+[#_github]
 ==== GitHub
 
 Download the latest app tarball (`neuvector_app.tar.gz`) from the https://github.com/neuvector/neuvector-splunk-app[neuvector/neuvector-splunk-app repository].
 
+[#_splunkbase]
 ==== Splunkbase
 
 Download the latest app tarball from https://splunkbase.splunk.com/apps[Splunkbase].
 
+[#_splunk-apps-browser]
 ==== Splunk Apps Browser
 
 In the Splunk UI, click on the Apps dropdown, click "Find More Apps", then search for {product-name} Splunk App.
 
+[#_installation-and-setup]
 === Installation and Setup
 
 Install the app by either uploading the tarball or following the Splunkbase prompts.
 
+[#_configure-syslog-in-product-console]
 ==== Configure syslog in {product-name} console
 
 Go to Settings -> Configuration -> Syslog
@@ -67,8 +80,10 @@ image:syslog-config.png[syslog]
 
 You can configure multiple clusters to send syslog to your splunk instance and your splunk instance will receive these syslogs in real time.
 
+[#_faqs]
 === FAQs
 
+[#_what-user-role-is-required]
 ==== What user role is required?
 
 Any user role.

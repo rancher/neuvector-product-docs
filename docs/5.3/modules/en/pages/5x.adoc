@@ -4,6 +4,7 @@
 :page-opendocs-origin: /14.releasenotes/01.5x/01.5x.md
 :page-opendocs-slug:  /releasenotes/5x
 
+[#_release-notes-for-5x]
 == Release Notes for 5.x
 
 [NOTE]
@@ -220,7 +221,7 @@ The 5.3.1 version has been removed from docker hub in order to prevent the upgra
 
 ==== {product-name} UI Extension v. 1.0 for Rancher March 2024
 
-* After installation of {product-name}, xref:rancher.adoc#_suse_security_ui_extension_for_rancher[enabling/installing] the {product-name} UI Extension from Rancher will display a Dashboard for the cluster, including links to SSO to the full {product-name} cluster. NOTE: The extension may display as Third Party, which will be fixed in a future release. Also, after installation, Rancher 2.7.x users may see two {product-name} UI Ext icons in the list (bug). One icon will say Uninstall (meaning it is installed), and the other should say Install. This can be left as is, ie, don't Install again if the extension is already installed.
+* After installation of {product-name}, xref:rancher.adoc#_product-ui-extension-for-rancher[enabling/installing] the {product-name} UI Extension from Rancher will display a Dashboard for the cluster, including links to SSO to the full {product-name} cluster. NOTE: The extension may display as Third Party, which will be fixed in a future release. Also, after installation, Rancher 2.7.x users may see two {product-name} UI Ext icons in the list (bug). One icon will say Uninstall (meaning it is installed), and the other should say Install. This can be left as is, ie, don't Install again if the extension is already installed.
 
 === 5.2.4-s2 February 2024
 
@@ -752,7 +753,7 @@ neuvector-scanner-pod-87474dcff-s8vgt       1/1     Running   0          114s   
 
 [NOTE]
 ====
-The instructions below apply to upgrades to 5.0.x and 5.1.x. For 5.2.x, service accounts and bindings have changed, and should be xref:kubernetes.adoc#_deploy_suse_security[reviewed]  to plan upgrades.
+The instructions below apply to upgrades to 5.0.x and 5.1.x. For 5.2.x, service accounts and bindings have changed, and should be xref:kubernetes.adoc#_deploy-product[reviewed]  to plan upgrades.
 ====
 
 

@@ -4,6 +4,7 @@
 :page-opendocs-origin: /02.deploying/09.airgap/09.airgap.md
 :page-opendocs-slug: /deploying/airgap
 
+[#_tools-needed]
 == Tools Needed
 
 We need to install three tools for downloading all the bits for {product-name}.
@@ -21,6 +22,7 @@ curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 |
 yum install zstd skopeo -y
 ----
 
+[#_get-images-and-chart]
 == Get Images and Chart
 
 In order to get all the images we are going to use the chart itself. Using https://helm.sh/[Helm] let's add the repo and download the chart. We will also use https://github.com/containers/skopeo[skopeo] for downloading and uploading.
@@ -75,6 +77,7 @@ total 953920
 
 And we can compress and move everything.
 
+[#_compress-and-move]
 == Compress and Move
 
 Compressing is fairly simple. We will use `tar` with the ZST format for maximum compression.
@@ -87,6 +90,7 @@ tar -I zstd -vcf neuvector_airgap.zst neuvector
 
 Now simply move the 400M `neuvector_airgap.zst` to your network.
 
+[#_uncompress-and-load]
 == Uncompress and Load
 
 All we need to do now is uncompress with a similar command. The following will output to director called `neuvector`.
@@ -109,6 +113,7 @@ done
 
 With all the images loaded in a registry we can install with Helm.
 
+[#_deploy-with-helm]
 == Deploy with Helm
 
 Deploying with Helm is fairly straight forward. There are a few values that are needed to insure the images are pulling from the local registry. Here is a good example. You may need to tweak a few settings. Please follow the Helm best practices for `values.yaml`. Note the `imagePullSecrets` field. This is the secret for your cluster to authenticate to the registry.

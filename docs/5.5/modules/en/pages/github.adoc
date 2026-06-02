@@ -4,6 +4,7 @@
 :page-opendocs-origin: /06.scanning/03.build/06.github/06.github.md
 :page-opendocs-slug:  /scanning/build/github
 
+[#_scan-for-vulnerabilities-in-a-github-action-pipeline]
 == Scan for Vulnerabilities in a GitHub Action Pipeline
 
 The {product-name} scanner can be triggered from a GitHub Action pipeline by using the https://github.com/marketplace/actions/neuvector-vulnerability-scan-action[{product-name} Vulnerability Scan Action]

@@ -4,6 +4,7 @@
 :page-opendocs-origin: /06.scanning/06.scanners/06.scanners.md
 :page-opendocs-slug:  /scanning/scanners
 
+[#_increase-scanner-scalability-with-multiple-scanners]
 == Increase Scanner Scalability with Multiple Scanners
 
 To increase scanner performance and scalability, {product-name} supports deploying multiple scanner pods which can, in parallel, scan images in registries. The controller assigns scanning tasks to each available scanner pod. Scanner pods can be scaled up or down easily as needed using Kubernetes.
@@ -18,6 +19,7 @@ Please note that in initial releases the presence and status of multiple scanner
 
 Scan results from all scanners are shown in the Assets -> Registries menu. Additional scanner monitoring features will be added in future releases.
 
+[#_auto-scaling-of-scanner-pods]
 === Auto-scaling of Scanner Pods
 
 Scanner pods can be configured to auto-scale based on certain criteria. This will ensure that scanning jobs are handled quickly and efficiently, especially if there are thousands of images to be scanned or re-scanned. There are three possible settings: delayed, immediate,  and disabled. When images are queued for scanning by the controller, it keeps a 'task count' of the queue size.
@@ -36,6 +38,7 @@ Scanner auto-scaling is configured in Settings -> Configuration. The minimumScan
 Scanner auto-scaling is not supported when scanner is deployed with an OpenShift operator, as the operator will always change the number of pods to its configured value.
 ====
 
+[#_operations-and-debugging]
 === Operations and Debugging
 
 Each scanner pod will query the registries to be scanned to pull down the complete list of available images and other data. Each scanner will then be assigned an image to pull and scan from the registry.
@@ -47,6 +50,7 @@ To inspect the scanner behavior, logs from each scanner pod can be examined usin
 kubectl logs <scanner-pod-name> -n neuvector
 ----
 
+[#_performance-planning]
 == Performance Planning
 
 Experiment with varying numbers of scanners on registries with a large number of images to observe the scan completion time behavior in your environment. 2-5 scanners as the replica setting should be sufficient for most cases.
@@ -57,6 +61,7 @@ Large images will take more time to pull as well as need to be expanded to scan 
 
 Multiple scanner pods can be deployed to the same host/node, but considerations should be made to ensure the host has enough memory, CPU, and network bandwidth for maximizing scanner performance.
 
+[#_standalone-scanner-for-local-scanning]
 == Standalone Scanner for Local Scanning
 
 {product-name} supports standalone scanner deployments for local image scanning (which does not require a Controller). In the sample docker run below, the local image will be scanned and the results stored at the /var/neuvector locally. For local scanning, the image must be able to be accessed through the mounted docker.sock, otherwise a registry can be specified.
@@ -78,6 +83,7 @@ The following scanner environment variables can be used in the docker run comman
 * CLUSTER_JOIN_ADDR (optional), CLUSTER_JOIN_PORT (optional) - to send results to controller for use in Admission control rules (Kubernetes deployed controller).
 * CLUSTER_ADVERTISED_ADDR (optional) - if scanner is on different host than controller, to send results for use in Admission control rules (Kubernetes deployed controller).
 
+[#_host-scanning-in-standalone-mode]
 === Host Scanning in Standalone Mode
 
 Use the following command to scan the host.
@@ -93,6 +99,7 @@ Requires privileged mode!
 docker run --rm --privileged --pid=host neuvector/scanner -n neuvector
 ----
 
+[#_manual-deployment-of-multiple-scanners-on-kubernetes]
 === Manual Deployment of Multiple Scanners on Kubernetes
 
 To manually deploy scanners as part of an existing Kubernetes deployment, create a new role binding:

@@ -4,6 +4,7 @@
 :page-opendocs-origin: /08.integration/07.openid/07.openid.md
 :page-opendocs-slug:  /integration/openid
 
+[#_integrating-with-openid-connect-oidc-for-azure-and-okta]
 == Integrating with OpenID Connect (OIDC) for Azure and Okta
 
 To enable OpenID Connect authentication, the *Issuer*, *Client ID* and *Client secret* settings are required. With the issuer URL, {product-name} will call the discovery API to retrieve the Authenorization, Token and User info endpoints.
@@ -12,6 +13,7 @@ Locate the OpenID Connect Redirect URI on the top of the {product-name} OpenID C
 
 image:openid1.png[OpenID1]
 
+[#_microsoft-azure-configuration]
 === Microsoft Azure Configuration
 
 In Azure Active Directory > App registrations > Application name > Settings Page, locate Application ID string. This is used to set the Client ID in {product-name}. The Client secret can be located in Azure's Keys setting.
@@ -30,6 +32,7 @@ The group claim returned by Azure are identified by the "Object ID" instead of t
 
 image:openid5.png[OpenID5]
 
+[#_verify-permissions]
 ==== Verify Permissions
 
 Make sure the following permissions have been set from Microsoft Graph
@@ -38,6 +41,7 @@ Make sure the following permissions have been set from Microsoft Graph
 . openid - Sign users in
 . profile - View users' basic profile
 
+[#_okta-configuration]
 === Okta Configuration
 
 Login to your Okta account.
@@ -123,6 +127,7 @@ In your application integration page, navigate to "`Assignments`" tab and make s
 
 image:okta13.png[assignments]
 
+[#_product-openid-connect-configuration]
 === {product-name} OpenID Connect Configuration
 
 Configure the proper Issuer URL, Client ID and Client secret in the page.
@@ -136,6 +141,7 @@ After the user is authenticated, the proper role can be derived with group-based
 
 The group can be mapped to the Admin role in {product-name}. Individual users can be 'promoted' to a Federated Admin role by logging in as a local cluster admin, selecting the user with Identify Provider 'OpenID', and editing their role in Settings -> Users/Roles.
 
+[#_mapping-groups-to-roles-and-namespaces]
 === Mapping Groups to Roles and Namespaces
 
-Please see the xref:users.adoc#_mapping_groups_to_roles_and_namespaces[Users and Roles] section for how to map groups to preset and custom roles as well as namespaces in {product-name}.
+Please see the xref:users.adoc#_mapping-groups-to-roles-and-namespaces[Users and Roles] section for how to map groups to preset and custom roles as well as namespaces in {product-name}.

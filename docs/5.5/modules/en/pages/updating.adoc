@@ -4,6 +4,7 @@
 :page-opendocs-origin: /10.updating/01.updating/01.updating.md
 :page-opendocs-slug:  /updating/updating
 
+[#_updating-product-components]
 == Updating {product-name} Components
 
 It's super easy to update your {product-name} containers. If there is a new release available, pull it from Docker Hub. It is recommended to use a '`rolling update`' strategy to keep at least one Allinone or Controller container running at any time during an update.
@@ -48,10 +49,12 @@ $sudo docker-compose -f <filename> up -d
 We recommend that all {product-name} components be updated to the most recent version at the same time. Backward compatibility is supported for at least one minor version back. Although most older versions will be backward compatible, there may be exceptions which cause unexpected behavior.
 ====
 
+[#_rolling-updates]
 == Rolling Updates
 
 Orchestration tools such as Kubernetes, RedHat OpenShift, and Rancher support rolling updates with configurable policies. You can use this feature to update the {product-name} containers. The most important will be to ensure that there is at least one Allinone/Controller running so that policies, logs, and connection data is not lost. Make sure that there is a minimum of 30 seconds between container updates so that a new leader can be elected and the data synchronized between controllers.
 
+[#_sample-kubernetes-rolling-update]
 === Sample Kubernetes Rolling Update
 
 If your Deployment or Daemonset is already running, you can change the yaml file to the new version, then apply the update:
@@ -86,6 +89,7 @@ kubectl rollout undo -n neuvector ds/neuvector-enforcer-pod
 kubectl rollout undo -n neuvector deployment/neuvector-controller-pod  # same for manager, scanner etc
 ----
 
+[#_updating-the-vulnerability-cve-database]
 == Updating the Vulnerability CVE Database
 
 The {product-name} Scanner image is regularly updated on neuvector with new CVE database updates, using the 'latest' tag.
@@ -124,6 +128,7 @@ kubectl logs neuvector-controller-pod-777fdc5668-4jkjn -n neuvector | grep versi
 2019-07-29T17:04:12.224|DEBU|SCN|main.scannerRegister: - version=1.576
 ----
 
+[#_pod-disruption-budget]
 == Pod Disruption Budget
 
 A Kubernetes feature allows for ensuring that a minimum number of controllers are running at any time. This is useful for node draining or other maintenance activities that could remove controller pods. For example, create and apply the file below nv_pdb.yaml to ensure that there are at least 2 controllers running at any time.
@@ -142,6 +147,7 @@ spec:
       app: neuvector-controller-pod
 ----
 
+[#_upgrading-from-product-4x-to-51x]
 == Upgrading from {product-name} 4.x to 5.1.x
 
 Upgrade first to a 5.1.x release such as 5.1.3, then see the xref:kubernetes.adoc[Kubernetes deployment section] for updating to 5.2.x+ for important changes to services accounts and bindings.
@@ -201,6 +207,7 @@ The images are on the {product-name} Docker Hub registry. Use the appropriate ve
 
 Optionally, remove any references to the {product-name} license and secrets in Helm charts, deployment yaml, configmap, scripts etc, as these are no longer required to pull the images or to start using {product-name}.
 
+[#_note-about-scc-and-upgrading-via-operator-helm]
 === Note about SCC and Upgrading via Operator/Helm
 
 Privileged SCC is added to the Service Account specified in the deployment yaml by Operator version 1.3.4 and above in new deployments. In the case of upgrading the {product-name} Operator from a previous version to 1.3.4 or Helm to 2.0.0, please delete Privileged SCC before upgrading.
