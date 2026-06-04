@@ -9,7 +9,7 @@
 
 Operators take human operational knowledge and encode it into software that is more easily shared with consumers. Operators are pieces of software that ease the operational complexity of running another piece of software. More technically, Operators are a method of packaging, deploying, and managing a Kubernetes application.
 
-[#_product-operators]
+[#_product_operators]
 == {product-name} Operators
 
 The {product-name} Operator is based on the {product-name} Helm chart. The {product-name} RedHat OpenShift Operator runs in the OpenShift container platform to deploy and manage the {product-name} Security cluster components. The {product-name} Operator contains all necessary information to deploy {product-name} using Helm charts. You simply need to install the {product-name} operator from the OpenShift embedded Operator hub and create the {product-name} instance.

@@ -16,6 +16,7 @@
 * 响应规则以自动响应安全事件
 * 用于构建任何 {product-name} 功能自动化的 REST API
 
+[#_rest_api]
 === REST API
 
 可以使用 REST API 管理 {product-name} 解决方案。以下是使用 REST API 的常见自动化示例。REST API yaml 文档最好在 Swagger 2.0 查看器中查看。REST API 文档在下面的 yaml 文件中，最好在 swagger.io 等阅读器中查看。
@@ -285,7 +286,7 @@ curl -s -k -H 'Content-Type: application/json' -H 'X-Auth-Token: c64125decb31e6d
 [,bash]
 ----
 #!/bin/sh
-TOKEN_JSON=$(curl -k -H "Content-Type: application/json" -d '{"password": {"username": "admin", "password": "admin"}}' "https://`docker inspect neuvector.allinone | jq -r '.[0].NetworkSettings.IPAddress'`:10443/v1/auth")
+TOKEN_JSON=$(curl _k _H "Content_Type: application/json" _d '{"password": {"username": "admin", "password": "admin"}}' "https://`docker inspect neuvector.allinone | jq _r '.[0].NetworkSettings.IPAddress'`:10443/v1/auth")
 _TOKEN_=`echo $TOKEN_JSON | jq -r '.token.token'`
 curl -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"sniffer":{"file_number":1,"filter":"port 1381"}}' "https://`docker inspect neuvector.allinone | jq -r '.[0].NetworkSettings.IPAddress'`:10443/v1/sniffer?f_workload=`docker inspect neuvector.allinone | jq -r .[0].Id`"
 ----

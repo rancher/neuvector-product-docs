@@ -38,7 +38,7 @@ Wenn Sie mit dem aktuellen {product-name} Helm-Chart (v1.8.9+) bereitstellen, so
 
 Automatisierte Bereitstellung mit Helm finden Sie unter https://github.com/neuvector/neuvector-helm.
 
-Die Bereitstellung mit einem Operator, einschließlich des RedHat-zertifizierten Operators und des Kubernetes-Community-Operators, wird unterstützt, mit einer allgemeinen Beschreibung xref:operators.adoc[hier]. Der {product-name} RedHat-Operator befindet sich unter https://access.redhat.com/containers/#/registry.connect.redhat.com/neuvector/neuvector-operator, und der Community-Operator unter https://operatorhub.io/operator/neuvector-operator.
+Die Bereitstellung mit einem Operator, einschließlich des RedHat-zertifizierten Operators und des Kubernetes-Community-Operators, wird unterstützt, mit einer allgemeinen Beschreibung xref:operators.adoc[hier]. Der {product-name} RedHat-Operator befindet sich unter https://access.redhat.com/containers/#/registry.connect.redhat.com/neuvector/neuvector_operator, und der Community_Operator unter https://operatorhub.io/operator/neuvector_operator.
 
 == Bereitstellung mit ConfigMap
 

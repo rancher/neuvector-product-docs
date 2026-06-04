@@ -4,7 +4,7 @@
 :page-opendocs-origin: /06.scanning/03.build/03.build.md
 :page-opendocs-slug:  /scanning/build
 
-[#_ci-cd-build-phase-vulnerability-scanning]
+[#_ci_cd_build_phase_vulnerability_scanning]
 == CI/CD Build Phase Vulnerability Scanning
 
 Scan for vulnerabilities during the build phase of the pipeline using plug-ins such as https://plugins.jenkins.io/neuvector-vulnerability-scanner/[Jenkins], https://github.com/neuvector/azure-vsts[Azure Devops], https://github.com/neuvector/scan-action[Github Action], https://gitlab.com/neuvector/gitlab-plugin[gitlab], Bamboo, and https://github.com/neuvector/circleci-orb[CircleCI], or use the REST API. {product-name} supports two types of build-phase scanning: registry and local. For registry scanning, the {product-name} controller and scanner must be able to connect to the registry to pull the image.
@@ -15,12 +15,12 @@ Make sure there is a {product-name} scanner container deployed and properly conf
 
 You can download the plug-in from the Jenkins Plug-in Manager. Other plug-ins are accessible through the catalogs of the build tool, or on the https://github.com/neuvector[{product-name} github] page. The Bamboo scanner is available at https://github.com/neuvector/bamboo-plugin/releases/tag/1.0.1. The CircleCI ORB is available at https://github.com/neuvector/circleci-orb and through the CircleCI ORB catalog.
 
-[#_local-build-phase-scanning]
+[#_local_build_phase_scanning]
 === Local Build-Phase Scanning
 
 For local scanning, the {product-name} scanner will try to scan the image on a local host (or a host reachable by the remote host docker command).
 
-For Kubernetes or OpenShift-based local scanning, remove the commented-out section of the sample scanner deployment yaml file, shown in the xref:kubernetes.adoc#_deploy-using-kubernetes[Deploying {product-name}] sections. The commented out section looks like this:
+For Kubernetes or OpenShift-based local scanning, remove the commented-out section of the sample scanner deployment yaml file, shown in the xref:kubernetes.adoc#_deploy_using_kubernetes[Deploying {product-name}] sections. The commented out section looks like this:
 
 [,yaml]
 ----
@@ -49,9 +49,9 @@ For Kubernetes or OpenShift-based local scanning, remove the commented-out secti
       restartPolicy: Always
 ----
 
-For Docker-native local scanning, follow the instructions for Docker scanner deployments in the xref:docker.adoc#_deploy-the-product-scanner-container[Docker Production deployments] section for the scanner.
+For Docker-native local scanning, follow the instructions for Docker scanner deployments in the xref:docker.adoc#_deploy_the_product_scanner_container[Docker Production deployments] section for the scanner.
 
-[#_local-build-phase-scanning-scanner-only-no-controller-required]
+[#_local_build_phase_scanning_scanner_only_no_controller_required]
 === Local Build-Phase Scanning - Scanner Only (No Controller Required)
 
 {product-name} supports standalone scanner deployments for local image scanning (which does not require a Controller). Certain plug-in's such as the CircleCI ORB have an option to dynamically deploy a scanner when a build job requires image scanning, then remove the scanner when the results are sent back through the ORB. These dynamic scanner deployments are automatically invoked through the plug-in if supported.

@@ -4,7 +4,7 @@
 :page-opendocs-origin: /14.releasenotes/03.4x/03.4x.md
 :page-opendocs-slug:  /releasenotes/4x
 
-[#_release-notes-for-4x]
+[#_release_notes_for_4x]
 == Release Notes for 4.x
 
 === 4.4.4-s3 Security Patch April 2022
@@ -79,7 +79,7 @@
 
 * Add support for scanning embedded java jars and jars without Maven file, for example log4j-core-2.5.jar, when pom.xml doesn't exist.
 * Add CVE database source of https://github.com/advisories?query=maven[GitHub advisories for Maven], starting with scanner/CVE db version 2.531.
-* Rest API xref:automation.adoc#_rest-api[reference doc] is updated to 4.4.1 and 4.4.2.
+* Rest API xref:automation.adoc#_rest_api[reference doc] is updated to 4.4.1 and 4.4.2.
 
 ==== Bug Fixes
 
@@ -253,7 +253,7 @@ For example,
 * Report and display Image Modules detected during scan in scan results. This is shown in a tab in Image Scan results, and included in scan results from REST API.
 * Allow editing of filters in registry, group, and response rule configurations through console.
 * Update ConfigMap to add group_claim in oidcinitcfg.yaml and samlinitcfg.yaml, and Xff_Enabled in sysinitcfg.yaml
-* API's yaml is updated for 4.2 in xref:automation.adoc#_rest-api[Automation section].
+* API's yaml is updated for 4.2 in xref:automation.adoc#_rest_api[Automation section].
 
 ==== Bug Fixes
 
@@ -492,6 +492,6 @@ Kubernetes (for OpenShift use the equivalent oc commands)
  ** kubectl create clusterrolebinding neuvector-binding-view --clusterrole=view --serviceaccount=neuvector:default
  ** kubectl create rolebinding neuvector-admin --clusterrole=admin --serviceaccount=neuvector:default -n neuvector
 * Set the version tags to 4.0.0 for the Controller, Manager, Enforcer yaml's and apply the update
-* Create the xref:scanners.adoc#_manual-deployment-of-multiple-scanners-on-kubernetes[scanner pods]
-* Create or update the xref:scanners.adoc#_manual-deployment-of-multiple-scanners-on-kubernetes[scanner cron job]
+* Create the xref:scanners.adoc#_manual_deployment_of_multiple_scanners_on_kubernetes[scanner pods]
+* Create or update the xref:scanners.adoc#_manual_deployment_of_multiple_scanners_on_kubernetes[scanner cron job]
 * Wait a few minutes for the rolling update of the controllers to complete, and check all settings after login...

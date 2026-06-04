@@ -140,19 +140,19 @@ spec:
           env:
             - name: CLUSTER_JOIN_ADDR
               value: neuvector-svc-controller.neuvector
-# Commented out sections are required only for local build-phase scanning
-#            - name: SCANNER_DOCKER_URL
+# Commented out sections are required only for local build_phase scanning
+#            _ name: SCANNER_DOCKER_URL
 #              value: tcp://192.168.1.10:2376
 #          volumeMounts:
-#            - mountPath: /var/run/docker.sock
-#              name: docker-sock
+#            _ mountPath: /var/run/docker.sock
+#              name: docker_sock
 #              readOnly: true
 #      volumes:
-#        - name: docker-sock
+#        _ name: docker_sock
 #          hostPath:
 #            path: /var/run/docker.sock
       restartPolicy: Always
-----
+____
 
 A continuación, crea o actualiza el trabajo cron del actualizador de la base de datos CVE. Esto actualizará la base de datos CVE cada noche.
 

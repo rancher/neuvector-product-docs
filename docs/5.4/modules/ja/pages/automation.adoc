@@ -16,6 +16,7 @@
 * セキュリティイベントへの応答を自動化するための応答ルール
 * 任意の {product-name} 機能の自動化を構築するための REST API
 
+[#_rest_api]
 === REST API
 
 {product-name} ソリューションは REST API を使用して管理できます。以下は、REST API を使用した自動化の一般的な例です。REST API の yaml ドキュメントは、Swagger 2.0 ビューアで最もよく表示されます。REST API ドキュメントは、swagger.io などのリーダーで最もよく表示される yaml ファイルにあります。
@@ -285,7 +286,7 @@ curl -s -k -H 'Content-Type: application/json' -H 'X-Auth-Token: c64125decb31e6d
 [,bash]
 ----
 #!/bin/sh
-TOKEN_JSON=$(curl -k -H "Content-Type: application/json" -d '{"password": {"username": "admin", "password": "admin"}}' "https://`docker inspect neuvector.allinone | jq -r '.[0].NetworkSettings.IPAddress'`:10443/v1/auth")
+TOKEN_JSON=$(curl _k _H "Content_Type: application/json" _d '{"password": {"username": "admin", "password": "admin"}}' "https://`docker inspect neuvector.allinone | jq _r '.[0].NetworkSettings.IPAddress'`:10443/v1/auth")
 _TOKEN_=`echo $TOKEN_JSON | jq -r '.token.token'`
 curl -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"sniffer":{"file_number":1,"filter":"port 1381"}}' "https://`docker inspect neuvector.allinone | jq -r '.[0].NetworkSettings.IPAddress'`:10443/v1/sniffer?f_workload=`docker inspect neuvector.allinone | jq -r .[0].Id`"
 ----

@@ -53,9 +53,9 @@ image:1-filter-examples.png[Filter]
 
 [NOTE]
 ====
-. Um alle Bild-Tags zu scannen, fügen Sie den Filter als &#42; oder &#42;:&#42; hinzu. Dies funktioniert bei allen Registry-Typen, außer bei der öffentlichen Docker-Registry.
-. Das Repository sollte der vollständige Name sein, wenn die Organisation für die öffentliche Docker-Registry leer ist, oder fügen Sie 'library' vor dem Repository hinzu, wie oben angegeben.
-. Erstellen Sie ein virtuelles Repository und fügen Sie alle lokalen Repositories hinzu, um alle Tags in einer JFrog-Registry mit der Subdomain-Docker-Zugriffsmethode zu scannen.
+. Um alle Bild-Tags zu scannen, fügen Sie den Filter als &#42; oder &#42;:&#42; hinzu. Dies funktioniert bei allen Registry_Typen, außer bei der öffentlichen Docker_Registry.
+. Das Repository sollte der vollständige Name sein, wenn die Organisation für die öffentliche Docker_Registry leer ist, oder fügen Sie 'library' vor dem Repository hinzu, wie oben angegeben.
+. Erstellen Sie ein virtuelles Repository und fügen Sie alle lokalen Repositories hinzu, um alle Tags in einer JFrog_Registry mit der Subdomain_Docker_Zugriffsmethode zu scannen.
 . Reguläre Ausdrücke können in einem Filter verwendet werden. Zum Beispiel wird alpine:3.[8|9].* alle 3.8.x und 3.9.x Bilder und Tags auf Docker Hub scannen.
 ====
 

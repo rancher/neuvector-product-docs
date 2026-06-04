@@ -10,7 +10,7 @@ NeuVector versions 5.4.2 and later must have users generate/replace internal cer
 After March 2025, NeuVector versions prior to 5.4.2 must have users generate/replace internal certificates before using NeuVector.
 ====
 
-[#_internal-communication-and-certificates]
+[#_internal_communication_and_certificates]
 == Internal Communication and Certificates
 
 {product-name} includes default self-signed certificates for encryption for the Manager (console/UI access), Controller (REST API, internal), Enforcer (internal), and Scanner (internal) communications.
@@ -22,7 +22,7 @@ These certificates can be replaced by your own to further harden communication. 
 Replacing certificates is recommended to be performed only during initial deployment of {product-name}. Replacing on a running cluster (even with rolling upgrade) may result in an unstable state where {product-name} pods are unable to communicate with each other due to a mismatch in certificates, and DATA LOSS may occur.
 ====
 
-[#_replacing-certificates-used-in-internal-communications-of-product]
+[#_replacing_certificates_used_in_internal_communications_of_product]
 === Replacing Certificates Used in Internal Communications of {product-name}
 
 Replace the internal encryption files `ca.crt`, `tls.key`, `tls.crt` as follows:
@@ -300,10 +300,10 @@ docker run -it --entrypoint=bash neuvector/scanner:3.654 -c "cat /etc/neuvector/
 
 ========
 
-[#_updating-deploying-with-helm]
+[#_updating_deploying_with_helm]
 === Updating/Deploying with Helm
 
-As of Helm chart `2.4.1` we can now manage the internal certificate install. The chart https://github.com/neuvector/neuvector-helm/blob/master/charts/core/values.yaml[values.yaml] should be reviewed for all the settings. The below example uses RKE2, standard Ingress and installer certificates.
+As of Helm chart `2.4.1` we can now manage the internal certificate install. The chart https://github.com/neuvector/neuvector_helm/blob/master/charts/core/values.yaml[values.yaml] should be reviewed for all the settings. The below example uses RKE2, standard Ingress and installer certificates.
 
 [,bash]
 ----

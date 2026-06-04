@@ -4,7 +4,7 @@
 :page-opendocs-origin: /06.scanning/03.build/05.gitlab/05.gitlab.md
 :page-opendocs-slug:  /scanning/build/gitlab
 
-[#_scan-for-vulnerabilities-during-gitlab-build-pipeline]
+[#_scan_for_vulnerabilities_during_gitlab_build_pipeline]
 == Scan for Vulnerabilities during Gitlab Build Pipeline
 
 {product-name} can be configured to scan for vulnerabilities triggered in the Gitlab build pipeline. There is a https://gitlab.com/neuvector/gitlab-plugin[Gitlab plug-in here] which can be configured and used. Please follow the instructions on the gitlab site for using the plugin.
@@ -13,7 +13,7 @@ The scan can also use the {product-name} REST API by configuring the provided sc
 
 In addition, make sure there is a {product-name} scanner container deployed and configured to connect to the Allinone or Controller. In 4.0 and later, the neuvector/scanner container must be deployed separate from the allinone or controller.
 
-[#_scan-during-gitlab-build-using-rest-api]
+[#_scan_during_gitlab_build_using_rest_api]
 === Scan During Gitlab Build Using REST API
 
 Use the following script, configured for your {product-name} login credentials to trigger the vulnerability scans.

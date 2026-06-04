@@ -4,14 +4,14 @@
 :page-opendocs-origin: /02.deploying/01.production/01.configmap/01.configmap.md
 :page-opendocs-slug: /deploying/production/configmap
 
-[#_kubernetes-configmap]
+[#_kubernetes_configmap]
 == Kubernetes ConfigMap
 
 {product-name} supports automated configuration using the Kubernetes ConfigMap feature. This enables deployment of {product-name} containers with the appropriate configurations, integrations, and other settings in an automated way.
 
 The 'always_reload: true' setting can be added in any ConfigMap yaml to force reload of that yaml every time the controller starts (version 4.3.2+). Otherwise, the ConfigMap will only be loaded at initial startup or after complete cluster restart (see persistent storage section below).
 
-[#_complete-sample-product-configmap-initcfgyaml]
+[#_complete_sample_product_configmap_initcfgyaml]
 === Complete Sample {product-name} ConfigMap (initcfg.yaml)
 
 The latest ConfigMap can be found at the following https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.3.0/initcfg.yaml[initcfg.yaml].
@@ -402,7 +402,7 @@ Then create the ConfigMap object:
 kubectl create -f initcfg.yaml
 ----
 
-[#_protect-sensitive-data-using-a-secret]
+[#_protect_sensitive_data_using_a_secret]
 == Protect Sensitive Data Using a Secret
 
 If sensitive data is to be included in some sections of the configmap, a secret can be created for those sections with sensitive data.
@@ -453,11 +453,11 @@ secret:
 
 After controller is deployed, all the configuration files from both configmap and secret will be stored in /etc/config folder.
 
-Note that the secret is referred to in the standard Kubernetes and OpenShift Controller xref:kubernetes.adoc#_deploy-product[deployment yaml files] under Volumes.
+Note that the secret is referred to in the standard Kubernetes and OpenShift Controller xref:kubernetes.adoc#_deploy_product[deployment yaml files] under Volumes.
 
-[#_configmaps-and-persistent-storage]
+[#_configmaps_and_persistent_storage]
 == ConfigMaps and Persistent Storage
 
-Both the ConfigMaps and the xref:production.adoc#_backups-and-persistent-data[persistent storage] backup are only read when a new {product-name} cluster is deployed, or the cluster fails and is restarted. They are not used during rolling upgrades.
+Both the ConfigMaps and the xref:production.adoc#_backups_and_persistent_data[persistent storage] backup are only read when a new {product-name} cluster is deployed, or the cluster fails and is restarted. They are not used during rolling upgrades.
 
 The persistent storage configuration backup is read first, then the ConfigMaps are applied, so ConfigMap settings take precedence. All ConfigMap settings (e.g. updates) will also be saved into persistent storage.

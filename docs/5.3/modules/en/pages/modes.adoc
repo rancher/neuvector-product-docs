@@ -4,10 +4,10 @@
 :page-opendocs-origin: /05.policy/02.modes/02.modes.md
 :page-opendocs-slug:  /policy/modes
 
-[#_product-modes]
+[#_product_modes]
 == {product-name} Modes
 
-The {product-name} Violation Detection module has three modes: Discover, Monitor, and Protect. At any point in time, any Group (beginning with 'nv', or the 'Nodes' group) can be in any of these modes. The mode can be switched from the Groups menu, Network Activity view, or the Dashboard. Container Groups can have Process/File rules in a different mode than Network rules, as described xref:modes.adoc#_network-service-policy-mode[here].
+The {product-name} Violation Detection module has three modes: Discover, Monitor, and Protect. At any point in time, any Group (beginning with 'nv', or the 'Nodes' group) can be in any of these modes. The mode can be switched from the Groups menu, Network Activity view, or the Dashboard. Container Groups can have Process/File rules in a different mode than Network rules, as described xref:modes.adoc#_network_service_policy_mode[here].
 
 image:switchmodes.png[Modes]
 
@@ -46,7 +46,7 @@ In the Network map you can click on any conversation (green, yellow, red line) t
 
 In Protect mode, {product-name} enforcers will block (deny) any network violations and attacks detected. Violations are shown in the Network map with a red '`x`' in them, meaning they have been blocked. Unauthorized processes and file access will also be blocked in Protect mode. DLP sensors which match will block network connections.
 
-[#_switching-between-modes]
+[#_switching_between_modes]
 == Switching Between Modes
 
 You can easily switch {product-name} Groups from one mode to another. Remember that in Discover mode, {product-name} is building a Security Policy for allowed, normal container behavior. You can see these rules in the Policy -> Groups tab or in detail in the Policy -> Network Rules menu.
@@ -55,19 +55,19 @@ When you switch from Discover to Monitor mode, {product-name} will flag all viol
 
 Please ensure that, before introducing new updates that result in new types of connections between containers, you switch the affected Service(s) to Discover mode to learn these new behaviors. Alternatively, you can manually add new rules while in any mode, or edit the CRD used to create the rules to add new behaviors.
 
-[#_new-service-mode]
+[#_new_service_mode]
 === New Service Mode
 
 If new services are discovered by {product-name}, for example a previously unknown container starts running, it can be set to a default mode. In Discover mode, {product-name} will start to learn its behavior and build Rules. In Monitor, a violation will be generated when connections to the new service are detected. In Protect, all connections to the new service will be blocked unless the rules have been created prior.
 
 image:newservices.png[NewServiceMode]
 
-[#_network-service-policy-mode]
+[#_network_service_policy_mode]
 === Network Service Policy Mode
 
 There is a global setting available in Settings -> Configuration to separately set the network protection mode for enforcement of network rules. Enabling this (default is disabled), causes all network rules to be in the protection mode selected (Discover, Monitor, Protect), while process/file rules remain in the protection mode for that Group, as displayed in the Policy -> Groups screen. In this way, network rules can be set to Protect (blocking), while process/file policy can be set to Monitor, or vice versa.
 
-[#_automated-promotion-of-group-modes]
+[#_automated_promotion_of_group_modes]
 === Automated Promotion of Group Modes
 
 Promotes a Group's protection Mode based on elapsed time and criteria. This automation does not apply to CRD created Groups. This features allows a new application to run in Discover for some time period, learning the behavior and {product-name} creating allow-list rules for Network and Process, then automatically moving to Monitor, then Protect mode.
@@ -78,7 +78,7 @@ The criterion for moving from Monitor to Protect mode is: there are no security 
 
 image:policy_promotion.png[Promotion]
 
-[#_conflict-resolution-between-services-in-different-modes]
+[#_conflict_resolution_between_services_in_different_modes]
 ==== Conflict Resolution Between Services In Different Modes
 
 For network connections between containers in different service groups, if their policy modes are different, the following table shows how the system resolves the conflicts.

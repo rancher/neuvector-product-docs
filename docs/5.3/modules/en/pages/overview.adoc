@@ -4,7 +4,7 @@
 :page-opendocs-origin: /01.basics/01.overview/01.overview.adoc
 :page-opendocs-slug: /basics/overview
 
-[#_the-full-life-cycle-container-security-platform]
+[#_the_full_life_cycle_container_security_platform]
 == The Full Life-Cycle Container Security Platform
 
 [NOTE]
@@ -25,7 +25,7 @@ These docs describe the 5.x (Open Source) version. The 5.x images are accessible
 
 Other features of {product-name} include the ability to quarantine containers and to export logs through SYSLOG and webhooks, initiate packet capture for investigation, and integration with OpenShift RBACs, LDAP, Microsoft AD, and SSO with SAML. Note: Quarantine means that all network traffic is blocked.  The container will remain and continue to run - just without any network connections.  Kubernetes will not start up a container to replace a quarantined container, as the api-server is still able to reach the container.
 
-[#_security-containers]
+[#_security_containers]
 == Security Containers
 
 The {product-name} run-time container security solution contains four types of security containers: *Controllers*, *Enforcers*, *Managers*, and *Scanners*. A special container called the *Allinone* is also provided to combine the Controller, Enforcer, and Manager functions all in one container, primarily for docker native deployments.
@@ -55,7 +55,7 @@ For Docker native (non Kubernetes) deployments the Enforcer container and the Co
 
 The Manager is a stateless container that provides a web-UI (HTTPS only) console for users to manage the {product-name} security solution. More than one Manager container can be deployed as necessary.
 
-[#_all-in-one]
+[#_all_in_one]
 === All-in-One
 
 The All-in-One container includes a Controller, an Enforcer and a Manager in one package. It's useful for easy installation in single-node or small-scale deployments.
@@ -77,27 +77,27 @@ Here is a general architecture overview of {product-name}. Not shown is the sepa
 
 image:architecture.png[Architecture]
 
-[#_deployment-examples]
+[#_deployment_examples]
 == Deployment Examples
 
-For common deployment patterns and best practices see the xref:production.adoc#_best-practices-tips-qa-for-deploying-and-managing-product[Onboarding/Best Practices section].
+For common deployment patterns and best practices see the xref:production.adoc#_best_practices_tips_qa_for_deploying_and_managing_product[Onboarding/Best Practices section].
 
-[#_all-in-one-and-enforcers]
+[#_all_in_one_and_enforcers]
 === All-in-One and Enforcers
 
 This deployment is ideal for single-node or small-scale environments, for example for evaluation, testing, and small deployments. An All-in-One container is deployed on one node, which can also be a node with running application containers. An Enforcer can be deployed on all other nodes, with one Enforcer required on each node you wish to protect with {product-name}. This is also useful for native Docker deployments where a controller and enforcer cannot run on the same host.
 
-[#_controller-manager-and-enforcer-containers]
+[#_controller_manager_and_enforcer_containers]
 === Controller, Manager and Enforcer Containers
 
 This is a more generic deployment use case which consists one or more Controllers, one Manager and a set of Enforcers. The Controller and Manager can be deployed on the same node or on different nodes than the Enforcer.
 
-[#_all-in-one-only]
+[#_all_in_one_only]
 === All-in-One Only
 
 You can deploy just the allinone container for registry scanning, using the Jenkins plug-in, or simple one node testing of {product-name}.
 
-[#_controller-only]
+[#_controller_only]
 === Controller Only
 
 It is possible to deploy a single Controller container and/or scanner to manage vulnerability scanning outside a cluster, for example for use with the Jenkins plug-in. Registry scanning can also be performed by the Controller using the REST API exclusively, but typically a Manager container is also desired in order to provide console based configuration and results viewing for registry scanning.

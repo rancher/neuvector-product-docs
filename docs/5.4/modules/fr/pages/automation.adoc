@@ -285,7 +285,7 @@ Lorsqu'un conteneur présente un comportement suspect, commencez une capture de 
 [,bash]
 ----
 #!/bin/sh
-TOKEN_JSON=$(curl -k -H "Content-Type: application/json" -d '{"password": {"username": "admin", "password": "admin"}}' "https://`docker inspect neuvector.allinone | jq -r '.[0].NetworkSettings.IPAddress'`:10443/v1/auth")
+TOKEN_JSON=$(curl _k _H "Content_Type: application/json" _d '{"password": {"username": "admin", "password": "admin"}}' "https://`docker inspect neuvector.allinone | jq _r '.[0].NetworkSettings.IPAddress'`:10443/v1/auth")
 _TOKEN_=`echo $TOKEN_JSON | jq -r '.token.token'`
 curl -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"sniffer":{"file_number":1,"filter":"port 1381"}}' "https://`docker inspect neuvector.allinone | jq -r '.[0].NetworkSettings.IPAddress'`:10443/v1/sniffer?f_workload=`docker inspect neuvector.allinone | jq -r .[0].Id`"
 ----

@@ -9,7 +9,7 @@
 This page is deprecated and will be removed in a future release.
 ====
 
-[#_deploy-to-swarm-cluster]
+[#_deploy_to_swarm_cluster]
 == Deploy to Swarm Cluster
 
 To deploy {product-name} using a Swarm cluster, first pull the {product-name} images using Docker UCP in the Images menu. You may need to add a version number to get the latest version on Docker Hub.
@@ -18,7 +18,7 @@ Currently, Swarm/UCP does not support the seccomp capabilities (cap_add options)
 
 The Docker UCP HRM service uses the default port 8443 which conflicts with the {product-name} console port. If using the default HRM port, then change the {product-name} port mapping, for example 9443:8443 for the allinone container in the examples below. After the {product-name} application is successfully deployed, login to the console on port 9443 of the allinone host.
 
-[#_deploy-on-docker-swarm-using-privileged-mode]
+[#_deploy_on_docker_swarm_using_privileged_mode]
 == Deploy on Docker Swarm Using Privileged Mode
 
 The following is an example of the docker-compose file to deploy the all-in-one container on the first node. Because the all-in-one container has an enforcer module inside, application containers on the same node can be secured. Both greenfield and brownfield deployment are supported.
@@ -97,7 +97,7 @@ Scanner:
      - /var/run/docker.sock:/var/run/docker.sock:ro
 ----
 
-[#_deployment-without-using-privileged-mode]
+[#_deployment_without_using_privileged_mode]
 == Deployment Without Using Privileged Mode
 
 For some platform configurations it is possible to deploy the {product-name} containers without requiring them to run in privileged mode. The configuration must support the ability to add capabilities and set the apparmour profile. Note that Docker DataCenter/UCP and Swarm currently do not support this, but it is still possible to deploy {product-name} manually using Compose or Run.

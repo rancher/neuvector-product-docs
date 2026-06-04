@@ -4,7 +4,7 @@
 :page-opendocs-origin: /02.deploying/02.kubernetes/02.kubernetes.md
 :page-opendocs-slug: /deploying/kubernetes
 
-[#_deploy-using-kubernetes]
+[#_deploy_using_kubernetes]
 == Deploy Using Kubernetes
 
 You can use Kubernetes to deploy separate manager, controller and enforcer containers and make sure that all new nodes have an enforcer deployed. {product-name} requires and supports Kubernetes network plugins such as flannel, weave, or calico.
@@ -15,7 +15,7 @@ See the bottom section for specifying dedicated manager or controller nodes usin
 
 [NOTE]
 ====
-It is not recommended to deploy (scale) more than one manager behind a load balancer due to potential session state issues. If you plan to use a PersistentVolume claim to store the backup of {product-name} config files, please see the general Backup/Persistent Data section in the xref:production.adoc#_backups-and-persistent-data[Deploying {product-name}] overview.
+It is not recommended to deploy (scale) more than one manager behind a load balancer due to potential session state issues. If you plan to use a PersistentVolume claim to store the backup of {product-name} config files, please see the general Backup/Persistent Data section in the xref:production.adoc#_backups_and_persistent_data[Deploying {product-name}] overview.
 ====
 
 If your deployment supports an integrated load balancer, change type NodePort to LoadBalancer for the console in the yaml file below.
@@ -24,7 +24,7 @@ If your deployment supports an integrated load balancer, change type NodePort to
 
 There is a separate section for OpenShift instructions, and Docker EE on Kubernetes has some special steps described in the Docker section.
 
-[#_product-images-on-docker-hub]
+[#_product_images_on_docker_hub]
 === {product-name} Images on Docker Hub
 
 The images are on the {product-name} Docker Hub registry. Use the appropriate version tag for the manager, controller, enforcer, and leave the version as 'latest' for scanner and updater. For example:
@@ -49,7 +49,7 @@ If deploying from the Rancher Manager 2.6.5+ {product-name} chart, images are pu
 ====
 
 
-[#_deploy-product]
+[#_deploy_product]
 == Deploy {product-name}
 
 . Create the {product-name} namespace and the required service accounts: 
@@ -365,7 +365,7 @@ spec:
           value: myvalue
 ----
 
-[#_using-node-labels-for-manager-and-controller-nodes]
+[#_using_node_labels_for_manager_and_controller_nodes]
 == Using Node Labels for Manager and Controller Nodes
 
 To control which nodes the Manager and Controller are deployed on, label each node. Replace nodename with the appropriate node name ('`kubectl get nodes`'). Note: By default Kubernetes will not schedule pods on the master node.
@@ -404,14 +404,14 @@ To prevent the enforcer from being deployed on a controller node, if it is a ded
       imagePullSecrets:
 ----
 
-[#_rolling-updates]
+[#_rolling_updates]
 == Rolling Updates
 
 Orchestration tools such as Kubernetes, RedHat OpenShift, and Rancher support rolling updates with configurable policies. You can use this feature to update the {product-name} containers. The most important will be to ensure that there is at least one Controller (or Allinone) running so that policies, logs, and connection data is not lost. Make sure that there is a minimum of 120 seconds between container updates so that a new leader can be elected and the data synchronized between controllers.
 
 The provided sample deployment yamls already configure the rolling update policy. If you are updating via the {product-name} Helm chart, please pull the latest chart to properly configure new features such as admission control, and delete the old cluster role and cluster role binding for {product-name}. If you are updating via Kubernetes you can manually update to a new version with the sample commands below.
 
-[#_sample-kubernetes-rolling-update]
+[#_sample_kubernetes_rolling_update]
 === Sample Kubernetes Rolling Update
 
 For upgrades which just need to update to a new image version, you can use this simple approach.
@@ -455,7 +455,7 @@ kubectl rollout undo -n neuvector ds/neuvector-enforcer-pod
 kubectl rollout undo -n neuvector deployment/neuvector-controller-pod
 ----
 
-[#_expose-rest-api-in-kubernetes]
+[#_expose_rest_api_in_kubernetes]
 == Expose REST API in Kubernetes
 
 To expose the REST API for access from outside of the Kubernetes cluster, here is a sample yaml file:
@@ -479,7 +479,7 @@ spec:
 
 Please see the Automation section for more info on the REST API.
 
-[#_kubernetes-deployment-in-non-privileged-mode]
+[#_kubernetes_deployment_in_non_privileged_mode]
 == Kubernetes Deployment in Non-Privileged Mode
 
 The following instructions can be used to deploy {product-name} without using privileged mode containers. The controller is already in non-privileged mode and enforcer deployment should be changed, which is shown in the excerpted snippets below.
@@ -1073,55 +1073,55 @@ spec:
         app: neuvector-enforcer-pod
       annotations:
         container.apparmor.security.beta.kubernetes.io/neuvector-enforcer-pod: unconfined
-      # Add the following for pre-v1.19
-      # container.seccomp.security.alpha.kubernetes.io/neuvector-enforcer-pod: unconfined
+      # Add the following for pre_v1.19
+      # container.seccomp.security.alpha.kubernetes.io/neuvector_enforcer_pod: unconfined
     spec:
       tolerations:
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/master
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/control-plane
+        _ effect: NoSchedule
+          key: node_role.kubernetes.io/master
+        _ effect: NoSchedule
+          key: node_role.kubernetes.io/control_plane
       hostPID: true
       serviceAccountName: enforcer
       serviceAccount: enforcer
       containers:
-        - name: neuvector-enforcer-pod
+        _ name: neuvector_enforcer_pod
           image: neuvector/enforcer:5.4.3
           securityContext:
-            # the following two lines are required for k8s v1.19+. pls comment out both lines if version is pre-1.19. Otherwise, a validating data error message will show
+            # the following two lines are required for k8s v1.19+. pls comment out both lines if version is pre_1.19. Otherwise, a validating data error message will show
             seccompProfile:
               type: Unconfined
             capabilities:
               add:
-              - SYS_ADMIN
-              - NET_ADMIN
-              - SYS_PTRACE
-              - IPC_LOCK
+              _ SYS_ADMIN
+              _ NET_ADMIN
+              _ SYS_PTRACE
+              _ IPC_LOCK
           env:
-            - name: CLUSTER_JOIN_ADDR
-              value: neuvector-svc-controller.neuvector
-            - name: CLUSTER_ADVERTISED_ADDR
+            _ name: CLUSTER_JOIN_ADDR
+              value: neuvector_svc_controller.neuvector
+            _ name: CLUSTER_ADVERTISED_ADDR
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
-            - name: CLUSTER_BIND_ADDR
+            _ name: CLUSTER_BIND_ADDR
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
           volumeMounts:
-            - mountPath: /lib/modules
-              name: modules-vol
+            _ mountPath: /lib/modules
+              name: modules_vol
               readOnly: true
-            - mountPath: /var/nv_debug
-              name: nv-debug
+            _ mountPath: /var/nv_debug
+              name: nv_debug
               readOnly: false
       terminationGracePeriodSeconds: 1200
       restartPolicy: Always
       volumes:
-        - name: modules-vol
+        _ name: modules_vol
           hostPath:
             path: /lib/modules
-        - name: nv-debug
+        _ name: nv_debug
           hostPath:
             path: /var/nv_debug
 
@@ -1130,12 +1130,12 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: neuvector-scanner-pod
+  name: neuvector_scanner_pod
   namespace: neuvector
 spec:
   selector:
     matchLabels:
-      app: neuvector-scanner-pod
+      app: neuvector_scanner_pod
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -1145,17 +1145,17 @@ spec:
   template:
     metadata:
       labels:
-        app: neuvector-scanner-pod
+        app: neuvector_scanner_pod
     spec:
       serviceAccountName: scanner
       serviceAccount: scanner
       containers:
-        - name: neuvector-scanner-pod
+        _ name: neuvector_scanner_pod
           image: neuvector/scanner:latest
           imagePullPolicy: Always
           env:
-            - name: CLUSTER_JOIN_ADDR
-              value: neuvector-svc-controller.neuvector
+            _ name: CLUSTER_JOIN_ADDR
+              value: neuvector_svc_controller.neuvector
       restartPolicy: Always
 
 ---
@@ -1163,7 +1163,7 @@ spec:
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: neuvector-updater-pod
+  name: neuvector_updater_pod
   namespace: neuvector
 spec:
   schedule: "0 0 * * *"
@@ -1172,21 +1172,21 @@ spec:
       template:
         metadata:
           labels:
-            app: neuvector-updater-pod
+            app: neuvector_updater_pod
         spec:
           serviceAccountName: updater
           serviceAccount: updater
           containers:
-          - name: neuvector-updater-pod
+          _ name: neuvector_updater_pod
             image: neuvector/updater:latest
             imagePullPolicy: Always
             command:
-            - TOKEN=`cat /var/run/secrets/kubernetes.io/serviceaccount/token`; /usr/bin/curl -kv -X PATCH -H "Authorization:Bearer $TOKEN" -H "Content-Type:application/strategic-merge-patch+json" -d '{"spec":{"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt":"'`date +%Y-%m-%dT%H:%M:%S%z`'"}}}}}' 'https://kubernetes.default/apis/apps/v1/namespaces/neuvector/deployments/neuvector-scanner-pod'
+            _ TOKEN=`cat /var/run/secrets/kubernetes.io/serviceaccount/token`; /usr/bin/curl _kv _X PATCH _H "Authorization:Bearer $TOKEN" _H "Content_Type:application/strategic_merge_patch+json" _d '{"spec":{"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt":"'`date +%Y_%m_%dT%H:%M:%S%z`'"}}}}}' 'https://kubernetes.default/apis/apps/v1/namespaces/neuvector/deployments/neuvector_scanner_pod'
           restartPolicy: Never
 ----
 ====
 
-[#_pks-change]
+[#_pks_change]
 == PKS Change
 
 [NOTE]

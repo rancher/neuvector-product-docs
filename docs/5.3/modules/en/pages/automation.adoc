@@ -4,7 +4,7 @@
 :page-opendocs-origin: /11.automation/02.automation/02.automation.md
 :page-opendocs-slug:  /automation/automation
 
-[#_product-automation]
+[#_product_automation]
 == {product-name} Automation
 
 There are many automation features in {product-name} to support the entire CI/CD workflow, including:
@@ -17,7 +17,7 @@ There are many automation features in {product-name} to support the entire CI/CD
 * Response rules to automate responses to security events
 * REST API for building automation of any {product-name} function
 
-[#_rest-api]
+[#_rest_api]
 === REST API
 
 The {product-name} solution can be managed using the REST API. Below are common examples of automation using the REST API. The REST API yaml doc is best viewed in the Swagger 2.0 viewer. The REST API documentation is below in a yaml file which is best viewed in a reader such as swagger.io.
@@ -31,7 +31,7 @@ If you are making REST API calls with username/password, please be sure make a D
 
 {product-name} also support Response Rules to automate common responses to security events or vulnerabilities detected. Please see the section Security Policy -> Response Rules for more details.
 
-[#_expose-rest-api-in-kubernetes]
+[#_expose_rest_api_in_kubernetes]
 === Expose REST API in Kubernetes
 
 To expose the REST API for access from outside of the Kubernetes cluster, enable port 10443.
@@ -63,7 +63,7 @@ spec:
 If using type LoadBalancer, set the _controllerIP_ in the examples below to the external IP or URL for the loadbalancer.
 ====
 
-[#_authentication-for-rest-api]
+[#_authentication_for_rest_api]
 === Authentication for REST API
 
 The REST API supports two types of authentication: username/password and token. Both can be configured in Settings -> Users, API Keys & Roles, and be associated with default or custom roles to limit access privileges. The examples below show username/password based authentication where a token is created first, then used in subsequent REST API calls. If using a token, it can be used directly in each REST API call. Note: username based connections have a limited number of concurrent sessions, so it is important to delete the username token as shown below when finished. Token based authentication does not have a limit, but expire according to the time limit selected when created.
@@ -76,7 +76,7 @@ image:5_2_api_created.png[token]
 
 image:5_2_api_key_header.png[token]
 
-[#_trigger-vulnerability-scanning-from-a-script]
+[#_trigger_vulnerability_scanning_from_a_script]
 === Trigger Vulnerability Scanning from a script
 
 {product-name} can be triggered automatically to scan an image for vulnerabilities. This can be done by configuring a registry/repository to be monitored, using the {product-name} Jenkins plug-in, or using the REST API. Please see the section on Scanning & Compliance for more detail.
@@ -217,7 +217,7 @@ Sample output:
 ----
 ====
 
-[#_create-policy-rules-automatically]
+[#_create_policy_rules_automatically]
 === Create Policy Rules Automatically
 
 To create a new rule in the {product-name} policy controller, the groups for the FROM and TO fields must exist first. The following sample creates a new Group based on the container label nv-service-type=data, and another Group for label nv-service-type=website. A rule is then created to allow traffic from the wordpress container to the mysql container using only the mysql protocol.
@@ -238,6 +238,7 @@ curl -k -X "DELETE" -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKE
 If the Groups already exist in {product-name} then the new rule can be created, skipping the Group creation steps. This example also removes the authentication token at the end. Note that a Rule ID number can be specified and {product-name} executes rules in numerical order lowest to highest.
 
 [[export-import-configuration-file]]
+[#export-import-configuration-file]
 === Export/Import Configuration File
 
 Here are samples to backup the {product-name} configuration file automatically. You can select whether to export all configuration settings (policy, users, Settings etc), or only the policy.
@@ -275,7 +276,7 @@ To import the file:
 sudo pip install requests six
 ----
 
-[#_setting-or-changing-user-password]
+[#_setting_or_changing_user_password]
 === Setting or Changing User Password
 
 Use the rest API calls for User management.
@@ -285,7 +286,7 @@ Use the rest API calls for User management.
 curl -s -k -H 'Content-Type: application/json' -H 'X-Auth-Token: c64125decb31e6d3125da45cba0f5025' https://127.0.0.1:10443/v1/user/admin -X PATCH -d '{"config":{"fullname":"admin","password":"admin","new_password":"NEWPASS"}}'
 ----
 
-[#_starting-packet-capture-on-a-container]
+[#_starting_packet_capture_on_a_container]
 === Starting Packet Capture on a Container
 
 When a container exhibits suspicious behavior, start a packet capture.
@@ -300,7 +301,7 @@ curl -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"sn
 
 Don't forget to stop the sniffer session after some time so it doesn't run forever. Number of files to rotate has a maximum value of 50.
 
-[#_check-and-accept-the-eula-new-deployments]
+[#_check_and_accept_the_eula_new_deployments]
 === Check and Accept the EULA (new deployments)
 
 Get the authentication TOKEN as above. Also replace the controller IP address with your as appropriate.
@@ -324,7 +325,7 @@ curl -s -k -H 'Content-Type: application/json' -H 'X-Auth-Token: $_TOKEN_' -d '{
 
 Then check the EULA again.
 
-[#_configure-registry-scanning]
+[#_configure_registry_scanning]
 === Configure Registry Scanning
 
 [,shell]
@@ -332,7 +333,7 @@ Then check the EULA again.
 curl -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"request": {"registry": "https://registry.connect.redhat.com", "username": "username", "password": "password", "tag": "latest", "repository": "neuvector/enforcer"}}' "https://controller:port/v1/scan/repository"
 ----
 
-[#_enable-packet-capture-on-all-pods-in-a-namespace]
+[#_enable_packet_capture_on_all_pods_in_a_namespace]
 === Enable Packet Capture on All Pods in a Namespace
 
 .Click here for details
@@ -537,7 +538,7 @@ done
 ----
 ====
 
-[#_enable-disable-container-quarantine]
+[#_enable_disable_container_quarantine]
 === Enable Disable Container Quarantine
 
 The API call to quarantine is via PATCH to /v1/workload/:id with the following body. The workload id is the container/pod id.
@@ -553,7 +554,7 @@ The API call to quarantine is via PATCH to /v1/workload/:id with the following b
 }'
 ----
 
-[#_enable-debugging-mode-for-product-support]
+[#_enable_debugging_mode_for_product_support]
 === Enable Debugging Mode for {product-name} Support
 
 Set access token with your IP, user, password:
@@ -605,7 +606,7 @@ echo `date +%Y%m%d_%H%M%S` log out
 curl -k -X 'DELETE' -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/auth" > /dev/null 2>&1
 ----
 
-[#_report-if-a-vulnerability-is-in-the-base-image-layers]
+[#_report_if_a_vulnerability_is_in_the_base_image_layers]
 === Report if a vulnerability is in the base image layers
 
 To identify CVE's in the base image when using REST API to scan images, the base image must be identified in the API call, as in the example below.
@@ -630,7 +631,7 @@ For example,
 {"request": {"repository": "neuvector/manager", "tag": "4.0.2", "scan_layers": true, "base_image": "10.1.127.12:5000/neuvector/manager:4.0.2”}}
 ----
 
-[#_get-the-cve-database-version-and-date]
+[#_get_the_cve_database_version_and_date]
 === Get the CVE Database Version and Date
 
 [,shell]
@@ -662,7 +663,7 @@ Output:
 }
 ----
 
-[#_manage-federation-for-master-and-remote-worker-clusters]
+[#_manage_federation_for_master_and_remote_worker_clusters]
 === Manage Federation for Master and Remote (Worker) Clusters
 
 Generally, listing Federation members can use a GET to the following endpoint (see samples for specific syntax):

@@ -4,7 +4,7 @@
 :page-opendocs-origin: /05.policy/05.networkrules/05.networkrules.md
 :page-opendocs-slug:  /policy/networkrules
 
-[#_policy-network-rules]
+[#_policy_network_rules]
 == Policy: Network Rules
 
 {product-name} automatically creates Network Rules from your running applications in Discover mode. You can also manually add them in any mode, Discover, Monitor, or Protect. Rules can be added or edited from the CLI or REST API.
@@ -23,7 +23,7 @@ Network rules are enforced in the order that they appear in the list, from top t
 If you edit (add, delete, change) rules, your changes are NOT applied until you click the Save button at the top. If you exit this page without deploying your changes, they will be lost.
 ====
 
-[#_adding-new-rules]
+[#_adding_new_rules]
 === Adding New Rules
 Add a rule using the '`+`' either below another rule in the right column, or using the button in the lower right.
 
@@ -86,7 +86,7 @@ If Deny is selected, {product-name} will log this as a violation while in Monito
 Don't forget to Deploy/Update if you make any changes!
 ====
 
-[#_egress-control-allowing-connections-to-trusted-internal-services-on-other-networks]
+[#_egress_control_allowing_connections_to_trusted_internal_services_on_other_networks]
 == Egress Control: Allowing Connections to Trusted Internal Services on Other Networks
 
 A common use case for customizing rules is to allow a container service to connect to a network outside of the {product-name} managed cluster's network. In many cases, since {product-name} does not recognize this network it will classify it as an '`External`' network, even if it is an internal network.
@@ -100,7 +100,7 @@ Be sure to click Deploy to save the new rule.
 
 Finally, review the list of rules to make sure the new rule is in the order and priority desired. Rules are applied from top to bottom.
 
-[#_ingress-ip-policy-based-on-x-forwarded-for]
+[#_ingress_ip_policy_based_on_x_forwarded_for]
 === Ingress IP Policy Based on X-FORWARDED-FOR
 
 In a Kubernetes cluster, an application can be exposed to the outside of the cluster by a NodePort, LoadBalancer or Ingress services. These services typically replace the source IP while doing the Source NAT (SNAT) on the packets. As the original source IP is masqueraded, this prevents {product-name} from recognizing the connection is actually from the 'external'.
@@ -118,22 +118,22 @@ This improvement created some unexpected issues in some setup. If the above line
 
 A switch is available to disable this feature. Disabling it tells {product-name} not to identify that the connection is from "external" using X-FORWARDED-FOR headers. By default this is enabled, and the X-FORWARDED-FOR header is used in policy enforcement. To disable it, go to Settings -> Configuration, and disable the "X-Forwarded-For based policy match" setting.
 
-[#_special-enforcement-for-istio-serviceentry-destinations]
+[#_special_enforcement_for_istio_serviceentry_destinations]
 === Special Enforcement for Istio ServiceEntry Destinations
 
 Egress network policy enforcement functionality was added in version 5.1.0 for pods to ServiceEntry destinations declared with Istio. Typically, a ServiceEntry defines how an external service referred by DNS name is resolved to a destination IP. Prior to v5.1, {product-name} could not detect and enforce rules for connections to a ServiceEntry, so all connections were classified as External. With 5.1, rules can be enforced for specific ServiceEntry destinations. Implicit violations will be reported for newly visible traffic if allow rules don't exist. These rules can be learned and auto-created under Discover mode. To allow this traffic, you can put the group into discover mode or create a custom group with destination addresses (or DNS name) and add a new network rule to this destination to allow the traffic.
 
-[#_virtual-host-based-network-policy]
+[#_virtual_host_based_network_policy]
 === Virtual Host Based Network Policy
 
 Custom groups can support virtual host based address groups. This enables a use case where two different FQDN addresses are resolved to the same IP address, but different rules for each FQDN should be enforced. A new custom group with '`address=vh:xxx.yyy`' can be created using the '`vh:`' indicator to enable this protection. A network rule can then use the custom group as the '`From`' source based on the virtual hostname (instead of resolved IP address) to enforce different rules for virtual hosts.
 
-[#_split-mode-network-protections]
+[#_split_mode_network_protections]
 == Split Mode Network Protections
 
-Container Groups can have Process/File rules in a different mode than Network rules, as described xref:modes.adoc#_network-service-policy-mode[here].
+Container Groups can have Process/File rules in a different mode than Network rules, as described xref:modes.adoc#_network_service_policy_mode[here].
 
-[#_built-in-network-threat-detection]
+[#_built_in_network_threat_detection]
 == Built-In Network Threat Detection
 
 {product-name} automatically detects certain network attacks, regardless of protection mode. In Discover and Monitor mode, these threats will be alerted and can be found in Notifications -> Security Events. In Protect mode, these will alerted as well as blocked. Response rules can be created based on threat detection as well.

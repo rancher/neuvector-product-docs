@@ -38,7 +38,7 @@ Si despliegas con el actual {product-name} Helm chart (v1.8.9+), se deben realiz
 
 El despliegue automatizado usando Helm se puede encontrar en https://github.com/neuvector/neuvector-helm.
 
-El despliegue usando un Operador, incluyendo el Operador Certificado de RedHat y el operador de la comunidad de Kubernetes está soportado, con una descripción general xref:operators.adoc[aquí]. El operador de RedHat {product-name} está en https://access.redhat.com/containers/#/registry.connect.redhat.com/neuvector/neuvector-operator, y el operador de la comunidad en https://operatorhub.io/operator/neuvector-operator.
+El despliegue usando un Operador, incluyendo el Operador Certificado de RedHat y el operador de la comunidad de Kubernetes está soportado, con una descripción general xref:operators.adoc[aquí]. El operador de RedHat {product-name} está en https://access.redhat.com/containers/#/registry.connect.redhat.com/neuvector/neuvector_operator, y el operador de la comunidad en https://operatorhub.io/operator/neuvector_operator.
 
 == Despliegue Usando ConfigMap
 

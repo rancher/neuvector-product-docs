@@ -9,7 +9,7 @@ Starting with {product-name} 5.4, full compatibility and integration of {product
 
 In the Rancher console, *Users & Authentication* -> *Role Templates* page, customers can create Global, Cluster, Project, and Namespace roles with specific {product-name} Verbs, Resources, and API Groups. When such a Rancher role is assigned to a Rancher user, the user's {product-name} SSO session is assigned different {product-name} permissions accordingly. This is to provide SSO users with custom roles (that is, roles other than the reserved admin, reader, fedAdmin, and fedReader roles).
 
-[#_supported-custom-product-role-mapping-in-rancher-sso]
+[#_supported_custom_product_role_mapping_in_rancher_sso]
 == Supported custom {product-name} role mapping in Rancher SSO
 
 Below are supported role mappings for {product-name} Verbs, Resources, and API Groups used in the Rancher UI at *Users & Authentication* -> *Role Templates* -> *Create Global, Cluster, or Project Role Template*.
@@ -40,7 +40,7 @@ Below are supported role mappings for {product-name} Verbs, Resources, and API G
 ** SecurityEvents
 ** SystemConfig
 
-[#_resource-display-and-logical-name-mapping]
+[#_resource_display_and_logical_name_mapping]
 === Resource display and logical name mapping
 
 The following table illustrates the logical names of resources.
@@ -70,7 +70,7 @@ The following table illustrates the logical names of resources.
 This integration supports roles at the Global, Cluster, Project, and Namespace levels. Users must customize and create rules based on their requirements and scope permissions for SSO.
 ====
 
-[#_definitions-and-expectations-with-global-cluster-and-project-namespace-roles]
+[#_definitions_and_expectations_with_global_cluster_and_project_namespace_roles]
 == Definitions and expectations with Global, Cluster, and Project/Namespace roles
 
 * Cluster resource with `*` verb on a Rancher Global role:
@@ -84,10 +84,10 @@ This integration supports roles at the Global, Cluster, Project, and Namespace l
 * Namespace resource with `*` verb on Rancher Project roles:
 ** Always mapped to the {product-name} `namespace-admin` role
 
-[#_use-cases-and-examples]
+[#_use_cases_and_examples]
 == Use cases and examples
 
-[#_use-case-1]
+[#_use_case_1]
 === Use case 1
 
 * Use a Global role to run runtime scans from a {product-name} SSO session on all clusters managed by Rancher Manager except the local cluster. Users must create Cluster roles to propagate the Global role to all downstream clusters.
@@ -128,7 +128,7 @@ inheritedClusterRoles:
 ** Log in to Rancher Manager and launch {product-name} from any downstream cluster.  
   The user can perform runtime scan tasks such as container scans, node scans, and browsing vulnerability pages. This also applies to newly joined clusters.
 
-[#_use-case-2]
+[#_use_case_2]
 === Use case 2
 
 * Create a FedAdmin user. Always log in as a FedAdmin through the federation master cluster. If the environment is not federated, roles are downgraded to Reader or Admin.
@@ -161,22 +161,22 @@ API: neuvector.com
 To switch between FedAdmin and FedReader, change the verb from `*` to `get`. The `get` verb provides read-only access.
 ====
 
-[#_use-case-3]
+[#_use_case_3]
 === Use case 3
 
 A user can perform a limited set of read-only tasks and modify a limited set of tasks on a cluster.
 
-[#_use-case-4]
+[#_use_case_4]
 === Use case 4
 
 A user can perform read-only tasks on selected domains and modify tasks on other domains within a cluster.
 
-[#_use-case-5]
+[#_use_case_5]
 === Use case 5
 
 A user obtains permissions by combining Global, Cluster, and Project roles.
 
-[#_additional-considerations]
+[#_additional_considerations]
 == Additional considerations
 
 * Use this documentation and parameters as a reference when creating SSO and RBAC rules.

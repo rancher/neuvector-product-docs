@@ -38,7 +38,7 @@
 
 Helmを使用した自動デプロイメントについては、 https://github.com/neuvector/neuvector-helm.でご確認いただけます。
 
-RedHat認定オペレーターおよびKubernetesコミュニティオペレーターを含むオペレーターを使用したデプロイメントがサポートされており、一般的な説明はxref:operators.adoc[こちら]にあります。{product-name} RedHatオペレーターは https://access.redhat.com/containers/#/registry.connect.redhat.com/neuvector/neuvector-operator,にあり、コミュニティオペレーターは https://operatorhub.io/operator/neuvector-operator.にあります
+RedHat認定オペレーターおよびKubernetesコミュニティオペレーターを含むオペレーターを使用したデプロイメントがサポートされており、一般的な説明はxref:operators.adoc[こちら]にあります。{product-name} RedHatオペレーターは https://access.redhat.com/containers/#/registry.connect.redhat.com/neuvector/neuvector_operator,にあり、コミュニティオペレーターは https://operatorhub.io/operator/neuvector_operator.にあります
 
 == ConfigMapを使用したデプロイメント
 

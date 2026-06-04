@@ -54,8 +54,8 @@ image:1-filter-examples.png[filtres]
 [NOTE]
 ====
 . Pour numériser tous les tags d'image, ajoutez le filtre comme &#42; ou &#42;:&#42;. Cela fonctionne sur tous les types de registre sauf le registre docker public.
-. Le dépôt doit être le nom complet si l'organisation est nulle pour le registre docker public ou ajouter 'library' avant le dépôt comme indiqué ci-dessus.
-. Créez un dépôt virtuel et ajoutez tous les dépôts locaux pour numériser tous les tags sur un registre JFrog avec la méthode d'accès au sous-domaine docker.
+. Le dépôt doit être le nom complet si l'organisation est nulle pour le registre docker public ou ajouter 'library' avant le dépôt comme indiqué ci_dessus.
+. Créez un dépôt virtuel et ajoutez tous les dépôts locaux pour numériser tous les tags sur un registre JFrog avec la méthode d'accès au sous_domaine docker.
 . Des expressions régulières peuvent être utilisées dans un filtre. Par exemple, alpine:3.[8|9].* numérisera toutes les images et tags 3.8.x et 3.9.x sur docker hub.
 ====
 

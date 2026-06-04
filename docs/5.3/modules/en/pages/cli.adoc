@@ -4,7 +4,7 @@
 :page-opendocs-origin: /12.troubleshooting/02.cli/02.cli.md
 :page-opendocs-slug:  /tronubleshooting/cli
 
-[#_using-the-product-command-line]
+[#_using_the_product_command_line]
 == Using the {product-name} Command Line
 
 The {product-name} solution supports a limited set of functions using the CLI. The CLI is supported through the Manager, which in turn uses a RestAPI to issue commands to the Controller. The Controller then manages the Enforcer(s) appropriately. A complete set of operations is supported through the REST API, which can be exposed directly from the Controller. You can access the {product-name} CLI by typing the cli command for the Manager or Allinone, for example:
@@ -23,7 +23,7 @@ Where '`allinone`' is the container name for the Controller. You may need to use
 
 Although the CLI is available through the Manager, we recommend using the xref:automation.adoc[REST API] directly into the controller for querying and automation.
 
-[#_cli-command-examples]
+[#_cli_command_examples]
 === CLI Command Examples
 
 Here are some of the most common CLI commands:
@@ -86,10 +86,10 @@ MODES:
 
 More CLI commands are listed below.
 
-[#_command-line-reference-commands]
+[#_command_line_reference_commands]
 == Command Line Reference & Commands
 
-[#_login-logout]
+[#_login_logout]
 === Login/Logout
 
 [,shell]
@@ -406,7 +406,7 @@ Commands:
   syslog_server  Unset syslog server address.
 ----
 
-[#_vulnerability-scan]
+[#_vulnerability_scan]
 === Vulnerability Scan
 
 [,shell]
@@ -522,7 +522,7 @@ Options:
   -h, --help  Show this message and exit.
 ----
 
-[#_show-debug-commands]
+[#_show_debug_commands]
 === Show/Debug commands
 
 [,shell]
@@ -741,7 +741,7 @@ Options:
   -h, --help           Show this message and exit.
 ----
 
-[#_export-import]
+[#_export_import]
 === Export/Import
 
 [,shell]
@@ -768,7 +768,7 @@ Options:
   -h, --help  Show this message and exit.
 ----
 
-[#_packet-sniffer]
+[#_packet_sniffer]
 ==== Packet Sniffer
 
 [NOTE]

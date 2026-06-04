@@ -4,7 +4,7 @@
 :page-opendocs-origin: /05.policy/08.responserules/08.responserules.md
 :page-opendocs-slug:  /policy/responserules
 
-[#_policy-response-rules]
+[#_policy_response_rules]
 == Policy: Response Rules
 
 Response Rules provide a flexible, customizable rule engine to automate responses to important security events. Triggers can include Security Events, Vulnerability Scan results, CIS Benchmarks, Admission Control events and general Events. Actions include container quarantine, webhooks, and suppression of alerts.
@@ -27,7 +27,7 @@ All Response Rules are evaluated to determine if they match the condition/criter
 
 Additional events and actions will continue to be added by {product-name} in future releases.
 
-[#_detailed-configuration-for-response-rules]
+[#_detailed_configuration_for_response_rules]
 == Detailed Configuration for Response Rules
 
 Response Rules enable automated responses such as quarantine, webhook, and suppress log based on certain security events. Currently, the events which can be defined in the response rule include event logs, security event logs, and CVE (vulnerability scan) and CIS benchmark reports. Response rules are applied in all modes: Discover, Monitor and Protect and the behavior is same for all 3 modes.
@@ -36,12 +36,12 @@ Actions from multiple rules will be applied if an event matches multiple rules. 
 
 There are 6 default response rules included with {product-name} which are set to the status '`disabled,`' one for each category. Users can either modify a default rule to match their requirements or create new ones. Be sure to enable any rules which should be applied.
 
-[#_response-rule-parameters-matrix]
+[#_response_rule_parameters_matrix]
 === Response Rule Parameters Matrix
 
 image:resp1.png[matrix]
 
-[#_using-multiple-criteria-in-a-single-rule]
+[#_using_multiple_criteria_in_a_single_rule]
 === Using Multiple Criteria in a Single Rule
 
 The matching logic for multiple criteria in one response rule is:
@@ -63,7 +63,7 @@ The matching logic for multiple criteria in one response rule is:
 * Each rule can have multiple actions.
 ====
 
-[#_creating-a-response-rule-for-security-event-logs]
+[#_creating_a_response_rule_for_security_event_logs]
 === Creating a response rule for security event logs
 
 * Click "insert to top" to insert the rule at the top
@@ -74,17 +74,17 @@ The matching logic for multiple criteria in one response rule is:
 * Enable status
 * The log levels or process names can be used as other matching criteria
 
-[#_sample-rule-to-quarantine-container-and-send-webhook-when-package-is-updated-in-the-nvalpinepythondefault-container]
+[#_sample_rule_to_quarantine_container_and_send_webhook_when_package_is_updated_in_the_nvalpinepythondefault_container]
 === Sample rule to quarantine container and send webhook when package is updated in the nv.alpinepython.default container.
 
 image:resp3.png[rulesample]
 
-[#_icons-to-manage-rules-edit-delete-disable-and-insert-new-rule-below]
+[#_icons_to_manage_rules_edit_delete_disable_and_insert_new_rule_below]
 === Icons to manage rules - edit, delete, disable and insert new rule below
 
 image:resp4.png[manage]
 
-[#_creating-a-response-rule-for-event-logs]
+[#_creating_a_response_rule_for_event_logs]
 === Creating a response rule for event logs
 
 * Click "insert to top" to insert the rule at the top
@@ -95,17 +95,17 @@ image:resp4.png[manage]
 * Enable status
 * The log Level can be used as other matching criteria
 
-[#_sample-events-that-can-be-chosen-for-a-response-rule]
+[#_sample_events_that_can_be_chosen_for_a_response_rule]
 === Sample events that can be chosen for a response rule
 
 image:resp5.png[events]
 
-[#_sample-criteria-for-admission-control-events]
+[#_sample_criteria_for_admission_control_events]
 === Sample criteria for Admission control events
 
 image:admission.png[events]
 
-[#_creating-a-response-rule-for-cve-report-category-log-level-and-report-name-as-matching-criteria]
+[#_creating_a_response_rule_for_cve_report_category_log_level_and_report_name_as_matching_criteria]
 === Creating a response rule for cve-report category (log level and report name as matching criteria)
 
 * Click "insert to top" to insert the rule at the top
@@ -115,22 +115,22 @@ image:admission.png[events]
 * Select actions to be applied Quarantine, Webhook or suppress log (quarantine is not applicable for registry scan)
 * Enable status
 
-[#_sample-cve-report-types-that-can-be-chosen-for-cve-report-category-response-rule]
+[#_sample_cve_report_types_that_can_be_chosen_for_cve_report_category_response_rule]
 === Sample CVE report types that can be chosen for CVE-Report category response rule
 
 image:resp7.png[cvereport]
 
-[#_quarantine-container-and-send-webhook-when-vulnerability-scan-results-contain-more-than-5-high-level-cve-vulnerabilities-for-that-container]
+[#_quarantine_container_and_send_webhook_when_vulnerability_scan_results_contain_more_than_5_high_level_cve_vulnerabilities_for_that_container]
 === Quarantine container and send webhook when vulnerability scan results contain more than 5 high level CVE vulnerabilities for that container
 
 image:resp8.png[cvequarantine]
 
-[#_send-a-webhook-if-container-contains-vulnerability-with-name-cve-2018-12]
+[#_send_a_webhook_if_container_contains_vulnerability_with_name_cve_2018_12]
 === Send a webhook if container contains vulnerability with name cve-2018-12
 
 image:resp8-a.png[webhook]
 
-[#_creating-response-rule-for-cis-benchmarks-log-level-and-benchmark-number-as-matching-criteria]
+[#_creating_response_rule_for_cis_benchmarks_log_level_and_benchmark_number_as_matching_criteria]
 === Creating response rule for CIS benchmarks (log level and benchmark number as matching criteria)
 
 * Click "insert to top" to insert the rule at the top
@@ -142,26 +142,26 @@ image:resp8-a.png[webhook]
 
 image:resp8-b.png[cis]
 
-[#_unquarantine-a-container-by-deleting-response-rule]
+[#_unquarantine_a_container_by_deleting_response_rule]
 === Unquarantine a container by deleting response rule
 
 * You may want to unquarantine a container if it is quarantined by a response rule
 * Delete the response rule which caused the container to be quarantined, which can be found in the event log
 * Select the unquarantine option to unquarantine the container after deleting the rule
 
-[#_viewing-the-rule-id-responsible-for-the-container-quarantine-in-notifications-events]
+[#_viewing_the_rule_id_responsible_for_the_container_quarantine_in_notifications_events]
 === Viewing the rule id responsible for the container quarantine (in Notifications -> Events)
 
 image:resp9.png[unquarantine]
 
-[#_unquarantine-option-popup-when-the-appropriate-response-rule-is-deleted]
+[#_unquarantine_option_popup_when_the_appropriate_response_rule_is_deleted]
 === Unquarantine option popup when the appropriate response rule is deleted
 
 Check the box to unquarantine any containers which were quarantined by this rule
 
 image:resp10.png[option]
 
-[#_complete-list-of-categoried-criteria-that-can-be-configured-for-response-rules]
+[#_complete_list_of_categoried_criteria_that_can_be_configured_for_response_rules]
 === Complete list of categoried criteria that can be configured for Response Rules
 
 Note that some criteria require a value (e.g. cve-high:1, name:D.5.4, level:critical) delimited by a colon, while others are preset and will show in the drop down when you start typing a criteria.
@@ -239,7 +239,7 @@ Group.Auto.Promote
 User.Password.Alert
 ----
 
-[#_incidents-security-event]
+[#_incidents_security_event]
 ==== Incidents (Security Event)
 
 [,shell]
@@ -260,7 +260,7 @@ Process.Profile.Violation // container
 Host.Process.Violation    // host
 ----
 
-[#_threats-security-event]
+[#_threats_security_event]
 ==== Threats (Security Event)
 
 [,shell]
@@ -296,7 +296,7 @@ DNS.Tunneling
 K8S.externalIPs.MitM
 ----
 
-[#_violations-security-event]
+[#_violations_security_event]
 ==== Violations (Security Event)
 
 [,shell]
@@ -318,7 +318,7 @@ Compliance.HostCustomCheck.Violation
 Compliance.Test.Name   // D.[1-5].*
 ----
 
-[#_cve-report]
+[#_cve_report]
 ==== CVE-Report
 
 [,shell]
@@ -343,7 +343,7 @@ Admission.Control.Violation // for admission control
 Admission.Control.Denied    // for admission control
 ----
 
-[#_dynamically-generated-criteria]
+[#_dynamically_generated_criteria]
 ==== Dynamically Generated Criteria
 
 [,shell]

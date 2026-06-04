@@ -38,7 +38,7 @@
 
 使用 Helm 进行自动化部署可以在 https://github.com/neuvector/neuvector-helm. 找到
 
-支持使用操作员进行部署，包括 RedHat 认证操作员和 Kubernetes 社区操作员，相关的通用描述请参见 xref:operators.adoc[这里]。{product-name} RedHat 操作员位于 https://access.redhat.com/containers/#/registry.connect.redhat.com/neuvector/neuvector-operator,，社区操作员位于 https://operatorhub.io/operator/neuvector-operator.
+支持使用操作员进行部署，包括 RedHat 认证操作员和 Kubernetes 社区操作员，相关的通用描述请参见 xref:operators.adoc[这里]。{product-name} RedHat 操作员位于 https://access.redhat.com/containers/#/registry.connect.redhat.com/neuvector/neuvector_operator,，社区操作员位于 https://operatorhub.io/operator/neuvector_operator.
 
 == 使用 ConfigMap 部署
 

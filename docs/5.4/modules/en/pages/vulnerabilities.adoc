@@ -4,7 +4,7 @@
 :page-opendocs-origin: /06.scanning/01.scanning/01.vulnerabilities/01.vulnerabilities.md
 :page-opendocs-slug:  /scanning/scanning/vulnerabilities
 
-[#_managing-vulnerabilities-with-product]
+[#_managing_vulnerabilities_with_product]
 == Managing Vulnerabilities with {product-name}
 
 {product-name} enables automated vulnerability scanning and management throughout the pipeline. Best practices for managing vulnerabilities in {product-name} include:
@@ -20,16 +20,16 @@ The Dashboard in {product-name} presents a summary risk score which includes vul
 
 The other main tool for reviewing, filtering, and reporting on vulnerabilities is in the Security Risks menu.
 
-[#_security-risks-menu-vulnerabilities]
-=== Security Risks Menu - Vulnerabilities
+[#_security_risks_menu_vulnerabilities]
+=== Security Risks Menu _ Vulnerabilities
 
-This menu combines the results from registry (image), node, and container vulnerability scans and compliance checks found in the Assets menu to enable end-to-end vulnerability management and reporting.
+This menu combines the results from registry (image), node, and container vulnerability scans and compliance checks found in the Assets menu to enable end_to_end vulnerability management and reporting.
 
 The Vulnerabilities menu provides a powerful explorer tool to:
 
 * Make it easy to filter for viewing or downloading of reports, by typing in a search string or using the advanced filter next to the box. The advanced filter allows users to filter vulnerabilities by fix available (or not available), urgency, workloads, service, container, nodes or namespace names.
 * Understand the Impact of vulnerabilities and compliance checks by clicking on the impact row and reviewing remediation and impacted images, nodes, or containers.
-* View the Protection Status (exploit risk) of any vulnerability or compliance issue to see if there are {product-name} Run-Time security protections (rules) enabled for impacted nodes or containers.
+* View the Protection Status (exploit risk) of any vulnerability or compliance issue to see if there are {product-name} Run_Time security protections (rules) enabled for impacted nodes or containers.
 * 'Accept' a vulnerability/CVE after it has been reviewed to hide it from views and suppress it from reports.
 
 image:vulnerabilities_4_4.png[SecurityRisks]
@@ -53,7 +53,7 @@ The Impact analysis window (showing affected images, nodes, containers) color sc
 
 The Impact colors are meant to correspond to the run-time protection colors for Discover, Monitor and Protect modes in other places in the {product-name} console.
 
-[#_accepting-vulnerabilities]
+[#_accepting_vulnerabilities]
 === Accepting Vulnerabilities
 
 You can 'Accept' a vulnerability (CVE) to exclude it from reports, views, risk scoring etc. A vulnerability can be selected and the Accept button clicked from several screens such as Security Risks -> Vulnerabilities, Assets -> Containers etc. Once accepted, it is added to the Security Risks -> Vulnerability Profile list. It can be viewed, exported, and edited here. Note that this Accept feature can be limited to listed Images and/or Namespaces. New entries can also be added manually to this list from this screen.
@@ -77,7 +77,7 @@ This action can also be performed in Assets -> Nodes, which will create a Vulner
 Globally Accepted vulnerabilities are excluded from the view in Security Risks -> Vulnerabilities and in exported reports from this page. Accepted vulnerabilities which are limited to specific images or namespaces will continue to show in the view, but be excluded for reports where the Advanced Filter limits the view to those images or namespaces.
 ====
 
-[#_managing-vulnerability-profiles]
+[#_managing_vulnerability_profiles]
 === Managing Vulnerability Profiles
 
 Each accepted vulnerability/CVE creates an entry in the Security Risks -> Vulnerability Profile list. These entries can be edited to add or remove attributes such as image name(s) and namespace(s).

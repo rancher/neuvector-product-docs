@@ -38,7 +38,7 @@ Se implantando com o atual Helm chart {product-name} (v1.8.9+), as seguintes alt
 
 A implantação automatizada usando Helm pode ser encontrada em https://github.com/neuvector/neuvector-helm.
 
-A implantação usando um Operador, incluindo o Operador Certificado pela RedHat e o operador da comunidade Kubernetes é suportada, com uma descrição geral xref:operators.adoc[aqui]. O {product-name} operador RedHat está em https://access.redhat.com/containers/#/registry.connect.redhat.com/neuvector/neuvector-operator, e o operador da comunidade em https://operatorhub.io/operator/neuvector-operator..
+A implantação usando um Operador, incluindo o Operador Certificado pela RedHat e o operador da comunidade Kubernetes é suportada, com uma descrição geral xref:operators.adoc[aqui]. O {product-name} operador RedHat está em https://access.redhat.com/containers/#/registry.connect.redhat.com/neuvector/neuvector_operator, e o operador da comunidade em https://operatorhub.io/operator/neuvector_operator..
 
 == Implantação Usando ConfigMap
 

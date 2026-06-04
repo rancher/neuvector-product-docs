@@ -4,7 +4,7 @@
 :page-opendocs-origin: /02.deploying/04.openshift/04.openshift.md
 :page-opendocs-slug: /deploying/openshift
 
-[#_deploy-separate-product-components-with-redhat-openshift]
+[#_deploy_separate_product_components_with_redhat_openshift]
 == Deploy Separate {product-name} Components with RedHat OpenShift
 
 {product-name} is compatible with standard ovs SDN plug-ins as well as others such as flannel, weave, or calico. The samples below assume a standard ovs plug-in is used. This also assumes a local docker registry will be used (see instructions at end for creating the secret for dynamically pulling from neuvector or Docker Hub).
@@ -13,7 +13,7 @@
 
 To deploy manually, first pull the appropriate {product-name} containers from the {product-name} registry into your local registry. Note: the scanner image should be pulled regularly for CVE database updates from {product-name}.
 
-[#_product-images-on-docker-hub]
+[#_product_images_on_docker_hub]
 === {product-name} Images on Docker Hub
 
 The images are on the {product-name} Docker Hub registry. Use the appropriate version tag for the manager, controller, enforcer, and leave the version as 'latest' for scanner and updater. For example:
@@ -31,7 +31,7 @@ If deploying with the current {product-name} Helm chart (v1.8.9+), the following
 * Update image names/tags to the current version on Docker hub, as shown above
 * Leave the imagePullSecrets empty
 
-[#_deploy-on-openshift]
+[#_deploy_on_openshift]
 == Deploy on OpenShift
 
 [,shell]
@@ -45,7 +45,7 @@ docker pull docker.io/neuvector/updater
 docker logout docker.io
 ----
 
-The sample file below will deploy one manager, 3 controllers, and 2 scanner pods. It will deploy an enforcer on every node as a daemonset, including on the master node (if schedulable). See the bottom section for specifying dedicated manager or controller nodes using node labels. Note: It is not recommended to deploy (scale) more than one manager behind a load balancer due to potential session state issues. If you plan to use a PersistentVolume claim to store the backup of {product-name} config files, please see the general Backup/Persistent Data section in the xref:production.adoc#_backups-and-persistent-data[Production Deployment] overview.
+The sample file below will deploy one manager, 3 controllers, and 2 scanner pods. It will deploy an enforcer on every node as a daemonset, including on the master node (if schedulable). See the bottom section for specifying dedicated manager or controller nodes using node labels. Note: It is not recommended to deploy (scale) more than one manager behind a load balancer due to potential session state issues. If you plan to use a PersistentVolume claim to store the backup of {product-name} config files, please see the general Backup/Persistent Data section in the xref:production.adoc#_backups_and_persistent_data[Production Deployment] overview.
 
 Next, set the route and allow privileged {product-name} containers using the instructions below. By default, OpenShift does not allow privileged containers. Also, by default OpenShift does not schedule pods on the Master node. See the instructions at the end to enable/disable this.
 
@@ -457,7 +457,7 @@ spec:
           value: myvalue
 ----
 
-[#_using-node-labels-for-manager-and-controller-nodes]
+[#_using_node_labels_for_manager_and_controller_nodes]
 == Using Node Labels for Manager and Controller Nodes
 
 To control which nodes the Manager and Controller are deployed on, label each node. Replace `<nodename>` with the appropriate node name.
@@ -496,14 +496,14 @@ app: neuvector-enforcer-pod
       imagePullSecrets:
 ----
 
-[#_updating-the-cve-database-on-openshift-deployments]
+[#_updating_the_cve_database_on_openshift_deployments]
 == Updating the CVE Database on OpenShift Deployments
 
 The latest scanner image always contains the most recent CVE database update from {product-name}. For this reason, a version tag is not recommended when pulling the image. However, updating the CVE database requires regular pulling of the latest scanner image so the updater cron job can redeploy the scanner(s).  The samples above assume {product-name} images are pulled, tagged and pushed to a local OpenShift registry. Deployment is then from this registry instead of directly from neuvector (or the legacy {product-name} registry on docker hub).
 
 To regularly update the CVE database, we recommend a script/cron job be created to pull the latest {product-name} scanner image and perform the tagging and pushing steps to the local registry. This will ensure the CVE database is being updated regularly and images and containers are being scanned for new vulnerabilities.
 
-[#_rolling-updates]
+[#_rolling_updates]
 == Rolling Updates
 
 Orchestration tools such as Kubernetes, RedHat OpenShift, and Rancher support rolling updates with configurable policies. You can use this feature to update the {product-name} containers. The most important will be to ensure that there is at least one Allinone/Controller running so that policies, logs, and connection data is not lost. Make sure that there is a minimum of 30 seconds between container updates so that a new leader can be elected and the data synchronized between controllers.
@@ -530,7 +530,7 @@ You can now update your yaml file with these new versions and '`apply`', or use 
 
 The provided sample deployment yamls already configure the rolling update policy. If you are updating via the {product-name} Helm chart, please pull the latest chart to properly configure new features such as admission control, and delete the old cluster role and cluster role binding for {product-name}.
 
-[#_enabling-the-rest-api]
+[#_enabling_the_rest_api]
 == Enabling the REST API
 
 To enable the rest API, port 10443 must be configured as follows:
@@ -552,7 +552,7 @@ spec:
     app: neuvector-controller-pod
 ----
 
-[#_enable-disable-scheduling-on-the-master-node]
+[#_enable_disable_scheduling_on_the_master_node]
 == Enable/Disable Scheduling on the Master Node
 
 The following commands can be used to enable/disable the scheduling on the master node.
@@ -567,7 +567,7 @@ oc adm manage-node nodename --schedulable
 oc adm manage-node nodename --schedulable=false
 ----
 
-[#_openshift-deployment-in-non-privileged-mode]
+[#_openshift_deployment_in_non_privileged_mode]
 == OpenShift Deployment in Non-Privileged Mode
 
 The following instructions can be used to deploy {product-name} without using privileged mode containers. The controller is already in non-privileged mode and the enforcer deployment should be changed, which is shown in the excerpted snippets below.

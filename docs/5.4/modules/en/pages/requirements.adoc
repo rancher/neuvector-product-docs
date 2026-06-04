@@ -4,7 +4,7 @@
 :page-opendocs-origin: /01.basics/02.requirements/02.requirements.md
 :page-opendocs-slug: /basics/requirements
 
-[#_system-requirements]
+[#_system_requirements]
 == System Requirements
 
 [cols="1,1,1,1,4", options="header"]
@@ -44,10 +44,10 @@ Example - largest image size = 1.3GB, the scanner container memory should be 1.8
 | vCPU may be shared
 |===
 
-* For configuration backup/HA, a RWX PVC of 1Gi or more. See xref:production.adoc#_backups-and-persistent-data[Backups and Persistent Data section] for more details.
+* For configuration backup/HA, a RWX PVC of 1Gi or more. See xref:production.adoc#_backups_and_persistent_data[Backups and Persistent Data section] for more details.
 * Recommended browser: Chrome for better performance
 
-[#_supported-platforms]
+[#_supported_platforms]
 == Supported Platforms
 
 * Officially supported linux distributions, SUSE Linux, Ubuntu, CentOS/Red Hat (RHEL), Debian, CoreOS, AWS Bottlerocket and Photon.
@@ -62,7 +62,7 @@ Example - largest image size = 1.3GB, the scanner container memory should be 1.8
 
 AWS Bottlerocket Note: Must change path of the containerd socket specific to Bottleneck. Please see Kubernetes deployment section for details.
 
-[#_not-supported]
+[#_not_supported]
 == Not Supported
 
 * GKE Autopilot.
@@ -125,7 +125,7 @@ spec:
  app: neuvector-enforcer-pod <-- Added
 ----
 
-[#_performance-and-scaling]
+[#_performance_and_scaling]
 == Performance and Scaling
 
 As always, performance planning for {product-name} containers will depend on several factors, including:
@@ -140,7 +140,7 @@ For throughput or latency sensitive environments, additional memory and/or a ded
 
 For performance tuning of the Controller and Scanner for registry scanning, see System Requirements above.
 
-For additional advice on performance and sizing, see the xref:production.adoc#_best-practices-tips-qa-for-deploying-and-managing-product[Onboarding/Best Practices section].
+For additional advice on performance and sizing, see the xref:production.adoc#_best_practices_tips_qa_for_deploying_and_managing_product[Onboarding/Best Practices section].
 
 [#_throughput]
 === Throughput
@@ -204,7 +204,7 @@ The table below shows the average latency of 2-10% benchmarked using the Redis b
 
 The benchmark above shows average TPS of Protect mode versus Monitor mode, and the latency added for Protect mode for several tests in the benchmark. The main way to lower the actual latency (microseconds) in Protect mode is to run on a system with a faster CPU. You can find more details on this open source Redis benchmark tool at https://redis.io/topics/benchmarks.
 
-[#_adding-scaling-constraints-for-large-workload-environments]
+[#_adding_scaling_constraints_for_large_workload_environments]
 === Adding Scaling Constraints for Large Workload Environments
 
 During NeuVector installation, if your host operating system has a large amount of workloads then the NeuVector Enforcer pods can fail to spin up when trying to open the large volume of files due to the pods host monitoring. This can also cause RKE2-server failures because of the large amounts of open files.

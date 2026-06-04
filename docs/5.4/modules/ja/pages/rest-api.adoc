@@ -191,12 +191,12 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   annotations:
-    # https://kubernetes-sigs.github.io/aws-alb-ingress-controller/guide/ingress/annotation/#healthcheck-path
-    alb.ingress.kubernetes.io/backend-protocol: HTTPS
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-west-2:596810101010:certificate/380b6abc-1234-408d-axyz-651710101010
-    alb.ingress.kubernetes.io/healthcheck-path: /
-    alb.ingress.kubernetes.io/healthcheck-protocol: HTTPS
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    # https://kubernetes_sigs.github.io/aws_alb_ingress_controller/guide/ingress/annotation/#healthcheck_path
+    alb.ingress.kubernetes.io/backend_protocol: HTTPS
+    alb.ingress.kubernetes.io/certificate_arn: arn:aws:acm:us_west_2:596810101010:certificate/380b6abc_1234_408d_axyz_651710101010
+    alb.ingress.kubernetes.io/healthcheck_path: /
+    alb.ingress.kubernetes.io/healthcheck_protocol: HTTPS
+    alb.ingress.kubernetes.io/listen_ports: '[{"HTTPS":443}]'
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/success-codes: "301"
     alb.ingress.kubernetes.io/target-type: instance

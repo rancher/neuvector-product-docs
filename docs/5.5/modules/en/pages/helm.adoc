@@ -4,7 +4,7 @@
 :chart-version: 108.0.2+up2.8.11
 :chart-version-url: https://github.com/rancher/charts/blob/release-v2.13/charts/neuvector/108.0.2%2Bup2.8.11/
 
-This is an example guide on how to deploy {neuvector-product-name} via Helm to be used alongside https://documentation.suse.com/cloudnative/rancher-manager/latest/en/installation-and-upgrade/installation-and-upgrade.html[SUSE Rancher installations]. For further information regarding {neuvector-product-name} deployment methods, refer to xref:production.adoc#_planning-deployments[Planning Deployments].
+This is an example guide on how to deploy {neuvector-product-name} via Helm to be used alongside https://documentation.suse.com/cloudnative/rancher-manager/latest/en/installation-and-upgrade/installation-and-upgrade.html[SUSE Rancher installations]. For further information regarding {neuvector-product-name} deployment methods, refer to xref:production.adoc#_planning_deployments[Planning Deployments].
 
 [#_prerequisites]
 == Prerequisites
@@ -86,7 +86,7 @@ NAME                      TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)      
 neuvector-service-webui   NodePort   10.43.207.222   <none>        8443:30101/TCP   21m
 ----
 
-[#_post-installation]
+[#_post_installation]
 == Post-Installation
 
 The default login credentials for the {neuvector-product-name} UI username and password is `admin` / `admin`. You are prompted to change this upon your first login.

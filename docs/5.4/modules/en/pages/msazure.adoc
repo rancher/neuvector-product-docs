@@ -4,7 +4,7 @@
 :page-opendocs-origin: /08.integration/05.msazure/05.msazure.md
 :page-opendocs-slug:  /integration/msazure
 
-[#_integrate-with-azure-ad-saml-authentication]
+[#_integrate_with_azure_ad_saml_authentication]
 == Integrate with Azure AD SAML authentication
 
 . In the Azure management console, select the `"Enterprise applications" menu item in Azure Active Directory
@@ -68,7 +68,7 @@ image:azure12.png[azure_config12]
 +
 image:azure13.png[azure_config13]
 
-[#_mapping-groups-to-roles-and-namespaces]
+[#_mapping_groups_to_roles_and_namespaces]
 === Mapping Groups to Roles and Namespaces
 
-Please see the xref:users.adoc#_mapping-groups-to-roles-and-namespaces[Users and Roles] section for how to map groups to preset and custom roles as well as namespaces in {product-name}.
+Please see the xref:users.adoc#_mapping_groups_to_roles_and_namespaces[Users and Roles] section for how to map groups to preset and custom roles as well as namespaces in {product-name}.

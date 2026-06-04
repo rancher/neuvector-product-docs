@@ -402,6 +402,7 @@ Im Allgemeinen müssen Sie die privilegierte Einstellung ersetzen durch:
 
 Die obige Syntax gilt für Docker EE v17.06.0+. Versionen davor verwenden : anstelle von =, zum Beispiel apparmor:unconfined.
 
+[#_docker_native_updates]
 == Docker Native Updates
 
 [CAUTION]

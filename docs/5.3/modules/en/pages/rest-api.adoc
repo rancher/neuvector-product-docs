@@ -4,7 +4,7 @@
 :page-opendocs-origin: /03.configuration/01.console/01.console.md
 :page-opendocs-slug: /configuration/console
 
-[#_connect-to-ui]
+[#_connect_to_ui]
 == Connect to UI
 
 Open a browser window, connect to the manager using HTTPS. After accepting the EULA, the user is able to access the UI.
@@ -58,19 +58,19 @@ See below for cases where your corporate firewall blocks 8443.
 If your Chrome browser blocks the {product-name} self-signed certificate, see the next section on Chrome Certificate Upload. 
 ====
 
-[#_connect-to-rest-api-server]
+[#_connect_to_rest_api_server]
 == Connect to REST API Server 
 
 All operations in {product-name} can be invoked through the REST API instead of the console. The REST API server is part of the Controller/Allinone container. For details on the REST API, please see the section on Workflow and xref:automation.adoc[Automation]. 
 
-[#_default-username-and-password]
+[#_default_username_and_password]
 == Default username and password 
 
 **admin:admin** 
 
 After successful login, the admin user should update the account with a more secure password. 
 
-[#_creating-additional-users]
+[#_creating_additional_users]
 == Creating Additional Users 
 
 New users can be added from the Settings -> Users & Roles menu. There are predefined global roles in {product-name}: 
@@ -84,12 +84,12 @@ Users can be restricted to one or more namespaces using the Advanced Settings.
 
 See the section xref:users.adoc[Users & Roles] for advanced user management and creation of custom roles. 
 
-[#_connection-timeout-setting]
+[#_connection_timeout_setting]
 == Connection Timeout Setting 
 
-You can set the number of seconds which the console will timeout in the upper right of the console in My Profile -> Session timeout. The default is 5 minutes and the maximum is 3600 seconds (1 hour). 
+You can set the number of seconds which the console will timeout in the upper right of the console in My Profile _> Session timeout. The default is 5 minutes and the maximum is 3600 seconds (1 hour). 
 
-[#_enabling-http-for-manager]
+[#_enabling_http_for_manager]
 == Enabling HTTP for Manager 
 
 To disable HTTPS and enable HTTP access, add this to the Manager or Allinone yaml section in the environment variables section. For example, in Kubernetes: 
@@ -110,7 +110,7 @@ tls:
 
 This is useful if putting the manager behind a load balancer. 
 
-[#_enabling-access-from-corporate-network-which-blocks-8443]
+[#_enabling_access_from_corporate_network_which_blocks_8443]
 == Enabling Access from Corporate Network Which Blocks 8443 
 
 If your corporate network does not allow access on port 8443 to the Manager console, you can create an ingress service to map it and allow access. 
@@ -175,7 +175,7 @@ You will need to change the annotation for the ingress address from ingress.mycl
 
 This example uses the URL cloud.neuvector.com. After the ingress service is created, you can find it's external IP. You then can configure the hosts file to point cloud.neuvector.com to that IP. After that, you should be able to browse to `\https://cloud.neuvector.com` (the url you choose to use). 
 
-[#_using-ssl-passthrough-instead-of-redirect]
+[#_using_ssl_passthrough_instead_of_redirect]
 === Using SSL Passthrough Instead of Redirect 
 
 To use TLS/SSL passthrough instead of the redirect example above (supported on some ingress controllers such as nginx), make sure the ingress controller is configured appropriated for passthrough, and the appropriate annotation is added to the ingress. For example, 
@@ -186,12 +186,12 @@ annotations:
   ingress.kubernetes.io/ssl-passthrough: "true" 
 ----
 
-[#_replacing-the-product-self-signed-certificates]
+[#_replacing_the_product_self_signed_certificates]
 == Replacing the {product-name} Self-signed Certificates 
 
 Please see the next section xref:replacecert.adoc[Replacing the Self-Signed Certificates] for details. The certificate must be replaced in both the Manager and Controller/Allinone yamls. 
 
-[#_configuring-aws-alb-with-certificate-arn]
+[#_configuring_aws_alb_with_certificate_arn]
 == Configuring AWS ALB with Certificate ARN 
 
 Here is a sample ingress configuration using the AWS load balancer with the certificate ARN (actual ARN obfuscated). 

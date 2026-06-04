@@ -95,7 +95,7 @@ docker run --rm --privileged --pid=host neuvector/scanner -n neuvector
 [#_manual_deployment_of_multiple_scanners_on_kubernetes]
 === Manuelle Bereitstellung mehrerer Scanner auf Kubernetes
 
-Um Scanner manuell als Teil einer bestehenden Kubernetes-Bereitstellung bereitzustellen, erstellen Sie eine neue Rollenbindung:
+Um Scanner manuell als Teil einer bestehenden Kubernetes_Bereitstellung bereitzustellen, erstellen Sie eine neue Rollenbindung:
 
 [,shell]
 ----
