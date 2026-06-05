@@ -4,6 +4,7 @@
 :page-opendocs-origin: /05.policy/06.processrules/06.processrules.md
 :page-opendocs-slug:  /stratégie/règles de profil de processus
 
+[#_policy_groups_process_profile_rules]
 == Stratégie -> Groupes -> Règles de profil de processus
 
 Il existe deux types de protections de processus/fichiers dans {product-name}. L'une est le Zero-drift, où l'activité de processus et de fichiers autorisée est automatiquement déterminée en fonction de l'image du conteneur, et la seconde est basée sur un apprentissage comportemental. Chacune peut être personnalisée (règles ajoutées manuellement) si désiré.
@@ -13,6 +14,7 @@ Il existe deux types de protections de processus/fichiers dans {product-name}. L
 Il y a une limitation lors de l'exécution sur des systèmes avec le système de fichiers AUFS, où une condition de concurrence peut être rencontrée et les règles de processus ne sont pas appliquées pour le blocage (mode Protect). Cependant, ces violations sont toujours signalées dans les journaux d'événements de sécurité.
 ====
 
+[#_zero_drift_process_protection]
 === Protection de processus Zero-drift
 
 C'est le mode par défaut pour les protections de processus et de fichiers. Le Zero-drift autorise automatiquement uniquement les processus qui proviennent du processus parent qui se trouve dans l'image de conteneur d'origine, et n'autorise pas les mises à jour de fichiers ou l'installation de nouveaux fichiers. En mode Découverte ou Surveillance, le Zero-drift alertera sur toute activité de processus ou de fichier suspecte. En mode Protect, il bloquera une telle activité. Le Zero-drift ne nécessite pas que les processus soient appris ou ajoutés à une liste d'autorisation. Désactiver le Zero-drift pour un groupe entraînera l'application des règles de processus et de fichiers énumérées pour ce groupe.
@@ -26,10 +28,12 @@ C'est le mode par défaut pour les protections de processus et de fichiers. Le Z
 
 La possibilité d'activer/désactiver le mode Zero-drift se trouve dans la console dans les groupes de stratégie ->. Plusieurs groupes peuvent être sélectionnés pour activer ou désactiver ce paramètre pour tous les groupes sélectionnés.
 
+[#_basic_mode_process_protection]
 === Protection de processus en mode de base
 
 Le Zero-drift peut être désactivé, passant à la protection de processus de base. La protection de base impose une activité de processus/fichier basée sur les règles de processus et/ou de fichiers énumérées pour chaque groupe. Cela signifie qu'il doit y avoir une liste de règles de processus et/ou de règles de fichiers en place pour que la protection ait lieu. Les règles peuvent être créées automatiquement grâce à l'apprentissage comportemental en mode Découverte, créées manuellement via la console ou l'API REST, ou créées par programmation en appliquant un CRD. Avec la protection de base activée, s'il n'y a pas de règles en place, toute activité sera alertée/bloquée en mode Surveillance ou Protection.
 
+[#_behavioral_learning_based_process_protection]
 === Protection de processus basée sur l'apprentissage comportemental
 
 Les règles de profil de processus utilisent l'apprentissage de référence pour profiler les processus qui devraient être autorisés à s'exécuter dans un groupe de conteneurs (c'est-à-dire un groupe). Dans des conditions normales dans un environnement de microservices, pour les conteneurs avec une image particulière, seuls un ensemble limité de processus par des utilisateurs spécifiques s'exécuteraient. Si le conteneur est attaqué, l'attaquant malveillant initiera probablement de nouveaux programmes rarement vus dans ce conteneur. Ces événements anormaux peuvent être détectés par {product-name} et des alertes et actions générées (voir aussi Règles de réponse).
@@ -43,14 +47,17 @@ Notez qu'en plus des processus de référence, {product-name} dispose d'une dét
 Les sondes de vivacité Kubernetes sont automatiquement autorisées et ajoutées aux règles de processus apprises même en mode Surveillance/Protection.
 ====
 
+[#_process_rules_for_nodes]
 === Règles de processus pour les nœuds
 
 Le groupe spécial réservé 'nœuds' peut être configuré pour appliquer des règles de profil de processus sur chaque nœud (hôte) dans le cluster. Sélectionnez le groupe 'nœuds' et examinez les règles de processus, en les modifiant si nécessaire. Ensuite, passez en mode Surveillance ou Protection. La liste des règles de processus 'locales' (apprises) est une combinaison de tous les processus de tous les nœuds dans le cluster en mode Découverte.
 
+[#_process_rules_for_custom_groups]
 === Règles de processus pour les groupes personnalisés
 
 Pour les groupes personnalisés définis par l'utilisateur, les règles de processus, si désirées, doivent être ajoutées manuellement. Les groupes personnalisés n'apprennent pas automatiquement les règles de processus.
 
+[#_process_rules_precedence]
 === Priorité des règles de processus
 
 Des règles de processus peuvent exister pour les groupes personnalisés définis par l'utilisateur ainsi que pour les groupes appris automatiquement. Les règles créées pour les groupes personnalisés ont la priorité sur les règles des groupes appris automatiquement.
@@ -61,6 +68,7 @@ Les règles de processus avec un nom et un chemin contenant tous deux des caract
 
 Les règles de processus avec une action Refuser et un caractère générique dans le nom auront la priorité sur les actions Autoriser avec un caractère générique dans le nom.
 
+[#_discover_mode]
 === Mode découverte
 
 * Tous les nouveaux processus sont profilés avec l'action autoriser
@@ -74,6 +82,7 @@ Les règles de processus avec une action Refuser et un caractère générique da
 Un processus suspect (détection intégrée), tel que nmap, ncat, etc., est signalé comme un événement de processus suspect et ne sera PAS appris. Si un service a besoin de ce processus, le processus doit être ajouté avec une règle de profil 'autoriser' explicitement.
 ====
 
+[#_monitor_protect_mode_new_container_started_in_monitor_or_protect_mode]
 === Mode de surveillance/protection (nouveau conteneur démarré en mode surveillance ou protection)
 
 * Chaque nouveau processus génère une alerte
@@ -95,6 +104,7 @@ Les plateformes de conteneurs avec le pilote de stockage AUFS introduiront un d�
 En mode protection, les conteneurs système tels que ceux de Kubernetes ne permettront pas l'action de blocage mais généreront un événement de violation de processus s'il y a une violation de processus.
 ====
 
+[#_creating_process_profile_rules]
 === Création de règles de profil de processus
 
 Plusieurs règles peuvent être créées pour le même processus. Les règles sont exécutées séquentiellement et la première règle correspondante sera exécutée.
@@ -111,6 +121,7 @@ Les violations seront enregistrées dans Notifications -> Événements de sécur
 
 image:process_event.png[violation]
 
+[#_built_in_suspicious_process_detection]
 === Détection intégrée de processus suspects
 
 Les détections intégrées suivantes sont automatiquement activées dans {product-name}.
@@ -187,6 +198,7 @@ De plus, les détections suivantes sont activées :
 
 Les processus suspects sont signalés lorsqu'ils sont en mode Découverte ou Surveillance, et bloqués lorsqu'ils sont en mode Protection. La détection s'applique aux conteneurs ainsi qu'aux hôtes, à l'exception de 'sshd' qui n'est pas considéré comme suspect sur les hôtes. Les processus énumérés ci-dessus peuvent être ajoutés à la liste d'autorisation pour les conteneurs (Groupes) y compris les hôtes s'ils doivent être autorisés.
 
+[#_split_mode_process_file_protections]
 == Protections des processus/fichiers en mode fractionné
 
 Les groupes de conteneurs peuvent avoir des règles de processus/fichiers dans un mode différent de celui des règles réseau, comme décrit xref:modes.adoc#_network_service_policy_mode[ici].

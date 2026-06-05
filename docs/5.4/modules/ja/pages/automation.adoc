@@ -4,6 +4,7 @@
 :page-opendocs-origin: /11.automation/02.automation/02.automation.md
 :page-opendocs-slug:  /自動化/自動化
 
+[#_product_automation]
 == {product-name} 自動化
 
 には、CI/CD ワークフロー全体をサポートする多くの自動化機能{product-name}があります。具体的には、以下のものが含まれます：
@@ -30,6 +31,7 @@
 
 {product-name}は、検出されたセキュリティイベントや脆弱性に対する一般的な応答を自動化するための応答ルールもサポートしています。詳細については、セキュリティポリシー -> 応答ルールのセクションを参照してください。
 
+[#_expose_rest_api_in_kubernetes]
 === KubernetesでREST APIを公開する
 
 Kubernetesクラスターの外部からアクセスするためにREST APIを公開するには、ポート10443を有効にします。
@@ -61,6 +63,7 @@ spec:
 LoadBalancerタイプを使用する場合は、以下の例で_controllerIP_をロードバランサーの外部IPまたはURLに設定してください。
 ====
 
+[#_authentication_for_rest_api]
 === REST APIの認証
 
 REST APIは、ユーザー名/パスワードとトークンの2種類の認証をサポートしています。両方とも設定->ユーザー、APIキーとロールで構成でき、デフォルトまたはカスタムロールに関連付けてアクセス権を制限できます。以下の例は、最初にトークンが作成され、その後のREST API呼び出しで使用されるユーザー名/パスワードベースの認証を示しています。トークンを使用する場合は、各REST API呼び出しで直接使用できます。注意: ユーザー名ベースの接続には同時セッションの数に制限があるため、終了時に以下に示すようにユーザー名トークンを削除することが重要です。トークンベースの認証には制限はありませんが、作成時に選択した時間制限に従って期限切れになります。
@@ -73,6 +76,7 @@ image:5_2_api_created.png[token]
 
 image:5_2_api_key_header.png[token]
 
+[#_trigger_vulnerability_scanning_from_a_script]
 === スクリプトから脆弱性スキャンをトリガーする
 
 {product-name}は、自動的に画像の脆弱性をスキャンするようにトリガーできます。これは、監視対象としてレジストリ／リポジトリを構成するか、{product-name} Jenkinsプラグインを使用する、またはREST APIを使用することで実行できます。詳細については、スキャンとコンプライアンスのセクションをご覧ください。
@@ -213,6 +217,7 @@ curl -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"re
 ----
 ====
 
+[#_create_policy_rules_automatically]
 === ポリシールールを自動的に作成する
 
 {product-name}ポリシーコントローラーで新しいルールを作成するには、FROMおよびTOフィールドのグループが最初に存在する必要があります。以下のサンプルは、コンテナラベルnv-service-type=dataに基づいて新しいグループを作成し、ラベルnv-service-type=websiteの別のグループを作成します。次に、mysqlプロトコルのみを使用して、wordpressコンテナからmysqlコンテナへのトラフィックを許可するルールが作成されます。
@@ -270,6 +275,7 @@ curl -k -X "DELETE" -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKE
 sudo pip install requests six
 ----
 
+[#_setting_or_changing_user_password]
 === ユーザーパスワードの設定または変更
 
 ユーザー管理のためにREST API呼び出しを使用してください。
@@ -279,6 +285,7 @@ sudo pip install requests six
 curl -s -k -H 'Content-Type: application/json' -H 'X-Auth-Token: c64125decb31e6d3125da45cba0f5025' https://127.0.0.1:10443/v1/user/admin -X PATCH -d '{"config":{"fullname":"admin","password":"admin","new_password":"NEWPASS"}}'
 ----
 
+[#_starting_packet_capture_on_a_container]
 === コンテナでのパケットキャプチャの開始
 
 コンテナが疑わしい動作を示す場合は、パケットキャプチャを開始してください。
@@ -293,6 +300,7 @@ curl -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"sn
 
 スニファーセッションが永遠に実行されないように、しばらくしてから停止することを忘れないでください。回転するファイルの数は最大50です。
 
+[#_check_and_accept_the_eula_new_deployments]
 === EULAを確認して受け入れてください （新しいデプロイメント）
 
 上記のように認証トークンを取得してください。コントローラーのIPアドレスを適切に自分のものに置き換えてください。
@@ -316,6 +324,7 @@ curl -s -k -H 'Content-Type: application/json' -H 'X-Auth-Token: $_TOKEN_' -d '{
 
 その後、再度EULAを確認してください。
 
+[#_configure_registry_scanning]
 === レジストリスキャンを設定する
 
 [,shell]
@@ -323,6 +332,7 @@ curl -s -k -H 'Content-Type: application/json' -H 'X-Auth-Token: $_TOKEN_' -d '{
 curl -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"request": {"registry": "https://registry.connect.redhat.com", "username": "username", "password": "password", "tag": "latest", "repository": "neuvector/enforcer"}}' "https://controller:port/v1/scan/repository"
 ----
 
+[#_enable_packet_capture_on_all_pods_in_a_namespace]
 === 名前空間内のすべてのポッドでパケットキャプチャを有効にする
 
 .詳しくは、ここをクリックしてください。
@@ -527,6 +537,7 @@ done
 ----
 ====
 
+[#_enable_disable_container_quarantine]
 === コンテナ隔離を有効または無効にする
 
 隔離するためのAPI呼び出しは、次のボディを持つ/v1/workload/:idへのPATCHです。ワークロードIDはコンテナ/ポッドIDです。
@@ -542,6 +553,7 @@ done
 }'
 ----
 
+[#_enable_debugging_mode_for_product_support]
 === {product-name}サポートのためのデバッグモードを有効にする
 
 IP、ユーザー、パスワードでアクセストークンを設定する：
@@ -593,6 +605,7 @@ echo `date +%Y%m%d_%H%M%S` log out
 curl -k -X 'DELETE' -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/auth" > /dev/null 2>&1
 ----
 
+[#_report_if_a_vulnerability_is_in_the_base_image_layers]
 === 脆弱性がベースイメージ階層に存在するか報告する
 
 REST APIを使用してイメージをスキャンする際、ベースイメージ内のCVEを特定するためには、API呼び出しでベースイメージを指定する必要があります。以下の例のように指定してください。
@@ -603,6 +616,7 @@ curl -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"re
 {noformat}
 ----
 
+[#_limitations]
 ==== 制限
 
 スキャン対象のイメージがリモートイメージで"registry"が指定されている場合、ベースイメージもリモートイメージでなければならず、名前はhttpまたはhttpsで始まる必要があります。 スキャン対象のイメージがローカルイメージの場合、ベースイメージもローカルイメージでなければなりません。
@@ -616,6 +630,7 @@ curl -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"re
 {"request": {"repository": "neuvector/manager", "tag": "4.0.2", "scan_layers": true, "base_image": "10.1.127.12:5000/neuvector/manager:4.0.2”}}
 ----
 
+[#_get_the_cve_database_version_and_date]
 === CVEデータベースのバージョンと日付を取得する
 
 [,shell]
@@ -647,6 +662,7 @@ curl -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" "https:/
 }
 ----
 
+[#_manage_federation_for_master_and_remote_worker_clusters]
 === マスターおよびリモート（ワーカー）クラスターのフェデレーションを管理する
 
 一般的に、フェデレーションメンバーの一覧を取得するには、次のエンドポイントにGETリクエストを送信できます（特定の構文についてはサンプルを参照してください）： +

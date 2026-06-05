@@ -4,6 +4,7 @@
 :page-opendocs-origin: /02.deploying/05.docker/05.docker.md
 :page-opendocs-slug: /deploying/docker
 
+[#_kubernetes_deployment_on_mirantis_kubernetes_engine]
 == Kubernetes-Bereitstellung auf Mirantis Kubernetes Engine
 
 Befolgen Sie die Anweisungen im xref:kubernetes.adoc[Kubernetes-Abschnitt].
@@ -13,6 +14,7 @@ Befolgen Sie die Anweisungen im xref:kubernetes.adoc[Kubernetes-Abschnitt].
 {product-name} unterstützt keine gemischten Kubernetes / Swarm-Cluster.
 ====
 
+[#_deploy_product_containers_using_docker_native_or_ucp_swarm]
 == Bereitstellung von {product-name} Containern mit Docker Native oder UCP/Swarm
 
 Bitte beachten Sie, dass die native Docker-Bereitstellung auf Mirantis Kubernetes Engine mit Swarm die Bereitstellung von Diensten mit Containern im privilegierten Modus oder mit hinzugefügten Seccomp-Funktionen NICHT unterstützt. Um in dieser Umgebung bereitzustellen, müssen Sie Docker Compose oder Run verwenden, um die {product-name} Container bereitzustellen. Sie können die Bereitstellung auf dem Remote-Host (docker-compose -H HOST) verwenden, um diese Aufgabe zu erleichtern.
@@ -21,10 +23,12 @@ Hier sind die Beispielkonfigurationsdateien für Docker Compose. Bitte beachten 
 
 NOTE: Die Umgebungsvariable NV_PLATFORM_INFO=platform=Docker wird verwendet, um {product-name} mitzuteilen, dass die Plattform Docker/Swarm ist, auch wenn möglicherweise ungenutzte Kubernetes-Container von {product-name} bei einer Docker EE-Bereitstellung erkannt werden. Um diese in der Network Activity -> View sowie in -> Show System sehen zu können, fügen Sie die Umgebungsvariable NV_SYSTEM_GROUPS für den Enforcer hinzu.
 
+[#_deploy_allinone_for_high_availability]
 === Stellen Sie All-in-One für hohe Verfügbarkeit bereit
 
 Für HA in Produktionsumgebungen mit Docker Native oder EE, stellen Sie den All-in-One-Container auf den ersten drei Produktionshosts bereit. Jeder All-in-One sollte auf die IP-Adressen aller All-in-One-Hosts verweisen. Zum Beispiel sind drei All-in-One-Container das Minimum für HA, und die CLUSTER_JOIN_ADDR sollte die drei IP-Adressen durch Kommas getrennt auflisten. Zusätzliche HA All-in-One können in ungerader Anzahl bereitgestellt werden, z.B. 5, 7. Stellen Sie den Enforcer auf den verbleibenden Hosts im Cluster bereit, in beliebiger Reihenfolge.
 
+[#_deploy_allinone_using_docker_compose_privileged_mode]
 === Stellen Sie All-in-One mit docker-compose (privilegierter Modus) bereit.
 
 Im Folgenden finden Sie ein Beispiel für die docker-compose-Datei, um den All-in-One-Container auf dem ersten Knoten bereitzustellen. Da der All-in-One-Container ein Enforcer-Modul enthält, können Anwendungscontainer auf demselben Knoten gesichert werden. Sowohl Greenfield- als auch Brownfield-Bereitstellungen werden unterstützt.
@@ -63,6 +67,7 @@ Port 18300 und 18301 sind Standardports für die Clusterkommunikation. Sie müss
 Um die REST-API im All-in-One freizugeben, fügen Sie die Portzuordnung für 10443 hinzu, zum Beispiel - 10443:10443.
 ====
 
+[#_add_an_enforcer_container_using_docker_compose_privileged_mode]
 === Fügen Sie einen Enforcer-Container mit Docker-Compose (privilegierter Modus) hinzu.
 
 Dies ist ein Beispiel für die Docker-Compose-Datei, um einen Enforcer in das Cluster einzufügen. Sowohl Greenfield- als auch Brownfield-Bereitstellungen werden unterstützt.
@@ -90,6 +95,7 @@ enforcer:
 
 Die wichtigste Umgebungsvariable ist *CLUSTER_JOIN_ADDR*. Für Enforcer ersetzen Sie `<controller_node_ip>` durch die IP-Adresse des Controllers. Typischerweise haben *CLUSTER_JOIN_ADDR* in der Docker-Compose-Datei des Controllers/All-in-One und in der Docker-Compose-Datei des Enforcers denselben Wert.
 
+[#_deploy_the_suse_security_scanner_container]
 === Stellen Sie den {product-name} Scanner-Container bereit.
 
 Ab {product-name} 4.0+ muss ein separater Scanner-Container bereitgestellt werden, um Schwachstellen zu scannen. Wichtig: Verwenden Sie immer das :latest-Tag, wenn Sie das Scanner-Image abrufen und ausführen, um sicherzustellen, dass die neueste CVE-Datenbank bereitgestellt wird.
@@ -136,10 +142,12 @@ Um einen eigenständigen Scanner (kein Controller/All-in-One) bereitzustellen, s
 
 Um den Scanner zu aktualisieren, um die neuesten CVE-Datenbankaktualisierungen von {product-name} zu erhalten, erstellen Sie einen Cron-Daemon-Job, um den Scanner zu beenden und neu zu starten, wobei die neuesten Daten abgerufen werden. Siehe xref:docker.adoc#_docker_native_updates[diesen Abschnitt] für Details.
 
+[#_deployment_without_using_privileged_mode]
 === Bereitstellung ohne Verwendung des privilegierten Modus
 
 Für einige Plattformkonfigurationen ist es möglich, die {product-name} Container bereitzustellen, ohne dass sie im privilegierten Modus ausgeführt werden müssen. Die Konfiguration muss die Möglichkeit unterstützen, Berechtigungen hinzuzufügen und das AppArmor-Profil festzulegen. Beachten Sie, dass Docker DataCenter/UCP und Swarm dies derzeit nicht unterstützen, es jedoch dennoch möglich ist, {product-name} manuell mit Compose oder Run bereitzustellen.
 
+[#_deploy_allinone_no_privileged_mode_with_docker_compose]
 === Bereitstellung All-in-One (KEIN privilegierter Modus) mit docker-compose
 
 [,yaml]
@@ -175,6 +183,7 @@ allinone:
         - /var/neuvector:/var/neuvector
 ----
 
+[#_deploy_enforcer_no_privileged_mode_with_docker_compose]
 === Bereitstellung Enforcer (KEIN privilegierter Modus) mit docker-compose
 
 [,yaml]
@@ -206,6 +215,7 @@ enforcer:
         - /sys/fs/cgroup/:/host/cgroup/:ro
 ----
 
+[#_deploy_allinone_privileged_mode_with_docker_run]
 === Bereitstellung All-in-One (privilegierter Modus) mit docker run
 
 Sie können docker run anstelle von compose zur Bereitstellung verwenden. Hier sind Beispiele.
@@ -231,6 +241,7 @@ docker run -d --name allinone \
 neuvector/allinone:<version>
 ----
 
+[#_deploy_enforcer_privileged_mode_with_docker_run]
 === Bereitstellung Enforcer (privilegierter Modus) mit docker run
 
 [,shell]
@@ -250,6 +261,7 @@ docker run -d --name enforcer \
 neuvector/enforcer:<version>
 ----
 
+[#_deploy_allinone_no_privileged_mode_with_docker_run]
 === Bereitstellung All-in-One (KEIN privilegierter Modus) mit docker run
 
 Sie können docker run anstelle von Compose zum Bereitstellen verwenden. Hier sind Beispiele.
@@ -281,6 +293,7 @@ docker run -d --name allinone \
 neuvector/allinone:<version>
 ----
 
+[#_deploy_enforcer_no_privileged_mode_with_docker_run]
 === Bereitstellung Enforcer (KEIN privilegierter Modus) mit docker run
 
 [,shell]
@@ -306,6 +319,7 @@ docker run -d --name enforcer \
 neuvector/enforcer:<version>
 ----
 
+[#_deploy_separate_product_components_on_different_hosts]
 == Separater {product-name} Komponenten auf verschiedenen Hosts bereitstellen
 
 Wenn Sie planen, einen Docker-Host einem Controller und/oder Manager (kein Enforcer) zu widmen, können diese Container einzeln anstelle des All-in-One bereitgestellt werden. Beachten Sie, dass Docker nicht unterstützt, den Enforcer auf demselben Knoten wie den Controller als separate Komponenten bereitzustellen, was die Verwendung des All-in-One-Containers erfordert, wenn Controller- und Enforcer-Funktionen auf einem Knoten gewünscht sind.
@@ -379,10 +393,12 @@ enforcer:
         - /sys/fs/cgroup/:/host/cgroup/:ro
 ----
 
+[#_monitoring_and_restarting_product]
 == Überwachung und Neustart von {product-name}
 
 Da die {product-name} Container nicht als UCP/Swarm-Dienst bereitgestellt werden, werden sie auf Knoten nicht automatisch gestartet/neugestartet. Sie sollten über Ihr SIEM-System Alarme für {product-name} SYSLOG-Ereignisse oder über DataCenter einrichten, um zu erkennen, ob ein {product-name} Container nicht läuft.
 
+[#_deploying_without_privileged_mode]
 == Bereitstellung ohne privilegierten Modus
 
 Im Allgemeinen müssen Sie die privilegierte Einstellung ersetzen durch:

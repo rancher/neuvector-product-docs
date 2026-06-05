@@ -4,6 +4,7 @@
 :page-opendocs-origin: /02.deploying/03.rancher/03.rancher.md
 :page-opendocs-slug: /deploying/rancher
 
+[#_deploy_and_manage_product_through_rancher_extensions_or_apps_marketplace]
 == Desplegar y gestionar {product-name} a través de las extensiones de Rancher o de las aplicaciones y mercado de Rancher
 
 {product-name} se puede ampliar fácilmente, ya sea a través de las extensiones de Rancher para clientes Prime o de las aplicaciones y mercado de Rancher. La ampliación predeterminada (basada en Helm) de {product-name} desplegará {product-name} contenedores en el espacio de nombres cattle-neuvector-system.
@@ -13,6 +14,7 @@
 Solo las ampliaciones de {product-name} a través de las extensiones de Rancher ({product-name}) de la versión 2.7.0+ de Rancher, o de las aplicaciones y mercado de la versión 2.6.5+ de Rancher, se pueden gestionar directamente (inicio de sesión único en la consola de {product-name}) a través de Rancher. Si se añaden clústeres a Rancher con {product-name} ya desplegado, o donde {product-name} ha sido desplegado directamente en el clúster, estos clústeres no estarán habilitados para la integración SSO.
 ====
 
+[#_suse_security_ui_extension_for_rancher]
 === Extensión de UI de {product-name} para Rancher
 
 Los clientes Prime de Rancher pueden desplegar fácilmente {product-name} y la extensión de UI de {product-name} para Rancher. Esto permitirá a los usuarios Prime monitorizar y gestionar ciertas funciones y eventos de {product-name} directamente a través de la UI de Rancher. Para usuarios de la comunidad, por favor consulta la sección Desplegar {product-name} a continuación para desplegar desde las aplicaciones y mercado de Rancher.
@@ -57,6 +59,7 @@ Desinstalar la extensión de la interfaz de usuario {product-name} NO desinstala
 ====
 --
 
+[#_deploy_suse_security]
 === Desplegar {product-name}
 
 Primero, encuentra el gráfico {product-name} en los gráficos de Rancher, selecciónalo y revisa las instrucciones y varios valores de configuración. (Opcional) Crea un proyecto para desplegar si lo deseas, por ejemplo, {product-name}. Nota: Si ves más de un gráfico {product-name}, no selecciones el que es para actualizar ampliaciones de gráficos Helm heredados {product-name} 4.x.
@@ -78,6 +81,7 @@ Después de una ampliación {product-name} exitosa, verá un resumen de las ampl
 
 image:nv_deployed.png[desplegado]
 
+[#_manage_product]
 === Administrar {product-name}
 
 Ahora verá un elemento de menú {product-name} a la izquierda, y seleccionar eso mostrará un mosaico/botón {product-name}, que al hacer clic lo llevará a la consola {product-name}, en una nueva pestaña.
@@ -97,12 +101,14 @@ image:local_admin.png[local]
 Se recomienda iniciar sesión directamente en la consola {product-name} como admin/admin para cambiar manualmente la contraseña de administrador a una contraseña fuerte. Esto solo cambiará la contraseña del usuario administrador del proveedor de identidad {product-name} (puede ver otro usuario administrador cuyo proveedor de identidad es Rancher). Alternativamente, incluya un xref:configmap.adoc#_protect_sensitive_data_using_a_secret[ConfigMap como secreto] en el despliegue inicial desde Rancher (consulte los valores del gráfico para la configuración de ConfigMap) para establecer la contraseña de administrador predeterminada a una contraseña fuerte.
 ====
 
+[#_neuvector_rancher_sso_permission_resources]
 === Recursos de Permisos de NeuVector/Rancher SSO
 
 La interfaz de usuario de Rancher v2.9.2 permite seleccionar recursos de permisos de NeuVector al crear `Global/Cluster/Project/Namespaces` roles. Cuando a un usuario de Rancher se le asigna un rol con un recurso de permiso de NeuVector, la sesión SSO de NeuVector del usuario se asigna al respectivo permiso de NeuVector en consecuencia. Esto es para proporcionar a los usuarios SSO roles personalizados distintos de los roles reservados `admin/reader/fedAdmin/fedReader`.
 
 A continuación se presentan los recursos de permisos mapeados utilizados con los roles `Global/Cluster/Project/Namespaces` aplicables.
 
+[#_mapped_permission_resources_for_global_cluster_role]
 ==== Recursos de Permisos Mapeados para el Rol `Global/Cluster`
 
 [NOTE]
@@ -152,6 +158,7 @@ SecurityEvents
 SystemConfig
 ----
 
+[#_mapped_permission_resources_for_project_namespace_role]
 ==== Recursos de Permisos Mapeados para el Rol `Project/Namespace`
 
 [NOTE]
@@ -189,12 +196,14 @@ SecurityEvents
 SystemConfig
 ----
 
+[#_disabling_product_rancher_sso]
 === Desactivando {product-name}/Rancher SSO
 
 Para desactivar la capacidad de iniciar sesión en {product-name} desde Rancher Manager, ve a Configuración -> Configuración.
 
 image:rancher_sso.png[rancher_sso]
 
+[#_rancher_legacy_deployments]
 === Ampliaciones legadas de Rancher
 
 El archivo de muestra desplegará un gestor y 3 controladores. Se desplegará un ejecutor en cada nodo. Consulta la sección inferior para especificar nodos dedicados de gestor o controlador utilizando etiquetas de nodo. Nota: No se recomienda desplegar (escalar) más de un gestor detrás de un balanceador de carga debido a posibles problemas de estado de sesión.
@@ -249,6 +258,7 @@ enforcer:
      io.rancher.scheduler.global: true
 ----
 
+[#_deploy_without_privileged_mode]
 == Desplegar sin modo privilegiado
 
 En algunos sistemas, se admite la ampliación sin utilizar el modo privilegiado. Estos sistemas deben soportar la capacidad de añadir capacidades utilizando la configuración cap_add y de establecer el perfil de apparmor.
@@ -311,6 +321,7 @@ enforcer:
      io.rancher.scheduler.global: true
 ----
 
+[#_using_node_labels_for_manager_and_controller_nodes]
 == Uso de etiquetas de nodo para los nodos del gestor y del controlador
 
 Para controlar en qué nodos se despliegan el gestor y el controlador, etiqueta cada nodo. Elige los nodos donde se van a desplegar los controladores. Etiquétalos con "nvcontroller=true". (Con el archivo de muestra actual, no puede ejecutarse más de un controlador en el mismo nodo.)

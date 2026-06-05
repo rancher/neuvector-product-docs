@@ -224,7 +224,7 @@ Expression: `(?i)(password|passwd|api_token)\S{0,32}\s*:\s*(?-i)([0-9a-zA-Z\/+]{
 Suggestion: msgReferVender}, 
 ----
 
-En la página **Informes de Riesgo**, cuando se detectan secretos, el formato de alerta se mostrará con información de salida general mostrando como "${variable}=${value}". Como ejemplo en la imagen de abajo, esto se puede ver con la variable "env1=AIDAJQ...".
+En la página **Informes de Riesgo**, cuando se detectan secretos, el formato de alerta se mostrará con información de salida general mostrando como "$\{variable}=$\{value}". Como ejemplo en la imagen de abajo, esto se puede ver con la variable "env1=AIDAJQ...".
 
 image::https://github.com/user-attachments/assets/848533ed-70c1-494b-b7d5-6e9b60951f77[secret_detection]
 

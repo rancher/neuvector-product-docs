@@ -4,6 +4,7 @@
 :page-opendocs-origin: /04.navigation/03.improve_score/03.improve_score.md
 :page-opendocs-slug:  /navigation/improve_score
 
+[#_improving_the_security_risk_score]
 == Mejorando la puntuación de riesgo de seguridad
 
 La puntuación de riesgo de seguridad en el panel proporciona una puntuación entre 0 y 100.
@@ -23,8 +24,10 @@ La puntuación es la suma de las siguientes métricas, cada una mostrada como un
 
 Por defecto, {product-name} incluye todos los contenedores, incluidos los contenedores del sistema, en la puntuación de riesgo. Esto se puede personalizar para cada grupo de contenedores aprendidos para desactivar ciertos contenedores de ser incluidos en el cálculo de la puntuación de riesgo, como se muestra a continuación.
 
+[#_how_to_improve_the_score]
 === Cómo mejorar la puntuación
 
+[#_product_protection_mode]
 ==== {product-name} Modo de Protección
 
 . Cambia el nuevo modo de protección del servicio en Configuración -> a Monitorizar o Proteger
@@ -34,6 +37,7 @@ O bien
 
 . Haz clic en el icono de la herramienta para seguir el asistente y realizar los pasos anteriores
 
+[#_ingress_egress_risk]
 ==== Riesgo de Ingreso/Salida
 
 . Haz clic en el icono de la herramienta para seguir el asistente y revisar Ingreso y Salida
@@ -41,6 +45,7 @@ O bien
 . Cambia todos los servicios que aún están en modo Descubrimiento a Monitorizar o Proteger
 . Revisa y elimina todas las amenazas, violaciones e historial de sesiones haciendo clic en el icono de Eliminar/Papelera para cada uno
 
+[#_privileged_and_or_root_containers]
 ==== Contenedores privilegiados y/o raíz
 
 . Elimina contenedores privilegiados
@@ -52,16 +57,19 @@ O bien
 Esto puede no ser posible debido a tus contenedores requeridos, sin embargo, cada uno de estos solo cuenta por 4 puntos.
 ====
 
+[#_admission_controls]
 ==== Controles de admisión
 
 . Asegúrate de que, en un entorno de Kubernetes/OpenShift, el Control de Admisión esté habilitado y haya al menos una regla activa en la directiva -> Control de Admisión
 
+[#_vulnerabilities]
 ==== Vulnerabilidades
 
 . Asegúrate de que todos los contenedores no del sistema estén en modo Monitorizar o Proteger, en la directiva -> Grupos
 . Elimina/remedia las vulnerabilidades del host
 . Elimina/remedia las vulnerabilidades de la plataforma orquestadora (por ejemplo, Kubernetes, OpenShift)
 
+[#_how_to_customize_which_container_groups_are_included_in_the_score]
 === Cómo personalizar qué grupos de contenedores se incluyen en la puntuación
 
 Para habilitar o deshabilitar qué grupos de contenedores se incluyen en la Puntuación de Riesgo de Seguridad, ve al menú de Directiva -> Grupos y selecciona el Grupo a modificar. La columna de resumen a la derecha tiene un icono 'Puntuable' que indica qué grupos se utilizan para la puntuación.

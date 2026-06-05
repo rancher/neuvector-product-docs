@@ -4,8 +4,10 @@
 :page-opendocs-origin: /02.deploying/01.production/03.details/03.details.md
 :page-opendocs-slug: /deploying/production/details
 
+[#_environment_variables]
 == 環境変数
 
+[#_for_both_controller_allinone_and_enforcer]
 === コントローラー（オールインワン）とエンフォーサーの両方に対応
 
 * CLUSTER_JOIN_ADDR
@@ -44,6 +46,7 @@ ____
 （オプション）メモリ圧力の問題を調査するためにメモリプロファイルデータの収集を有効にするには値を1に設定します。
 ____
 
+[#_controller]
 === コントローラ
 
 * CTRL_PERSIST_CONFIG
@@ -82,6 +85,7 @@ ____
 （オプション）有効にすると（値=1）、icmpトラフィックは発見モードで学習でき、ポリシーが生成されます。グループのモニターまたは保護モードにネットワークポリシーがない場合、icmpトラフィックに対して暗黙の違反が生成されます。
 ____
 
+[#_manager]
 === マネージャ
 
 * CTRL_SERVER_IP
@@ -113,6 +117,7 @@ ____
 この環境変数は、スタンドアロンのNeuVector製品専用です。Rancher SSOを使用する場合は、変数を「on」に設定してください。そうでない場合は、NeuVectorがデフォルトでHTTPSを使用するため、設定しないでください。
 ====
 
+[#_enforcer]
 === Enforcer
 
 * CONTAINER_NET_TYPE
@@ -163,6 +168,7 @@ ____
 （オプション）{product-name}が「システムコンテナ」と見なすグループやネームスペースをセミコロンで区切って指定してください。例えば、Rancherベースのアプリとデフォルトのネームスペースの場合、NV_SYSTEM_GROUPS=__cattle-system;__defaultです。これらの値は正規表現として解釈されます。システムコンテナ（{product-name}およびKubernetesシステムコンテナも含む）は、グループが保護モードに設定されていても、モニターモード（アラートのみ）でのみ動作します。
 ____
 
+[#_open_ports]
 == Open Ports (オープンポート)
 
 * CLUSTER_RPC_PORT - コントローラーおよびオールインワンで.デフォルトは18300です。

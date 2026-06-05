@@ -4,6 +4,7 @@
 :page-opendocs-origin: /08.integration/01.integration/01.integration.md
 :page-opendocs-slug:  /integration/integration
 
+[#_integration]
 == 集成
 
 {product-name} 提供多种集成选项，包括 REST API、CLI、Syslog、RBAC、SAML、LDAP 和 Webhooks。有关使用 REST API 自动化任务的示例，请参见 xref:automation.adoc[*自动化*] 部分。
@@ -12,6 +13,7 @@
 
 以下集成设置可在 {product-name} 用户界面中的 *设置* 下找到。
 
+[#_openshift_and_kubernetes_rbac]
 === OpenShift 和 Kubernetes RBAC
 
 如果您使用 Red Hat OpenShift 基于角色的访问控制（RBAC），并希望 {product-name} 自动读取和执行这些权限，请启用此选项。
@@ -34,6 +36,7 @@ image:openshift-rbac.png[OpenShift]
 默认的 {product-name} *管理员* 用户以及在 {product-name} 中直接创建的任何用户在启用 OpenShift RBAC 时仍然有效。
 ====
 
+[#_trust_external_root_cas_with_helm]
 === 信任 Helm 的外部根 CA
 
 {product-name} 可以信任外部根证书颁发机构（CA），以进行安全连接，如 LDAPS、OpenID Connect（OIDC）和注册表扫描。此功能使与外部身份验证服务和镜像注册表的可信通信成为可能。
@@ -99,6 +102,7 @@ echo https://$NODE_IP:$NODE_PORT
 在浏览器中打开显示的 URL 以访问 {product-name} 管理器 UI。
 ====
 
+[#_kubernetes_rbac]
 === Kubernetes RBAC
 
 要手动为特定名称空间配置 Kubernetes RBAC：
@@ -109,16 +113,19 @@ echo https://$NODE_IP:$NODE_PORT
 
 image:k8s-rbac.png[Kubernetes]
 
+[#_syslog]
 === Syslog
 
 通过输入 Syslog 服务器地址并选择通知级别来配置 Syslog 集成。您可以使用 IP 地址或 DNS，并选择 UDP 或 TCP。
 
+[#_webhooks]
 === webhook
 
 {product-name} 可以通过使用 Webhooks 向外部端点发送通知。指定Webhook端点URL以接收通知。
 
 您可以在 *策略* → *响应规则* 下为自定义事件配置 Webhook 通知。
 
+[#_directory_and_sso_integration]
 === 目录和SSO集成
 
 {product-name}支持目录和单点登录（SSO）集成，包括LDAP、Microsoft Active Directory、SAML和OpenID Connect。

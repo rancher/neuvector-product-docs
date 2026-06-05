@@ -4,6 +4,7 @@
 :page-opendocs-origin: /02.deploying/05.docker/05.docker.md
 :page-opendocs-slug: /deploying/docker
 
+[#_kubernetes_deployment_on_mirantis_kubernetes_engine]
 == Implantação do Kubernetes no Mirantis Kubernetes Engine
 
 Siga as instruções na xref:kubernetes.adoc[seção Kubernetes].
@@ -13,6 +14,7 @@ Siga as instruções na xref:kubernetes.adoc[seção Kubernetes].
 {product-name} não suporta clusters mistos de Kubernetes / Swarm.
 ====
 
+[#_deploy_product_containers_using_docker_native_or_ucp_swarm]
 == Implante {product-name} Contêineres Usando Docker Nativo ou UCP/Swarm
 
 Observe que a implantação nativa do Docker no Mirantis Kubernetes Engine usando Swarm NÃO SUPORTA a implantação de serviços com contêineres em modo privilegiado ou com capacidades seccomp adicionadas. Para implantar neste ambiente, você deve usar Docker Compose ou Run para implantar os {product-name} contêineres. Você pode usar a implantação em host remoto (docker-compose -H HOST) para facilitar essa tarefa.
@@ -21,10 +23,12 @@ Aqui estão os arquivos de configuração de exemplo do docker compose. Observe 
 
 NOTE: A variável de ambiente NV_PLATFORM_INFO=platform=Docker é usada para notificar {product-name} que a plataforma é Docker/Swarm, mesmo que possam haver contêineres Kubernetes não utilizados detectados por {product-name} em uma implantação Docker EE. Além disso, para poder ver isso na Atividade de Rede -> Visualizar -> Mostrar Sistema, adicione a variável de ambiente para o Enforcer NV_SYSTEM_GROUPS.
 
+[#_deploy_allinone_for_high_availability]
 === Implante All-in-One para alta disponibilidade
 
 Para HA em ambientes de produção Docker nativo ou EE, implante o contêiner All-in-One nos primeiros três hosts de produção. Cada All-in-One deve apontar para os endereços IP de todos os hosts All-in-One. Por exemplo, três contêineres All-in-One é o mínimo para HA, e o CLUSTER_JOIN_ADDR deve listar os três endereços IP separados por vírgula. All-in-One adicionais para HA podem ser implantados em números ímpares, por exemplo, 5, 7. Implante o Enforcer nos hosts restantes do cluster, em qualquer um.
 
+[#_deploy_allinone_using_docker_compose_privileged_mode]
 === Implante o All-in-One usando docker-compose (modo privilegiado)
 
 A seguir, um exemplo do arquivo docker-compose para implantar o contêiner All-in-One no primeiro nó. Como o contêiner All-in-One possui um módulo de enforcer interno, os contêineres de aplicativo no mesmo nó podem ser protegidos. Implantações tanto em greenfield quanto em brownfield são suportadas.
@@ -63,6 +67,7 @@ As portas 18300 e 18301 são as portas padrão para comunicação do cluster. El
 Para expor a API REST no All-in-One, adicione o mapeamento de porta para 10443, por exemplo - 10443:10443.
 ====
 
+[#_add_an_enforcer_container_using_docker_compose_privileged_mode]
 === Adicione um contêiner enforcer usando docker-compose (modo privilegiado)
 
 Este é um exemplo de arquivo docker-compose para adicionar um enforcer ao cluster. Implantações tanto em greenfield quanto em brownfield são suportadas.
@@ -90,6 +95,7 @@ enforcer:
 
 A variável de ambiente mais importante é *CLUSTER_JOIN_ADDR*. Para enforcers, substitua `<controller_node_ip>` pelo endereço IP do nó do controlador. Normalmente, *CLUSTER_JOIN_ADDR* no arquivo docker-compose do controlador/all-in-one e no arquivo docker-compose do enforcer têm o mesmo valor.
 
+[#_deploy_the_suse_security_scanner_container]
 === Implante o {product-name} contêiner Scanner
 
 A partir do {product-name} 4.0+, um contêiner scanner separado deve ser implantado para realizar a varredura de vulnerabilidades. Importante: Sempre use a tag :latest ao puxar e executar a imagem do scanner para garantir que o banco de dados CVE mais recente seja implantado.
@@ -136,10 +142,12 @@ Para implantar um scanner autônomo (sem controlador/All-in-One), consulte a se�
 
 Para atualizar o Scanner a fim de obter as últimas atualizações do banco de dados CVE de {product-name}, crie um trabalho cron para parar e reiniciar o scanner, puxando a versão mais recente. Veja xref:docker.adoc#_docker_native_updates[esta seção] para detalhes.
 
+[#_deployment_without_using_privileged_mode]
 === Implantação Sem Usar Modo Privilegiado
 
 Para algumas configurações de plataforma, é possível implantar os contêineres {product-name} sem exigir que eles sejam executados em modo privilegiado. A configuração deve suportar a capacidade de adicionar permissões e definir o arquivo de controle do AppArmor. Observe que o Docker DataCenter/UCP e o Swarm atualmente não suportam isso, mas ainda é possível implantar {product-name} manualmente usando Compose ou Run.
 
+[#_deploy_allinone_no_privileged_mode_with_docker_compose]
 === Implante o All-in-One (SEM modo privilegiado) com docker-compose
 
 [,yaml]
@@ -175,6 +183,7 @@ allinone:
         - /var/neuvector:/var/neuvector
 ----
 
+[#_deploy_enforcer_no_privileged_mode_with_docker_compose]
 === Implante o enforcer (SEM modo privilegiado) com docker-compose
 
 [,yaml]
@@ -206,6 +215,7 @@ enforcer:
         - /sys/fs/cgroup/:/host/cgroup/:ro
 ----
 
+[#_deploy_allinone_privileged_mode_with_docker_run]
 === Implante o All-in-One (modo privilegiado) com docker run
 
 Você pode usar docker run em vez de compose para implantar. Aqui estão exemplos.
@@ -231,6 +241,7 @@ docker run -d --name allinone \
 neuvector/allinone:<version>
 ----
 
+[#_deploy_enforcer_privileged_mode_with_docker_run]
 === Implante o enforcer (modo privilegiado) com docker run
 
 [,shell]
@@ -250,6 +261,7 @@ docker run -d --name enforcer \
 neuvector/enforcer:<version>
 ----
 
+[#_deploy_allinone_no_privileged_mode_with_docker_run]
 === Implante o All-in-One (SEM modo privilegiado) com docker run
 
 Você pode usar docker run em vez de compose para implantar. Aqui estão exemplos.
@@ -281,6 +293,7 @@ docker run -d --name allinone \
 neuvector/allinone:<version>
 ----
 
+[#_deploy_enforcer_no_privileged_mode_with_docker_run]
 === Implante o enforcer (SEM modo privilegiado) com docker run
 
 [,shell]
@@ -306,6 +319,7 @@ docker run -d --name enforcer \
 neuvector/enforcer:<version>
 ----
 
+[#_deploy_separate_product_components_on_different_hosts]
 == Implante {product-name} Componentes Separados em Hosts Diferentes
 
 Se planeja dedicar um host Docker a um Controlador e/ou Gerente (sem Enforcer), esses contêineres podem ser implantados individualmente em vez do All-in-One. Observe que o Docker não suporta a implantação do enforcer no mesmo nó que o controlador como componentes separados, exigindo o uso do contêiner All-in-One se as funções de controlador e enforcer forem desejadas em um nó.
@@ -379,10 +393,12 @@ enforcer:
         - /sys/fs/cgroup/:/host/cgroup/:ro
 ----
 
+[#_monitoring_and_restarting_product]
 == Monitorando e Reiniciando {product-name}
 
 Como os {product-name} contêineres não são implantados como um serviço UCP/Swarm, eles não são iniciados/reiniciados automaticamente nos nós. Você deve configurar alertas através do seu sistema SIEM para {product-name} eventos SYSLOG ou através do DataCenter para detectar se um {product-name} contêiner não está em execução.
 
+[#_deploying_without_privileged_mode]
 == Implantando Sem Modo Privilegiado
 
 Em geral, você precisará substituir a configuração privilegiada por:
@@ -402,6 +418,7 @@ Em geral, você precisará substituir a configuração privilegiada por:
 
 A sintaxe acima é para Docker EE v17.06.0+. Versões anteriores a esta usam : em vez de =, por exemplo apparmor:unconfined.
 
+[#_docker_native_updates]
 == Atualizações Nativas do Docker
 
 [CAUTION]

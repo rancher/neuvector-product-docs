@@ -4,6 +4,7 @@
 :page-opendocs-origin: /02.deploying/03.rancher/03.rancher.md
 :page-opendocs-slug: /deploying/rancher
 
+[#_deploy_and_manage_product_through_rancher_extensions_or_apps_marketplace]
 == Rancherの拡張機能またはアプリとマーケットプレイスを通じて{product-name}をデプロイおよび管理する
 
 {product-name}は、プライム顧客向けのRancher拡張機能またはRancherアプリとマーケットプレイスを通じて簡単にデプロイできます。デフォルトの（Helmベースの）{product-name}デプロイメントは、cattle-neuvector-systemネームスペースに{product-name}コンテナをデプロイします。
@@ -13,6 +14,7 @@
 Rancherバージョン2.7.0以上の{product-name}Rancher拡張機能（{product-name}）またはRancherバージョン2.6.5以上のアプリとマーケットプレイスを通じてのデプロイメントのみが、Rancherを通じて直接管理できます（{product-name}コンソールへのシングルサインオン）。{product-name}がすでにデプロイされている状態でRancherにクラスターを追加する場合、または{product-name}がクラスターに直接デプロイされている場合、これらのクラスターはSSO統合のために有効化されません。
 ====
 
+[#_suse_security_ui_extension_for_rancher]
 === {product-name}Rancher用のUI拡張機能
 
 Rancherプライム顧客は、{product-name}およびRancher用の{product-name} UI拡張機能を簡単にデプロイできます。これにより、プライムユーザーはRancher UIを通じて特定の{product-name}機能やイベントを直接監視および管理できるようになります。コミュニティユーザーの方は、Rancherアプリとマーケットプレイスからデプロイするために、以下のデプロイ{product-name}セクションをご覧ください。
@@ -57,6 +59,7 @@ image:ui7uninstall.png[アンインストール]
 ====
 --
 
+[#_deploy_suse_security]
 === デプロイ {product-name}
 
 まず、Rancher チャートの中から {product-name} チャートを見つけて選択し、指示とさまざまな設定値を確認します。（オプション）必要に応じてデプロイするプロジェクトを作成します。例: {product-name}。注意:複数の {product-name} チャートが表示される場合は、レガシーな{product-name} 4.x Helmチャートのアップグレード用のものを選択しないでください。
@@ -78,6 +81,7 @@ image:rancher_chart_values.png[nv_values]
 
 image:nv_deployed.png[デプロイ済み]
 
+[#_manage_product]
 === {product-name}を管理する
 
 左側に{product-name}メニュー項目が表示され、それを選択すると{product-name}タイル/ボタンが表示され、クリックすると新しいタブで{product-name}コンソールに移動します。
@@ -97,12 +101,14 @@ image:local_admin.png[local]
 admin/adminとして{product-name}コンソールに直接ログインし、管理者パスワードを強力なパスワードに手動で変更することをお勧めします。これにより、{product-name}アイデンティティプロバイダーの管理者ユーザーパスワードのみが変更されます（アイデンティティプロバイダーがRancherの別の管理者ユーザーが表示される場合があります）。または、Rancherからの初期デプロイメントにxref:configmap.adoc#_protect_sensitive_data_using_a_secret[ConfigMapをシークレットとして]含めて、デフォルトの管理者パスワードを強力なパスワードに設定します（ConfigMap設定のチャート値を参照）。
 ====
 
+[#_neuvector_rancher_sso_permission_resources]
 === NeuVector/Rancher SSO権限リソース
 
 Rancher v2.9.2 UIでは、`Global/Cluster/Project/Namespaces`ロールを作成する際にNeuVector権限リソースを選択できます。RancherユーザーにNeuVector権限リソースを持つロールが割り当てられると、そのユーザーのNeuVector SSOセッションはそれに応じたNeuVector権限が割り当てられます。これは、SSOユーザーに予約された`admin/reader/fedAdmin/fedReader`ロール以外のカスタムロールを提供するためのものです。
 
 以下は、適用可能な`Global/Cluster/Project/Namespaces`ロールと共に使用されるマッピングされた権限リソースです。
 
+[#_mapped_permission_resources_for_global_cluster_role]
 ==== `Global/Cluster`ロールのマッピングされた権限リソース
 
 [NOTE]
@@ -152,6 +158,7 @@ SecurityEvents
 SystemConfig
 ----
 
+[#_mapped_permission_resources_for_project_namespace_role]
 ==== `Project/Namespace`ロールのマッピングされた権限リソース
 
 [NOTE]
@@ -189,12 +196,14 @@ SecurityEvents
 SystemConfig
 ----
 
+[#_disabling_product_rancher_sso]
 === {product-name}/Rancher SSOの無効化
 
 Rancher Managerから{product-name}へのログイン機能を無効にするには、設定->の構成に移動してください。
 
 image:rancher_sso.png[rancher_sso]
 
+[#_rancher_legacy_deployments]
 === Rancherレガシーデプロイメント
 
 サンプルファイルは、1つのマネージャーと3つのコントローラーをデプロイメントします。すべてのノードにエンフォーサーをデプロイメントします。ノードラベルを使用して専用のマネージャーまたはコントローラーノードを指定するには、下部セクションを参照してください。注意:セッション状態の問題の可能性があるため、ロードバランサーの背後に1つ以上のマネージャーをデプロイ（スケール）することは推奨されません。
@@ -249,6 +258,7 @@ enforcer:
      io.rancher.scheduler.global: true
 ----
 
+[#_deploy_without_privileged_mode]
 == 特権モードなしでデプロイ
 
 一部のシステムでは、特権モードを使用せずにデプロイすることがサポートされています。これらのシステムは、cap_add設定を使用して機能を追加し、apparmorプロファイルを設定する能力をサポートしている必要があります。
@@ -311,6 +321,7 @@ enforcer:
      io.rancher.scheduler.global: true
 ----
 
+[#_using_node_labels_for_manager_and_controller_nodes]
 == マネージャーおよびコントローラーノードのためのノードラベルの使用
 
 マネージャーとコントローラーがデプロイされるノードを制御するには、各ノードにラベルを付けます。コントローラーをデプロイするノードを選択してください。それらに「nvcontroller=true」とラベルを付けます。（現在のサンプルファイルでは、同じノードで1つ以上のコントローラーを実行することはできません）。

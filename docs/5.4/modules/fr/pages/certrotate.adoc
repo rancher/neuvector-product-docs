@@ -6,7 +6,9 @@ Une fois activé, un nouveau conteneur d'initialisation du pod contrôleur crée
 
 Pour activer la rotation automatique, ```internal.autoRotateCert``` doit être défini sur ```true```. (désactivé par défaut).
 
+[#_expected_behavior_when_internalautorotatecert_is_enabled]
 == Comportement attendu lorsque internal.autoRotateCert est activé
+[#_fresh_install]
 === Nouvelle installation
 
 1. Lorsque tous les conteneurs commencent à fonctionner, les conteneurs d'initialisation du contrôleur s'exécuteront et créeront un job de mise à niveau.
@@ -21,6 +23,7 @@ image:cert_rotate_02.png[certrotate]
 +
 image:cert_rotate_03.png[certrotate]
 
+[#_upgrade]
 === Mise à niveau
 
 1. Le déploiement ancien est déjà en cours d'exécution.
@@ -41,6 +44,7 @@ image:cert_rotate_07.png[certrotate]
 
 Si `internal.autoRotateCert` est faux, le job de mise à niveau démarrera toujours mais aucune action ne sera effectuée. Le comportement original sera suivi, c'est-à-dire qu'il n'y aura pas de conteneur d'initialisation et que les certificats intégrés seront toujours utilisés dans tous les cas.
 
+[#_new_options_in_helm_chart]
 == Nouvelles options dans le chart HELM
 Dans les charts HELM, ces options sont ajoutées{nbsp}:
 [source, yaml]
@@ -52,6 +56,7 @@ controller.upgrader.imagePullPolicy (default IfNotPresent): Upgrader's pull poli
 controller.upgrader.schedule (default "0 0 1 * *"): Upgrader's cronjob schedule.
 ---
 
+[#_rotating_sensitive_field_in_configuration]
 == Rotation du champ sensible dans la configuration
 
 Lorsque la clé de chiffrement de l'appareil est tournée, NeuVector ne re-chiffre pas immédiatement les champs de configuration sensibles existants. Ces champs ne sont re-chiffrés que lorsqu'ils sont mis à jour ou modifiés après la rotation. 

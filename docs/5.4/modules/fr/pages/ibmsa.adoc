@@ -15,7 +15,7 @@ Pour générer l'URL d'enregistrement requise, veuillez vous connecter à {produ
 
 image:ibmsa_config_new.png[ibmconfigure]
 
-Ensuite, retournez à la console IBM Security Advisor, et sous « Entrez l'URL de configuration {product-name} », tapez « https://{{product-name} nom d'hôte/IP du contrôleur}:{port} » et collez ce qui a été copié dans les étapes ci-dessus. Pour le port, utilisez le port REST API exposé {product-name} (par défaut 10443). Pour les environnements multi-clusters, il s'agit également du service 'fed-worker' qui expose ce port.
+Ensuite, retournez à la console IBM Security Advisor, et sous « Entrez l'URL de configuration {product-name} », tapez « https://{{product-name} nom d'hôte/IP du contrôleur}:\{port} » et collez ce qui a été copié dans les étapes ci-dessus. Pour le port, utilisez le port REST API exposé {product-name} (par défaut 10443). Pour les environnements multi-clusters, il s'agit également du service 'fed-worker' qui expose ce port.
 
 IBM Security Advisor communiquera avec votre {product-name} contrôleur de cluster via le nom d'hôte ou l'IP fournis. Remarque : Cela peut devoir être exposé en tant que service pour un accès depuis l'extérieur du cluster Kubernetes, similaire à la façon dont l'API REST est exposée en tant que service.
 

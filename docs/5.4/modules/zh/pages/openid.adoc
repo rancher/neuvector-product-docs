@@ -18,7 +18,7 @@ image:openid1.png[OpenID1]
 
 image:openid3.png[OpenID3]
 
-发行者 URL 采用 "https://login.microsoftonline.com/{tenantID}/v2.0" 格式。要找到 tenantID，请转到 menu:Azure Active Directory[属性页面]，找到目录 ID，并将其替换为 URL 中的 tenantID。
+发行者 URL 采用 ++https://login.microsoftonline.com/{tenantID}/v2.0++ 格式。要找到 tenantID，请转到 menu:Azure Active Directory[属性页面]，找到目录 ID，并将其替换为 URL 中的 tenantID。
 
 image:openid4.png[OpenID4]
 

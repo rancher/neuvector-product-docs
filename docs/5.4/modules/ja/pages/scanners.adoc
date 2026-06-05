@@ -4,6 +4,7 @@
 :page-opendocs-origin: /06.scanning/06.scanners/06.scanners.md
 :page-opendocs-slug:  /スキャン/スキャナー
 
+[#_increase_scanner_scalability_with_multiple_scanners]
 == 複数のスキャナーでスキャナーのスケーラビリティを向上させる
 
 スキャナーの性能とスケーラビリティを向上させるために、{product-name}は複数のスキャナーポッドを展開することをサポートしており、これにより、並行してレジストリ内のイメージをスキャンできます。コントローラーは、利用可能な各スキャナーポッドにスキャンタスクを割り当てます。スキャナーポッドは、Kubernetesを使用して必要に応じて簡単にスケールアップまたはスケールダウンできます。
@@ -18,6 +19,7 @@
 
 すべてのスキャナーからのスキャン結果は、アセット->レジストリメニューに表示されます。追加のスキャナー監視機能は、今後のリリースで追加される予定です。
 
+[#_auto_scaling_of_scanner_pods]
 === スキャナーポッドの自動スケーリング
 
 スキャナーポッドは、特定の基準に基づいて自動スケーリングするように構成できます。これにより、スキャンジョブが迅速かつ効率的に処理され、特にスキャンまたは再スキャンする必要がある数千のイメージがある場合に効果的です。設定は3つの可能性があります：遅延、即時、無効です。コントローラーによってスキャンのために画像がキューに入れられると、キューのサイズの「タスクカウント」を保持します。
@@ -36,6 +38,7 @@
 スキャナーがOpenShiftオペレーターでデプロイされている場合、オペレーターは常にポッドの数をその設定値に変更するため、スキャナーの自動スケーリングはサポートされていません。
 ====
 
+[#_operations_and_debugging]
 === 操作とデバッグ
 
 各スキャナーポッドは、スキャンされるレジストリにクエリを行い、利用可能な画像とその他のデータの完全なリストを取得します。その後、各スキャナーにはレジストリからプルしてスキャンする画像が割り当てられます。
@@ -47,6 +50,7 @@
 kubectl logs <scanner-pod-name> -n neuvector
 ----
 
+[#_performance_planning]
 == パフォーマンス計画
 
 多くの画像を持つレジストリで異なる数のスキャナーを試して、環境におけるスキャン完了時間の動作を観察してください。2-5スキャナーのレプリカ設定は、ほとんどのケースで十分であるべきです。
@@ -57,6 +61,7 @@ kubectl logs <scanner-pod-name> -n neuvector
 
 複数のスキャナーポッドを同じホスト/ノードに展開することができますが、ホストがスキャナーのパフォーマンスを最大化するために十分なメモリ、CPU、およびネットワーク帯域幅を持っていることを確認する必要があります。
 
+[#_standalone_scanner_for_local_scanning]
 == ローカルスキャン用のスタンドアロンスキャナー
 
 {product-name}は、ローカルイメージスキャンのためのスタンドアロンスキャナーの展開をサポートしています（コントローラーは必要ありません）。以下のサンプルdocker runでは、ローカルイメージがスキャンされ、結果が/var/neuvectorにローカルに保存されます。ローカルスキャンの場合、イメージはマウントされたdocker.sockを通じてアクセスできる必要があります。そうでない場合は、レジストリを指定することができます。
@@ -78,6 +83,7 @@ docker run --name neuvector.scanner --rm -e SCANNER_REPOSITORY=ubuntu -e SCANNER
 * CLUSTER_JOIN_ADDR（オプション）、CLUSTER_JOIN_PORT（オプション） - Admission controlルールに使用するためにコントローラーに結果を送信します（Kubernetes展開コントローラー）。
 * CLUSTER_ADVERTISED_ADDR（オプション） - スキャナーがコントローラーとは異なるホストにある場合、Admission controlルールに使用するために結果を送信します（Kubernetes展開コントローラー）。
 
+[#_host_scanning_in_standalone_mode]
 === スタンドアロンモードでのホストスキャン
 
 ホストをスキャンするには、次のコマンドを使用してください。
@@ -93,6 +99,7 @@ docker run --name neuvector.scanner --rm -e SCANNER_REPOSITORY=ubuntu -e SCANNER
 docker run --rm --privileged --pid=host neuvector/scanner -n neuvector
 ----
 
+[#_manual_deployment_of_multiple_scanners_on_kubernetes]
 === Kubernetes上での複数スキャナーの手動デプロイメント
 
 既存のKubernetesデプロイメントの一部としてスキャナーを手動でデプロイするには、新しいロールバインディングを作成してください：
@@ -152,7 +159,7 @@ spec:
 #          hostPath:
 #            path: /var/run/docker.sock
       restartPolicy: Always
-____
+----
 
 次に、CVEデータベースアップデータのcronジョブを作成または更新してください。これにより、CVEデータベースが毎晩更新されます。
 

@@ -4,8 +4,10 @@
 :page-opendocs-origin: /02.deploying/01.production/03.details/03.details.md
 :page-opendocs-slug: /deploying/production/details
 
+[#_environment_variables]
 == 环境变量
 
+[#_for_both_controller_allinone_and_enforcer]
 === 适用于控制器（All-in-One）和执行器
 
 * CLUSTER_JOIN_ADDR
@@ -44,6 +46,7 @@ ____
 （可选）将值设置为 1 以启用内存配置文件数据的收集，以帮助调查内存压力问题。
 ____
 
+[#_controller]
 === 控制器
 
 * CTRL_PERSIST_CONFIG
@@ -82,6 +85,7 @@ ____
 （可选）启用时（值=1），可以在发现模式下学习 icmp 流量，并生成策略。如果组中没有监视或保护模式的网络策略，将为 icmp 流量生成隐式违规。
 ____
 
+[#_manager]
 === 经理
 
 * CTRL_SERVER_IP
@@ -113,6 +117,7 @@ ____
 此环境变量仅适用于独立的 NeuVector 产品。如果使用 Rancher SSO，请将变量设置为 "on"，否则保持未设置，因为 NeuVector 默认使用 HTTPS。
 ====
 
+[#_enforcer]
 === Enforcer
 
 * CONTAINER_NET_TYPE
@@ -163,6 +168,7 @@ ____
 （可选）指定 {product-name} 认为是 '系统容器' 的组或名称空间，以分号分隔。例如，对于基于 Rancher 的应用和默认命名空间，NV_SYSTEM_GROUPS=__cattle-system;__default。这些值在正则表达式中被翻译。系统容器（还包括 {product-name} 和 Kubernetes 系统容器）仅在监视模式下运行（仅警报），即使组设置为保护模式。
 ____
 
+[#_open_ports]
 == 打开端口
 
 * CLUSTER_RPC_PORT - 在控制器和一体机上。默认值 18300。

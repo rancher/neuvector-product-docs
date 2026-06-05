@@ -18,7 +18,7 @@ In Azure Active Directory > App-Registrierungen > Anwendungsname > Einstellungss
 
 image:openid3.png[OpenID3]
 
-Die Issuer-URL hat das Format "https://login.microsoftonline.com/{tenantID}/v2.0". Um die tenantID zu finden, gehen Sie zu menu:Azure Active Directory[Eigenschaften-Seite] und finden Sie die Verzeichnis-ID, ersetzen Sie sie durch die tenantID in der URL.
+Die Issuer-URL hat das Format ++\https://login.microsoftonline.com/{tenantID}/v2.0++. Um die tenantID zu finden, gehen Sie zu menu:Azure Active Directory[Eigenschaften-Seite] und finden Sie die Verzeichnis-ID, ersetzen Sie sie durch die tenantID in der URL.
 
 image:openid4.png[OpenID4]
 

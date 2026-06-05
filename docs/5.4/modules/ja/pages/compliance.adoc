@@ -4,6 +4,7 @@
 :page-opendocs-origin: /06.scanning/01.scanning/02.compliance/02.compliance.md
 :page-opendocs-slug:  /スキャンニング/スキャンニング/コンプライアンス
 
+[#_managing_compliance_and_cis_benchmarks]
 == コンプライアンスとCISベンチマークの管理
 
 {product-name}によるコンプライアンス監査には、CISベンチマーク、カスタムチェック、シークレット監査、およびPCI、GDPRなどの業界標準テンプレートが含まれます。
@@ -19,6 +20,7 @@
 
 セキュリティリスク->コンプライアンスメニューは、脆弱性メニューが機能するのと同様に、統合されたコンプライアンスレポートを可能にします。
 
+[#_security_risks_compliance_and_compliance_profile]
 === セキュリティリスク - コンプライアンスとコンプライアンスプロファイル
 
 コンプライアンス結果は、カテゴリと名前でリストに表示されます。カテゴリには、Docker、Kubernetes、OpenShift、およびカスタムが含まれます。各項目の名前はCISベンチマークに対応しています。例えば、K.4.2.3はKubernetesのCISベンチマーク4.2.3に対応しています。Dockerベンチマークは「D」で始まり、イメージ関連のベンチマークのみ「I」で始まります。
@@ -33,6 +35,7 @@ image:compliance_4.png[コンプライアンス]
 
 image:secret_compliance_4.png[secrets]
 
+[#_customizing_compliance_templates_for_pci_gdpr_hipaa_nist_pciv4_and_disa_stig]
 === PCI、GDPR、HIPAA、NIST、PCIv4、およびDISA STIGのコンプライアンステンプレートのカスタマイズ
 
 コンプライアンスプロファイルメニューでは、PCI、GDPR、HIPAA、NIST、PCIv4、およびDISA STIGなどの業界標準用のビルトインテンプレートをカスタマイズできます。これらのレポートは、セキュリティリスク->コンプライアンスメニューから、フィルタリングする標準の1つを選択し、エクスポートすることで生成できます。NISTプロファイルは https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-190.pdf[NIST SP 800-190]用です。
@@ -59,6 +62,7 @@ image:DocheckASSETSEnableNS.png[namespace]
 
 テンプレートとアセットがカスタマイズされた後（必要に応じて）、セキュリティリスク -> コンプライアンスプロファイルメニューでレポートを生成できます。セキュリティリスク -> コンプライアンスメニューを開き、詳細フィルターを選択して、希望するコンプライアンステンプレートを選択します。例えば、GDPRを選択すると、表示とレポートがGDPRプロファイルのみにフィルタリングされます。
 
+[#_sample_helm_installation_with_prime_compliance]
 === プライムコンプライアンスを使用したサンプルHelmインストール
 
 以下は、プライムコンプライアンスでSUSE Security 5.4.0をインストールするためのサンプルHelmインストールコマンドです。ユーザーは、プライムコンプライアンスが5.4.0から始まるため、インストールバージョンを5.4.0以降に変更できます。インストール後、プライムユーザーはSUSE SecurityウェブUIの**コンプライアンス > 規制**タブビューから利用可能な規制を確認できます。
@@ -72,6 +76,7 @@ tag=5.4.0-b2,controller.image.repository=nvpublic/co,enforcer.image.repository=n
 en,manager.image.repository=nvpublic/ma
 ----
 
+[#_secrets_auditing]
 === シークレット監査
 
 {product-name}は、イメージコンプライアンススキャンおよびランタイムスキャンの一環として、40種類以上の一般的なシークレットをチェックします。さらに、xref:customcompliance.adoc[カスタムコンプライアンススクリプト]をコンテナまたはホスト用に設定でき、xref:dlp.adoc[DLPパケット検査]機能を使用してネットワークペイロード内のシークレットをチェックできます。

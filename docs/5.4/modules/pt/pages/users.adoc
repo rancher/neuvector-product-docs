@@ -1,9 +1,11 @@
+[#_users]
 = Usuários e funções
 :revdate: 2025-01-10
 :page-revdate: {revdate}
 :page-opendocs-origin: /03.configuration/02.users/02.users.md
 :page-opendocs-slug: /configuração/usuários
 
+[#_configuring_users_and_custom_roles]
 == Configurando Usuários e Funções Personalizadas
 
 O menu Configurações -> Usuários e Funções permite a gestão de usuários e funções. Cada usuário é atribuído a uma função predefinida ou personalizada. Os usuários podem ser mapeados para funções através da integração de grupos com LDAP/AD ou outras integrações de sistema SSO. Veja a seção xref:integration.adoc#_directory_and_sso_integration[Integração Empresarial] para instruções detalhadas para cada tipo de diretório ou integração SSO.
@@ -14,6 +16,7 @@ Os usuários podem ser configurados diretamente em {product-name} ou integrados 
 
 O requisito padrão de senha é um mínimo de 8 caracteres, 1 letra maiúscula, 1 letra minúscula e 1 caractere numérico. Esses e outros requisitos podem ser alterados por um administrador em Configurações -> Usuários sob Políticas de Autenticação e Segurança.
 
+[#_namespace_restricted_users]
 === Usuários Restritos a Namespace
 
 Os usuários podem ser restritos a certos namespaces. Primeiro, selecione a função global (use 'nenhuma' se nenhuma função global for desejada), depois clique em Configurações Avançadas.
@@ -32,12 +35,14 @@ Se um usuário já fez login anteriormente através de uma integração empresar
 Quando um usuário restrito a um namespace configura um registro em Ativos em {product-name}, apenas usuários com acesso a esse namespace podem ver/escaneá-lo. Usuários globais poderão ver e gerenciar esse registro, mas não aqueles com namespaces ou funções restritas.
 ====
 
+[#_roles]
 === Funções
 
 As funções pré-configuradas incluem Administrador, Leitor e CI/Ops. Para criar uma nova função personalizada, selecione a aba Funções em Configurações -> Usuários e Funções. Nomeie a função e adicione a permissão de leitura ou escrita apropriada a ela.
 
 image:roles_4.png[funções]
 
+[#_rbac_permissions]
 === Permissões RBAC
 
 * Controle de Admissão. Gerenciar regras de controle de admissão.
@@ -53,6 +58,7 @@ image:roles_4.png[funções]
 * Evento de Segurança. Acesse as notificações -> dos logs de Eventos de Segurança.
 * Configuração do Sistema. Permita a configuração em Configurações -> Configuração.
 
+[#_mapping_groups_to_roles_and_namespaces]
 === Mapeamento de Grupos para Funções e Namespaces.
 
 Grupos podem ser mapeados para funções predefinidas ou personalizadas em {product-name}. Além disso, uma função pode ser restrita a um ou mais namespaces.
@@ -74,6 +80,7 @@ image:group_role_map_examples.png[ExemplosDeMapeamento]
 Se o usuário estiver em vários grupos, a função será a 'primeira correspondente' na ordem listada e a função do grupo será atribuída. Por favor, ajuste a ordem de configuração para um comportamento adequado arrastando e soltando os mapeamentos na ordem apropriada na lista.
 ====
 
+[#_multi_cluster_fedadmin_and_admin_roles_for_primary_and_remote_management]
 === Papéis de FedAdmin e Admin Multi-Cluster para Gerenciamento Primário e Remoto
 
 Quando um cluster é xref:multicluster.adoc[promovido] para se tornar um cluster primário, o admin se torna um FedAdmin automaticamente. O FedAdmin pode realizar operações no primário, como gerar um token de federação para conectar um cluster remoto, bem como criar regras de segurança federadas, como regras de rede, de processo, de arquivo e de controle de admissão.

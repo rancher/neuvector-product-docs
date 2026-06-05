@@ -4,6 +4,7 @@
 :page-opendocs-origin: /02.deploying/05.docker/05.docker.md
 :page-opendocs-slug: /deploying/docker
 
+[#_kubernetes_deployment_on_mirantis_kubernetes_engine]
 == 在 Mirantis Kubernetes 引擎上进行 Kubernetes 部署
 
 请遵循 xref:kubernetes.adoc[Kubernetes 部分] 中的说明。
@@ -13,6 +14,7 @@
 {product-name} 不支持混合 Kubernetes / Swarm 集群。
 ====
 
+[#_deploy_product_containers_using_docker_native_or_ucp_swarm]
 == 使用 Docker 原生或 UCP/Swarm 部署 {product-name} 容器
 
 请注意，在 Mirantis Kubernetes 引擎上使用 Swarm 进行原生 Docker 部署不支持以特权模式部署服务或添加 seccomp 功能的容器。要在此环境中部署，您必须使用 Docker Compose 或 Run 来部署 {product-name} 容器。您可以使用远程主机部署 (docker-compose -H HOST) 来简化此任务。
@@ -21,10 +23,12 @@
 
 NOTE: 环境变量 NV_PLATFORM_INFO=platform=Docker 用于通知 {product-name} 平台为 Docker/Swarm，即使在 Docker EE 部署中可能会检测到未使用的 Kubernetes 容器 {product-name}。此外，要在网络活动 -> 视图 -> 显示系统中查看这些内容，请为执法者添加环境变量 NV_SYSTEM_GROUPS。
 
+[#_deploy_allinone_for_high_availability]
 === 部署 All-in-One 以实现高可用性
 
 在生产 Docker 原生或 EE 环境中，为高可用性在前三个生产主机上部署 All-in-One 容器。每个 All-in-One 应指向所有 All-in-One 主机的 IP 地址。例如，三个 All-in-One 容器是高可用性的最小要求，CLUSTER_JOIN_ADDR 应列出三个用逗号分隔的 IP 地址。可以以奇数个数部署额外的高可用性 All-in-One，例如 5、7。在集群中其余主机上部署执法者，顺序不限。
 
+[#_deploy_allinone_using_docker_compose_privileged_mode]
 === 使用 docker-compose 部署 All-in-One（特权模式）
 
 以下是一个示例的 docker-compose 文件，用于在第一个节点上部署 All-in-One 容器。由于 All-in-One 容器内部有一个执法模块，因此同一节点上的应用程序容器可以得到保护。支持绿地和棕地部署。
@@ -63,6 +67,7 @@ allinone:
 要在 All-in-One 中公开 REST API，请添加 10443 的端口映射，例如 - 10443:10443。
 ====
 
+[#_add_an_enforcer_container_using_docker_compose_privileged_mode]
 === 使用 docker-compose 添加一个执法者容器（特权模式）
 
 这是一个示例 docker-compose 文件，用于将执法者加入集群。支持绿地和棕地部署。
@@ -90,6 +95,7 @@ enforcer:
 
 最重要的环境变量是*CLUSTER_JOIN_ADDR*。对于执法者，将 `<controller_node_ip>` 替换为控制器的节点 IP 地址。通常，控制器/All-in-One 的 docker-compose 文件和执法者的 docker-compose 文件中的*CLUSTER_JOIN_ADDR*具有相同的值。
 
+[#_deploy_the_suse_security_scanner_container]
 === 部署{product-name}扫描器容器
 
 从{product-name} 4.0+开始，必须部署一个单独的扫描器容器以执行漏洞扫描。重要说明：在拉取和运行扫描器镜像时，请始终使用:latest标签，以确保部署最新的CVE数据库。
@@ -136,10 +142,12 @@ docker run -itd --name s1  -e CLUSTER_JOIN_ADDR=controller_node_ip neuvector/sca
 
 要更新扫描器以获取来自 {product-name} 的最新 CVE 数据库更新，请创建一个 cron 任务以停止并重启扫描器，拉取最新版本。有关详细信息，请参见 xref:docker.adoc#_docker_native_updates[本节]。
 
+[#_deployment_without_using_privileged_mode]
 === 不使用特权模式的部署
 
 对于某些平台配置，可以在不要求以特权模式运行的情况下部署 {product-name} 容器。配置必须支持添加功能和设置 apparmor 配置文件。请注意，Docker DataCenter/UCP 和 Swarm 目前不支持此功能，但仍然可以使用 Compose 或 Run 手动部署 {product-name}。
 
+[#_deploy_allinone_no_privileged_mode_with_docker_compose]
 === 使用 docker-compose 部署 All-in-One（无特权模式）
 
 [,yaml]
@@ -175,6 +183,7 @@ allinone:
         - /var/neuvector:/var/neuvector
 ----
 
+[#_deploy_enforcer_no_privileged_mode_with_docker_compose]
 === 使用 docker-compose 部署执法者（无特权模式）
 
 [,yaml]
@@ -206,6 +215,7 @@ enforcer:
         - /sys/fs/cgroup/:/host/cgroup/:ro
 ----
 
+[#_deploy_allinone_privileged_mode_with_docker_run]
 === 使用 docker run 部署 All-in-One（特权模式）
 
 您可以使用 docker run 而不是 compose 进行部署。以下是示例。
@@ -231,6 +241,7 @@ docker run -d --name allinone \
 neuvector/allinone:<version>
 ----
 
+[#_deploy_enforcer_privileged_mode_with_docker_run]
 === 使用 docker run 部署执法者（特权模式）
 
 [,shell]
@@ -250,6 +261,7 @@ docker run -d --name enforcer \
 neuvector/enforcer:<version>
 ----
 
+[#_deploy_allinone_no_privileged_mode_with_docker_run]
 === 使用 docker run 部署 All-in-One（无特权模式）
 
 您可以使用 docker run 而不是 compose 进行部署。以下是示例。
@@ -281,6 +293,7 @@ docker run -d --name allinone \
 neuvector/allinone:<version>
 ----
 
+[#_deploy_enforcer_no_privileged_mode_with_docker_run]
 === 使用 docker run 部署执法者（无特权模式）
 
 [,shell]
@@ -306,6 +319,7 @@ docker run -d --name enforcer \
 neuvector/enforcer:<version>
 ----
 
+[#_deploy_separate_product_components_on_different_hosts]
 == 在不同主机上部署独立的 {product-name} 组件
 
 如果计划将 docker 主机专用于控制器和/或管理器（无执法者），则可以单独部署这些容器，而不是使用 All-in-One。请注意，docker 不支持在同一节点上将执法者作为单独组件部署，因此如果希望在节点上同时部署控制器和执法者功能，则需要使用 All-in-One 容器。
@@ -379,10 +393,12 @@ enforcer:
         - /sys/fs/cgroup/:/host/cgroup/:ro
 ----
 
+[#_monitoring_and_restarting_product]
 == 监控和重启 {product-name}
 
 由于 {product-name} 容器未作为 UCP/Swarm 服务部署，因此它们不会在节点上自动启动/重启。您应该通过 SIEM 系统为 {product-name} SYSLOG 事件设置警报，或通过数据中心检测 {product-name} 容器是否未运行。
 
+[#_deploying_without_privileged_mode]
 == 在没有特权模式下部署
 
 一般来说，您需要将特权设置替换为：
@@ -402,6 +418,7 @@ enforcer:
 
 上述语法适用于 Docker EE v17.06.0 及以上版本。此版本之前使用 : 而不是 =，例如 apparmor:unconfined。
 
+[#_docker_native_updates]
 == Docker 原生更新
 
 [CAUTION]

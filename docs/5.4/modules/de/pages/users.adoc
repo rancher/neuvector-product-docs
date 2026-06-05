@@ -1,9 +1,11 @@
+[#_users]
 = Benutzer und Funktionen
 :revdate: 2025-01-10
 :page-revdate: {revdate}
 :page-opendocs-origin: /03.configuration/02.users/02.users.md
 :page-opendocs-slug: /configuration/users
 
+[#_configuring_users_and_custom_roles]
 == Benutzer und benutzerdefinierte Rollen konfigurieren
 
 Das Menü Einstellungen -> Benutzer und Rollen ermöglicht die Verwaltung von Benutzern sowie Rollen. Jeder Benutzer wird einer vordefinierten oder benutzerdefinierten Rolle zugewiesen. Benutzer können über die Gruppenintegration mit LDAP/AD oder andere SSO-Systemintegrationen Rollen zugewiesen werden. Siehe den Abschnitt xref:integration.adoc#_directory_and_sso_integration[Enterprise Integration] für detaillierte Anweisungen zu jedem Typ oder Verzeichnis oder SSO-Integration.
@@ -14,6 +16,7 @@ Benutzer können direkt in {product-name} konfiguriert oder über Verzeichnisse/
 
 Die Standardanforderung für Passwörter beträgt mindestens 8 Zeichen, 1 Großbuchstabe, 1 Kleinbuchstabe, 1 numerisches Zeichen. Diese und andere Anforderungen können von einem Administrator in den Einstellungen -> Benutzer unter Authentifizierung und Sicherheitsrichtlinien geändert werden.
 
+[#_namespace_restricted_users]
 === Benutzer mit eingeschränktem Namespace
 
 Benutzer können auf bestimmte Namespaces beschränkt werden. Wählen Sie zunächst die globale Rolle aus (verwenden Sie 'keine', wenn keine globale Rolle gewünscht ist), und klicken Sie dann auf die erweiterten Einstellungen.
@@ -32,12 +35,14 @@ Wenn ein Benutzer zuvor über eine Unternehmensintegration angemeldet war, wird 
 Wenn ein Benutzer mit eingeschränktem Namespace ein Registry in Assets in {product-name} konfiguriert, können nur Benutzer mit Zugriff auf diesen Namespace dieses Registry sehen oder scannen. Globale Benutzer können diese Registry sehen/verwalten, jedoch keine Benutzer mit eingeschränkten Namespaces/Rollen.
 ====
 
+[#_roles]
 === Rollen
 
 Vorkonfigurierte Rollen umfassen Administrator, Leser und CI/Ops. Um eine neue benutzerdefinierte Rolle zu erstellen, wählen Sie die Registerkarte Rollen in Einstellungen -> Benutzer & Rollen. Benennen Sie die Rolle und fügen Sie die entsprechenden Lese- oder Schreibberechtigungen hinzu.
 
 image:roles_4.png[Rollen]
 
+[#_rbac_permissions]
 === RBAC-Berechtigungen
 
 * Zulassungssteuerung. Verwalten Sie die Regeln zur Zulassungssteuerung.
@@ -53,6 +58,7 @@ image:roles_4.png[Rollen]
 * Sicherheitsereignis. Zugriffsbenachrichtigungen -> Sicherheitsereignisprotokolle.
 * Systemkonfiguration. Erlauben Sie die Konfiguration der Einstellungen -> Konfiguration.
 
+[#_mapping_groups_to_roles_and_namespaces]
 === Gruppen zu Rollen und Namespaces zuordnen.
 
 Gruppen können vordefinierten oder benutzerdefinierten Rollen in {product-name} zugeordnet werden. Darüber hinaus kann eine Rolle auf einen oder mehrere Namespaces beschränkt werden.
@@ -74,6 +80,7 @@ image:group_role_map_examples.png[MappingExamples]
 Wenn der Benutzer in mehreren Gruppen ist, wird die zuerst zutreffende Rolle gemäß der Reihenfolge, in der sie aufgelistet sind, zugewiesen. Bitte passen Sie die Reihenfolge der Konfiguration für ein korrektes Verhalten an, indem Sie die Zuordnungen in die entsprechende Reihenfolge in der Liste ziehen und ablegen.
 ====
 
+[#_multi_cluster_fedadmin_and_admin_roles_for_primary_and_remote_management]
 === Multi-Cluster FedAdmin und Administratorrollen für primäre und entfernte Verwaltung.
 
 Wenn ein Cluster zu einem primären Cluster xref:multicluster.adoc[befördert] wird, wird der Administrator automatisch zu einem FedAdmin. Der FedAdmin kann Operationen am Primärcluster durchführen, wie z. B. ein Föderationstoken zu generieren, um einen entfernten Cluster zu verbinden, sowie föderierte Sicherheitsregeln wie Netzwerk-, Prozess-, Datei- und Zulassungssteuerungsregeln zu erstellen.

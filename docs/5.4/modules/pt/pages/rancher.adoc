@@ -4,6 +4,7 @@
 :page-opendocs-origin: /02.deploying/03.rancher/03.rancher.md
 :page-opendocs-slug: /deploying/rancher
 
+[#_deploy_and_manage_product_through_rancher_extensions_or_apps_marketplace]
 == Implante e gerencie {product-name} através das Extensões ou Apps e Marketplace do Rancher
 
 {product-name} pode ser implantado facilmente, seja através das Extensões do Rancher para clientes Prime, ou Apps e Marketplace do Rancher. A implantação padrão (baseada em Helm) de {product-name} implantará {product-name} contêineres no namespace cattle-neuvector-system.
@@ -13,6 +14,7 @@
 Apenas implantações de {product-name} através das Extensões do Rancher ({product-name}) da versão 2.7.0+ do Rancher, ou Apps & Marketplace da versão 2.6.5+ do Rancher podem ser gerenciadas diretamente (login único no console de {product-name}) através do Rancher. Se adicionar clusters ao Rancher com {product-name} já implantado, ou onde {product-name} foi implantado diretamente no cluster, esses clusters não serão habilitados para integração SSO.
 ====
 
+[#_suse_security_ui_extension_for_rancher]
 === {product-name} Extensão de UI para Rancher
 
 Clientes Prime do Rancher podem facilmente implantar {product-name} e a Extensão de UI {product-name} para Rancher. Isso permitirá que usuários Prime monitorem e gerenciem certas funções e eventos de {product-name} diretamente através da UI do Rancher. Para usuários da comunidade, consulte a seção Implantar {product-name} abaixo para implantar a partir dos Apps e Marketplace do Rancher.
@@ -57,6 +59,7 @@ Desinstalar a extensão de UI {product-name} NÃO desinstalará o aplicativo {pr
 ====
 --
 
+[#_deploy_suse_security]
 === Implantar {product-name}
 
 Primeiro, encontre o gráfico {product-name} nos gráficos do Rancher, selecione-o e revise as instruções e vários valores de configuração. (Opcional) Crie um projeto para implantar, se desejado, por exemplo, {product-name}. Nota: Se você ver mais de um gráfico {product-name}, não selecione o que é para atualizar implantações de gráficos Helm legados {product-name} 4.x.
@@ -78,6 +81,7 @@ Após a implantação bem-sucedida de {product-name}, você verá um resumo das 
 
 image:nv_deployed.png[implantado]
 
+[#_manage_product]
 === Gerenciar {product-name}
 
 Agora você verá um item de menu {product-name} à esquerda, e selecionar isso mostrará um botão/tile {product-name}, que ao ser clicado levará você ao console {product-name}, em uma nova aba.
@@ -97,12 +101,14 @@ image:local_admin.png[local]
 É recomendável fazer login diretamente no {product-name} console como admin/admin para alterar manualmente a senha do administrador para uma senha forte. Isso mudará apenas a senha do {product-name} usuário administrador do provedor de identidade (você pode ver outro usuário administrador cujo provedor de identidade é Rancher). Alternativamente, inclua um xref:configmap.adoc#_protect_sensitive_data_using_a_secret[ConfigMap como um segredo] na implantação inicial do Rancher (veja os valores do gráfico para as configurações do ConfigMap) para definir a senha padrão do administrador como uma senha forte.
 ====
 
+[#_neuvector_rancher_sso_permission_resources]
 === Recursos de Permissão SSO NeuVector/Rancher
 
 A interface do Rancher v2.9.2 permite selecionar recursos de permissão NeuVector ao criar `Global/Cluster/Project/Namespaces` funções. Quando um usuário do Rancher é atribuído a uma função com um recurso de permissão NeuVector, a sessão SSO NeuVector do usuário é atribuída ao respectivo recurso de permissão NeuVector. Isso é para fornecer aos usuários SSO funções personalizadas além das funções reservadas `admin/reader/fedAdmin/fedReader`.
 
 Abaixo estão os recursos de permissão mapeados usados com as funções `Global/Cluster/Project/Namespaces` aplicáveis.
 
+[#_mapped_permission_resources_for_global_cluster_role]
 ==== Recursos de Permissão Mapeados para a Função `Global/Cluster`
 
 [NOTE]
@@ -152,6 +158,7 @@ SecurityEvents
 SystemConfig
 ----
 
+[#_mapped_permission_resources_for_project_namespace_role]
 ==== Recursos de Permissão Mapeados para a Função `Project/Namespace`
 
 [NOTE]
@@ -189,12 +196,14 @@ SecurityEvents
 SystemConfig
 ----
 
+[#_disabling_product_rancher_sso]
 === Desabilitando {product-name}/Rancher SSO
 
 Para desabilitar a capacidade de login em {product-name} a partir do Rancher Manager, vá para Configurações -> Configuração.
 
 image:rancher_sso.png[rancher_sso]
 
+[#_rancher_legacy_deployments]
 === Implantações Legadas do Rancher
 
 O arquivo de exemplo implantará um gerente e 3 controladores. Ele implantará um aplicador em cada nó. Veja a seção inferior para especificar nós dedicados de gerenciador ou controlador usando rótulos de nó. Nota: Não é recomendado implantar (escalar) mais de um gerenciador atrás de um balanceador de carga devido a possíveis problemas de estado de sessão.
@@ -249,6 +258,7 @@ enforcer:
      io.rancher.scheduler.global: true
 ----
 
+[#_deploy_without_privileged_mode]
 == Implantar Sem Modo Privilegiado
 
 Em alguns sistemas, a implantação sem usar o modo privilegiado é suportada. Esses sistemas devem oferecer suporte à adição de capacidades por meio da configuração cap_add e à definição do perfil do apparmor.
@@ -311,6 +321,7 @@ enforcer:
      io.rancher.scheduler.global: true
 ----
 
+[#_using_node_labels_for_manager_and_controller_nodes]
 == Usando Rótulos de Nó para Nós do Gerente e do Controlador
 
 Para controlar em quais nós o Gerente e o Controlador são implantados, rotule cada nó. Escolha os nós onde os controladores devem ser implantados. Rotule-os com "nvcontroller=true". (Com o arquivo de exemplo atual, não mais do que um controlador pode ser executado no mesmo nó.)

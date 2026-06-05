@@ -4,6 +4,7 @@
 :page-opendocs-origin: /11.automation/02.automation/02.automation.md
 :page-opendocs-slug:  /automação/automação
 
+[#_product_automation]
 == {product-name} Automação
 
 Existem muitos recursos de automação no {product-name} para suportar todo o fluxo de trabalho CI/CD, incluindo:
@@ -16,6 +17,7 @@ Existem muitos recursos de automação no {product-name} para suportar todo o fl
 * Regras de resposta para automatizar respostas a eventos de segurança
 * API REST para construir automação de qualquer função do {product-name}
 
+[#_rest_api]
 === API REST
 
 A {product-name} solução pode ser gerenciada usando a API REST. Abaixo estão exemplos comuns de automação usando a API REST. O documento yaml da API REST é melhor visualizado no visualizador Swagger 2.0. A documentação da API REST está abaixo em um arquivo yaml que é melhor visualizado em um leitor como swagger.io.
@@ -29,6 +31,7 @@ Se você estiver fazendo chamadas de API REST com nome de usuário/senha, certif
 
 {product-name} também suporta Regras de Resposta para automatizar respostas comuns a eventos de segurança ou vulnerabilidades detectadas. Consulte a seção Política de Segurança -> Regras de Resposta para mais detalhes.
 
+[#_expose_rest_api_in_kubernetes]
 === Expor a API REST no Kubernetes
 
 Para expor a API REST para acesso de fora do cluster Kubernetes, habilite a porta 10443.
@@ -60,6 +63,7 @@ spec:
 Se estiver usando o tipo LoadBalancer, defina o _controllerIP_ nos exemplos abaixo para o IP externo ou URL do loadbalancer.
 ====
 
+[#_authentication_for_rest_api]
 === Autenticação para API REST
 
 A API REST suporta dois tipos de autenticação: nome de usuário/senha e token. Ambos podem ser configurados em Configurações -> Usuários, Chaves de API e Funções, e associados a funções padrão ou personalizadas para limitar privilégios de acesso. Os exemplos abaixo mostram a autenticação baseada em nome de usuário/senha, onde um token é criado primeiro e depois usado em chamadas subsequentes da API REST. Se estiver usando um token, ele pode ser usado diretamente em cada chamada da API REST. Nota: conexões baseadas em nome de usuário têm um número limitado de sessões simultâneas, portanto, é importante excluir o token de nome de usuário conforme mostrado abaixo quando terminar. A autenticação baseada em token não tem limite, mas expira de acordo com o limite de tempo selecionado ao ser criada.
@@ -72,6 +76,7 @@ image:5_2_api_created.png[token]
 
 image:5_2_api_key_header.png[token]
 
+[#_trigger_vulnerability_scanning_from_a_script]
 === Acionar a varredura de vulnerabilidades a partir de um script
 
 {product-name} pode ser acionado automaticamente para varrer uma imagem em busca de vulnerabilidades. Isso pode ser feito configurando um registro/repositório para ser monitorado, usando o plug-in {product-name} do Jenkins ou utilizando a API REST. Por favor, consulte a seção sobre Varredura e Conformidade para mais detalhes.
@@ -212,6 +217,7 @@ Saída de exemplo:
 ----
 ====
 
+[#_create_policy_rules_automatically]
 === Criar Regras de Política Automaticamente
 
 Para criar uma nova regra no {product-name} controlador de políticas, os grupos para os campos DE e PARA devem existir primeiro. O seguinte exemplo cria um novo Grupo com base no rótulo do contêiner nv-service-type=data, e outro Grupo para o rótulo nv-service-type=website. Uma regra é então criada para permitir o tráfego do contêiner wordpress para o contêiner mysql usando apenas o protocolo mysql.
@@ -269,6 +275,7 @@ Para importar o arquivo:
 sudo pip install requests six
 ----
 
+[#_setting_or_changing_user_password]
 === Definindo ou Alterando a Senha do Usuário
 
 Use as chamadas da API REST para gerenciamento de usuários.
@@ -278,6 +285,7 @@ Use as chamadas da API REST para gerenciamento de usuários.
 curl -s -k -H 'Content-Type: application/json' -H 'X-Auth-Token: c64125decb31e6d3125da45cba0f5025' https://127.0.0.1:10443/v1/user/admin -X PATCH -d '{"config":{"fullname":"admin","password":"admin","new_password":"NEWPASS"}}'
 ----
 
+[#_starting_packet_capture_on_a_container]
 === Iniciando a Captura de Pacotes em um Contêiner
 
 Quando um contêiner apresentar comportamento suspeito, inicie uma captura de pacotes.
@@ -292,6 +300,7 @@ curl -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"sn
 
 Não se esqueça de parar a sessão do sniffer após algum tempo para que não fique rodando para sempre. O número de arquivos a serem rotacionados tem um valor máximo de 50.
 
+[#_check_and_accept_the_eula_new_deployments]
 === Verifique e aceite o EULA (novas implantações)
 
 Obtenha o token de autenticação conforme acima. Substitua também o endereço IP do controlador pelo seu, conforme apropriado.
@@ -315,6 +324,7 @@ curl -s -k -H 'Content-Type: application/json' -H 'X-Auth-Token: $_TOKEN_' -d '{
 
 Em seguida, verifique o EULA novamente.
 
+[#_configure_registry_scanning]
 === Configurar a varredura do registro
 
 [,shell]
@@ -322,6 +332,7 @@ Em seguida, verifique o EULA novamente.
 curl -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"request": {"registry": "https://registry.connect.redhat.com", "username": "username", "password": "password", "tag": "latest", "repository": "neuvector/enforcer"}}' "https://controller:port/v1/scan/repository"
 ----
 
+[#_enable_packet_capture_on_all_pods_in_a_namespace]
 === Ativar captura de pacotes em todos os pods em um namespace
 
 .Clique aqui para ver os detalhes
@@ -526,6 +537,7 @@ done
 ----
 ====
 
+[#_enable_disable_container_quarantine]
 === Ativar/desativar quarentena de contêiner
 
 A chamada da API para quarentena é via PATCH para /v1/workload/:id com o seguinte corpo. O id do workload é o id do contêiner/pod.
@@ -541,6 +553,7 @@ A chamada da API para quarentena é via PATCH para /v1/workload/:id com o seguin
 }'
 ----
 
+[#_enable_debugging_mode_for_product_support]
 === Ativar o modo de depuração para o {product-name} suporte
 
 Defina o token de acesso com seu IP, usuário, senha:
@@ -592,6 +605,7 @@ echo `date +%Y%m%d_%H%M%S` log out
 curl -k -X 'DELETE' -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/auth" > /dev/null 2>&1
 ----
 
+[#_report_if_a_vulnerability_is_in_the_base_image_layers]
 === Relatar se uma vulnerabilidade está nas camadas da imagem base
 
 Para identificar CVEs na imagem base ao usar a API REST para escanear imagens, a imagem base deve ser identificada na chamada da API, como no exemplo abaixo.
@@ -602,6 +616,7 @@ curl -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"re
 {noformat}
 ----
 
+[#_limitations]
 ==== Limitações
 
 Se a imagem a ser escaneada for uma imagem remota, com "registry" especificado, a imagem base também deve ser uma imagem remota, e o nome deve começar com http ou https.  Se a imagem a ser escaneada for uma imagem local, então a imagem base também deve ser uma imagem local.
@@ -615,6 +630,7 @@ Por exemplo,
 {"request": {"repository": "neuvector/manager", "tag": "4.0.2", "scan_layers": true, "base_image": "10.1.127.12:5000/neuvector/manager:4.0.2”}}
 ----
 
+[#_get_the_cve_database_version_and_date]
 === Obtenha a versão e a data do banco de dados CVE
 
 [,shell]
@@ -646,6 +662,7 @@ Saída:
 }
 ----
 
+[#_manage_federation_for_master_and_remote_worker_clusters]
 === Gerenciar a federação para clusters mestres e remotos (trabalhadores)
 
 Geralmente, listar os membros da Federação pode usar um GET para o seguinte endpoint (veja os exemplos para a sintaxe específica):

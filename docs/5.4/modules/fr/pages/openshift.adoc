@@ -4,6 +4,7 @@
 :page-opendocs-origin: /02.deploying/04.openshift/04.openshift.md
 :page-opendocs-slug: /deploying/openshift
 
+[#_deploy_separate_product_components_with_redhat_openshift]
 == Déployer des composants {product-name} séparés avec RedHat OpenShift
 
 {product-name} est compatible avec les plug-ins SDN ovs standard ainsi qu'avec d'autres tels que flannel, weave ou calico. Les exemples ci-dessous supposent qu'un plug-in ovs standard est utilisé. Cela suppose également qu'un registre docker local sera utilisé (voir les instructions à la fin pour créer le secret permettant de tirer dynamiquement depuis neuvector ou Docker Hub).
@@ -12,6 +13,7 @@
 
 Pour déployer manuellement, commencez par tirer les conteneurs {product-name} appropriés depuis le registre {product-name} vers votre registre local. Remarque{nbsp}: l'image du scanner doit être tirée régulièrement pour les mises à jour de la base de données CVE depuis {product-name}.
 
+[#_product_images_on_docker_hub]
 === {product-name} Images sur Docker Hub
 
 Les images se trouvent sur le {product-name} registre Docker Hub. Utilisez le tag de version approprié pour le gestionnaire, le contrôleur, l'Enforcer, et laissez la version comme 'latest' pour le scanner et l'updater. Par exemple :
@@ -30,6 +32,7 @@ Si vous déployez avec le {product-name} chart Helm actuel (v1.8.9+), les modifi
 * Mettez à jour les noms/tags d'image vers la version actuelle sur Docker Hub, comme indiqué ci-dessus
 * Laissez les imagePullSecrets vides
 
+[#_deploy_on_openshift]
 == Déployer sur OpenShift
 
 [,shell]
@@ -467,6 +470,7 @@ spec:
           value: myvalue
 ----
 
+[#_using_node_labels_for_manager_and_controller_nodes]
 == Utilisation des étiquettes de nœud pour les nœuds Manager et Controller
 
 Pour contrôler sur quels nœuds le Manager et le Controller sont déployés, étiquetez chaque nœud. Remplacez `<nodename>` par le nom de nœud approprié.
@@ -505,12 +509,14 @@ app: neuvector-enforcer-pod
       imagePullSecrets:
 ----
 
+[#_updating_the_cve_database_on_openshift_deployments]
 == Mise à jour de la base de données CVE sur les déploiements OpenShift
 
 L'image du scanner la plus récente contient toujours la mise à jour de la base de données CVE la plus récente de {product-name}. Pour cette raison, un tag de version n'est pas recommandé lors du tirage de l'image. Cependant, la mise à jour de la base de données CVE nécessite un tirage régulier de la dernière image du scanner afin que le cron job de mise à jour puisse redéployer le(s) scanner(s).  Les exemples ci-dessus supposent que {product-name} images sont tirées, taguées et poussées vers un registre OpenShift local. Le déploiement se fait alors depuis ce registre au lieu de directement depuis neuvector (ou le {product-name} registre hérité sur Docker Hub).
 
 Pour mettre à jour régulièrement la base de données CVE, nous recommandons de créer un script/cron job pour tirer la dernière {product-name} image du scanner et effectuer les étapes de tagging et de pushing vers le registre local. Cela garantira que la base de données CVE est mise à jour régulièrement et que les images et conteneurs sont scannés pour de nouvelles vulnérabilités.
 
+[#_rolling_updates]
 == Mises à jour progressives
 
 Les outils d'orchestration tels que Kubernetes, RedHat OpenShift et Rancher prennent en charge les mises à jour progressives avec des stratégies configurables. Vous pouvez utiliser cette fonctionnalité pour mettre à jour les {product-name} conteneurs. Le plus important sera de s'assurer qu'il y a au moins un Allinone/Controller en cours d'exécution afin que les stratégies, les journaux et les données de connexion ne soient pas perdus. Assurez-vous qu'il y a un minimum de 30 secondes entre les mises à jour des conteneurs afin qu'un nouveau leader puisse être élu et que les données soient synchronisées entre les contrôleurs.
@@ -537,6 +543,7 @@ Vous pouvez maintenant mettre à jour votre fichier yaml avec ces nouvelles vers
 
 Les fichiers de déploiement YAML fournis configurent déjà la stratégie de mise à jour progressive. Si vous mettez à jour via le chart Helm {product-name}, veuillez récupérer le dernier chart pour configurer correctement les nouvelles fonctionnalités telles que le contrôle d'admission, et supprimer l'ancien rôle de cluster et le lien de rôle de cluster pour {product-name}.
 
+[#_enabling_the_rest_api]
 == Activation de l'API REST
 
 Pour activer l'API REST, le port 10443 doit être configuré comme suit{nbsp}:
@@ -558,6 +565,7 @@ spec:
     app: neuvector-controller-pod
 ----
 
+[#_enable_disable_scheduling_on_the_master_node]
 == Activer/Désactiver la planification sur le nœud maître
 
 Les commandes suivantes peuvent être utilisées pour activer/désactiver la planification sur le nœud maître.
@@ -572,6 +580,7 @@ oc adm manage-node nodename --schedulable
 oc adm manage-node nodename --schedulable=false
 ----
 
+[#_openshift_deployment_in_non_privileged_mode]
 == Déploiement OpenShift en mode non privilégié
 
 Les instructions suivantes peuvent être utilisées pour déployer {product-name} sans utiliser de conteneurs en mode privilégié. Le contrôleur est déjà en mode non privilégié et le déploiement de l'enforcer doit être modifié, comme le montrent les extraits ci-dessous.

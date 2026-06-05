@@ -6,7 +6,9 @@
 
 要启用自动轮换，```internal.autoRotateCert```必须设置为```true```。（默认情况下禁用）。
 
+[#_expected_behavior_when_internalautorotatecert_is_enabled]
 == 当internal.autoRotateCert启用时的预期行为
+[#_fresh_install]
 === 全新安装
 
 1. 当所有容器开始运行时，控制器的 init 容器将运行并创建一个升级作业。
@@ -21,6 +23,7 @@ image:cert_rotate_02.png[certrotate]
 +
 image:cert_rotate_03.png[certrotate]
 
+[#_upgrade]
 === 升级
 
 1. 旧的部署已经在运行。
@@ -41,6 +44,7 @@ image:cert_rotate_07.png[certrotate]
 
 如果`internal.autoRotateCert`为假，升级作业仍然会启动，但不会执行任何操作。将遵循原始行为，即在所有情况下都不会有 init 容器，并且仍将使用内置证书。
 
+[#_new_options_in_helm_chart]
 == HELM 图表中的新选项
 在 helm 图表中，添加了以下选项：
 [source, yaml]
@@ -52,6 +56,7 @@ controller.upgrader.imagePullPolicy (default IfNotPresent): Upgrader's pull poli
 controller.upgrader.schedule (default "0 0 1 * *"): Upgrader's cronjob schedule.
 ---
 
+[#_rotating_sensitive_field_in_configuration]
 == 在配置中轮换敏感字段
 
 当设备加密密钥被轮换时，NeuVector 不会立即重新加密现有的敏感配置字段。这些字段仅在轮换后被更新或修改时才会重新加密。

@@ -4,6 +4,7 @@
 :page-opendocs-origin: /02.deploying/01.production/01.production.md
 :page-opendocs-slug: /deploying/production
 
+[#_planning_deployments]
 == Planejamento de Implantações
 
 Os contêineres {product-name} em uma implantação padrão incluem o controlador, manager, enforcer, scanner e updater. A colocação de onde esses contêineres (em quais nós) são implantados deve ser considerada, e rótulos, taints ou tolerâncias apropriadas devem ser criados para controlá-los.
@@ -30,24 +31,29 @@ Se implantando com o atual Helm chart {product-name} (v1.8.9+), as seguintes alt
 * Atualize os nomes/tags das imagens para a versão atual no Docker Hub, conforme mostrado acima
 * Deixe o imagePullSecrets vazio
 
+[#_best_practices_tips_qa_for_deploying_and_managing_suse_security]
 === Melhores Práticas, Dicas, Perguntas e Respostas para Implantação e Gerenciamento de {product-name}
 
 // Download and review xref:attachment$NV_Onboarding_5.0.pdf[Deployment Best Practices document] for tips, such as performance and sizing, best practices, and frequently asked questions about deployments.
 
+[#_deployment_using_helm_or_operators]
 == Implantação Usando Helm ou Operadores
 
 A implantação automatizada usando Helm pode ser encontrada em https://github.com/neuvector/neuvector-helm.
 
 A implantação usando um Operador, incluindo o Operador Certificado pela RedHat e o operador da comunidade Kubernetes é suportada, com uma descrição geral xref:operators.adoc[aqui]. O {product-name} operador RedHat está em https://access.redhat.com/containers/#/registry.connect.redhat.com/neuvector/neuvector_operator, e o operador da comunidade em https://operatorhub.io/operator/neuvector_operator..
 
+[#_deployment_using_configmap]
 == Implantação Usando ConfigMap
 
 A implantação automatizada no Kubernetes é suportada usando um ConfigMap. Por favor, veja a seção xref:configmap.adoc[Implantando Usando ConfigMap] para mais detalhes.
 
+[#_deploying_the_controllers]
 == Implantando os Controladores
 
 Recomendamos que múltiplos controladores sejam executados para uma configuração de alta disponibilidade (HA). Os controladores usam o protocolo RAFT baseado em consenso para eleger um líder e, se o líder falhar, eleger outro líder. Por causa disso, o número de controladores ativos deve ser um número ímpar, por exemplo, 3, 5, 7 etc.
 
+[#_controller_ha]
 == HA do Controlador
 
 Os controladores irão sincronizar todos os dados entre si, incluindo configuração, política, conversas, eventos e notificações.
@@ -56,6 +62,7 @@ Se o controlador ativo primário falhar, um novo líder será automaticamente el
 
 Tome precauções especiais para garantir que sempre haja um controlador em execução e pronto, especialmente durante atualizações e reinicializações do sistema operacional do host ou da plataforma de orquestração.
 
+[#_backups_and_persistent_data]
 == Backups e Dados Persistentes
 
 Certifique-se de exportar periodicamente o arquivo de configuração do console e salvá-lo como um backup.
@@ -71,6 +78,7 @@ Se você deseja salvar logs como violações, ameaças, vulnerabilidades e event
 Se um volume persistente não estiver montado, {product-name} NÃO armazena a configuração ou a política como dados persistentes. Certifique-se de fazer backup da configuração e da política do Controlador antes de parar o contêiner allinone ou do controlador. Isso pode ser feito em `Settings -> Configuration`. Alternativamente, o controlador pode ser implantado em uma configuração HA com 3 ou 5 controladores em execução, caso em que a política persistirá com outros controladores enquanto um estiver sendo atualizado.
 ====
 
+[#_persistent_volume_example]
 === Exemplo de Volume Persistente
 
 O PersistentVolume definido no cluster é necessário para o suporte a volume persistente. A exigência para {product-name} é que os modos de acesso precisem ser ReadWriteMany(RWX). Nem todos os tipos de armazenamento suportam o modo de acesso RWX. Por exemplo, no GKE, pode ser necessário criar um volume persistente RWX usando armazenamento NFS.
@@ -139,6 +147,7 @@ Adicione também a seguinte variável de ambiente no Controller ou nos arquivos 
             - name: CTRL_PERSIST_CONFIG
 ----
 
+[#_configmaps_and_persistent_storage]
 === ConfigMaps e Armazenamento Persistente
 
 Tanto o backup de ConfigMaps quanto o armazenamento persistente são lidos apenas quando um novo {product-name} cluster é implantado, ou quando o cluster falha e é reiniciado. Eles não são utilizados durante upgrades contínuos.
@@ -147,6 +156,7 @@ O backup da configuração de armazenamento persistente é lido primeiro, depois
 
 Para mais informações, consulte a seção xref:configmap.adoc[ConfigMaps].
 
+[#_updating_cve_vulnerability_database_in_production]
 == Atualizando o Banco de Dados de Vulnerabilidade CVE em Produção
 
 Consulte cada seção de exemplo para instruções sobre como manter o banco de dados CVE atualizado.
@@ -179,10 +189,12 @@ kubectl logs neuvector-controller-pod-777fdc5668-4jkjn -n neuvector | grep versi
 2019-07-29T17:04:12.224|DEBU|SCN|main.scannerRegister: - version=1.576
 ----
 
+[#_accessing_the_console]
 == Acessando o Console
 
 Por padrão, o console é exposto como um serviço na porta 8443, ou nodePort com uma porta aleatória em cada host. Consulte a primeira seção Básicos -> xref:rest-api.adoc[Conectar ao Manager] para opções de desativação do HTTPS ou acesso ao console através de um firewall corporativo que não permite a porta 8443 para o acesso ao console.
 
+[#_handing_host_updates_or_auto_scaling_nodes_with_a_pod_disruption_budget]
 == Gerenciando Atualizações de Host ou Nós de Auto-escala com um Orçamento de Interrupção de Pod
 
 Atividades de manutenção ou escalonamento podem afetar os controladores nos nós. Provedores de nuvem pública suportam a capacidade de auto-escalar nós, o que pode expulsar dinamicamente pods, incluindo os controladores {product-name}. Para evitar interrupções nos controladores, um orçamento de interrupção de pod {product-name} pode ser criado.
@@ -212,12 +224,14 @@ kubectl create -f nv_pdb.yaml
 
 Para mais detalhes: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
 
+[#_deploy_without_privileged_mode]
 == Implantar sem Modo Privilegiado
 
 Em alguns sistemas, a implantação sem usar o modo privilegiado é suportada. Esses sistemas devem suportar capacidades de seccom e configurar o perfil do apparmor.
 
 Veja a seção sobre xref:docker.adoc[Implantação do Docker] para arquivos de composição de exemplo.
 
+[#_multi_site_multi_cluster_architecture]
 == Arquitetura Multi-site, Multi-Cluster
 
 Para empresas com várias localizações e onde um cluster {product-name} separado pode ser implantado para cada local, a seguir está uma arquitetura de referência proposta. Cada cluster tem seu próprio conjunto de controladores e é gerenciado separadamente.

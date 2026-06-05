@@ -1,9 +1,11 @@
+[#_users]
 = Utilisateurs et rôles
 :revdate: 2025-01-10
 :page-revdate: {revdate}
 :page-opendocs-origin: /03.configuration/02.users/02.users.md
 :page-opendocs-slug: /configuration/users
 
+[#_configuring_users_and_custom_roles]
 == Configuration des utilisateurs et des rôles personnalisés
 
 Le menu Paramètres -> Utilisateurs et Rôles permet la gestion des utilisateurs ainsi que des rôles. Chaque utilisateur est assigné à un rôle prédéfini ou personnalisé. Les utilisateurs peuvent être associés à des rôles via l'intégration de groupe avec LDAP/AD ou d'autres intégrations de système SSO. Consultez la section xref:integration.adoc#_directory_and_sso_integration[Intégration d'entreprise] pour obtenir des instructions détaillées sur chaque type d'intégration, qu'il s'agisse d'une intégration de répertoire ou d'une intégration SSO.
@@ -14,6 +16,7 @@ Les utilisateurs peuvent être configurés directement dans {product-name} ou in
 
 L'exigence de mot de passe par défaut est d'une longueur minimale de 8 caractères, 1 lettre majuscule, 1 lettre minuscule, 1 caractère numérique. Ces exigences et d'autres peuvent être modifiées par un administrateur dans Paramètres -> Utilisateurs sous Authentification et Politiques de Sécurité.
 
+[#_namespace_restricted_users]
 === Utilisateurs restreints par espace de noms
 
 Les utilisateurs peuvent être restreints à certains espaces de noms. Sélectionnez d'abord le rôle global (utilisez 'aucun' si aucun rôle global n'est souhaité), puis cliquez sur les Paramètres avancés.
@@ -32,12 +35,14 @@ Si un utilisateur s'est déjà connecté via une intégration d'entreprise, son 
 Lorsqu'un utilisateur restreint à un espace de noms configure un registre dans les Actifs dans {product-name}, seuls les utilisateurs ayant accès à cet espace de noms peuvent voir/scanner ce registre. Les utilisateurs globaux pourront voir/gérer ce registre, mais pas les utilisateurs avec des espaces de noms ou des rôles restreints.
 ====
 
+[#_roles]
 === Rôles
 
 Les rôles préconfigurés incluent Administrateur, Lecteur et CI/Ops. Pour créer un nouveau rôle personnalisé, sélectionnez l'onglet Rôles dans Paramètres -> Utilisateurs et Rôles. Nommez le rôle et ajoutez-lui les autorisations de lecture ou d'écriture appropriées.
 
 image:roles_4.png[rôles]
 
+[#_rbac_permissions]
 === Autorisations RBAC
 
 * Contrôle d'admission. Gérer les règles de contrôle d'admission.
@@ -53,6 +58,7 @@ image:roles_4.png[rôles]
 * Événement de sécurité. Accéder aux notifications -> des journaux d'événements de sécurité.
 * Configuration système. Autoriser la configuration des paramètres -> Configuration.
 
+[#_mapping_groups_to_roles_and_namespaces]
 === Mapper des groupes à des rôles et des espaces de noms.
 
 Les groupes peuvent être mappés à des rôles prédéfinis ou personnalisés dans {product-name}. De plus, un rôle peut être restreint à un ou plusieurs espaces de noms.
@@ -74,6 +80,7 @@ image:group_role_map_examples.png[ExemplesDeMappage]
 Si l'utilisateur est dans plusieurs groupes, le rôle sera 'premier correspondant' dans l'ordre énuméré et le rôle du groupe sera attribué. Veuillez ajuster l'ordre de configuration pour un comportement approprié en faisant glisser et déposer les mappages dans l'ordre approprié dans la liste.
 ====
 
+[#_multi_cluster_fedadmin_and_admin_roles_for_primary_and_remote_management]
 === Rôles Multi-Cluster FedAdmin et Admin pour la gestion primaire et distante
 
 Lorsqu'un cluster est xref:multicluster.adoc[promu] pour devenir un cluster primaire, l'administrateur devient automatiquement un FedAdmin. Le FedAdmin peut effectuer des opérations sur le primaire telles que générer un jeton de fédération pour connecter un cluster distant ainsi que créer des règles de sécurité fédérées telles que des règles de réseau, de processus, de fichiers et de contrôle d'admission.

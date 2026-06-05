@@ -4,6 +4,7 @@
 :page-opendocs-origin: /05.policy/06.processrules/06.processrules.md
 :page-opendocs-slug:  /política/regrasdeprocesso
 
+[#_policy_groups_process_profile_rules]
 == Política -> Grupos -> Regras de Arquivo de Controle de Processo
 
 Existem dois tipos de proteções de processo/arquivo em {product-name}. Uma é a Zero-drift, onde a atividade permitida de processo e arquivo é automaticamente determinada com base na imagem do contêiner, e a segunda é baseada em aprendizado comportamental. Cada uma pode ser personalizada (regras adicionadas manualmente) se desejado.
@@ -13,6 +14,7 @@ Existem dois tipos de proteções de processo/arquivo em {product-name}. Uma é 
 Há uma limitação ao rodar em sistemas com o sistema de arquivos AUFS, onde pode ocorrer uma condição de corrida e as regras de processo não são aplicadas para bloqueio (Modo de Proteção). No entanto, essas violações ainda são relatadas nos logs de eventos de segurança.
 ====
 
+[#_zero_drift_process_protection]
 === Proteção de Processo Zero-drift
 
 Este é o modo padrão para proteções de processo e arquivo. Zero-drift permite automaticamente apenas processos que se originam do processo pai que está na imagem original do contêiner, e não permite atualizações de arquivos ou a instalação de novos arquivos. Quando em modo Descobrir ou Monitorar, o zero-drift alertará sobre qualquer atividade suspeita de processo ou arquivo. No modo de Proteção, ele bloqueará tal atividade. Zero-drift não requer que processos sejam aprendidos ou adicionados a uma lista de permissões. Desabilitar o zero-drift para um grupo fará com que as regras de processo e arquivo listadas para o grupo entrem em vigor em vez disso.
@@ -26,10 +28,12 @@ Este é o modo padrão para proteções de processo e arquivo. Zero-drift permit
 
 A capacidade de habilitar/desabilitar o modo zero-drift está no console em Política -> Grupos. Vários grupos podem ser selecionados para alternar essa configuração para todos os grupos selecionados.
 
+[#_basic_mode_process_protection]
 === Proteção de Processo em Modo Básico
 
 O zero-drift pode ser desabilitado, mudando para a proteção de processo básica. A proteção básica impõe a atividade de processo/arquivo com base nas regras de processo e/ou arquivo listadas para cada Grupo. Isso significa que deve haver uma lista de regras de processo e/ou regras de arquivo em vigor para que a proteção ocorra. As regras podem ser criadas automaticamente através do Aprendizado Comportamental enquanto estiver no modo Descobrir, criadas manualmente através do console ou API REST, ou criadas programaticamente aplicando um CRD. Com o Básico habilitado, se não houver regras em vigor, toda atividade será alertada/bloqueada enquanto estiver nos modos Monitorar ou Proteger.
 
+[#_behavioral_learning_based_process_protection]
 === Proteção de processo baseada em aprendizado comportamental
 
 As regras de arquivo de controle de processo utilizam o aprendizado de base para definir o perfil dos processos que devem ser permitidos a serem executados em um grupo de contêineres (ou seja, um Grupo). Em condições normais em um ambiente de microserviços, para contêineres com uma imagem particular, apenas um conjunto limitado de processos por usuários específicos seria executado. Se o contêiner for atacado, o atacante malicioso provavelmente iniciaria alguns novos programas que normalmente não são vistos neste contêiner. Esses eventos anormais podem ser detectados por {product-name} e alertas e ações gerados (veja também Regras de Resposta).
@@ -43,14 +47,17 @@ Observe que, além dos processos de base, {product-name} possui detecção incor
 As sondas de liveness do Kubernetes são automaticamente permitidas e adicionadas às regras de processo aprendidas, mesmo no modo Monitor/Proteger.
 ====
 
+[#_process_rules_for_nodes]
 === Regras de processo para Nós
 
 O grupo reservado especial 'nós' pode ser configurado para impor regras de arquivo de controle de processo em cada nó (host) no cluster. Selecione o grupo 'nós' e revise as regras de processo, editando se necessário. Em seguida, altere o modo de proteção para Monitorar ou Proteger. A lista de regras de processo 'local' (aprendida) é uma combinação de todos os processos de todos os nós no cluster enquanto está no modo Descobrir.
 
+[#_process_rules_for_custom_groups]
 === Regras de processo para Grupos Personalizados
 
 Para Grupos personalizados definidos pelo usuário, as regras de processo, se desejadas, devem ser adicionadas manualmente. Grupos personalizados não aprendem regras de processo automaticamente.
 
+[#_process_rules_precedence]
 === Precedência das regras de processo
 
 Regras de processo podem existir para Grupos personalizados definidos pelo usuário, bem como para Grupos aprendidos automaticamente. Regras criadas para Grupos personalizados têm precedência sobre regras para Grupos aprendidos automaticamente.
@@ -61,6 +68,7 @@ Regras de processo com nome e caminho contendo curingas têm precedência sobre 
 
 Regras de processo com uma ação Negar e curinga no nome terão precedência sobre ações Permitir com curinga no nome.
 
+[#_discover_mode]
 === Modo de aprendizagem
 
 * Todos os novos processos são perfilados com a ação permitir.
@@ -74,6 +82,7 @@ Regras de processo com uma ação Negar e curinga no nome terão precedência so
 Um processo suspeito (detecção incorporada), como nmap, ncat, etc., é relatado como um evento de processo suspeito e NÃO será aprendido. Se um serviço precisar desse processo, ele deve ser adicionado com uma regra de arquivo de controle de 'permissão' explicitamente.
 ====
 
+[#_monitor_protect_mode_new_container_started_in_monitor_or_protect_mode]
 === Modo Monitorar/Proteger (novo contêiner iniciado em modo monitorar ou proteger)
 
 * Todo novo processo gera um alerta
@@ -95,6 +104,7 @@ Plataformas de contêiner com o driver de armazenamento AUFS introduzirão um at
 No modo Proteger, contêineres do sistema, como os do Kubernetes, não habilitarão a ação de bloqueio, mas gerarão um evento de violação de processo se houver uma violação de processo.
 ====
 
+[#_creating_process_profile_rules]
 === Criando regras de arquivo de controle de processo.
 
 Múltiplas regras podem ser criadas para o mesmo processo. As regras são executadas sequencialmente e a primeira regra correspondente será executada.
@@ -111,6 +121,7 @@ As violações serão registradas em Notificações -> Eventos de Segurança.
 
 image:process_event.png[violation]
 
+[#_built_in_suspicious_process_detection]
 === Detecção de Processos Suspeitos Integrada
 
 As seguintes detecções integradas estão habilitadas automaticamente em {product-name}.
@@ -187,6 +198,7 @@ Além disso, as seguintes detecções estão habilitadas:
 
 Processos suspeitos são alertados quando em modo Descobrir ou Monitorar, e bloqueados quando em modo Proteger. A detecção se aplica a contêineres, bem como a hosts, com a exceção do 'sshd', que não é considerado suspeito em hosts. Os processos listados acima podem ser adicionados à Lista de Permissão para contêineres (Grupos), inclusive para hosts, se for permitido.
 
+[#_split_mode_process_file_protections]
 == Proteções de Processo/Arquivo em Modo Dividido
 
 Grupos de contêineres podem ter regras de Processo/Arquivo em um modo diferente das regras de Rede, conforme descrito xref:modes.adoc#_network_service_policy_mode[aqui].

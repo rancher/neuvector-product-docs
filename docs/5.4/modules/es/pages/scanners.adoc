@@ -4,6 +4,7 @@
 :page-opendocs-origin: /06.scanning/06.scanners/06.scanners.md
 :page-opendocs-slug:  /escaneo/escáneres
 
+[#_increase_scanner_scalability_with_multiple_scanners]
 == Aumentar la escalabilidad de los escáneres con múltiples escáneres
 
 Para aumentar el rendimiento y la escalabilidad del escáner, {product-name} admite desplegar múltiples pods de escáner que pueden, en paralelo, escanear imágenes en registros. El controlador asigna tareas de escaneo a cada pod de escáner disponible. Los pods de escáner se pueden escalar hacia arriba o hacia abajo fácilmente según sea necesario utilizando Kubernetes.
@@ -18,6 +19,7 @@ Ten en cuenta que en las versiones iniciales, la presencia y el estado de múlti
 
 Los resultados de escaneo de todos los escáneres se muestran en el menú de Registros de Activos ->. Se añadirán características adicionales de monitoreo de escáneres en futuras versiones.
 
+[#_auto_scaling_of_scanner_pods]
 === Escalado Automático de Pods de Escáner
 
 Los pods de escáner se pueden configurar para escalar automáticamente según ciertos criterios. Esto asegurará que los trabajos de escaneo se manejen de manera rápida y eficiente, especialmente si hay miles de imágenes que escanear o volver a escanear. Hay tres configuraciones posibles: retrasada, inmediata y desactivada. Cuando las imágenes están en cola para escanear por el controlador, mantiene un 'conteo de tareas' del tamaño de la cola.
@@ -36,6 +38,7 @@ El autoescalado del escáner está configurado en Configuración -> Configuraci�
 La autoescalación del escáner no es compatible cuando el escáner se despliega con un operador de OpenShift, ya que el operador siempre cambiará el número de pods a su valor configurado.
 ====
 
+[#_operations_and_debugging]
 === Operaciones y Depuración
 
 Cada pod de escáner consultará los registros que se van a escanear para obtener la lista completa de imágenes disponibles y otros datos. A cada escáner se le asignará una imagen para extraer y escanear del registro.
@@ -47,6 +50,7 @@ Para inspeccionar el comportamiento del escáner, se pueden examinar los registr
 kubectl logs <scanner-pod-name> -n neuvector
 ----
 
+[#_performance_planning]
 == Planificación del Rendimiento
 
 Experimenta con diferentes números de escáneres en registros con un gran número de imágenes para observar el comportamiento del tiempo de finalización del escaneo en tu entorno. De 2 a 5 escáneres como configuración de réplica deberían ser suficientes para la mayoría de los casos.
@@ -57,6 +61,7 @@ Las imágenes grandes tardarán más en extraerse y también necesitarán ser ex
 
 Se pueden desplegar múltiples pods de escáner en el mismo host/nodo, pero se deben tener en cuenta consideraciones para asegurar que el host tenga suficiente memoria, CPU y ancho de banda de red para maximizar el rendimiento del escáner.
 
+[#_standalone_scanner_for_local_scanning]
 == Escáner independiente para escaneo local
 
 {product-name} admite despliegues de escáner independiente para escaneo de imágenes locales (que no requiere un Controlador). En el siguiente comando de docker run, la imagen local será escaneada y los resultados se almacenarán en /var/neuvector localmente. Para el escaneo local, la imagen debe poder ser accedida a través del docker.sock montado, de lo contrario se puede especificar un registro.
@@ -78,6 +83,7 @@ Las siguientes variables de entorno del escáner se pueden utilizar en el comand
 * CLUSTER_JOIN_ADDR (opcional), CLUSTER_JOIN_PORT (opcional) - para enviar resultados al controlador para su uso en reglas de control de admisión (controlador desplegado en Kubernetes).
 * CLUSTER_ADVERTISED_ADDR (opcional) - si el escáner está en un host diferente al del controlador, para enviar resultados para su uso en reglas de control de admisión (controlador desplegado en Kubernetes).
 
+[#_host_scanning_in_standalone_mode]
 === Escaneo de Hosts en Modo Autónomo
 
 Utiliza el siguiente comando para escanear el host.
@@ -93,6 +99,7 @@ Utiliza el siguiente comando para escanear el host.
 docker run --rm --privileged --pid=host neuvector/scanner -n neuvector
 ----
 
+[#_manual_deployment_of_multiple_scanners_on_kubernetes]
 === Despliegue Manual de Múltiples Escáneres en Kubernetes
 
 Para desplegar escáneres manualmente como parte de un despliegue existente de Kubernetes, crea un nuevo enlace de rol:
@@ -152,7 +159,7 @@ spec:
 #          hostPath:
 #            path: /var/run/docker.sock
       restartPolicy: Always
-____
+----
 
 A continuación, crea o actualiza el trabajo cron del actualizador de la base de datos CVE. Esto actualizará la base de datos CVE cada noche.
 

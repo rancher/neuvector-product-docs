@@ -4,6 +4,7 @@
 :page-opendocs-origin: /08.integration/01.integration/01.integration.md
 :page-opendocs-slug:  /integration/integration
 
+[#_integration]
 == Integration
 
 {product-name} bietet mehrere Integrationsoptionen, einschließlich einer REST-API, CLI, Syslog, RBAC, SAML, LDAP und Webhooks. Für Beispiele zur Automatisierung von Aufgaben mit der REST-API siehe den xref:automation.adoc[*Automatisierung*] Abschnitt.
@@ -12,6 +13,7 @@
 
 Die folgenden Integrationseinstellungen sind in der {product-name} Benutzeroberfläche unter *Einstellungen* verfügbar.
 
+[#_openshift_and_kubernetes_rbac]
 === OpenShift und Kubernetes RBAC
 
 Aktivieren Sie diese Option, wenn Sie die rollenbasierte Zugriffskontrolle (RBAC) von Red Hat OpenShift verwenden und möchten, dass {product-name} diese Berechtigungen automatisch liest und durchsetzt.
@@ -34,6 +36,7 @@ Verwenden Sie nicht die OpenShift `AllowAllPasswordIdentityProvider` Einstellung
 Der Standardbenutzer {product-name} *Admin* und alle direkt in {product-name} erstellten Benutzer bleiben aktiv, wenn OpenShift RBAC aktiviert ist.
 ====
 
+[#_trust_external_root_cas_with_helm]
 === Vertrauen Sie externen Root-CAs mit Helm.
 
 {product-name} kann externen Root-CAs für sichere Verbindungen wie LDAPS, OpenID Connect (OIDC) und Registry-Scanning vertrauen. Diese Funktion ermöglicht eine vertrauenswürdige Kommunikation mit externen Authentifizierungsdiensten und Image-Registries.
@@ -99,6 +102,7 @@ echo https://$NODE_IP:$NODE_PORT
 Öffnen Sie die angezeigte URL in einem Browser, um auf die {product-name} Manager-Benutzeroberfläche zuzugreifen.
 ====
 
+[#_kubernetes_rbac]
 === Kubernetes RBAC
 
 Um Kubernetes RBAC manuell für bestimmte Namespaces zu konfigurieren:
@@ -109,16 +113,19 @@ Um Kubernetes RBAC manuell für bestimmte Namespaces zu konfigurieren:
 
 image:k8s-rbac.png[Kubernetes]
 
+[#_syslog]
 === Syslog
 
 Konfigurieren Sie die Syslog-Integration, indem Sie die Adresse des Syslog-Servers eingeben und die Benachrichtigungsstufe auswählen. Sie können eine IP-Adresse oder einen DNS-Namen verwenden und entweder UDP oder TCP wählen.
 
+[#_webhooks]
 === Webhooks
 
 {product-name} kann Benachrichtigungen an einen externen Endpunkt über Webhooks senden. Geben Sie die URL des Webhook-Endpunkts an, um Benachrichtigungen zu empfangen.
 
 Sie können Webhook-Benachrichtigungen für benutzerdefinierte Ereignisse unter *Richtlinie* → *Reaktionsregeln* konfigurieren.
 
+[#_directory_and_sso_integration]
 === Verzeichnis- und SSO-Integration
 
 {product-name} unterstützt Verzeichnis- und Single Sign-On (SSO)-Integrationen, einschließlich LDAP, Microsoft Active Directory, SAML und OpenID Connect.

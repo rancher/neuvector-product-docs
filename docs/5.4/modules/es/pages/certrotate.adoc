@@ -6,7 +6,9 @@ Una vez habilitado, un init-container recién añadido del pod del controlador c
 
 Para habilitar la auto-rotación, ```internal.autoRotateCert``` debe configurarse en ```true```. (deshabilitado por defecto).
 
+[#_expected_behavior_when_internalautorotatecert_is_enabled]
 == Comportamiento esperado cuando internal.autoRotateCert está habilitado
+[#_fresh_install]
 === Instalación nueva
 
 1. Cuando todos los contenedores comiencen a ejecutarse, los contenedores de inicialización del controlador se ejecutarán y crearán un trabajo de actualización.
@@ -21,6 +23,7 @@ image:cert_rotate_02.png[certrotate]
 +
 image:cert_rotate_03.png[certrotate]
 
+[#_upgrade]
 === Actualización
 
 1. La ampliación antigua ya está en ejecución.
@@ -41,6 +44,7 @@ image:cert_rotate_07.png[certrotate]
 
 Si `internal.autoRotateCert` es falso, el trabajo de actualización aún comenzará, pero no se realizarán acciones. Se seguirá el comportamiento original, es decir, no habrá contenedores de inicialización y los certificados integrados seguirán utilizándose en todos los casos.
 
+[#_new_options_in_helm_chart]
 == Nuevas opciones en el chart de HELM.
 En los charts de HELM, se añaden estas opciones:
 [source, yaml]
@@ -52,6 +56,7 @@ controller.upgrader.imagePullPolicy (default IfNotPresent): Upgrader's pull poli
 controller.upgrader.schedule (default "0 0 1 * *"): Upgrader's cronjob schedule.
 ---
 
+[#_rotating_sensitive_field_in_configuration]
 == Rotación del campo sensible en la configuración.
 
 Cuando se rota la clave de cifrado del dispositivo, NeuVector no vuelve a cifrar inmediatamente los campos de configuración sensibles existentes. Estos campos se vuelven a cifrar solo cuando se actualizan o modifican después de la rotación. 

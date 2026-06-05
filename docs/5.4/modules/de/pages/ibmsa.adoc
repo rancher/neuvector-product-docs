@@ -15,7 +15,7 @@ Um die erforderliche Registrierungs-URL zu generieren, melden Sie sich bitte als
 
 image:ibmsa_config_new.png[ibmconfigure]
 
-Kehren Sie dann zur IBM Security Advisor Konsole zurück und geben Sie unter "Geben Sie die {product-name} setup-URL ein" "https://{{product-name} controller hostname/ip}:{port}" ein und fügen Sie das, was Sie aus den obigen Schritten kopiert haben, ein. Für den Port verwenden Sie den freigegebenen {product-name} REST API-Port (Standard ist 10443). Für Multi-Cluster-Umgebungen ist dies auch der 'fed-worker'-Dienst, der diesen Port bereitstellt.
+Kehren Sie dann zur IBM Security Advisor Konsole zurück und geben Sie unter "Geben Sie die {product-name} setup-URL ein" "https://{{product-name} controller hostname/ip}:\{port}" ein und fügen Sie das, was Sie aus den obigen Schritten kopiert haben, ein. Für den Port verwenden Sie den freigegebenen {product-name} REST API-Port (Standard ist 10443). Für Multi-Cluster-Umgebungen ist dies auch der 'fed-worker'-Dienst, der diesen Port bereitstellt.
 
 IBM Security Advisor wird über den bereitgestellten Hostnamen oder die IP-Adresse mit Ihrem {product-name} Clustercontroller kommunizieren. Hinweis: Dies muss möglicherweise als Dienst für den Zugriff von außerhalb des Kubernetes-Clusters bereitgestellt werden, ähnlich wie die REST API als Dienst bereitgestellt wird.
 

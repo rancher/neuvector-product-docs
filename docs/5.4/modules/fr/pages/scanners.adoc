@@ -4,6 +4,7 @@
 :page-opendocs-origin: /06.scanning/06.scanners/06.scanners.md
 :page-opendocs-slug:  /scanning/scanners
 
+[#_increase_scanner_scalability_with_multiple_scanners]
 == Augmenter l'évolutivité des scanners avec plusieurs scanners
 
 Pour améliorer les performances et l'évolutivité des scanners, {product-name} prend en charge le déploiement de plusieurs pods de scanner qui peuvent, en parallèle, scanner des images dans des registres. Le contrôleur attribue des tâches de scan à chaque pod de scanner disponible. Les pods de scanner peuvent être facilement augmentés ou réduits selon les besoins en utilisant Kubernetes.
@@ -18,6 +19,7 @@ Veuillez noter que dans les versions initiales, la présence et le statut de plu
 
 Les résultats de scan de tous les scanners sont affichés dans le menu Actifs -> Registres. Des fonctionnalités de surveillance supplémentaires des scanners seront ajoutées dans de futures versions.
 
+[#_auto_scaling_of_scanner_pods]
 === Mise à l'échelle automatique des pods de scanner
 
 Les pods de scanner peuvent être configurés pour se mettre à l'échelle automatiquement en fonction de certains critères. Cela garantira que les tâches de numérisation sont traitées rapidement et efficacement, surtout s'il y a des milliers d'images à numériser ou à re-numériser. Il existe trois paramètres possibles{nbsp}: retardé, immédiat et désactivé. Lorsque des images sont mises en file d'attente pour numérisation par le contrôleur, celui-ci maintient un "compte de tâches" de la taille de la file d'attente.
@@ -36,6 +38,7 @@ L'auto-scaling des scanners est configuré dans les paramètres -> Configuration
 L'auto-scaling des scanners n'est pas pris en charge lorsque le scanner est déployé avec un opérateur OpenShift, car l'opérateur changera toujours le nombre de pods à sa valeur configurée.
 ====
 
+[#_operations_and_debugging]
 === Opérations et Débogage
 
 Chaque pod de numérisation interrogera les registres à numériser pour télécharger la liste complète des images disponibles et d'autres données. Chaque scanner se verra ensuite attribuer une image à télécharger et à numériser depuis le registre.
@@ -47,6 +50,7 @@ Pour inspecter le comportement du scanner, les journaux de chaque pod de numéri
 kubectl logs <scanner-pod-name> -n neuvector
 ----
 
+[#_performance_planning]
 == Planification de la Performance
 
 Expérimentez avec des nombres variés de scanners sur des registres avec un grand nombre d'images pour observer le comportement du temps de complétion de la numérisation dans votre environnement. La configuration à 2–5 scanners devrait suffire dans la plupart des cas.
@@ -57,6 +61,7 @@ Les grandes images prendront plus de temps à récupérer et devront également 
 
 Plusieurs pods de scanner peuvent être déployés sur le même hôte/nœud, mais des considérations doivent être prises en compte pour s'assurer que l'hôte dispose de suffisamment de mémoire, d'UC et de bande passante réseau pour maximiser les performances du scanner.
 
+[#_standalone_scanner_for_local_scanning]
 == Scanner autonome pour le scan local
 
 {product-name} prend en charge les déploiements de scanner autonome pour le scan d'images locales (qui ne nécessite pas de contrôleur). Dans l'exemple de commande docker ci-dessous, l'image locale sera scannée et les résultats seront stockés dans /var/neuvector localement. Pour le scan local, l'image doit pouvoir être accessible via le docker.sock monté, sinon un registre peut être spécifié.
@@ -78,6 +83,7 @@ Les variables d'environnement du scanner suivantes peuvent être utilisées dans
 * CLUSTER_JOIN_ADDR (optionnel), CLUSTER_JOIN_PORT (optionnel) - pour envoyer les résultats au contrôleur pour utilisation dans les règles de contrôle d'admission (contrôleur déployé sur Kubernetes).
 * CLUSTER_ADVERTISED_ADDR (optionnel) - si le scanner est sur un hôte différent de celui du contrôleur, pour envoyer les résultats pour utilisation dans les règles de contrôle d'admission (contrôleur déployé sur Kubernetes).
 
+[#_host_scanning_in_standalone_mode]
 === Analyse des hôtes en mode autonome
 
 Utilisez la commande suivante pour analyser l'hôte.
@@ -93,6 +99,7 @@ Nécessite le mode privilégié{nbsp}!
 docker run --rm --privileged --pid=host neuvector/scanner -n neuvector
 ----
 
+[#_manual_deployment_of_multiple_scanners_on_kubernetes]
 === Déploiement manuel de plusieurs scanners sur Kubernetes
 
 Pour déployer manuellement des scanners dans le cadre d'un déploiement Kubernetes existant, créez un nouveau lien de rôle{nbsp}:
@@ -152,7 +159,7 @@ spec:
 #          hostPath:
 #            path: /var/run/docker.sock
       restartPolicy: Always
-____
+----
 
 Ensuite, créez ou mettez à jour la tâche cron de mise à jour de la base de données CVE. Cela mettra à jour la base de données CVE chaque nuit.
 

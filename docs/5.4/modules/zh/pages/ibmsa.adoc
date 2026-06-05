@@ -15,7 +15,7 @@
 
 image:ibmsa_config_new.png[ibmconfigure]
 
-然后返回IBM安全顾问控制台，在"输入{product-name}设置URL"下，输入"https://{{product-name}控制器主机名/ip}:{port}"并粘贴上面步骤中复制的内容。对于端口，请使用暴露的{product-name} REST API端口（默认是10443）。对于多集群环境，这也是暴露此端口的'fed-worker'服务。
+然后返回IBM安全顾问控制台，在"输入{product-name}设置URL"下，输入"https://{{product-name}控制器主机名/ip}:\{port}"并粘贴上面步骤中复制的内容。对于端口，请使用暴露的{product-name} REST API端口（默认是10443）。对于多集群环境，这也是暴露此端口的'fed-worker'服务。
 
 IBM安全顾问将通过提供的主机名或IP与您的{product-name}集群控制器进行通信。注意：这可能需要作为服务暴露，以便从Kubernetes集群外部访问，类似于REST API作为服务暴露的方式。
 

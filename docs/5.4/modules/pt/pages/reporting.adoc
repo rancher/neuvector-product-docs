@@ -4,6 +4,7 @@
 :page-opendocs-origin: /07.reporting/01.reporting/01.reporting.md
 :page-opendocs-slug:  /relatorios/relatorios
 
+[#_reporting]
 == Geração de relatórios
 
 Os relatórios podem ser visualizados e baixados a partir de vários menus no {product-name} console. O Painel exibe um resumo de segurança que pode ser baixado como um PDF. O download do PDF pode ser filtrado por um namespace, se desejado.
@@ -20,10 +21,12 @@ Relatórios de conformidade para PCI, HIPAA, GDPR e outras regulamentações pod
 
 image:gdpr_report.png[Relatórios]
 
+[#_event_reporting]
 === Relatórios de Eventos
 
 Todos os eventos, como segurança, administração, admissão, varredura e risco, são registrados por {product-name} e também podem ser visualizados no Console no menu de Notificações. Veja os detalhes a seguir.
 
+[#_event_limits]
 ==== Limites de Eventos
 
 Todos os eventos são armazenados na memória para exibição nas telas do Painel e Notificações. Espera-se que os eventos sejam enviados via SYSLOG, webhook ou outros meios para serem armazenados e gerenciados por um sistema SIEM. Atualmente, há um limite de 4K para cada tipo de evento abaixo:
@@ -36,6 +39,7 @@ Todos os eventos são armazenados na memória para exibição nas telas do Paine
 
 É por isso que, uma vez que o limite é atingido, apenas os 4K eventos mais recentes desse tipo são exibidos. Isso afeta as listas de Notificações, bem como as exibições no Painel.
 
+[#_siem_and_syslog]
 == SIEM e SYSLOG
 
 Você pode configurar o servidor SYSLOG e as notificações de webhook no {product-name} console no menu -> Configuração. Escolha o nível de registro, TCP ou UDP, e o formato se JSON for desejado. Os dados CVE podem ser enviados individualmente para cada CVE e/ou incluir resultados de varredura em camadas. Você também pode optar por enviar eventos para o log do pod do controlador em vez de ou além do SYSLOG. Observe que os eventos são enviados apenas para o log do pod do controlador principal.
@@ -51,8 +55,10 @@ Além disso, você pode configurar seu servidor SYSLOG através da CLI da seguin
 
 A API REST também pode ser usada para configuração.
 
+[#_sample_syslog_output]
 === Saída SYSLOG de Exemplo
 
+[#_network_violation]
 ==== Violação de Rede
 
 [,shell]
@@ -60,6 +66,7 @@ A API REST também pode ser usada para configuração.
 2020-01-24T21:39:34Z neuvector-controller-pod-575f94dccf-rccmt /usr/local/bin/controller 12 neuvector - notification=violation,level=Warning,reported_timestamp=1579901965,reported_at=2020-01-24T21:39:25Z,cluster_name=cluster.local,client_id=edf1c28d3411a9686e6e0374a9325b6a3626619938d3cf435a9d90075a1ef653,client_name=k8s_POD_node-pod-7c57bdbf5d-dxkn4_default_cdd9cf23-488d-439c-9408-ed98f838c67b_0,client_domain=default,client_image=k8s.gcr.io/pause:3.1,client_service=node-pod.default,server_id=external,server_name=external,server_port=80,ip_proto=6,applications=[HTTP],servers=[],sessions=1,policy_action=violate,policy_id=0,client_ip=192.168.35.69,server_ip=172.217.5.110
 ----
 
+[#_process_violation]
 ==== Violação de Processo
 
 [,shell]
@@ -67,6 +74,7 @@ A API REST também pode ser usada para configuração.
 2020-01-24T21:39:29Z neuvector-controller-pod-575f94dccf-rccmt /usr/local/bin/controller 12 neuvector - notification=incident,name=Process.Profile.Violation,level=Warning,reported_timestamp=1579901965,reported_at=2020-01-24T21:39:25Z,cluster_name=cluster.local,host_id=k43:HF45:AJC6:5RYO:O5OA:KACD:KRT2:M3O6:P3VQ:IC4I:FSRD:P3HJ:ETLS,host_name=k43,enforcer_id=90822bad25eea14180c0942bf30197528bdab8c8237f307cc3059e6bbdb91f7a,enforcer_name=k8s_neuvector-enforcer-pod_neuvector-enforcer-pod-cg8jp_neuvector_d4ef187e-041c-4bc2-9cdc-c563a3feac6c_0,workload_id=d1be6d14f1f2782029d0944040ea8c0ba581991de99df86041205e15abc80209,workload_name=k8s_node-pod_node-pod-7c57bdbf5d-dxkn4_default_cdd9cf23-488d-439c-9408-ed98f838c67b_0,workload_domain=default,workload_image=nvbeta/node:latest,workload_service=node-pod.default,proc_name=curl,proc_path=/usr/bin/curl,proc_cmd=curl google.com,proc_effective_uid=1000,proc_effective_user=neuvector,client_ip=,server_ip=,client_port=0,server_port=0,server_conn_port=0,ether_type=0,ip_proto=0,conn_ingress=false,proc_parent_name=docker-runc,proc_parent_path=/usr/bin/docker-runc,action=violate,group=nv.node-pod.default,aggregation_from=1579901965,count=1,message=Process profile violation
 ----
 
+[#_admission_control]
 ==== Controle de Admissão
 
 [,shell]
@@ -83,10 +91,12 @@ nc -l -p 8514 -o syslog-dump.hex | tee syslog-messages.txt
 
 Captura mensagens na tela, registra-as em arquivo e faz um hexdump.
 
+[#_integration_with_splunk]
 === Integração com o Splunk
 
 Você pode integrar com o Splunk usando SYSLOG para capturar eventos de segurança de contêiner e relatar no Splunk.
 
+[#_notifications_and_logs]
 == Notificações e Registros
 
 No {product-name} Console no menu de Notificações, você pode encontrar notificações para Eventos de Segurança, Eventos de Risco (Escaneamento e Conformidade) e eventos gerais do sistema.
@@ -95,6 +105,7 @@ As notificações podem ser baixadas como CSV ou PDF a partir dos menus de Notif
 
 Você também pode exibir os registros usando a CLI ou a API REST.
 
+[#_security_events]
 === Security Events
 
 Violações são conexões que violam as Regras da lista branca ou correspondem a uma Regra da lista negra. Violações de rede são capturadas e os IPs de origem podem ser investigados mais a fundo. Eventos de violação da lista branca de rede aparecem como "Regra de Negação Implícita Violada" para indicar que a conexão de rede não correspondeu a nenhuma regra da lista branca.
@@ -109,6 +120,7 @@ image:security_events_addrule.png[AdicionarRegra]
 
 image:ping_capture.png[Captura]
 
+[#_add_new_rules_for_security_events]
 ==== Adicionar Novas Regras para Eventos de Segurança
 
 Você pode facilmente adicionar regras (Política de Segurança) para permitir ou negar o evento detectado selecionando o botão Revisar Regra e implantando uma nova regra.
@@ -117,6 +129,7 @@ image:security_events_review.png[RevisarRegra]
 
 Isso é útil se ocorrerem falsos positivos ou se um comportamento de rede/processo deveria ter sido descoberto, mas não ocorreu durante o modo de Descoberta.
 
+[#_advanced_filters]
 ==== Filtros Avançados
 
 Crie um filtro avançado para visualizar ou exportar eventos selecionando cada tipo geral ou inserindo palavras-chave.
@@ -128,10 +141,12 @@ Crie um filtro avançado para visualizar ou exportar eventos selecionando cada t
 * File. Violação de acesso a arquivo. Ou um arquivo/diretório sensível monitorado foi acessado (veja a lista de monitoramento padrão), ou uma regra de monitoramento de arquivo personalizada foi acionada. Consulte a página xref:./filerules.adoc[Regras de Acesso a Arquivos] para mais informações.
 * Privilégio. Uma elevação de privilégio foi detectada no contêiner ou host. Escaladas de privilégio podem ser feitas de várias maneiras e não são 100% detectáveis, portanto, esta é uma condição difícil de testar.
 
+[#_risk_reports]
 === Relatórios de Risco
 
 Esta seção contém eventos para varreduras de vulnerabilidades (imagem, registro, tempo de execução, contêiner, host, plataforma), varreduras de conformidade (benchmark CIS, scripts personalizados) e eventos de controle de admissão (permitido, negado).
 
+[#_other_integrations]
 == Outras Integrações
 
 {product-name} publicou um exportador Prometheus com um painel Grafana na conta do GitHub {product-name} https://github.com/neuvector/prometheus-exporter, que pode ser personalizado para cada instalação.  Além disso, integrações de exemplo com Fluentd também estão disponíveis mediante solicitação.

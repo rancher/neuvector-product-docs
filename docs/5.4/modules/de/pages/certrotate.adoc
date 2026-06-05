@@ -6,7 +6,9 @@ Nach der Aktivierung wird ein neu hinzugefügter Init-Container des Controller-P
 
 Um die automatische Rotation zu aktivieren, muss ```internal.autoRotateCert``` auf ```true``` gesetzt werden. (Standardmäßig deaktiviert).
 
+[#_expected_behavior_when_internalautorotatecert_is_enabled]
 == Erwartetes Verhalten, wenn internal.autoRotateCert aktiviert ist
+[#_fresh_install]
 === Neuinstallation
 
 1. Wenn alle Container zu laufen beginnen, werden die Init-Container des Controllers ausgeführt und erstellen einen Upgrader-Job.
@@ -21,6 +23,7 @@ image:cert_rotate_02.png[certrotate]
 +
 image:cert_rotate_03.png[certrotate]
 
+[#_upgrade]
 === Aufrüsten
 
 1. Die alte Implementierung läuft bereits.
@@ -41,6 +44,7 @@ image:cert_rotate_07.png[certrotate]
 
 Wenn `internal.autoRotateCert` falsch ist, wird der Upgrader-Job dennoch gestartet, aber es werden keine Aktionen ausgeführt. Das ursprüngliche Verhalten wird beibehalten, d.h. keine Init-Container und die integrierten Zertifikate werden in allen Fällen weiterhin verwendet.
 
+[#_new_options_in_helm_chart]
 == Neue Optionen im Helm-Chart
 In Helm-Charts werden diese Optionen hinzugefügt:
 [source, yaml]
@@ -52,6 +56,7 @@ controller.upgrader.imagePullPolicy (default IfNotPresent): Upgrader's pull poli
 controller.upgrader.schedule (default "0 0 1 * *"): Upgrader's cronjob schedule.
 ---
 
+[#_rotating_sensitive_field_in_configuration]
 == Rotieren des sensiblen Feldes in der Konfiguration
 
 Wenn der Verschlüsselungsschlüssel des Geräts rotiert wird, verschlüsselt NeuVector nicht sofort die vorhandenen sensiblen Konfigurationsfelder erneut. Diese Felder werden nur dann erneut verschlüsselt, wenn sie nach der Rotation aktualisiert oder geändert werden. 

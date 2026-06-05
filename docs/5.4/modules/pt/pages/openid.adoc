@@ -18,7 +18,7 @@ No Azure Active Directory > Registros de aplicativos > Nome do aplicativo > Pág
 
 image:openid3.png[OpenID3]
 
-A URL do Emissor deve ter o formato "https://login.microsoftonline.com/{tenantID}/v2.0". Para localizar o tenantID, vá para menu:Azure Active Directory[Página de Propriedades] e encontre o ID do Diretório, substitua-o pelo tenantID na URL.
+A URL do Emissor deve ter o formato ++https://login.microsoftonline.com/{tenantID}/v2.0++. Para localizar o tenantID, vá para menu:Azure Active Directory[Página de Propriedades] e encontre o ID do Diretório, substitua-o pelo tenantID na URL.
 
 image:openid4.png[OpenID4]
 

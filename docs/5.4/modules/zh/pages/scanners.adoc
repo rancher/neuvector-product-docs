@@ -4,6 +4,7 @@
 :page-opendocs-origin: /06.scanning/06.scanners/06.scanners.md
 :page-opendocs-slug:  /scanning/scanners
 
+[#_increase_scanner_scalability_with_multiple_scanners]
 == 通过多个扫描器提高扫描器的可伸缩性
 
 为了提高扫描器的性能和可伸缩性，{product-name} 支持部署多个扫描器实例，这些实例可以并行扫描注册表中的镜像。控制器将扫描任务分配给每个可用的扫描器实例。扫描器实例可以根据需要通过 Kubernetes 轻松实现扩展或缩减。
@@ -18,6 +19,7 @@
 
 所有扫描器的扫描结果显示在资产 -> 注册表菜单中。未来版本将添加额外的扫描器监控功能。
 
+[#_auto_scaling_of_scanner_pods]
 === 扫描器实例的自动扩展
 
 扫描器实例可以根据某些标准配置为自动扩展。这将确保扫描任务快速高效地处理，特别是当需要扫描或重新扫描数千个镜像时。有三种可能的设置：延迟、立即和禁用。当控制器排队扫描图像时，它会保持一个“任务计数”，以记录队列大小。
@@ -36,6 +38,7 @@
 当扫描器与OpenShift操作员一起部署时，不支持扫描器自动扩展，因为操作员将始终将实例数更改为其配置值。
 ====
 
+[#_operations_and_debugging]
 === 操作和调试
 
 每个扫描器实例将查询要扫描的注册表，以拉取可用图像和其他数据的完整列表。然后将为每个扫描器实例分配一个镜像，从注册表中拉取并进行扫描。
@@ -47,6 +50,7 @@
 kubectl logs <scanner-pod-name> -n neuvector
 ----
 
+[#_performance_planning]
 == 性能规划
 
 在具有大量图像的注册表上尝试不同数量的扫描器，以观察您环境中的扫描完成时间行为。2-5个扫描器作为副本设置，在大多数情况下应该足够。
@@ -57,6 +61,7 @@ kubectl logs <scanner-pod-name> -n neuvector
 
 可以将多个扫描器部署到同一个主机/节点，但应确保主机拥有足够的内存、处理器和网络带宽，以最大化扫描器的性能。
 
+[#_standalone_scanner_for_local_scanning]
 == 本地扫描的独立扫描器
 
 {product-name} 支持本地图像扫描的独立扫描器部署（不需要控制器）。在下面的示例 docker 运行中，本地图像将被扫描，结果将存储在本地的 /var/neuvector 中。对于本地扫描，图像必须能够通过挂载的 docker.sock 访问，否则可以指定一个注册表。
@@ -78,6 +83,7 @@ docker run --name neuvector.scanner --rm -e SCANNER_REPOSITORY=ubuntu -e SCANNER
 * CLUSTER_JOIN_ADDR（可选），CLUSTER_JOIN_PORT（可选） - 将结果发送到控制器以用于准入控制规则（Kubernetes 部署的控制器）。
 * CLUSTER_ADVERTISED_ADDR（可选） - 如果扫描器与控制器在不同主机上，将结果发送用于准入控制规则（Kubernetes 部署的控制器）。
 
+[#_host_scanning_in_standalone_mode]
 === 独立模式下的主机扫描
 
 使用以下命令扫描主机。
@@ -93,6 +99,7 @@ docker run --name neuvector.scanner --rm -e SCANNER_REPOSITORY=ubuntu -e SCANNER
 docker run --rm --privileged --pid=host neuvector/scanner -n neuvector
 ----
 
+[#_manual_deployment_of_multiple_scanners_on_kubernetes]
 === 在Kubernetes上手动部署多个扫描器
 
 要手动将扫描器作为现有Kubernetes部署的一部分进行部署，请创建一个新的角色绑定：
@@ -152,7 +159,7 @@ spec:
 #          hostPath:
 #            path: /var/run/docker.sock
       restartPolicy: Always
-____
+----
 
 接下来，创建或更新 CVE 数据库更新 cron 任务。这将每晚更新CVE数据库。
 

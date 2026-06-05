@@ -4,6 +4,7 @@
 :page-opendocs-origin: /05.policy/06.processrules/06.processrules.md
 :page-opendocs-slug:  /Richtlinie/prozessregeln
 
+[#_policy_groups_process_profile_rules]
 == Richtlinie -> Gruppen -> Prozessprofilregeln
 
 Es gibt zwei Arten von Prozess-/Dateischutz in {product-name}. Die eine ist Zero-Drift, bei der erlaubte Prozess- und Dateiaktivitäten automatisch basierend auf dem Container-Image bestimmt werden, und die zweite basiert auf verhaltensbasiertem Lernen. Jede kann bei Bedarf angepasst werden (Regeln können manuell hinzugefügt werden).
@@ -13,6 +14,7 @@ Es gibt zwei Arten von Prozess-/Dateischutz in {product-name}. Die eine ist Zero
 Es gibt eine Einschränkung beim Betrieb auf Systemen mit dem AUFS-Dateisystem, bei der ein Wettlaufproblem auftreten kann und die Prozessregeln nicht für die Blockierung (Schutzmodus) durchgesetzt werden. Diese Verstöße werden jedoch weiterhin in den Sicherheitsereignisprotokollen gemeldet.
 ====
 
+[#_zero_drift_process_protection]
 === Zero-Drift-Prozessschutz
 
 Dies ist der Standardmodus für Prozess- und Dateischutz. Zero-Drift erlaubt automatisch nur Prozesse, die vom übergeordneten Prozess stammen, der im ursprünglichen Container-Image enthalten ist, und erlaubt keine Dateiaktualisierungen oder die Installation neuer Dateien. Im Entdeckungs- oder Überwachungsmodus wird Zero-Drift bei verdächtigen Prozess- oder Dateiaktivitäten Alarm schlagen. Im Schutzmodus wird solche Aktivität blockiert. Zero-Drift erfordert nicht, dass Prozesse gelernt oder zu einer Erlaubenliste hinzugefügt werden. Das Deaktivieren von Zero-Drift für eine Gruppe bewirkt, dass die für die Gruppe aufgeführten Prozess- und Dateiregeln stattdessen wirksam werden.
@@ -26,10 +28,12 @@ Dies ist der Standardmodus für Prozess- und Dateischutz. Zero-Drift erlaubt aut
 
 Die Möglichkeit, den Zero-Drift-Modus zu aktivieren/deaktivieren, befindet sich in der Konsole in Richtlinie -> Gruppen. Mehrere Gruppen können ausgewählt werden, um diese Einstellung für alle ausgewählten Gruppen umzuschalten.
 
+[#_basic_mode_process_protection]
 === Basismodus Prozessschutz
 
 Zero-Drift kann deaktiviert werden, wodurch auf den Basisprozessschutz umgeschaltet wird. Der Basisprozessschutz erzwingt die Prozess-/Dateiaktivität basierend auf den aufgeführten Prozess- und/oder Dateiregeln für jede Gruppe. Das bedeutet, dass eine Liste von Prozessregeln und/oder Dateiregeln vorhanden sein muss, damit der Schutz stattfinden kann. Regeln können während des Entdeckungsmodus durch Verhaltenslernen automatisch erstellt, manuell über die Konsole oder die REST-API erstellt oder programmgesteuert durch die Anwendung eines CRD erstellt werden. Mit aktiviertem Basismodus wird, wenn keine Regeln vorhanden sind, alle Aktivitäten im Überwachungs- oder Schutzmodus alarmiert/blockiert.
 
+[#_behavioral_learning_based_process_protection]
 === Verhaltensbasierter Prozessschutz
 
 Prozessprofilregeln verwenden Baseline-Lernen, um die Prozesse zu profilieren, die in einer Gruppe von Containern (d.h. einer Gruppe) ausgeführt werden dürfen. Unter normalen Bedingungen in einer Microservices-Umgebung würden für Container mit einem bestimmten Image nur eine begrenzte Anzahl von Prozessen durch spezifische Benutzer ausgeführt. Wenn der Container angegriffen wird, würde der böswillige Angreifer wahrscheinlich einige neue Programme initiieren, die in diesem Container normalerweise nicht zu sehen sind. Diese nicht ordnungsgemäßen Ereignisse können durch {product-name} erkannt werden und es werden Warnungen und Maßnahmen generiert (siehe auch Reaktionsregeln).
@@ -43,14 +47,17 @@ Beachten Sie, dass zusätzlich zu den Basisprozessen {product-name} über eine i
 Kubernetes-Liveness-Probes sind automatisch erlaubt und werden auch im Überwachungs-/Schutzmodus zu den gelernten Prozessregeln hinzugefügt.
 ====
 
+[#_process_rules_for_nodes]
 === Prozessregeln für Knoten
 
 Die spezielle reservierte Gruppe 'Knoten' kann konfiguriert werden, um Prozessprofilregeln für jeden Knoten (Host) im Cluster durchzusetzen. Wählen Sie die Gruppe 'Knoten' aus und überprüfen Sie die Prozessregeln und bearbeiten Sie diese bei Bedarf. Wechseln Sie dann den Schutzmodus auf Überwachen oder Schützen. Die 'lokale' (erlernte) Liste der Prozessregeln ist eine Kombination aller Prozesse von allen Knoten im Cluster während des Entdeckungsmodus.
 
+[#_process_rules_for_custom_groups]
 === Prozessregeln für benutzerdefinierte Gruppen
 
 Für benutzerdefinierte Gruppen müssen die Prozessregeln, falls gewünscht, manuell hinzugefügt werden. Benutzerdefinierte Gruppen lernen Prozessregeln nicht automatisch.
 
+[#_process_rules_precedence]
 === Vorrang der Prozessregeln
 
 Prozessregeln können sowohl für benutzerdefinierte Gruppen als auch für automatisch erlernte Gruppen existieren. Regeln, die für benutzerdefinierte Gruppen erstellt wurden, haben Vorrang vor Regeln für automatisch erlernte Gruppen.
@@ -61,6 +68,7 @@ Prozessregeln mit Namen und Pfad, die beide Platzhalter enthalten, haben Vorrang
 
 Prozessregeln mit einer Verweigern-Aktion und einem Platzhalter im Namen haben Vorrang vor Erlauben-Aktionen mit Platzhaltern im Namen.
 
+[#_discover_mode]
 === Entdeckungsmodus
 
 * Alle neuen Prozesse werden mit der Aktion Erlauben profiliert.
@@ -74,6 +82,7 @@ Prozessregeln mit einer Verweigern-Aktion und einem Platzhalter im Namen haben V
 Ein verdächtiger Prozess (integrierte Erkennung), wie nmap, ncat usw., wird als verdächtiges Prozessereignis gemeldet und wird NICHT gelernt. Wenn ein Dienst diesen Prozess benötigt, muss der Prozess ausdrücklich mit einer 'Erlauben'-Profilregel hinzugefügt werden.
 ====
 
+[#_monitor_protect_mode_new_container_started_in_monitor_or_protect_mode]
 === Überwachungs-/Schutzmodus (neuer Container wird im Überwachungs- oder Schutzmodus gestartet)
 
 * Jeder neue Prozess erzeugt einen Alarm.
@@ -95,6 +104,7 @@ Containerplattformen mit dem AUFS-Speicher-Treiber führen aufgrund der Einschr�
 Im Schutzmodus werden Systemcontainer wie Kubernetes-Container die Blockierungsaktion nicht aktivieren, sondern ein Prozessverletzungsereignis generieren, wenn es eine Prozessverletzung gibt.
 ====
 
+[#_creating_process_profile_rules]
 === Erstellen von Prozessprofilregeln.
 
 Mehrere Regeln können für denselben Prozess erstellt werden. Die Regeln werden nacheinander ausgeführt und die erste übereinstimmende Regel wird ausgeführt.
@@ -111,6 +121,7 @@ Verstöße werden in Benachrichtigungen -> Sicherheitsereignisse protokolliert.
 
 image:process_event.png[Verletzung]
 
+[#_built_in_suspicious_process_detection]
 === Integrierte Erkennung verdächtiger Prozesse
 
 Die folgenden integrierten Erkennungen sind automatisch in {product-name} aktiviert.
@@ -187,6 +198,7 @@ Zusätzlich sind die folgenden Erkennungen aktiviert.
 
 Verdächtige Prozesse werden im Entdeckungs- oder Überwachungsmodus gemeldet und im Schutzmodus blockiert. Die Erkennung gilt sowohl für Container als auch für Hosts, mit der Ausnahme von 'sshd', das auf Hosts nicht als verdächtig angesehen wird. Die oben aufgeführten Prozesse können zur Allowlist für Container (Gruppen) einschließlich Hosts hinzugefügt werden, wenn sie erlaubt sein sollen.
 
+[#_split_mode_process_file_protections]
 == Split-Modus Prozess-/Dateischutz
 
 Container-Gruppen können Prozess-/Dateiregeln in einem anderen Modus als Netzwerkregeln haben, wie xref:modes.adoc#_network_service_policy_mode[hier] beschrieben.

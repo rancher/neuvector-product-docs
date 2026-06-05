@@ -4,12 +4,14 @@
 :page-opendocs-origin: /02.deploying/01.production/01.configmap/01.configmap.md
 :page-opendocs-slug: /deploying/production/configmap
 
+[#_kubernetes_configmap]
 == Kubernetes ConfigMap
 
 {product-name} admite la configuración automatizada utilizando la función ConfigMap de Kubernetes. Esto permite el despliegue de {product-name} contenedores con las configuraciones, integraciones y otros ajustes apropiados de manera automatizada.
 
 La configuración 'always_reload: true' se puede añadir en cualquier yaml de ConfigMap para forzar la recarga de ese yaml cada vez que el controlador se inicia (versión 4.3.2+). De lo contrario, el ConfigMap solo se cargará al inicio o tras un reinicio completo del clúster (ver sección de almacenamiento persistente a continuación).
 
+[#_complete_sample_product_configmap_initcfgyaml]
 === Ejemplo completo de ConfigMap {product-name} (initcfg.yaml)
 
 El último ConfigMap se puede encontrar en el siguiente https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.4.0/initcfg.yaml[initcfg.yaml].
@@ -441,6 +443,8 @@ Luego crea el objeto ConfigMap:
 kubectl create -f initcfg.yaml
 ----
 
+[#_federated_configmap_examples_fedinitcfgyaml]
+[#_federated_configmap_examples_fedinitcfg_yaml]
 === Ejemplos de ConfigMap Federados (fedinitcfg.yaml)
 
 NeuVector v5.4.0 admite la automatización de Federación a través del ConfigMap. A continuación se presentan ejemplos de configuraciones `fedinitcfg.yaml` que se pueden aplicar a tus clústeres primarios y clústeres downstream dependiendo de tu caso de uso.
@@ -485,6 +489,7 @@ Managed_Rest_Info:
 Use_Proxy: ""
 ----
 
+[#_protect_sensitive_data_using_a_secret]
 == Proteger datos sensibles utilizando un secreto
 
 Si se van a incluir datos sensibles en algunas secciones del ConfigMap, se puede crear un secreto para esas secciones con datos sensibles.
@@ -537,6 +542,7 @@ Después de que se despliegue el controlador, todos los archivos de configuraci�
 
 Ten en cuenta que el secreto se menciona en los archivos yaml de despliegue estándar de Kubernetes y OpenShift xref:kubernetes.adoc#_deploy_suse_security[deployment yaml files] bajo Volúmenes.
 
+[#_configmaps_and_persistent_storage]
 == ConfigMaps y almacenamiento persistente
 
 Tanto los ConfigMaps como la copia de seguridad del xref:production.adoc#_backups_and_persistent_data[almacenamiento persistente] solo se leen cuando se despliega un nuevo {product-name} clúster, o cuando el clúster falla y se reinicia. No se utilizan durante las actualizaciones progresivas.

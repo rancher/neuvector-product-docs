@@ -6,7 +6,9 @@
 
 自動ローテーションを有効にするには、```internal.autoRotateCert```を```true```に設定する必要があります。（デフォルトでは無効です。）
 
+[#_expected_behavior_when_internalautorotatecert_is_enabled]
 == internal.autoRotateCertが有効な場合の想定される動作
+[#_fresh_install]
 === 新規インストール
 
 1. すべてのコンテナが実行を開始すると、コントローラーのinitコンテナが実行され、アップグレーダージョブが作成されます。
@@ -21,6 +23,7 @@ image:cert_rotate_02.png[certrotate]
 +
 image:cert_rotate_03.png[certrotate]
 
+[#_upgrade]
 === アップグレード
 
 1. 古いデプロイメントはすでに実行中です。
@@ -41,6 +44,7 @@ image:cert_rotate_07.png[certrotate]
 
 `internal.autoRotateCert`がfalseの場合、アップグレーダージョブは開始されますが、アクションは実行されません。元の動作が維持されます。すなわち、initコンテナはなく、ビルトインの証明書がすべてのケースで使用されます。
 
+[#_new_options_in_helm_chart]
 == HELMチャートの新しいオプション
 HELMチャートでは、これらのオプションが追加されます：
 [source, yaml]
@@ -52,6 +56,7 @@ controller.upgrader.imagePullPolicy (default IfNotPresent): Upgrader's pull poli
 controller.upgrader.schedule (default "0 0 1 * *"): Upgrader's cronjob schedule.
 ---
 
+[#_rotating_sensitive_field_in_configuration]
 == 設定の機密フィールドのローテーション
 
 デバイスの暗号化キーがローテーションされると、NeuVectorは既存の機密設定フィールドを即座に再暗号化しません。これらのフィールドは、ローテーション後に更新または変更されたときのみ再暗号化されます。

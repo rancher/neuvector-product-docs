@@ -10,6 +10,7 @@ NeuVectorのバージョン5.4.2以降では、NeuVectorを使用する前にユ
 2025年3月以降、NeuVectorのバージョン5.4.2以前では、NeuVectorを使用する前にユーザーが内部証明書を生成/置き換える必要があります。
 ====
 
+[#_internal_communication_and_certificates]
 == 内部通信と証明書
 
 {product-name}には、マネージャー（コンソール/UIアクセス）、コントローラー（REST API、内部）、エンフォーサー（内部）、スキャナー（内部）通信のためのデフォルトの自己署名証明書が含まれています。
@@ -21,6 +22,7 @@ NeuVectorのバージョン5.4.2以降では、NeuVectorを使用する前にユ
 証明書の置き換えは、{product-name}の初期デプロイメント中にのみ行うことを推奨します。稼働中のクラスターでの置き換え（ローリングアップグレードを含む）は、証明書の不一致により{product-name}ポッドが相互に通信できない不安定な状態を引き起こす可能性があり、データ損失が発生する可能性があります。
 ====
 
+[#_replacing_certificates_used_in_internal_communications_of_suse_security]
 === {product-name}の内部通信で使用される証明書の置き換え
 
 内部暗号化ファイル`ca.crt`、`tls.key`、`tls.crt`を以下のように置き換えます：
@@ -298,6 +300,7 @@ docker run -it --entrypoint=bash neuvector/scanner:3.654 -c "cat /etc/neuvector/
 
 ========
 
+[#_updating_deploying_with_helm]
 === Helmでの更新およびデプロイ
 
 Helmチャート`2.4.1`から、内部証明書のインストールを管理できるようになりました。チャート https://github.com/neuvector/neuvector-helm/blob/master/charts/core/values.yaml[values.yaml]は、すべての設定を確認する必要があります。以下の例は、RKE2、標準のIngress、およびインストーラー証明書を使用しています。

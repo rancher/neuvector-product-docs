@@ -4,6 +4,7 @@
 :page-opendocs-origin: /02.deploying/04.openshift/04.openshift.md
 :page-opendocs-slug: /deploying/openshift
 
+[#_deploy_separate_product_components_with_redhat_openshift]
 == 使用 RedHat OpenShift 部署单独的 {product-name} 组件
 
 {product-name} 与标准 ovs SDN 插件以及其他插件（如 flannel、weave 或 calico）兼容。下面的示例假设使用标准 ovs 插件。这也假设将使用本地 docker 注册表（请参阅最后的说明以创建从 neuvector 或 Docker Hub 动态拉取的密钥）。
@@ -12,6 +13,7 @@
 
 要手动部署，请首先从 {product-name} 注册表中将适当的 {product-name} 容器拉取到本地注册表。注意：扫描器镜像应定期拉取以获取来自 {product-name} 的 CVE 数据库更新。
 
+[#_product_images_on_docker_hub]
 === {product-name} Docker Hub 上的镜像
 
 这些镜像位于 {product-name} Docker Hub 注册表中。为管理器、控制器、执行器使用适当的版本标签，并将扫描器和更新器的版本保留为 'latest'。例如：
@@ -30,6 +32,7 @@
 * 将镜像名称/标签更新为 Docker Hub 上的当前版本，如上所示
 * 将 imagePullSecrets 保持为空
 
+[#_deploy_on_openshift]
 == 在 OpenShift 上部署
 
 [,shell]
@@ -467,6 +470,7 @@ spec:
           value: myvalue
 ----
 
+[#_using_node_labels_for_manager_and_controller_nodes]
 == 为管理器和控制器节点使用节点标签
 
 要控制管理器和控制器部署在哪些节点上，请为每个节点打标签。将`<nodename>`替换为适当的节点名称。
@@ -505,12 +509,14 @@ app: neuvector-enforcer-pod
       imagePullSecrets:
 ----
 
+[#_updating_the_cve_database_on_openshift_deployments]
 == 在 OpenShift 部署中更新 CVE 数据库
 
 最新的扫描器镜像始终包含来自 {product-name} 的最新 CVE 数据库更新。因此，在拉取镜像时不建议使用版本标签。然而，更新CVE数据库需要定期拉取最新的扫描器镜像，以便更新程序的cron作业可以重新部署扫描器。 上述示例假设拉取、标记并推送了 {product-name} 镜像到本地 OpenShift 注册表。然后从这个注册表进行部署，而不是直接从 neuvector（或 docker hub 上的遗留 {product-name} 注册表）进行部署。
 
 为了定期更新CVE数据库，我们建议创建一个脚本/cron作业来拉取最新的{product-name}扫描器镜像，并执行标记和推送步骤到本地注册表。这将确保CVE数据库定期更新，并且镜像和容器会扫描新的漏洞。
 
+[#_rolling_updates]
 == 滚动更新
 
 Kubernetes、RedHat OpenShift和Rancher等编排工具支持具有可配置策略的滚动更新。您可以使用此功能来更新{product-name}容器。最重要的是确保至少有一个Allinone/Controller在运行，以便不会丢失策略、日志和连接数据。确保容器更新之间至少有30秒的间隔，以便可以选举出新的领导者并在控制器之间同步数据。
@@ -537,6 +543,7 @@ docker push docker-registry.default.svc:5000/neuvector/controller:2.0.1
 
 提供的示例部署 YAML 文件已经配置了滚动更新策略。如果您通过 {product-name} Helm 图表进行更新，请拉取最新的图表以正确配置新功能，例如准入控制，并删除 {product-name} 的旧集群角色和集群角色绑定。
 
+[#_enabling_the_rest_api]
 == 启用 REST API
 
 要启用 REST API，必须按如下方式配置端口 10443：
@@ -558,6 +565,7 @@ spec:
     app: neuvector-controller-pod
 ----
 
+[#_enable_disable_scheduling_on_the_master_node]
 == 在主节点上启用/禁用调度
 
 可以使用以下命令在主节点上启用/禁用调度。
@@ -572,6 +580,7 @@ oc adm manage-node nodename --schedulable
 oc adm manage-node nodename --schedulable=false
 ----
 
+[#_openshift_deployment_in_non_privileged_mode]
 == 在非特权模式下的 OpenShift 部署
 
 可以使用以下说明在不使用特权模式容器的情况下部署 {product-name}。控制器已经处于非特权模式，且强制器部署应进行更改，具体如下所示的摘录片段。

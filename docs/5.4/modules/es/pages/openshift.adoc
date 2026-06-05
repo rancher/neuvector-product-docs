@@ -4,6 +4,7 @@
 :page-opendocs-origin: /02.deploying/04.openshift/04.openshift.md
 :page-opendocs-slug: /deploying/openshift
 
+[#_deploy_separate_product_components_with_redhat_openshift]
 == Desplegar componentes separados {product-name} con RedHat OpenShift
 
 {product-name} es compatible con los complementos SDN ovs estándar, así como con otros como flannel, weave o calico. Las muestras a continuación suponen que se utiliza un complemento ovs estándar. Esto también supone que se utilizará un registro de docker local (ver instrucciones al final para crear el secreto para extraer dinámicamente de neuvector o Docker Hub).
@@ -12,6 +13,7 @@
 
 Para desplegar manualmente, primero extraiga los contenedores {product-name} apropiados del registro {product-name} a su registro local. Nota: la imagen del escáner debe extraerse regularmente para actualizaciones de la base de datos CVE desde {product-name}.
 
+[#_product_images_on_docker_hub]
 === Imágenes de {product-name} en Docker Hub
 
 Las imágenes están en el {product-name} registro de Docker Hub. Utilice la etiqueta de versión apropiada para el manager, controller y enforcer, y deje la versión como 'latest' para el scanner y el updater. Por ejemplo:
@@ -30,6 +32,7 @@ Si se despliega con el actual {product-name} Helm chart (v1.8.9+), se deben real
 * Actualiza los nombres/etiquetas de las imágenes a la versión actual en Docker Hub, como se muestra arriba
 * Deja vacíos los imagePullSecrets
 
+[#_deploy_on_openshift]
 == Despliega en OpenShift
 
 [,shell]
@@ -468,6 +471,7 @@ spec:
           value: myvalue
 ----
 
+[#_using_node_labels_for_manager_and_controller_nodes]
 == Uso de etiquetas de nodo para nodos de manager y controller
 
 Para controlar en qué nodos se despliegan el manager y el controller, etiqueta cada nodo. Reemplaza `<nodename>` con el nombre de nodo apropiado.
@@ -506,12 +510,14 @@ app: neuvector-enforcer-pod
       imagePullSecrets:
 ----
 
+[#_updating_the_cve_database_on_openshift_deployments]
 == Actualización de la base de datos CVE en despliegues de OpenShift
 
 La última imagen del escáner siempre contiene la actualización más reciente de la base de datos CVE de {product-name}. Por esta razón, no se recomienda una etiqueta de versión al extraer la imagen. Sin embargo, actualizar la base de datos CVE requiere extraer regularmente la última imagen del escáner para que el trabajo cron del actualizador pueda volver a desplegar el/los escáner(es).  Las muestras anteriores asumen que se extraen, etiquetan y envían imágenes de {product-name} a un registro local de OpenShift. El despliegue se realiza entonces desde este registro en lugar de directamente desde neuvector (o el {product-name} registro legado en Docker Hub).
 
 Para actualizar regularmente la base de datos CVE, recomendamos crear un script/trabajo cron para extraer la última {product-name} imagen del escáner y realizar los pasos de etiquetado y subida al registro local. Esto asegurará que la base de datos CVE se actualice regularmente y que las imágenes y contenedores se escaneen en busca de nuevas vulnerabilidades.
 
+[#_rolling_updates]
 == Actualizaciones continuas
 
 Las herramientas de orquestación como Kubernetes, RedHat OpenShift y Rancher soportan actualizaciones continuas con políticas configurables. Puedes usar esta función para actualizar los contenedores {product-name}. Lo más importante será asegurar que haya al menos un Allinone/Controlador en funcionamiento para que no se pierdan las directivas, los registros y los datos de conexión. Asegúrate de que haya un mínimo de 30 segundos entre las actualizaciones de contenedores para que se pueda elegir un nuevo líder y sincronizar los datos entre controladores.
@@ -538,6 +544,7 @@ Ahora puedes actualizar tu archivo yaml con estas nuevas versiones y '`apply`', 
 
 Los archivos yaml de despliegue de muestra proporcionados ya configuran la directiva de actualización progresiva. Si estás actualizando a través del chart de Helm {product-name}, por favor, obtén el chart más reciente para configurar correctamente nuevas características como el control de admisión, y elimina el antiguo rol de clúster y la vinculación de rol de clúster para {product-name}.
 
+[#_enabling_the_rest_api]
 == Habilitando la API REST
 
 Para habilitar la API REST, el puerto 10443 debe configurarse de la siguiente manera:
@@ -559,6 +566,7 @@ spec:
     app: neuvector-controller-pod
 ----
 
+[#_enable_disable_scheduling_on_the_master_node]
 == Habilitar/Deshabilitar la programación en el nodo maestro
 
 Los siguientes comandos se pueden usar para habilitar/deshabilitar la programación en el nodo maestro.
@@ -573,6 +581,7 @@ oc adm manage-node nodename --schedulable
 oc adm manage-node nodename --schedulable=false
 ----
 
+[#_openshift_deployment_in_non_privileged_mode]
 == Despliegue de OpenShift en modo no privilegiado
 
 Las siguientes instrucciones se pueden usar para desplegar {product-name} sin utilizar contenedores en modo privilegiado. El controlador ya está en modo no privilegiado y el despliegue del enforcer debería ser cambiado, como se muestra en los fragmentos extraídos a continuación.

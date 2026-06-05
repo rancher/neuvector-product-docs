@@ -4,6 +4,7 @@
 :page-opendocs-origin: /05.policy/02.modes/02.modes.md
 :page-opendocs-slug:  /directiva/modos
 
+[#_product_modes]
 == {product-name} Modos
 
 El {product-name} módulo de Detección de Violaciones tiene tres modos: Descubrir, Monitor y Proteger. En cualquier momento, cualquier Grupo (que comience con 'nv', o el grupo 'Nodos') puede estar en cualquiera de estos modos. El modo se puede cambiar desde el menú de Grupos, la vista de Actividad de Red o el Tablero. Los Grupos de Contenedores pueden tener reglas de Proceso/Archivo en un modo diferente al de las reglas de Red, como se describe xref:modes.adoc#_network_service_policy_mode[aquí].
@@ -15,6 +16,7 @@ image:switchmodes.png[Modos]
 Los grupos creados de forma personalizada no tienen un modo de Protección. Esto se debe a que pueden contener contenedores de diferentes grupos subyacentes, cada uno de los cuales puede estar en un modo diferente, causando confusión sobre el comportamiento.
 ====
 
+[#_discover]
 === Descubrimiento
 
 Por defecto, {product-name} comienza en modo Descubrir. En este modo, {product-name}:
@@ -30,6 +32,7 @@ Por defecto, {product-name} comienza en modo Descubrir. En este modo, {product-n
 Para determinar cuánto tiempo ejecutar un servicio en modo Descubrir, ejecuta tráfico de prueba a través de la aplicación y revisa todas las reglas para asegurarte de que estén completas. Varias horas deberían ser suficientes, pero algunas aplicaciones pueden requerir unos días para ser completamente ejercitadas. Cuando tengas dudas, cambia a modo Monitor y verifica las violaciones, que luego pueden convertirse en reglas de lista blanca antes de pasar a modo Proteger.
 ====
 
+[#_monitor]
 === Supervisar
 
 En modo Monitor, {product-name} monitorea las conversaciones y detecta violaciones en tiempo de ejecución de tu directiva de seguridad. En este modo, no se crean nuevas reglas por {product-name}, pero las reglas pueden ser añadidas manualmente en cualquier momento.
@@ -38,10 +41,12 @@ Cuando se detectan violaciones, son visibles en el mapa de Actividad de Red visu
 
 En el mapa de Red puedes hacer clic en cualquier conversación (línea verde, amarilla, roja) para mostrar más detalles sobre el tipo de conexión y el protocolo monitoreado por última vez. También puedes usar los botones de Buscar y Filtrar por Grupo en la parte inferior derecha para reducir la visualización de tus contenedores.
 
+[#_protect]
 === Proteger
 
 En modo Proteger, {product-name} los ejecutores bloquearán (negarán) cualquier violación de red y ataques detectados. Las violaciones se muestran en el mapa de Red con un '`x`' rojo en ellas, lo que significa que han sido bloqueadas. Los procesos no autorizados y el acceso a archivos también serán bloqueados en modo Proteger. Los sensores DLP que coincidan bloquearán las conexiones de red.
 
+[#_switching_between_modes]
 == Cambio entre modos
 
 Puedes cambiar fácilmente {product-name} Grupos de un modo a otro. Recuerda que en modo Descubrir, {product-name} está construyendo una directiva de seguridad para el comportamiento normal de contenedores permitidos. Puedes ver estas reglas en la pestaña de Directiva -> Grupos o en detalle en el menú de Reglas de Red de Directiva ->.
@@ -50,16 +55,19 @@ Cuando cambias de modo Descubrir a modo Monitor, {product-name} marcará todas l
 
 Por favor, asegúrate de que, antes de introducir nuevas actualizaciones que resulten en nuevos tipos de conexiones entre contenedores, cambies el/los Servicio(s) afectado(s) a modo Descubrir para aprender estos nuevos comportamientos. Alternativamente, puedes añadir manualmente nuevas reglas mientras estés en cualquier modo, o editar el CRD utilizado para crear las reglas para añadir nuevos comportamientos.
 
+[#_new_service_mode]
 === Nuevo Modo de Servicio
 
 Si se descubren nuevos servicios por {product-name}, por ejemplo, si un contenedor previamente desconocido comienza a ejecutarse, se puede establecer en un modo predeterminado. En modo Descubrir, {product-name} comenzará a aprender su comportamiento y a construir Reglas. En Monitor, se generará una violación cuando se detecten conexiones al nuevo servicio. En Proteger, todas las conexiones al nuevo servicio serán bloqueadas a menos que las reglas se hayan creado previamente.
 
 image:newservices.png[NewServiceMode]
 
+[#_network_service_policy_mode]
 === Modo de Directiva de Servicio de Red
 
 Hay una configuración global disponible en Configuración -> para establecer por separado el modo de protección de red para la aplicación de reglas de red de la directiva. Activar esto (el valor predeterminado es desactivado) provoca que todas las reglas de red estén en el modo de protección seleccionado (Descubrir, Monitor, Proteger), mientras que las reglas de proceso/archivo permanecen en el modo de protección para ese Grupo, como se muestra en la pantalla de Grupos de Directiva ->. De esta manera, las reglas de red pueden establecerse en Proteger (bloqueo), mientras que las reglas de proceso/archivo pueden establecerse en Monitor, o viceversa.
 
+[#_automated_promotion_of_group_modes]
 === Promoción Automatizada de Modos de Grupo
 
 Promociona el Modo de protección de un Grupo basado en el tiempo transcurrido y criterios. Esta automatización no se aplica a Grupos creados por CRD. Esta función permite que una nueva aplicación se ejecute en Descubrir durante un período de tiempo, aprendiendo el comportamiento y {product-name} creando reglas de lista blanca para Red y Proceso, luego moviéndose automáticamente a Monitor, y luego a modo Proteger.
@@ -70,6 +78,7 @@ El criterio para pasar de modo Monitor a Proteger es: no hay eventos de segurida
 
 image:policy_promotion.png[Promoción]
 
+[#_conflict_resolution_between_services_in_different_modes]
 ==== Resolución de Conflictos Entre Servicios en Diferentes Modos
 
 Para las conexiones de red entre contenedores en diferentes grupos de servicios, si sus modos de directiva son diferentes, la siguiente tabla muestra cómo el sistema resuelve los conflictos.

@@ -4,12 +4,14 @@
 :page-opendocs-origin: /02.deploying/01.production/01.configmap/01.configmap.md
 :page-opendocs-slug: /deploying/production/configmap
 
+[#_kubernetes_configmap]
 == Kubernetes ConfigMap
 
 {product-name} 支持使用 Kubernetes ConfigMap 功能进行自动化配置。这使得可以以自动化的方式部署 {product-name} 容器，并配置适当的集成和其他设置。
 
 可以在任何 ConfigMap yaml 中添加 'always_reload: true' 设置，以强制在控制器每次启动时重新加载该 yaml（版本 4.3.2 及以上）。否则，ConfigMap 仅在初始启动时或在集群完全重启后加载（请参见下面的持久存储部分）。
 
+[#_complete_sample_product_configmap_initcfgyaml]
 === 完整示例 {product-name} ConfigMap (initcfg.yaml)
 
 最新的 ConfigMap 可以在以下 https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.4.0/initcfg.yaml[initcfg.yaml] 找到。
@@ -441,6 +443,8 @@ metadata:
 kubectl create -f initcfg.yaml
 ----
 
+[#_federated_configmap_examples_fedinitcfgyaml]
+[#_federated_configmap_examples_fedinitcfg_yaml]
 === 联邦 ConfigMap 示例 (fedinitcfg.yaml)
 
 NeuVector v5.4.0 通过 ConfigMap 支持联邦自动化。以下是可以根据您的用例应用于主集群和管理集群的示例 `fedinitcfg.yaml` 配置。
@@ -485,6 +489,7 @@ Managed_Rest_Info:
 Use_Proxy: ""
 ----
 
+[#_protect_sensitive_data_using_a_secret]
 == 使用 Secret 保护敏感数据
 
 如果敏感数据需要包含在 ConfigMap 的某些部分中，可以为这些包含敏感数据的部分创建一个 Secret。
@@ -537,6 +542,7 @@ secret:
 
 请注意，Secret 在标准 Kubernetes 和 OpenShift 控制器 xref:kubernetes.adoc#_deploy_suse_security[部署 yaml 文件] 中被引用，位于卷下。
 
+[#_configmaps_and_persistent_storage]
 == ConfigMaps 和持久存储
 
 只有在部署新的 {product-name} 集群时，或者集群失败并重新启动时，ConfigMaps 和 xref:production.adoc#_backups_and_persistent_data[持久存储] 备份才会被读取。在滚动升级期间不会使用它们。

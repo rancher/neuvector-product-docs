@@ -4,6 +4,7 @@
 :page-opendocs-origin: /06.scanning/06.scanners/06.scanners.md
 :page-opendocs-slug:  /scanning/scanners
 
+[#_increase_scanner_scalability_with_multiple_scanners]
 == Aumente a escalabilidade do scanner com múltiplos scanners
 
 Para aumentar o desempenho e a escalabilidade do scanner, {product-name} suporta a implantação de múltiplos pods de scanner que podem, em paralelo, escanear imagens em registros. O controlador atribui tarefas de escaneamento a cada pod de scanner disponível. Os pods de scanner podem ser facilmente escalados para cima ou para baixo conforme necessário usando o Kubernetes.
@@ -18,6 +19,7 @@ Por favor, note que nas versões iniciais a presença e o status de múltiplos s
 
 Os resultados de escaneamento de todos os scanners são exibidos no menu Assets -> Registries. Recursos adicionais de monitoramento de scanners serão adicionados em futuras versões.
 
+[#_auto_scaling_of_scanner_pods]
 === Escalonamento automático de pods de scanner
 
 Os pods de scanner podem ser configurados para escalar automaticamente com base em certos critérios. Isso garantirá que os trabalhos de digitalização sejam tratados de forma rápida e eficiente, especialmente se houver milhares de imagens a serem digitalizadas ou redigitalizadas. Existem três configurações possíveis: atrasada, imediata e desativada. Quando as imagens estão na fila para digitalização pelo controlador, ele mantém uma 'contagem de tarefas' do tamanho da fila.
@@ -36,6 +38,7 @@ O escalonamento automático do scanner é configurado em Configurações -> Conf
 O escalonamento automático do scanner não é suportado quando o scanner é implantado com um operador OpenShift, pois o operador sempre mudará o número de pods para seu valor configurado.
 ====
 
+[#_operations_and_debugging]
 === Operações e Depuração
 
 Cada pod de scanner consultará os registros a serem digitalizados para baixar a lista completa de imagens disponíveis e outros dados. Cada scanner será então designado a uma imagem para puxar e digitalizar do registro.
@@ -47,6 +50,7 @@ Para inspecionar o comportamento do scanner, os logs de cada pod de scanner pode
 kubectl logs <scanner-pod-name> -n neuvector
 ----
 
+[#_performance_planning]
 == Planejamento de Desempenho
 
 Experimente com diferentes números de scanners em registros com um grande número de imagens para observar o comportamento do tempo de conclusão da digitalização em seu ambiente. 2-5 scanners, pois a configuração de réplica deve ser suficiente para a maioria dos casos.
@@ -57,6 +61,7 @@ Imagens grandes levarão mais tempo para serem puxadas, além de precisarem ser 
 
 Múltiplos pods de scanner podem ser implantados no mesmo host/nó, mas considerações devem ser feitas para garantir que o host tenha memória, CPU, e largura de banda de rede suficientes para maximizar o desempenho do scanner.
 
+[#_standalone_scanner_for_local_scanning]
 == Scanner Autônomo para Digitalização Local
 
 {product-name} suporta implantações de scanner autônomo para digitalização de imagens locais (que não requer um Controlador). No exemplo de execução do docker abaixo, a imagem local será digitalizada e os resultados armazenados em /var/neuvector localmente. Para digitalização local, a imagem deve ser acessível através do docker.sock montado, caso contrário, um registro pode ser especificado.
@@ -78,6 +83,7 @@ As seguintes variáveis de ambiente do scanner podem ser usadas no comando de ex
 * CLUSTER_JOIN_ADDR (opcional), CLUSTER_JOIN_PORT (opcional) - para enviar resultados ao controlador para uso em regras de controle de admissão (controlador implantado no Kubernetes).
 * CLUSTER_ADVERTISED_ADDR (opcional) - se o scanner estiver em um host diferente do controlador, para enviar resultados para uso nas regras de controle de admissão (controlador implantado no Kubernetes).
 
+[#_host_scanning_in_standalone_mode]
 === Escaneamento de Host em Modo Autônomo
 
 Utilize o seguinte comando para escanear o host.
@@ -93,6 +99,7 @@ Requer modo privilegiado!
 docker run --rm --privileged --pid=host neuvector/scanner -n neuvector
 ----
 
+[#_manual_deployment_of_multiple_scanners_on_kubernetes]
 === Implantação Manual de Múltiplos Scanners no Kubernetes
 
 Para implantar scanners manualmente como parte de uma implantação existente no Kubernetes, crie um novo vínculo de função:
@@ -152,7 +159,7 @@ spec:
 #          hostPath:
 #            path: /var/run/docker.sock
       restartPolicy: Always
-____
+----
 
 Em seguida, crie ou atualizar o cron job do atualizador do banco de dados CVE. Isso atualizará o banco de dados CVE todas as noites.
 

@@ -4,6 +4,7 @@
 :page-opendocs-origin: /11.automation/02.automation/02.automation.md
 :page-opendocs-slug:  /automation/automation
 
+[#_product_automation]
 == {product-name} 自动化
 
 在 {product-name} 中有许多自动化功能，以支持整个 CI/CD 工作流，包括：
@@ -30,6 +31,7 @@
 
 {product-name} 还支持响应规则，以自动化对检测到的安全事件或漏洞的常见响应。有关更多详细信息，请参见安全策略 -> 响应规则部分。
 
+[#_expose_rest_api_in_kubernetes]
 === 在 Kubernetes 中暴露 REST API
 
 要从 Kubernetes 集群外部访问 REST API，请启用 10443 端口。
@@ -61,6 +63,7 @@ spec:
 如果使用 LoadBalancer 类型，请在下面的示例中将 _controllerIP_ 设置为负载均衡器的外部 IP 或 URL。
 ====
 
+[#_authentication_for_rest_api]
 === REST API 的身份验证
 
 REST API 支持两种类型的身份验证：用户名/密码和词元两者都可以在设置 -> 用户、API 密钥和角色中配置，并与默认或自定义角色关联，以限制访问特权下面的示例显示了基于用户名/密码的身份验证，其中首先创建词元，然后在后续的 REST API 调用中使用。如果使用词元，可以直接在每个 REST API 调用中使用。注意：基于用户名的连接有有限的并发会话数量，因此在完成后，重要的是按照下面所示删除用户名词元。基于词元的身份验证没有限制，但会根据创建时选择的时间限制而过期。
@@ -73,6 +76,7 @@ image:5_2_api_created.png[词元]
 
 image:5_2_api_key_header.png[词元]
 
+[#_trigger_vulnerability_scanning_from_a_script]
 === 从脚本触发漏洞扫描
 
 {product-name} 可以自动触发以扫描图像中的漏洞。这可以通过配置要监控的注册表/储存库、使用 {product-name} Jenkins 插件或使用 REST API 来完成。请参阅扫描与合规性部分以获取更多详细信息。
@@ -213,6 +217,7 @@ curl -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"re
 ----
 ====
 
+[#_create_policy_rules_automatically]
 === 自动创建策略规则
 
 要在{product-name}策略控制器中创建新规则，FROM和TO字段的组必须先存在。以下示例基于容器标签nv-service-type=data创建一个新组，并为标签nv-service-type=website创建另一个组。然后创建一条规则，允许wordpress容器到mysql容器的流量，仅使用mysql协议。
@@ -270,6 +275,7 @@ curl -k -X "DELETE" -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKE
 sudo pip install requests six
 ----
 
+[#_setting_or_changing_user_password]
 === 设置或更改用户密码
 
 使用REST API调用进行用户管理。
@@ -279,6 +285,7 @@ sudo pip install requests six
 curl -s -k -H 'Content-Type: application/json' -H 'X-Auth-Token: c64125decb31e6d3125da45cba0f5025' https://127.0.0.1:10443/v1/user/admin -X PATCH -d '{"config":{"fullname":"admin","password":"admin","new_password":"NEWPASS"}}'
 ----
 
+[#_starting_packet_capture_on_a_container]
 === 在容器上启动数据包捕获
 
 当容器表现出可疑行为时，启动数据包捕获。
@@ -293,6 +300,7 @@ curl -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"sn
 
 请记得在一段时间后停止嗅探会话，以免其无限运行。轮换的文件数量最大值为50。
 
+[#_check_and_accept_the_eula_new_deployments]
 === 检查并接受 EULA（新部署）
 
 如上所述获取身份验证令牌。还请根据需要替换控制器IP地址。
@@ -316,6 +324,7 @@ curl -s -k -H 'Content-Type: application/json' -H 'X-Auth-Token: $_TOKEN_' -d '{
 
 然后再次检查 EULA。
 
+[#_configure_registry_scanning]
 === 配置注册表扫描
 
 [,shell]
@@ -323,6 +332,7 @@ curl -s -k -H 'Content-Type: application/json' -H 'X-Auth-Token: $_TOKEN_' -d '{
 curl -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"request": {"registry": "https://registry.connect.redhat.com", "username": "username", "password": "password", "tag": "latest", "repository": "neuvector/enforcer"}}' "https://controller:port/v1/scan/repository"
 ----
 
+[#_enable_packet_capture_on_all_pods_in_a_namespace]
 === 在名称空间中启用所有 Pod 的数据包捕获
 
 .点击这里查看详细信息
@@ -527,6 +537,7 @@ done
 ----
 ====
 
+[#_enable_disable_container_quarantine]
 === 启用或禁用容器隔离
 
 隔离的 API 调用是通过 PATCH 到 /v1/workload/:id，带有以下主体。工作负载 ID 是容器/Pod ID。
@@ -542,6 +553,7 @@ done
 }'
 ----
 
+[#_enable_debugging_mode_for_product_support]
 === 为 {product-name} 支持启用调试模式
 
 使用您的 IP、用户名和密码设置访问令牌:
@@ -593,6 +605,7 @@ echo `date +%Y%m%d_%H%M%S` log out
 curl -k -X 'DELETE' -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/auth" > /dev/null 2>&1
 ----
 
+[#_report_if_a_vulnerability_is_in_the_base_image_layers]
 === 报告基础镜像层中是否存在漏洞
 
 在使用 REST API 扫描镜像时，要识别基础镜像中的 CVE，必须在 API 调用中识别基础镜像，如下例所示。
@@ -603,6 +616,7 @@ curl -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"re
 {noformat}
 ----
 
+[#_limitations]
 ==== 局限性
 
 如果要扫描的镜像是远程镜像，并指定了 "registry"，则基础镜像也必须是远程镜像，名称必须以 http 或 https 开头。 如果要扫描的镜像是本地镜像，则基础镜像也必须是本地镜像。
@@ -616,6 +630,7 @@ curl -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"re
 {"request": {"repository": "neuvector/manager", "tag": "4.0.2", "scan_layers": true, "base_image": "10.1.127.12:5000/neuvector/manager:4.0.2”}}
 ----
 
+[#_get_the_cve_database_version_and_date]
 === 获取 CVE 数据库版本和日期
 
 [,shell]
@@ -647,6 +662,7 @@ curl -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" "https:/
 }
 ----
 
+[#_manage_federation_for_master_and_remote_worker_clusters]
 === 管理主集群和远程（工作）集群的联合
 
 通常，列出联合成员可以使用 GET 请求以下端点（请参见示例以获取特定语法）：

@@ -18,7 +18,7 @@ Dans Azure Active Directory > Enregistrements d'applications > Nom de l'applicat
 
 image:openid3.png[OpenID3]
 
-L'URL de l'émetteur prend le format "https://login.microsoftonline.com/{tenantID}/v2.0". Pour localiser le tenantID, allez à menu:Azure Active Directory[Page des propriétés] et trouvez l'ID de répertoire, remplacez-le par le tenantID dans l'URL.
+L'URL de l'émetteur prend le format ++https://login.microsoftonline.com/{tenantID}/v2.0++. Pour localiser le tenantID, allez à menu:Azure Active Directory[Page des propriétés] et trouvez l'ID de répertoire, remplacez-le par le tenantID dans l'URL.
 
 image:openid4.png[OpenID4]
 

@@ -4,12 +4,14 @@
 :page-opendocs-origin: /02.deploying/01.production/01.configmap/01.configmap.md
 :page-opendocs-slug: /deploying/production/configmap
 
+[#_kubernetes_configmap]
 == Kubernetes ConfigMap
 
 {product-name}はKubernetesのConfigMap機能を使用して自動構成をサポートします。これにより、適切な構成、統合、およびその他の設定を持つ{product-name}コンテナの自動デプロイが可能になります。
 
 'always_reload: true'設定は、コントローラーが起動するたびにそのyamlを強制的に再読み込みするために、任意のConfigMap yamlに追加できます（バージョン4.3.2以上）。そうでなければ、ConfigMapは初回起動時または完全なクラスター再起動後にのみ読み込まれます（以下の永続ストレージセクションを参照）。
 
+[#_complete_sample_product_configmap_initcfgyaml]
 === 完全なサンプル{product-name} ConfigMap（initcfg.yaml）
 
 最新のConfigMapは次の https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.4.0/initcfg.yaml[initcfg.yaml]で見つけることができます。
@@ -441,6 +443,8 @@ metadata:
 kubectl create -f initcfg.yaml
 ----
 
+[#_federated_configmap_examples_fedinitcfgyaml]
+[#_federated_configmap_examples_fedinitcfg_yaml]
 === 連携ConfigMapの例（fedinitcfg.yaml）
 
 NeuVector v5.4.0は、ConfigMapを通じて連携自動化をサポートしています。以下は、使用ケースに応じてプライマリおよび管理クラスターに適用できる`fedinitcfg.yaml`構成の例です。
@@ -485,6 +489,7 @@ Managed_Rest_Info:
 Use_Proxy: ""
 ----
 
+[#_protect_sensitive_data_using_a_secret]
 == シークレットを使用して機密データを保護する
 
 機密データがConfigMapの一部に含まれる場合、そのセクションのためにシークレットを作成することができます。
@@ -537,6 +542,7 @@ secret:
 
 秘密は、標準のKubernetesおよびOpenShiftコントローラーxref:kubernetes.adoc#_deploy_suse_security[デプロイメント yamlファイル]の下のボリュームで参照されることに注意してください。
 
+[#_configmaps_and_persistent_storage]
 == ConfigMapsと永続ストレージ
 
 ConfigMapsとxref:production.adoc#_backups_and_persistent_data[永続ストレージ]のバックアップは、新しい{product-name}クラスターがデプロイされるとき、またはクラスターが失敗して再起動されるときにのみ読み取られます。ローリングアップグレード中には使用されません。

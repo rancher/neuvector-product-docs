@@ -4,6 +4,7 @@
 :page-opendocs-origin: /02.deploying/04.openshift/04.openshift.md
 :page-opendocs-slug: /deploying/openshift
 
+[#_deploy_separate_product_components_with_redhat_openshift]
 == RedHat OpenShiftを使用して{product-name}コンポーネントを個別にデプロイする
 
 {product-name}は、標準のovs SDNプラグインやflannel、weave、calicoなどの他のプラグインと互換性があります。以下のサンプルは、標準のovsプラグインが使用されることを前提としています。これは、ローカルのDockerレジストリが使用されることも前提としています（neuvectorまたはDocker Hubから動的にプルするためのシークレットの作成に関する指示は最後にあります）。
@@ -12,6 +13,7 @@
 
 手動でデプロイするには、まず適切な{product-name}コンテナを{product-name}レジストリからローカルレジストリにプルしてください。注意：スキャナーイメージは、{product-name}からCVEデータベースの更新のために定期的にプルする必要があります。
 
+[#_product_images_on_docker_hub]
 === {product-name}Docker Hubのイメージ
 
 イメージは{product-name}のDocker Hubレジストリにあります。マネージャー、コントローラー、エンフォーサーには適切なバージョンタグを使用し、スキャナーとアップデーターにはバージョンを「latest」としておいてください。次に例を示します。
@@ -30,6 +32,7 @@
 * イメージ名/タグをDocker Hubの現在のバージョンに更新してください。上記のように。
 * imagePullSecretsを空のままにしてください
 
+[#_deploy_on_openshift]
 == OpenShiftにデプロイします
 
 [,shell]
@@ -467,6 +470,7 @@ spec:
           value: myvalue
 ----
 
+[#_using_node_labels_for_manager_and_controller_nodes]
 == マネージャーおよびコントローラーノードのためのノードラベルの使用
 
 マネージャーとコントローラーがデプロイされるノードを制御するために、各ノードにラベルを付けてください。`<nodename>`を適切なノード名に置き換えてください。
@@ -505,12 +509,14 @@ app: neuvector-enforcer-pod
       imagePullSecrets:
 ----
 
+[#_updating_the_cve_database_on_openshift_deployments]
 == OpenShiftデプロイメントにおけるCVEデータベースの更新
 
 最新のスキャナーイメージには、常に{product-name}からの最新のCVEデータベースの更新が含まれています。この理由から、イメージをプルする際にバージョンタグは推奨されません。ただし、CVEデータベースの更新には、最新のスキャナーイメージを定期的にプルする必要があるため、アップデータのcronジョブがスキャナーを再デプロイできるようになります。 上記のサンプルは、{product-name}のイメージがプルされ、タグ付けされ、ローカルのOpenShiftレジストリにプッシュされることを前提としています。デプロイメントは、neuvectorから直接ではなく、このレジストリから行われます（またはdocker hubのレガシー{product-name}レジストリから）。
 
 CVEデータベースを定期的に更新するために、最新の{product-name}スキャナーイメージをプルし、ローカルレジストリへのタグ付けとプッシュのステップを実行するスクリプト/cronジョブを作成することをお勧めします。これにより、CVEデータベースが定期的に更新され、イメージとコンテナが新しい脆弱性のスキャンを受けることが保証されます。
 
+[#_rolling_updates]
 == ローリングアップデート
 
 Kubernetes、RedHat OpenShift、Rancherなどのオーケストレーションツールは、設定可能なポリシーを持つローリングアップデートをサポートしています。この機能を使用して、{product-name}コンテナを更新できます。最も重要なのは、ポリシー、ログ、および接続データが失われないように、少なくとも1つのAllinone/Controllerが実行されていることを確認することです。新しいリーダーが選出され、コントローラー間でデータが同期されるように、コンテナの更新の間に最低30秒の間隔を設けてください。
@@ -537,6 +543,7 @@ docker push docker-registry.default.svc:5000/neuvector/controller:2.0.1
 
 提供されたサンプルデプロイメントyamlは、すでにローリングアップデートポリシーを構成しています。{product-name} Helmチャートを介して更新する場合は、最新のチャートをプルして、アドミッションコントロールなどの新機能を適切に構成し、{product-name}の古いクラスター役割とクラスター役割バインディングを削除してください。
 
+[#_enabling_the_rest_api]
 == REST APIの有効化
 
 REST APIを有効にするには、ポート10443を次のように構成する必要があります。
@@ -558,6 +565,7 @@ spec:
     app: neuvector-controller-pod
 ----
 
+[#_enable_disable_scheduling_on_the_master_node]
 == マスターノードでのスケジューリングの有効化/無効化
 
 以下のコマンドを使用して、マスターノードでのスケジューリングを有効または無効にできます。
@@ -572,6 +580,7 @@ oc adm manage-node nodename --schedulable
 oc adm manage-node nodename --schedulable=false
 ----
 
+[#_openshift_deployment_in_non_privileged_mode]
 == 非特権モードでのOpenShiftデプロイメント
 
 以下の手順を使用して、特権モードのコンテナを使用せずに{product-name}をデプロイすることができます。コントローラーはすでに非特権モードになっており、エンフォーサーのデプロイメントは、以下に示す抜粋されたスニペットのように変更する必要があります。

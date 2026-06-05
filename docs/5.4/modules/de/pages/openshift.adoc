@@ -4,6 +4,7 @@
 :page-opendocs-origin: /02.deploying/04.openshift/04.openshift.md
 :page-opendocs-slug: /deploying/openshift
 
+[#_deploy_separate_product_components_with_redhat_openshift]
 == Bereitstellen Sie getrennte {product-name}-Komponenten mit RedHat OpenShift
 
 {product-name} ist kompatibel mit Standard-ovs-SDN-Plugins sowie mit anderen wie Flannel, Weave oder Calico. Die folgenden Beispiele gehen davon aus, dass ein Standard-ovs-Plugin verwendet wird. Dies geht auch davon aus, dass ein lokales Docker-Registry verwendet wird (siehe Anweisungen am Ende zur Erstellung des Secrets für das dynamische Abrufen von neuvector oder Docker Hub).
@@ -12,6 +13,7 @@
 
 Um manuell bereitzustellen, ziehen Sie zuerst die entsprechenden {product-name} Container aus dem {product-name}-Registry in das lokale Registry. Hinweis: Das Scanner-Image sollte regelmäßig für CVE-Datenbank-Updates von {product-name} abgerufen werden.
 
+[#_product_images_on_docker_hub]
 === {product-name} Images auf Docker Hub
 
 Die Images befinden sich in der {product-name} Docker Hub-Registry. Verwenden Sie das entsprechende Versions-Tag für den Manager, Controller, Enforcer, und lassen Sie die Version für Scanner und Updater als 'latest'. Beispiel:
@@ -30,6 +32,7 @@ Wenn Sie mit dem aktuellen {product-name} Helm-Chart (v1.8.9+) bereitstellen, so
 * Aktualisieren Sie die Bildnamen/-tags auf die aktuelle Version im Docker Hub, wie oben gezeigt
 * Lassen Sie die imagePullSecrets leer
 
+[#_deploy_on_openshift]
 == Bereitstellung auf OpenShift
 
 [,shell]
@@ -467,6 +470,7 @@ spec:
           value: myvalue
 ----
 
+[#_using_node_labels_for_manager_and_controller_nodes]
 == Verwendung von Knoten-Labels für Manager- und Controller-Knoten
 
 Um zu steuern, auf welchen Knoten der Manager und der Controller bereitgestellt werden, beschriften Sie jeden Knoten. Ersetzen Sie `<nodename>` durch den entsprechenden Knotennamen.
@@ -505,12 +509,14 @@ app: neuvector-enforcer-pod
       imagePullSecrets:
 ----
 
+[#_updating_the_cve_database_on_openshift_deployments]
 == Aktualisierung der CVE-Datenbank bei OpenShift-Bereitstellungen
 
 Das neueste Scanner-Image enthält immer das aktuellste Update der CVE-Datenbank von {product-name}. Aus diesem Grund wird empfohlen, beim Abrufen des Images kein Versionstag zu verwenden. Die Aktualisierung der CVE-Datenbank erfordert jedoch regelmäßiges Abrufen des neuesten Scanner-Images, damit der Aktualisierungs-Cron-Daemon die Scanner neu bereitstellen kann.  Die obigen Beispiele gehen davon aus, dass {product-name} Images abgerufen, getaggt und in eine lokale OpenShift-Registry hochgeladen werden. Die Bereitstellung erfolgt dann aus dieser Registry anstelle von direkt von neuvector (oder der Legacy {product-name} Registry auf Docker Hub).
 
 Um die CVE-Datenbank regelmäßig zu aktualisieren, empfehlen wir, ein Skript/Cron-Daemon zu erstellen, um das neueste {product-name} Scanner-Image abzurufen und die Schritte zum Taggen und Hochladen in die lokale Registry durchzuführen. Dies stellt sicher, dass die CVE-Datenbank regelmäßig aktualisiert wird und Images sowie Container auf neue Schwachstellen gescannt werden.
 
+[#_rolling_updates]
 == Rolling Updates
 
 Orchestrierungstools wie Kubernetes, RedHat OpenShift und Rancher unterstützen Rolling Updates mit konfigurierbaren Richtlinien. Sie können diese Funktion nutzen, um die {product-name} Container zu aktualisieren. Am wichtigsten ist, dass sichergestellt wird, dass mindestens ein Allinone/Controller läuft, damit Richtlinien, Protokolle und Verbindungsdaten nicht verloren gehen. Stellen Sie sicher, dass zwischen den Container-Updates mindestens 30 Sekunden liegen, damit ein neuer Leader gewählt werden kann und die Daten zwischen den Controllern synchronisiert werden.
@@ -537,6 +543,7 @@ Sie können jetzt Ihre YAML-Datei mit diesen neuen Versionen und '`apply`' aktua
 
 Die bereitgestellten Beispiel-Implementierungs-YAMLs konfigurieren bereits die Rolling Update-Richtlinie. Wenn Sie über das {product-name} Helm-Chart aktualisieren, ziehen Sie bitte das neueste Chart, um neue Funktionen wie Admission Control richtig zu konfigurieren, und löschen Sie die alte Cluster-Rolle und die Cluster-Rollenbindung für {product-name}.
 
+[#_enabling_the_rest_api]
 == Aktivierung der REST-API
 
 Um die REST-API zu aktivieren, muss der Port 10443 wie folgt konfiguriert werden:
@@ -558,6 +565,7 @@ spec:
     app: neuvector-controller-pod
 ----
 
+[#_enable_disable_scheduling_on_the_master_node]
 == Aktivieren/Deaktivieren der Planung auf dem Master-Knoten
 
 Die folgenden Befehle können verwendet werden, um die Planung auf dem Master-Knoten zu aktivieren/deaktivieren.
@@ -572,6 +580,7 @@ oc adm manage-node nodename --schedulable
 oc adm manage-node nodename --schedulable=false
 ----
 
+[#_openshift_deployment_in_non_privileged_mode]
 == OpenShift-Implementierung im nicht privilegierten Modus
 
 Die folgenden Anweisungen können verwendet werden, um {product-name} ohne Verwendung von privilegierten Modus-Containern bereitzustellen. Der Controller befindet sich bereits im nicht privilegierten Modus und die Implementierung des Enforcers sollte geändert werden, was in den unten aufgeführten Auszügen gezeigt wird.

@@ -4,12 +4,14 @@
 :page-opendocs-origin: /02.deploying/01.production/01.configmap/01.configmap.md
 :page-opendocs-slug: /deploying/production/configmap
 
+[#_kubernetes_configmap]
 == Kubernetes ConfigMap
 
 {product-name} unterstützt die automatisierte Konfiguration mit der Kubernetes ConfigMap-Funktion. Dies ermöglicht die Bereitstellung von {product-name} Containern mit den entsprechenden Konfigurationen, Integrationen und anderen Einstellungen auf automatisierte Weise.
 
 Die Einstellung 'always_reload: true' kann in jede ConfigMap-YAML hinzugefügt werden, um das Neuladen dieser YAML jedes Mal zu erzwingen, wenn der Controller startet (Version 4.3.2+). Andernfalls wird die ConfigMap nur beim ersten Start oder nach einem vollständigen Clusterneustart geladen (siehe Abschnitt über persistente Speicherung unten).
 
+[#_complete_sample_product_configmap_initcfgyaml]
 === Vollständige Beispiel-ConfigMap {product-name} (initcfg.yaml)
 
 Die neueste ConfigMap finden Sie unter folgendem https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.4.0/initcfg.yaml[initcfg.yaml].
@@ -441,6 +443,8 @@ Erstellen Sie dann das ConfigMap-Objekt:
 kubectl create -f initcfg.yaml
 ----
 
+[#_federated_configmap_examples_fedinitcfgyaml]
+[#_federated_configmap_examples_fedinitcfg_yaml]
 === Beispiele für föderierte ConfigMaps (fedinitcfg.yaml)
 
 NeuVector v5.4.0 unterstützt die Automatisierung der Föderation über die ConfigMap. Unten sind Beispielkonfigurationen `fedinitcfg.yaml` aufgeführt, die je nach Anwendungsfall auf Ihre primären und verwalteten Cluster angewendet werden können.
@@ -485,6 +489,7 @@ Managed_Rest_Info:
 Use_Proxy: ""
 ----
 
+[#_protect_sensitive_data_using_a_secret]
 == Schützen Sie sensible Daten mit einem Geheimnis
 
 Wenn sensible Daten in einigen Abschnitten der ConfigMap enthalten sein sollen, kann ein Geheimnis für diese Abschnitte mit sensiblen Daten erstellt werden.
@@ -537,6 +542,7 @@ Nachdem der Controller bereitgestellt wurde, werden alle Konfigurationsdateien s
 
 Beachten Sie, dass das Geheimnis in den Standard-Kubernetes- und OpenShift-Controller xref:kubernetes.adoc#_deploy_suse_security[Deployment-YAML-Dateien] unter Volumes referenziert wird.
 
+[#_configmaps_and_persistent_storage]
 == ConfigMaps und persistenter Speicher
 
 Sowohl die ConfigMaps als auch die xref:production.adoc#_backups_and_persistent_data[Sicherung des persistenten Speichers] werden nur gelesen, wenn ein neuer {product-name} Cluster bereitgestellt wird oder der Cluster ausfällt und neu gestartet wird. Sie werden während der Rolling-Upgrades nicht verwendet.

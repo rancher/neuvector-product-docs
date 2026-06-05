@@ -1,9 +1,11 @@
+[#_users]
 = Usuarios y funciones
 :revdate: 2025-01-10
 :page-revdate: {revdate}
 :page-opendocs-origin: /03.configuration/02.users/02.users.md
 :page-opendocs-slug: /configuración/usuarios
 
+[#_configuring_users_and_custom_roles]
 == Configurando Usuarios y Roles Personalizados
 
 El menú de Configuración -> Usuarios y Roles permite la gestión de usuarios así como de roles. A cada usuario se le asigna un rol predefinido o personalizado. Los usuarios pueden ser asignados a roles a través de la integración de grupos con LDAP/AD u otras integraciones de sistemas SSO. Consulta la sección xref:integration.adoc#_directory_and_sso_integration[Integración Empresarial] para instrucciones detalladas para cada tipo de integración de directorio o SSO.
@@ -14,6 +16,7 @@ Los usuarios pueden ser configurados directamente en {product-name} o integrados
 
 El requisito de contraseña por defecto es un mínimo de 8 caracteres de longitud, 1 letra mayúscula, 1 letra minúscula, 1 carácter numérico. Estos y otros requisitos pueden ser cambiados por un administrador en Configuración -> Usuarios bajo Políticas de Autenticación y Seguridad.
 
+[#_namespace_restricted_users]
 === Usuarios restringidos a espacio de nombres
 
 Los usuarios pueden ser restringidos a ciertos espacios de nombres. Primero selecciona el rol global (usa 'ninguno' si no se desea un rol global), luego haz clic en Configuración Avanzada.
@@ -32,12 +35,14 @@ Si un usuario ha iniciado sesión previamente a través de una integración empr
 Cuando un usuario restringido por espacio de nombres configura un registro en Activos en {product-name}, solo los usuarios con acceso a ese espacio de nombres pueden ver/escanear ese registro. Los usuarios globales podrán ver/gestionar ese registro, pero no los usuarios con espacios de nombres/roles restringidos.
 ====
 
+[#_roles]
 === Funciones
 
 Los roles preconfigurados incluyen Administrador, Lector y CI/Ops. Para crear un nuevo rol personalizado, selecciona la pestaña Roles en Configuración -> Usuarios y Roles. Nombra el rol y añade los permisos de lectura o escritura apropiados.
 
 image:roles_4.png[roles]
 
+[#_rbac_permissions]
 === Permisos RBAC
 
 * Control de admisión. Gestiona las reglas de control de admisión.
@@ -53,6 +58,7 @@ image:roles_4.png[roles]
 * Evento de seguridad. Acceder a las notificaciones -> registros de eventos de seguridad.
 * Configuración del sistema. Permitir la configuración de Ajustes -> Configuración.
 
+[#_mapping_groups_to_roles_and_namespaces]
 === Asignación de grupos a roles y espacios de nombres.
 
 Los grupos pueden ser asignados a roles predefinidos o personalizados en {product-name}. Además, un rol puede ser restringido a uno o más espacios de nombres.
@@ -74,6 +80,7 @@ image:group_role_map_examples.png[EjemplosDeMapeo]
 Si el usuario está en múltiples grupos, el rol será el 'primer coincidente' en el orden listado y se asignará el rol del grupo. Por favor, ajusta el orden de configuración para un comportamiento adecuado arrastrando y soltando las asignaciones en el orden apropiado en la lista.
 ====
 
+[#_multi_cluster_fedadmin_and_admin_roles_for_primary_and_remote_management]
 === Roles de FedAdmin y Admin de múltiples clústeres para gestión primaria y remota.
 
 Cuando un clúster es xref:multicluster.adoc[promovido] a ser un clúster primario, el administrador se convierte automáticamente en un FedAdmin. El FedAdmin puede realizar operaciones en el primario, como generar un token de federación para conectar un clúster remoto, así como crear reglas de seguridad federadas como reglas de red, proceso, archivo y control de admisión.

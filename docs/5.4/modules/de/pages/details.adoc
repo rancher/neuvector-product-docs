@@ -4,8 +4,10 @@
 :page-opendocs-origin: /02.deploying/01.production/03.details/03.details.md
 :page-opendocs-slug: /deploying/production/details
 
+[#_environment_variables]
 == Umgebungsvariablen
 
+[#_for_both_controller_allinone_and_enforcer]
 === Sowohl für den Controller (All-in-One) als auch für den Enforcer.
 
 * CLUSTER_JOIN_ADDR
@@ -44,6 +46,7 @@ ____
 Setzen Sie den Wert auf 1, um die Sammlung von Speicherprofildaten zu aktivieren, um Speicherprobleme zu untersuchen.
 ____
 
+[#_controller]
 === Controller
 
 * CTRL_PERSIST_CONFIG
@@ -82,6 +85,7 @@ ____
 (Optional) Wenn aktiviert (Wert=1), kann ICMP-Verkehr im Entdeckungsmodus gelernt werden, und eine Richtlinie kann generiert werden. Wenn es keine Netzwerkrichtlinie im Überwachungs- oder Schutzmodus für die Gruppe gibt, wird eine implizite Verletzung für ICMP-Verkehr generiert.
 ____
 
+[#_manager]
 === manager
 
 * CTRL_SERVER_IP
@@ -113,6 +117,7 @@ ____
 Diese Umgebungsvariable ist nur für das eigenständige NeuVector-Produkt. Bitte setzen Sie die Variable auf "on", wenn Sie Rancher SSO verwenden, oder lassen Sie sie ungesetzt, da NeuVector standardmäßig HTTPS verwendet.
 ====
 
+[#_enforcer]
 === Enforcer
 
 * CONTAINER_NET_TYPE
@@ -163,6 +168,7 @@ ____
 (Optional) Geben Sie an, welche Gruppen oder Namespaces {product-name} als 'Systemcontainer' betrachtet, getrennt durch Semikolons. Zum Beispiel, für auf Rancher basierende Apps und den Standard-Namespace, NV_SYSTEM_GROUPS=__cattle-system;__default. Diese Werte werden in Regex übersetzt. Systemcontainer (die auch {product-name} und Kubernetes-Systemcontainer umfassen) arbeiten nur im Monitor-Modus (nur Alarm), selbst wenn die Gruppe auf Schutzmodus gesetzt ist.
 ____
 
+[#_open_ports]
 == Offene Ports
 
 * CLUSTER_RPC_PORT - auf Controller und All-in-One. Standardwert 18300.

@@ -10,6 +10,7 @@ Les versions de NeuVector 5.4.2 et ultérieures nécessitent que les utilisateur
 Après mars 2025, les versions de NeuVector antérieures à 5.4.2 nécessitent que les utilisateurs génèrent ou remplacent les certificats internes avant d'utiliser NeuVector.
 ====
 
+[#_internal_communication_and_certificates]
 == Communication interne et certificats
 
 {product-name} inclut, par défaut, des certificats auto-signés pour le chiffrement des communications du Manager (accès console/UI), du Contrôleur (API REST, interne), de l'Enforcer (interne) et du Scanner (interne).
@@ -21,6 +22,7 @@ Ces certificats peuvent être remplacés par les vôtres pour renforcer davantag
 Il est recommandé de remplacer les certificats uniquement lors du déploiement initial de {product-name}. Le remplacement sur un cluster en cours d'exécution (même avec une mise à niveau progressive) peut entraîner un état instable où les pods {product-name} ne peuvent pas communiquer entre eux en raison d'un décalage dans les certificats, et une PERTE DE DONNÉES peut se produire.
 ====
 
+[#_replacing_certificates_used_in_internal_communications_of_suse_security]
 === Remplacement des certificats utilisés dans les communications internes de {product-name}
 
 Remplacez les fichiers de chiffrement internes `ca.crt`, `tls.key`, `tls.crt` comme suit{nbsp}:
@@ -298,6 +300,7 @@ docker run -it --entrypoint=bash neuvector/scanner:3.654 -c "cat /etc/neuvector/
 
 ========
 
+[#_updating_deploying_with_helm]
 === Mise à jour/Déploiement avec Helm
 
 Depuis le graphique Helm `2.4.1`, nous pouvons maintenant gérer l'installation du certificat interne. Le graphique https://github.com/neuvector/neuvector-helm/blob/master/charts/core/values.yaml[values.yaml] doit être examiné pour tous les paramètres. L'exemple ci-dessous utilise RKE2, Ingress standard et certificats d'installateur.

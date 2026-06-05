@@ -4,6 +4,7 @@
 :page-opendocs-origin: /02.deploying/05.docker/05.docker.md
 :page-opendocs-slug: /deploying/docker
 
+[#_kubernetes_deployment_on_mirantis_kubernetes_engine]
 == Despliegue de Kubernetes en Mirantis Kubernetes Engine
 
 Sigue las instrucciones en la xref:kubernetes.adoc[sección de Kubernetes].
@@ -13,6 +14,7 @@ Sigue las instrucciones en la xref:kubernetes.adoc[sección de Kubernetes].
 {product-name} no soporta clústeres mixtos de Kubernetes / Swarm.
 ====
 
+[#_deploy_product_containers_using_docker_native_or_ucp_swarm]
 == Despliega {product-name} Contenedores Usando Docker Nativo o UCP/Swarm
 
 Ten en cuenta que el despliegue nativo de Docker en Mirantis Kubernetes Engine usando Swarm NO SOPORTA el despliegue de servicios con contenedores en modo privilegiado, o con capacidades de seccomp añadidas. Para desplegar en este entorno, debes usar Docker Compose o Run para desplegar los contenedores {product-name}. Puedes usar el despliegue en host remoto (docker-compose -H HOST) para facilitar esta tarea.
@@ -21,10 +23,12 @@ Aquí están los archivos de configuración de docker compose de ejemplo. Ten en
 
 NOTE: La variable de entorno NV_PLATFORM_INFO=platform=Docker se utiliza para notificar a {product-name} que la plataforma es Docker/Swarm, aunque puede haber contenedores de Kubernetes no utilizados detectados por {product-name} en un despliegue de Docker EE. Además, para poder ver estos en la Actividad de Red -> Vista -> Mostrar Sistema, añade la variable de entorno para el aplicador NV_SYSTEM_GROUPS.
 
+[#_deploy_allinone_for_high_availability]
 === Despliega All-in-One para alta disponibilidad
 
 Para HA en entornos de producción Docker nativo o EE, despliega el contenedor All-in-One en los primeros tres hosts de producción. Cada All-in-One debe apuntar a las direcciones IP de todos los hosts All-in-One. Por ejemplo, tres contenedores All-in-One son el mínimo para HA, y el CLUSTER_JOIN_ADDR debe listar las tres direcciones IP separadas por comas. Se pueden desplegar All-in-One adicionales en números impares, p. ej. 5, 7. Despliega el aplicador en los hosts restantes en el clúster, en cualquier orden.
 
+[#_deploy_allinone_using_docker_compose_privileged_mode]
 === Despliega All-in-One usando docker-compose (modo privilegiado)
 
 El siguiente es un ejemplo del archivo docker-compose para desplegar el contenedor All-in-One en el primer nodo. Debido a que el contenedor All-in-One tiene un módulo de aplicador interno, los contenedores de aplicación en el mismo nodo pueden ser asegurados. Se admiten tanto despliegues greenfield como brownfield.
@@ -63,6 +67,7 @@ Los puertos 18300 y 18301 son los puertos predeterminados para la comunicación 
 Para exponer la API REST en el All-in-One, añade el mapeo de puerto para 10443, por ejemplo - 10443:10443.
 ====
 
+[#_add_an_enforcer_container_using_docker_compose_privileged_mode]
 === Añade un contenedor de aplicador utilizando docker-compose (modo privilegiado)
 
 Este es un ejemplo de archivo docker-compose para unir un aplicador al clúster. Se admiten tanto despliegues greenfield como brownfield.
@@ -90,6 +95,7 @@ enforcer:
 
 La variable de entorno más importante es *CLUSTER_JOIN_ADDR*. Para los aplicadores, reemplaza `<controller_node_ip>` con la dirección IP del nodo del controlador. Típicamente, *CLUSTER_JOIN_ADDR* en el archivo docker-compose del controlador/all-in-one y en el archivo docker-compose del aplicador tienen el mismo valor.
 
+[#_deploy_the_suse_security_scanner_container]
 === Desplegar el {product-name} contenedor del escáner
 
 Desde {product-name} 4.0+, debe desplegarse un contenedor de escáner separado para realizar el escaneo de vulnerabilidades. Importante: Siempre utiliza la etiqueta :latest al descargar y ejecutar la imagen del escáner para asegurar que se despliega la base de datos CVE más reciente.
@@ -136,10 +142,12 @@ Para desplegar un escáner independiente (sin controlador/todo en uno), consulta
 
 Para actualizar el Escáner y obtener las últimas actualizaciones de la base de datos CVE de {product-name}, crea un trabajo cron para detener y reiniciar el escáner, obteniendo la última versión. Consulta xref:docker.adoc#_docker_native_updates[esta sección] para más detalles.
 
+[#_deployment_without_using_privileged_mode]
 === Despliegue Sin Usar Modo Privilegiado
 
 Para algunas configuraciones de plataforma, es posible desplegar los contenedores {product-name} sin requerir que se ejecuten en modo privilegiado. La configuración debe soportar la capacidad de añadir capacidades y establecer el perfil de apparmor. Ten en cuenta que Docker DataCenter/UCP y Swarm actualmente no soportan esto, pero aún es posible desplegar {product-name} manualmente usando Compose o Run.
 
+[#_deploy_allinone_no_privileged_mode_with_docker_compose]
 === Despliega All-in-One (SIN modo privilegiado) con docker-compose
 
 [,yaml]
@@ -175,6 +183,7 @@ allinone:
         - /var/neuvector:/var/neuvector
 ----
 
+[#_deploy_enforcer_no_privileged_mode_with_docker_compose]
 === Despliega aplicador (SIN modo privilegiado) con docker-compose
 
 [,yaml]
@@ -206,6 +215,7 @@ enforcer:
         - /sys/fs/cgroup/:/host/cgroup/:ro
 ----
 
+[#_deploy_allinone_privileged_mode_with_docker_run]
 === Despliega All-in-One (modo privilegiado) con docker run
 
 Puedes usar docker run en lugar de compose para desplegar. Aquí tienes ejemplos.
@@ -231,6 +241,7 @@ docker run -d --name allinone \
 neuvector/allinone:<version>
 ----
 
+[#_deploy_enforcer_privileged_mode_with_docker_run]
 === Despliega el aplicador (modo privilegiado) con docker run
 
 [,shell]
@@ -250,6 +261,7 @@ docker run -d --name enforcer \
 neuvector/enforcer:<version>
 ----
 
+[#_deploy_allinone_no_privileged_mode_with_docker_run]
 === Despliega All-in-One (SIN modo privilegiado) con docker run
 
 Puedes usar docker run en lugar de compose para desplegar. Aquí tienes ejemplos.
@@ -281,6 +293,7 @@ docker run -d --name allinone \
 neuvector/allinone:<version>
 ----
 
+[#_deploy_enforcer_no_privileged_mode_with_docker_run]
 === Despliega aplicador (SIN modo privilegiado) con docker run
 
 [,shell]
@@ -306,6 +319,7 @@ docker run -d --name enforcer \
 neuvector/enforcer:<version>
 ----
 
+[#_deploy_separate_product_components_on_different_hosts]
 == Despliega {product-name} componentes separados en diferentes hosts
 
 Si planeas dedicar un host de docker a un Controlador y/o Gestor (sin aplicador), estos contenedores pueden desplegarse individualmente en lugar del All-in-One. Ten en cuenta que Docker no soporta desplegar el aplicador en el mismo nodo que el controlador como componentes separados, requiriendo el uso del contenedor All-in-One si se desean las funciones de controlador y aplicador en un nodo.
@@ -379,10 +393,12 @@ enforcer:
         - /sys/fs/cgroup/:/host/cgroup/:ro
 ----
 
+[#_monitoring_and_restarting_product]
 == Monitoreo y reinicio de {product-name}
 
 Dado que los contenedores {product-name} no son desplegados como un servicio de UCP/Swarm, no se inician/reinician automáticamente en los nodos. Deberías configurar alerting a través de tu sistema SIEM para eventos SYSLOG de {product-name} o a través de DataCenter para detectar si un contenedor {product-name} no está en ejecución.
 
+[#_deploying_without_privileged_mode]
 == Desplegando sin modo privilegiado
 
 En general, necesitarás reemplazar la configuración de modo privilegiado por:
@@ -402,6 +418,7 @@ En general, necesitarás reemplazar la configuración de modo privilegiado por:
 
 La sintaxis anterior es para Docker EE v17.06.0+. Las versiones anteriores a esta utilizan : en lugar de =, por ejemplo apparmor:unconfined.
 
+[#_docker_native_updates]
 == Actualizaciones nativas de Docker
 
 [CAUTION]

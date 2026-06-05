@@ -4,6 +4,7 @@
 :page-opendocs-origin: /02.deploying/05.docker/05.docker.md
 :page-opendocs-slug: /déploiement/docker
 
+[#_kubernetes_deployment_on_mirantis_kubernetes_engine]
 == Déploiement Kubernetes sur Mirantis Kubernetes Engine
 
 Suivez les instructions dans la xref:kubernetes.adoc[section Kubernetes].
@@ -13,6 +14,7 @@ Suivez les instructions dans la xref:kubernetes.adoc[section Kubernetes].
 {product-name} ne prend pas en charge les clusters Kubernetes / Swarm mixtes.
 ====
 
+[#_deploy_product_containers_using_docker_native_or_ucp_swarm]
 == Déployer des conteneurs {product-name} en utilisant Docker natif ou UCP/Swarm
 
 Notez que le déploiement Docker natif sur Mirantis Kubernetes Engine utilisant Swarm NE prend PAS en charge le déploiement de services avec des conteneurs en mode privilégié, ou avec des capacités seccomp ajoutées. Pour déployer dans cet environnement, vous devez utiliser Docker Compose ou Run pour déployer les {product-name} conteneurs. Vous pouvez utiliser le déploiement sur hôte distant (docker-compose -H HOST) pour faciliter cette tâche.
@@ -21,10 +23,12 @@ Voici les fichiers de configuration Docker Compose d'exemple. Notez que l'utilis
 
 NOTE: La variable d'environnement NV_PLATFORM_INFO=platform=Docker est utilisée pour notifier {product-name} que la plateforme est Docker/Swarm, même s'il peut y avoir des conteneurs Kubernetes inutilisés détectés par {product-name} sur un déploiement Docker EE. Aussi, pour pouvoir les voir dans l'activité réseau -> Vue -> Afficher le système, ajoutez la variable d'environnement pour l'enforcer NV_SYSTEM_GROUPS.
 
+[#_deploy_allinone_for_high_availability]
 === Déployer All-in-One pour une haute disponibilité
 
 Pour la haute disponibilité dans des environnements Docker natifs ou EE en production, déployez le conteneur All-in-One sur les trois premiers hôtes de production. Chaque All-in-One doit pointer vers les adresses IP de tous les hôtes All-in-One. Par exemple, trois conteneurs All-in-One sont le minimum pour la haute disponibilité, et le CLUSTER_JOIN_ADDR doit lister les trois adresses IP séparées par des virgules. Des All-in-One supplémentaires peuvent être déployés en nombres impairs, par exemple 5, 7. Déployez l'enforcer sur les hôtes restants du cluster, dans n'importe quel ordre.
 
+[#_deploy_allinone_using_docker_compose_privileged_mode]
 === Déployez All-in-One en utilisant docker-compose (mode privilégié)
 
 Voici un exemple de fichier Docker Compose pour déployer le conteneur All-in-One sur le premier nœud. Parce que le conteneur All-in-One contient un module enforcer, les conteneurs d'application sur le même nœud peuvent être sécurisés. Les déploiements greenfield et brownfield sont tous deux pris en charge.
@@ -63,6 +67,7 @@ Les ports 18300 et 18301 sont les ports par défaut pour la communication du clu
 Pour exposer l'API REST dans l'All-in-One, ajoutez le mappage de ports pour 10443, par exemple 10443:10443.
 ====
 
+[#_add_an_enforcer_container_using_docker_compose_privileged_mode]
 === Ajoutez un conteneur enforcer en utilisant Docker Compose (mode privilégié)
 
 Voici un exemple de fichier Docker Compose pour rejoindre un enforcer dans le cluster. Les déploiements greenfield et brownfield sont tous deux pris en charge.
@@ -90,6 +95,7 @@ enforcer:
 
 La variable d'environnement la plus importante est *CLUSTER_JOIN_ADDR*. Pour les enforcers, remplacez `<controller_node_ip>` par l'adresse IP du nœud du contrôleur. Typiquement, *CLUSTER_JOIN_ADDR* dans le fichier Docker Compose du contrôleur/All-in-One et dans le fichier Docker Compose de l'enforcer ont la même valeur.
 
+[#_deploy_the_suse_security_scanner_container]
 === Déployez le {product-name} conteneur Scanner
 
 À partir de {product-name} 4.0+, un conteneur scanner séparé doit être déployé pour effectuer une analyse de vulnérabilité. Important : Utilisez toujours le tag :latest lors du tirage et de l'exécution de l'image du scanner pour garantir que la dernière base de données CVE est déployée.
@@ -136,10 +142,12 @@ Pour déployer un scanner autonome (sans contrôleur/tout-en-un), veuillez consu
 
 Pour mettre à jour le scanner afin d'obtenir les dernières mises à jour de la base de données CVE depuis {product-name}, créez une tâche cron pour arrêter et redémarrer le scanner, en tirant la dernière version. Voir xref:docker.adoc#_docker_native_updates[cette section] pour plus de détails.
 
+[#_deployment_without_using_privileged_mode]
 === Déploiement sans utiliser le mode privilégié
 
 Pour certaines configurations de plateforme, il est possible de déployer les {product-name} conteneurs sans qu'ils aient besoin de s'exécuter en mode privilégié. La configuration doit prendre en charge la possibilité d'ajouter des capacités et de définir le profil apparmor. Notez que Docker DataCenter/UCP et Swarm ne prennent actuellement pas en charge cela, mais il est toujours possible de déployer {product-name} manuellement en utilisant Docker Compose ou Run.
 
+[#_deploy_allinone_no_privileged_mode_with_docker_compose]
 === Déployez All-in-One (SANS mode privilégié) avec Docker Compose
 
 [,yaml]
@@ -175,6 +183,7 @@ allinone:
         - /var/neuvector:/var/neuvector
 ----
 
+[#_deploy_enforcer_no_privileged_mode_with_docker_compose]
 === Déployez l'enforcer (SANS mode privilégié) avec Docker Compose
 
 [,yaml]
@@ -206,6 +215,7 @@ enforcer:
         - /sys/fs/cgroup/:/host/cgroup/:ro
 ----
 
+[#_deploy_allinone_privileged_mode_with_docker_run]
 === Déployez All-in-One (mode privilégié) avec docker run
 
 Vous pouvez utiliser docker run au lieu de Docker Compose pour déployer. Voici des exemples.
@@ -231,6 +241,7 @@ docker run -d --name allinone \
 neuvector/allinone:<version>
 ----
 
+[#_deploy_enforcer_privileged_mode_with_docker_run]
 === Déployez l'enforcer (mode privilégié) avec docker run
 
 [,shell]
@@ -250,6 +261,7 @@ docker run -d --name enforcer \
 neuvector/enforcer:<version>
 ----
 
+[#_deploy_allinone_no_privileged_mode_with_docker_run]
 === Déployez All-in-One (SANS mode privilégié) avec docker run
 
 Vous pouvez utiliser docker run au lieu de Docker Compose pour déployer. Voici des exemples.
@@ -281,6 +293,7 @@ docker run -d --name allinone \
 neuvector/allinone:<version>
 ----
 
+[#_deploy_enforcer_no_privileged_mode_with_docker_run]
 === Déployez l'enforcer (SANS mode privilégié) avec docker run
 
 [,shell]
@@ -306,6 +319,7 @@ docker run -d --name enforcer \
 neuvector/enforcer:<version>
 ----
 
+[#_deploy_separate_product_components_on_different_hosts]
 == Déployer des {product-name} composants séparément sur différents hôtes
 
 Si vous prévoyez de dédier un hôte Docker à un Contrôleur et/ou un Gestionnaire (sans enforcer), ces conteneurs peuvent être déployés individuellement au lieu de l'All-in-One. Notez que Docker ne prend pas en charge le déploiement de l'enforcer sur le même nœud que le contrôleur en tant que composants séparés, nécessitant l'utilisation du conteneur All-in-One si les fonctions de contrôleur et d'enforcer sont souhaitées sur un nœud.
@@ -379,10 +393,12 @@ enforcer:
         - /sys/fs/cgroup/:/host/cgroup/:ro
 ----
 
+[#_monitoring_and_restarting_product]
 == Surveillance et redémarrage de {product-name}
 
 Puisque les {product-name} conteneurs ne sont pas déployés en tant que service UCP/Swarm, ils ne sont pas automatiquement démarrés/redémarrés sur les nœuds. Vous devez configurer des alertes via votre système SIEM pour les {product-name} événements SYSLOG ou via DataCenter pour détecter si un {product-name} conteneur ne fonctionne pas.
 
+[#_deploying_without_privileged_mode]
 == Déploiement sans mode privilégié
 
 En général, vous devrez remplacer le paramètre privilégié par{nbsp}:
@@ -402,6 +418,7 @@ En général, vous devrez remplacer le paramètre privilégié par{nbsp}:
 
 La syntaxe ci-dessus est pour Docker EE v17.06.0+. Les versions antérieures utilisent{nbsp}: au lieu de =, par exemple apparmor:unconfined.
 
+[#_docker_native_updates]
 == Mises à jour Docker Native
 
 [CAUTION]

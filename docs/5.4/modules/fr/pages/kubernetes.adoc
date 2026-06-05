@@ -4,6 +4,7 @@
 :page-opendocs-origin: /02.deploying/02.kubernetes/02.kubernetes.md
 :page-opendocs-slug: /déploiement/kubernetes
 
+[#_deploy_using_kubernetes]
 == Déployer à l'aide de Kubernetes
 
 Vous pouvez utiliser Kubernetes pour déployer des conteneurs de gestionnaire, de contrôleur et d'exécuteur séparés et vous assurer que tous les nouveaux nœuds ont un exécuteur déployé. {product-name} nécessite et prend en charge les plugins réseau Kubernetes tels que flannel, weave ou calico.
@@ -23,6 +24,7 @@ Si votre déploiement prend en charge un équilibreur de charge intégré, chang
 
 Il existe une section distincte pour les instructions OpenShift, et Docker EE sur Kubernetes a quelques étapes spéciales décrites dans la section Docker.
 
+[#_product_images_on_docker_hub]
 === {product-name} Images sur Docker Hub
 
 Les images sont sur le {product-name} registre Docker Hub. Utilisez le tag de version approprié pour le gestionnaire, le contrôleur, l'exécuteur, et laissez la version comme 'latest' pour le scanner et l'updater. Par exemple :
@@ -47,6 +49,7 @@ Si vous déployez à partir du Rancher Manager 2.6.5+ {product-name} chart, les 
 ====
 
 
+[#_deploy_suse_security]
 == Déployer {product-name}
 
 . Créez l'espace de noms {product-name} et les comptes de service requis{nbsp}: 
@@ -362,6 +365,7 @@ spec:
           value: myvalue
 ----
 
+[#_using_node_labels_for_manager_and_controller_nodes]
 == Utilisation des étiquettes de nœud pour les nœuds gestionnaire et contrôleur
 
 Pour contrôler sur quels nœuds le gestionnaire et le contrôleur sont déployés, étiquetez chaque nœud. Remplacez nodename par le nom de nœud approprié ('`kubectl get nodes`'). Remarque : Par défaut, Kubernetes ne planifiera pas de pods sur le nœud maître.
@@ -400,12 +404,14 @@ Pour empêcher l'exécuteur d'être déployé sur un nœud de contrôleur, s'il 
       imagePullSecrets:
 ----
 
+[#_rolling_updates]
 == Mises à jour progressives
 
 Les outils d'orchestration tels que Kubernetes, RedHat OpenShift et Rancher prennent en charge les mises à jour progressives avec des politiques configurables. Vous pouvez utiliser cette fonctionnalité pour mettre à jour les {product-name} conteneurs. Le plus important sera de s'assurer qu'il y a au moins un contrôleur (ou Allinone) en cours d'exécution afin que les stratégies, les journaux et les données de connexion ne soient pas perdus. Assurez-vous qu'il y a un minimum de 120 secondes entre les mises à jour des conteneurs afin qu'un nouveau leader puisse être élu et que les données soient synchronisées entre les contrôleurs.
 
 Les fichiers de déploiement yamls fournis configurent déjà la politique de mise à jour progressive. Si vous mettez à jour via le {product-name} chart Helm, veuillez récupérer le dernier chart pour configurer correctement les nouvelles fonctionnalités telles que le contrôle d'admission, et supprimer l'ancien rôle de cluster et le lien de rôle de cluster pour {product-name}. Si vous mettez à jour via Kubernetes, vous pouvez mettre à jour manuellement vers une nouvelle version avec les commandes d'exemple ci-dessous.
 
+[#_sample_kubernetes_rolling_update]
 === Mise à jour progressive Kubernetes d'exemple
 
 Pour les mises à niveau qui nécessitent simplement de passer à une nouvelle version d'image, vous pouvez utiliser cette approche simple.
@@ -449,6 +455,7 @@ kubectl rollout undo -n neuvector ds/neuvector-enforcer-pod
 kubectl rollout undo -n neuvector deployment/neuvector-controller-pod
 ----
 
+[#_expose_rest_api_in_kubernetes]
 == Exposer l'API REST dans Kubernetes
 
 Pour exposer l'API REST pour un accès depuis l'extérieur du cluster Kubernetes, voici un fichier yaml d'exemple{nbsp}:
@@ -472,6 +479,7 @@ spec:
 
 Veuillez consulter la section Automatisation pour plus d'informations sur l'API REST.
 
+[#_kubernetes_deployment_in_non_privileged_mode]
 == Déploiement Kubernetes en mode non privilégié
 
 Les instructions suivantes peuvent être utilisées pour déployer {product-name} sans utiliser de conteneurs en mode privilégié. Le contrôleur est déjà en mode non privilégié et le déploiement de l'enforcer doit être modifié, comme le montrent les extraits ci-dessous.
@@ -501,6 +509,7 @@ spec:
               - IPC_LOCK
 ----
 
+[#_kubernetes_deployment_yaml_for_v5_4_2_onwards]
 == YAML de déploiement Kubernetes pour la version 5.4.2 et versions ultérieures
 
 Le fichier YAML d'exemple suivant est pour les versions 5.4.2 et ultérieures où nous devons monter les certificats internes sur les pods Controller, Enforcer et Scanner car nous ne supportons plus les certificats codés en dur. Créez le secret de certificat interne à partir du lien donné avant de déployer{nbsp}: xref:internal.adoc[Remplacement des certificats internes].
@@ -775,7 +784,7 @@ spec:
             path: /lib/modules
         - name: nv-debug
           hostPath:
-            path: /var/nv_debug
+            path: /var/nv-debug
         - name: internal-cert
           secret:
             defaultMode: 420
@@ -1064,69 +1073,69 @@ spec:
         app: neuvector-enforcer-pod
       annotations:
         container.apparmor.security.beta.kubernetes.io/neuvector-enforcer-pod: unconfined
-      # Add the following for pre_v1.19
-      # container.seccomp.security.alpha.kubernetes.io/neuvector_enforcer_pod: unconfined
+      # Add the following for pre-v1.19
+      # container.seccomp.security.alpha.kubernetes.io/neuvector-enforcer-pod: unconfined
     spec:
       tolerations:
-        _ effect: NoSchedule
-          key: node_role.kubernetes.io/master
-        _ effect: NoSchedule
-          key: node_role.kubernetes.io/control_plane
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
       hostPID: true
       serviceAccountName: enforcer
       serviceAccount: enforcer
       containers:
-        _ name: neuvector_enforcer_pod
+        - name: neuvector-enforcer-pod
           image: neuvector/enforcer:5.4.3
           securityContext:
-            # the following two lines are required for k8s v1.19+. pls comment out both lines if version is pre_1.19. Otherwise, a validating data error message will show
+            # the following two lines are required for k8s v1.19+. pls comment out both lines if version is pre-1.19. Otherwise, a validating data error message will show
             seccompProfile:
               type: Unconfined
             capabilities:
               add:
-              _ SYS_ADMIN
-              _ NET_ADMIN
-              _ SYS_PTRACE
-              _ IPC_LOCK
+              - SYS_ADMIN
+              - NET_ADMIN
+              - SYS_PTRACE
+              - IPC_LOCK
           env:
-            _ name: CLUSTER_JOIN_ADDR
-              value: neuvector_svc_controller.neuvector
-            _ name: CLUSTER_ADVERTISED_ADDR
+            - name: CLUSTER_JOIN_ADDR
+              value: neuvector-svc-controller.neuvector
+            - name: CLUSTER_ADVERTISED_ADDR
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
-            _ name: CLUSTER_BIND_ADDR
+            - name: CLUSTER_BIND_ADDR
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
           volumeMounts:
-            _ mountPath: /lib/modules
-              name: modules_vol
+            - mountPath: /lib/modules
+              name: modules-vol
               readOnly: true
-            _ mountPath: /var/nv_debug
-              name: nv_debug
+            - mountPath: /var/nv_debug
+              name: nv-debug
               readOnly: false
       terminationGracePeriodSeconds: 1200
       restartPolicy: Always
       volumes:
-        _ name: modules_vol
+        - name: modules-vol
           hostPath:
             path: /lib/modules
-        _ name: nv_debug
+        - name: nv-debug
           hostPath:
-            path: /var/nv_debug
+            path: /var/nv-debug
 
-___
+---
 
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: neuvector_scanner_pod
+  name: neuvector-scanner-pod
   namespace: neuvector
 spec:
   selector:
     matchLabels:
-      app: neuvector_scanner_pod
+      app: neuvector-scanner-pod
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -1136,25 +1145,25 @@ spec:
   template:
     metadata:
       labels:
-        app: neuvector_scanner_pod
+        app: neuvector-scanner-pod
     spec:
       serviceAccountName: scanner
       serviceAccount: scanner
       containers:
-        _ name: neuvector_scanner_pod
+        - name: neuvector-scanner-pod
           image: neuvector/scanner:latest
           imagePullPolicy: Always
           env:
-            _ name: CLUSTER_JOIN_ADDR
-              value: neuvector_svc_controller.neuvector
+            - name: CLUSTER_JOIN_ADDR
+              value: neuvector-svc-controller.neuvector
       restartPolicy: Always
 
-___
+---
 
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: neuvector_updater_pod
+  name: neuvector-updater-pod
   namespace: neuvector
 spec:
   schedule: "0 0 * * *"
@@ -1163,20 +1172,21 @@ spec:
       template:
         metadata:
           labels:
-            app: neuvector_updater_pod
+            app: neuvector-updater-pod
         spec:
           serviceAccountName: updater
           serviceAccount: updater
           containers:
-          _ name: neuvector_updater_pod
+          - name: neuvector-updater-pod
             image: neuvector/updater:latest
             imagePullPolicy: Always
             command:
-            _ TOKEN=`cat /var/run/secrets/kubernetes.io/serviceaccount/token`; /usr/bin/curl _kv _X PATCH _H "Authorization:Bearer $TOKEN" _H "Content_Type:application/strategic_merge_patch+json" _d '{"spec":{"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt":"'`date +%Y_%m_%dT%H:%M:%S%z`'"}}}}}' 'https://kubernetes.default/apis/apps/v1/namespaces/neuvector/deployments/neuvector_scanner_pod'
+            - TOKEN=`cat /var/run/secrets/kubernetes.io/serviceaccount/token`; /usr/bin/curl -kv -X PATCH -H "Authorization:Bearer $TOKEN" -H "Content-Type:application/strategic-merge-patch+json" -d '{"spec":{"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt":"'`date +%Y-%m-%dT%H:%M:%S%z`'"}}}}}' 'https://kubernetes.default/apis/apps/v1/namespaces/neuvector/deployments/neuvector-scanner-pod'
           restartPolicy: Never
-____
+----
 ====
 
+[#_pks_change]
 == Changement de PKS
 
 [NOTE]

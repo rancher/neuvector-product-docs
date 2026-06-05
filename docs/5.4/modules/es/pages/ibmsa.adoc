@@ -15,7 +15,7 @@ Para generar la URL de registro requerida, inicie sesión en la consola {product
 
 image:ibmsa_config_new.png[ibmconfigure]
 
-Luego regrese a la consola de IBM Security Advisor, y, en "Ingrese la URL de configuración de {product-name}", escriba "https://{{product-name}nombre de host o IP del controlador:{port}" y pegue lo que se copió de los pasos anteriores. Para el puerto, utilice el puerto REST API expuesto {product-name} (el predeterminado es 10443). Para entornos de múltiples clústeres, este también es el servicio 'fed-worker' que expone este puerto.
+Luego regrese a la consola de IBM Security Advisor, y, en "Ingrese la URL de configuración de {product-name}", escriba "https://{{product-name}nombre de host o IP del controlador:\{port}" y pegue lo que se copió de los pasos anteriores. Para el puerto, utilice el puerto REST API expuesto {product-name} (el predeterminado es 10443). Para entornos de múltiples clústeres, este también es el servicio 'fed-worker' que expone este puerto.
 
 IBM Security Advisor se comunicará con su controlador de clúster {product-name} a través del nombre de host o IP proporcionado. Nota: Esto puede necesitar ser expuesto como un servicio para acceso desde fuera del clúster de Kubernetes, similar a cómo se expone la REST API como un servicio.
 

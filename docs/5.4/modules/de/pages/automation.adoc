@@ -1,9 +1,11 @@
+[#_rest_api]
 = REST API und Automatisierung
 :revdate: 2025-05-08
 :page-revdate: {revdate}
 :page-opendocs-origin: /11.automation/02.automation/02.automation.md
 :page-opendocs-slug:  /automation/automation
 
+[#_product_automation]
 == {product-name} Automatisierung
 
 Es gibt viele Automatisierungsfunktionen in {product-name}, um den gesamten CI/CD-Workflow zu unterstützen, einschließlich:
@@ -29,6 +31,7 @@ Wenn Sie REST-API-Aufrufe mit Benutzername/Passwort tätigen, stellen Sie bitte 
 
 {product-name} unterstützt auch Antwortregeln, um häufige Antworten auf Sicherheitsereignisse oder erkannte Schwachstellen zu automatisieren. Bitte siehe den Abschnitt Sicherheitsrichtlinie -> Antwortregeln für weitere Details.
 
+[#_expose_rest_api_in_kubernetes]
 === REST-API in Kubernetes exponieren
 
 Um die REST-API für den Zugriff von außerhalb des Kubernetes-Clusters freizugeben, aktivieren Sie den Port 10443.
@@ -60,6 +63,7 @@ spec:
 Wenn Sie den Typ LoadBalancer verwenden, setzen Sie die _controllerIP_ in den folgenden Beispielen auf die externe IP oder URL für den Loadbalancer.
 ====
 
+[#_authentication_for_rest_api]
 === Authentifizierung für REST-API
 
 Die REST-API unterstützt zwei Arten der Authentifizierung: Benutzername/Passwort und Token. Beide können in den Einstellungen -> Benutzer, API-Schlüssel und Rollen konfiguriert und mit Standard- oder benutzerdefinierten Rollen verknüpft werden, um die Zugriffsrechte zu beschränken. Die folgenden Beispiele zeigen die Authentifizierung auf Basis von Benutzername/Passwort, bei der zuerst ein Token erstellt wird, das dann in nachfolgenden REST-API-Aufrufen verwendet wird. Wenn ein Token verwendet wird, kann es direkt in jedem REST-API-Aufruf verwendet werden. Hinweis: Verbindungen auf Basis des Benutzernamens haben eine begrenzte Anzahl gleichzeitiger Sitzungen, daher ist es wichtig, das Benutzertoken wie unten gezeigt zu löschen, wenn Sie fertig sind. Token-basierte Authentifizierung hat keine Begrenzung, läuft jedoch gemäß der beim Erstellen ausgewählten Zeitgrenze ab.
@@ -72,6 +76,7 @@ image:5_2_api_created.png[token]
 
 image:5_2_api_key_header.png[token]
 
+[#_trigger_vulnerability_scanning_from_a_script]
 === Starten Sie einen Schwachstellenscan von einem Skript.
 
 {product-name} kann automatisch ausgelöst werden, um ein Bild auf Schwachstellen zu scannen. Dies kann durch die Konfiguration eines zu überwachenden Repositorys, die Verwendung des {product-name} Jenkins-Plugins oder die Verwendung der REST-API erfolgen. Bitte sehen Sie sich den Abschnitt über Scannen & Compliance für weitere Details an.
@@ -212,6 +217,7 @@ Beispielausgabe:
 ----
 ====
 
+[#_create_policy_rules_automatically]
 === Richtlinienregeln automatisch erstellen
 
 Um eine neue Regel im {product-name} Richtlinien-Controller zu erstellen, müssen die Gruppen für die Felder FROM und TO zuerst existieren. Das folgende Beispiel erstellt eine neue Gruppe basierend auf dem Container-Label nv-service-type=data und eine weitere Gruppe für das Label nv-service-type=website. Eine Regel wird dann erstellt, um den Verkehr vom Wordpress-Container zum MySQL-Container nur unter Verwendung des MySQL-Protokolls zuzulassen.
@@ -269,6 +275,7 @@ Um die Datei zu importieren:
 sudo pip install requests six
 ----
 
+[#_setting_or_changing_user_password]
 === Benutzerpasswort festlegen oder ändern
 
 Verwenden Sie die REST-API-Aufrufe zur Benutzerverwaltung.
@@ -278,6 +285,7 @@ Verwenden Sie die REST-API-Aufrufe zur Benutzerverwaltung.
 curl -s -k -H 'Content-Type: application/json' -H 'X-Auth-Token: c64125decb31e6d3125da45cba0f5025' https://127.0.0.1:10443/v1/user/admin -X PATCH -d '{"config":{"fullname":"admin","password":"admin","new_password":"NEWPASS"}}'
 ----
 
+[#_starting_packet_capture_on_a_container]
 === Packet Capture auf einem Container starten
 
 Wenn ein Container verdächtiges Verhalten zeigt, starten Sie eine Paketaufzeichnung.
@@ -292,6 +300,7 @@ curl -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"sn
 
 Vergessen Sie nicht, die Sniffer-Sitzung nach einiger Zeit zu stoppen, damit sie nicht ewig läuft. Die Anzahl der zu rotierenden Dateien hat einen maximalen Wert von 50.
 
+[#_check_and_accept_the_eula_new_deployments]
 === Überprüfen und Akzeptieren der EULA (neue Implementierungen)
 
 Holen Sie sich das Authentifizierungs-Token wie oben beschrieben. Ersetzen Sie auch die Controller-IP-Adresse durch Ihre, wie erforderlich.
@@ -315,6 +324,7 @@ curl -s -k -H 'Content-Type: application/json' -H 'X-Auth-Token: $_TOKEN_' -d '{
 
 Überprüfen Sie dann die EULA erneut.
 
+[#_configure_registry_scanning]
 === Registry-Scanning konfigurieren
 
 [,shell]
@@ -322,6 +332,7 @@ curl -s -k -H 'Content-Type: application/json' -H 'X-Auth-Token: $_TOKEN_' -d '{
 curl -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"request": {"registry": "https://registry.connect.redhat.com", "username": "username", "password": "password", "tag": "latest", "repository": "neuvector/enforcer"}}' "https://controller:port/v1/scan/repository"
 ----
 
+[#_enable_packet_capture_on_all_pods_in_a_namespace]
 === Aktivieren Sie die Paketaufzeichnung für alle Pods in einem Namespace
 
 .Klicken Sie hier für Details
@@ -526,6 +537,7 @@ done
 ----
 ====
 
+[#_enable_disable_container_quarantine]
 === Containerquarantäne aktivieren/deaktivieren
 
 Der API-Aufruf zur Quarantäne erfolgt über PATCH an /v1/workload/:id mit folgendem Body. Die Arbeitslast-ID ist die Container-/Pod-ID.
@@ -541,6 +553,7 @@ Der API-Aufruf zur Quarantäne erfolgt über PATCH an /v1/workload/:id mit folge
 }'
 ----
 
+[#_enable_debugging_mode_for_product_support]
 === Aktivieren Sie den Debugging-Modus für {product-name} Support
 
 Setzen Sie das Zugriffstoken mit Ihrer IP, Benutzer, Passwort:
@@ -592,6 +605,7 @@ echo `date +%Y%m%d_%H%M%S` log out
 curl -k -X 'DELETE' -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/auth" > /dev/null 2>&1
 ----
 
+[#_report_if_a_vulnerability_is_in_the_base_image_layers]
 === Melden Sie, ob eine Schwachstelle in den Basisbildschichten vorhanden ist
 
 Um CVEs im Basisbild zu identifizieren, wenn Sie die REST-API zum Scannen von Bildern verwenden, muss das Basisbild im API-Aufruf identifiziert werden, wie im folgenden Beispiel.
@@ -602,6 +616,7 @@ curl -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"re
 {noformat}
 ----
 
+[#_limitations]
 ==== Nutzungsbeschränkungen
 
 Wenn das zu scannende Bild ein Remote-Bild ist, mit "registry" angegeben, muss das Basisbild ebenfalls ein Remote-Bild sein, und der Name muss mit http oder https beginnen.  Wenn das zu scannende Bild ein lokales Bild ist, muss das Basisbild ebenfalls ein lokales Bild sein.
@@ -615,6 +630,7 @@ Beispiel:
 {"request": {"repository": "neuvector/manager", "tag": "4.0.2", "scan_layers": true, "base_image": "10.1.127.12:5000/neuvector/manager:4.0.2”}}
 ----
 
+[#_get_the_cve_database_version_and_date]
 === Holen Sie sich die CVE-Datenbankversion und das Datum
 
 [,shell]
@@ -646,6 +662,7 @@ Ausgabe:
 }
 ----
 
+[#_manage_federation_for_master_and_remote_worker_clusters]
 === Verwalten von Föderationen für Master- und Remote- (Arbeits-)Cluster
 
 Im Allgemeinen kann das Auflisten von Föderationsmitgliedern ein GET an den folgenden Endpunkt verwenden (siehe Beispiele für spezifische Syntax):

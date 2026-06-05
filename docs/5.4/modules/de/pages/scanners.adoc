@@ -4,6 +4,7 @@
 :page-opendocs-origin: /06.scanning/06.scanners/06.scanners.md
 :page-opendocs-slug:  /scanning/scanners
 
+[#_increase_scanner_scalability_with_multiple_scanners]
 == Erhöhen Sie die Skalierbarkeit von Scannern mit mehreren Scannern
 
 Um die Leistung und Skalierbarkeit von Scannern zu erhöhen, unterstützt {product-name} die Bereitstellung mehrerer Scanner-Pods, die parallel Bilder in Registries scannen können. Der Controller weist jedem verfügbaren Scanner-Pod Scanning-Aufgaben zu. Scanner-Pods können bei Bedarf einfach hoch- oder herunterskaliert werden, indem Kubernetes verwendet wird.
@@ -18,6 +19,7 @@ Bitte beachten Sie, dass in den ersten Versionen die Anwesenheit und der Status 
 
 Die Scan-Ergebnisse aller Scanner werden im Menü Assets -> Registries angezeigt. Zusätzliche Überwachungsfunktionen für Scanner werden in zukünftigen Versionen hinzugefügt.
 
+[#_auto_scaling_of_scanner_pods]
 === Automatische Skalierung von Scanner-Pods
 
 Scanner-Pods können so konfiguriert werden, dass sie basierend auf bestimmten Kriterien automatisch skalieren. Dies wird sicherstellen, dass Scan-Jobs schnell und effizient bearbeitet werden, insbesondere wenn es Tausende von Bildern zu scannen oder erneut zu scannen gibt. Es gibt drei mögliche Einstellungen: verzögert, sofort und deaktiviert. Wenn Bilder vom Controller zum Scannen in die Warteschlange gestellt werden, behält er eine "Aufgabenanzahl" der Warteschlangengröße bei.
@@ -36,6 +38,7 @@ Die automatische Skalierung des Scanners ist in den Einstellungen unter -> Konfi
 Die automatische Skalierung des Scanners wird nicht unterstützt, wenn der Scanner mit einem OpenShift-Operator bereitgestellt wird, da der Operator die Anzahl der Pods immer auf den konfigurierten Wert ändern wird.
 ====
 
+[#_operations_and_debugging]
 === Betrieb und Debugging
 
 Jeder Scanner-Pod fragt die Registries ab, um die vollständige Liste der verfügbaren Bilder und weiterer Daten herunterzuladen. Jeder Scanner wird dann ein Bild zugewiesen, das er aus der Registry abrufen und scannen soll.
@@ -47,6 +50,7 @@ Um das Verhalten des Scanners zu überprüfen, können die Protokolle jedes Scan
 kubectl logs <scanner-pod-name> -n neuvector
 ----
 
+[#_performance_planning]
 == Leistungsplanung
 
 Experimentieren Sie mit unterschiedlichen Zahlen von Scannern auf Registries mit einer großen Anzahl von Bildern, um das Verhalten der Scanabschlusszeit in Ihrer Umgebung zu beobachten. 2-5 Scanner als Replikateinstellung sollten für die meisten Fälle ausreichend sein.
@@ -57,6 +61,7 @@ Große Bilder benötigen mehr Zeit zum Herunterladen und müssen zudem aufgeklap
 
 Mehrere Scanner-Pods können auf demselben Host/Knoten bereitgestellt werden, jedoch sollten Überlegungen angestellt werden, um sicherzustellen, dass der Host über genügend Speicher, CPU und Netzwerkbandbreite verfügt, um die Scanner-Leistung zu maximieren.
 
+[#_standalone_scanner_for_local_scanning]
 == Standalone-Scanner für lokale Scans
 
 {product-name} unterstützt die Bereitstellung von Standalone-Scannern für lokale Bildscans (die keinen Controller erfordern). Im folgenden Beispiel für einen Docker-Befehl wird das lokale Bild gescannt und die Ergebnisse werden lokal im /var/neuvector gespeichert. Für lokale Scans muss das Bild über den gemounteten docker.sock zugänglich sein, andernfalls kann eine Registry angegeben werden.
@@ -78,6 +83,7 @@ Die folgenden Umgebungsvariablen für Scanner können im Docker-Befehl verwendet
 * CLUSTER_JOIN_ADDR (optional), CLUSTER_JOIN_PORT (optional) - um Ergebnisse an den Controller zu senden, die in den Zulassungssteuerungsregeln verwendet werden (Kubernetes-bereitgestellter Controller).
 * CLUSTER_ADVERTISED_ADDR (optional) - wenn der Scanner auf einem anderen Host als der Controller ist, um Ergebnisse für die Verwendung in den Zulassungssteuerungsregeln zu senden (Kubernetes-bereitgestellter Controller).
 
+[#_host_scanning_in_standalone_mode]
 === Host-Scanning im Standalone-Modus
 
 Verwenden Sie den folgenden Befehl, um den Host zu scannen.

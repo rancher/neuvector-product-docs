@@ -4,6 +4,7 @@
 :page-opendocs-origin: /08.integration/01.integration/01.integration.md
 :page-opendocs-slug:  /integration/integration
 
+[#_integration]
 == Intégration
 
 {product-name} offre plusieurs options d'intégration, y compris une API REST, CLI, Syslog, RBAC, SAML, LDAP et webhooks. Pour des exemples d'automatisation des tâches en utilisant l'API REST, voir la section xref:automation.adoc[*Automatisation*].
@@ -12,6 +13,7 @@
 
 Les paramètres d'intégration suivants sont disponibles dans l'interface utilisateur de {product-name} sous *Paramètres*.
 
+[#_openshift_and_kubernetes_rbac]
 === OpenShift et Kubernetes RBAC
 
 Activez cette option si vous utilisez le contrôle d'accès en fonction du rôle (RBAC) de Red Hat OpenShift et souhaitez que {product-name} lise et applique automatiquement ces autorisations.
@@ -34,6 +36,7 @@ Ne pas utiliser le paramètre `AllowAllPasswordIdentityProvider` d'OpenShift. Ce
 L'utilisateur par défaut {product-name} *Admin* et tous les utilisateurs créés directement dans {product-name} restent actifs lorsque le contrôle d'accès en fonction du rôle d'OpenShift est activé.
 ====
 
+[#_trust_external_root_cas_with_helm]
 === Faire confiance aux CA racines externes avec Helm
 
 {product-name} peut faire confiance aux CA racines externes pour des connexions sécurisées telles que LDAPS, OpenID Connect (OIDC) et l'analyse de registre. Cette capacité permet une communication de confiance avec des services d'authentification externes et des registres d'images.
@@ -99,6 +102,7 @@ echo https://$NODE_IP:$NODE_PORT
 Ouvrez l'URL affichée dans un navigateur pour accéder à l'interface utilisateur du {product-name} Manager.
 ====
 
+[#_kubernetes_rbac]
 === Kubernetes RBAC
 
 Pour configurer manuellement Kubernetes RBAC pour des espaces de noms spécifiques{nbsp}:
@@ -109,16 +113,19 @@ Pour configurer manuellement Kubernetes RBAC pour des espaces de noms spécifiqu
 
 image:k8s-rbac.png[Kubernetes]
 
+[#_syslog]
 === Syslog
 
 Configurez l'intégration Syslog en saisissant l'adresse du serveur Syslog et en sélectionnant le niveau de notification. Vous pouvez utiliser une adresse IP ou un nom DNS et choisir soit UDP soit TCP.
 
+[#_webhooks]
 === Webhooks
 
 {product-name} peut envoyer des notifications à un point de terminaison externe en utilisant des webhooks. Spécifiez l'URL du point de terminaison webhook pour recevoir des notifications.
 
 Vous pouvez configurer des notifications webhook pour des événements personnalisés sous *Stratégie* → *Règles de réponse*.
 
+[#_directory_and_sso_integration]
 === Intégration de répertoire et SSO
 
 {product-name} prend en charge les intégrations de répertoire et de connexion unique (SSO), y compris LDAP, Microsoft Active Directory, SAML et OpenID Connect.

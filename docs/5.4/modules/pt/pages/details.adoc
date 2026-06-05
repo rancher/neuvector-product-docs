@@ -4,8 +4,10 @@
 :page-opendocs-origin: /02.deploying/01.production/03.details/03.details.md
 :page-opendocs-slug: /deploying/production/details
 
+[#_environment_variables]
 == Variáveis de Ambiente
 
+[#_for_both_controller_allinone_and_enforcer]
 === Para ambos o Controlador (All-in-One) e o Enforcer
 
 * CLUSTER_JOIN_ADDR
@@ -44,6 +46,7 @@ ____
 (Opcional) Defina o valor como 1 para habilitar a coleta de dados de perfil de memória para ajudar a investigar problemas de pressão de memória.
 ____
 
+[#_controller]
 === Controlador
 
 * CTRL_PERSIST_CONFIG
@@ -82,6 +85,7 @@ ____
 (Opcional) Quando habilitado (valor=1), o tráfego icmp pode ser aprendido em modo de descoberta, e a política pode ser gerada. Se não houver política de rede em modo de monitoramento ou proteção para o grupo, uma violação implícita será gerada para o tráfego ICMP.
 ____
 
+[#_manager]
 === Gerente
 
 * CTRL_SERVER_IP
@@ -113,6 +117,7 @@ ____
 Esta variável de ambiente é apenas para o produto NeuVector autônomo. Por favor, defina a variável como "on" se estiver usando Rancher SSO ou deixe sem definir, pois o NeuVector usará HTTPS por padrão.
 ====
 
+[#_enforcer]
 === Enforcer
 
 * CONTAINER_NET_TYPE
@@ -163,6 +168,7 @@ ____
 (Opcional) Especifique quais grupos ou namespaces que {product-name} considera como 'contêineres do sistema', separados por ponto e vírgula. Por exemplo, para aplicativos baseados em Rancher e o namespace padrão, NV_SYSTEM_GROUPS=__cattle-system;__default. Esses valores são traduzidos em regex. Contêineres do sistema (que também incluem {product-name} e contêineres do sistema Kubernetes) operam apenas no modo de monitoramento (apenas alerta), mesmo que o grupo esteja configurado para o modo de proteção.
 ____
 
+[#_open_ports]
 == Portas Abertas
 
 * CLUSTER_RPC_PORT - no controlador e All-in-One. Padrão 18300.
