@@ -12,6 +12,15 @@
 To receive email notifications of new releases, please subscribe to this SUSE mailing list: https://lists.suse.com/mailman/listinfo/neuvector-updates
 ====
 
+== 5.4.10 May 2026
+
+This release rebuilds the container images to patch CVEs in underlying operating system, application and library dependencies. It contains no new functional features or breaking changes, ensuring complete backwards compatibility.
+
+[#_5410_may_2026]
+== 5.4.10 May 2026
+
+This release rebuilds the container images to patch CVEs in underlying operating system, application and library dependencies. It contains no new functional features or breaking changes, ensuring complete backwards compatibility.
+
 [#_549_february_2026]
 == 5.4.9 February 2026
 

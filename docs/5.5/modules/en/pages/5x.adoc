@@ -12,6 +12,11 @@
 To receive email notifications of new releases, please subscribe to this SUSE mailing list: https://lists.suse.com/mailman/listinfo/neuvector-updates
 ====
 
+[#_552_may_2026]
+== 5.5.2 May 2026
+This release rebuilds the container images to patch CVEs in underlying operating system, application and library dependencies. It contains no new functional features or breaking changes, ensuring complete backwards compatibility.
+
+
 [#_551_april_2026]
 == 5.5.1 April 2026
 
@@ -52,6 +57,11 @@ To receive email notifications of new releases, please subscribe to this SUSE ma
 === References
 
 * https://github.com/neuvector/manager/security/advisories/GHSA-hx45-873x-74qv[Potential information leakage from manager `/network/graph` API]
+
+[#_5410_may_2026]
+== 5.4.10 May 2026
+
+This release rebuilds the container images to patch CVEs in underlying operating system, application and library dependencies. It contains no new functional features or breaking changes, ensuring complete backwards compatibility.
 
 [#_549_february_2026]
 == 5.4.9 February 2026
