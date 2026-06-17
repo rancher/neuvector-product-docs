@@ -1,0 +1,193 @@
+= 查错
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /12.troubleshooting/01.troubleshooting/01.troubleshooting.md
+:page-opendocs-slug:  /troubleshooting/troubleshooting
+
+== 故障排除 {product-name} 部署
+
+使用与应用程序工作负载相同的编排工具来部署、管理和更新 {product-name} 容器。请务必查看在线文档，以了解部署过程中每个步骤的必要性。通常，部署是通过简单地复制示例 yaml 文件并在未事先查看步骤的情况下进行的，例如正确配置注册表、密钥或 RBAC/角色绑定。
+
+=== 初始部署
+
+* 检查 {product-name} 容器是否可以使用正确的身份验证进行拉取。检查所使用的密钥，并确保集群能够访问适当的注册表。
+* 确保 yaml 文件中所需的更改（例如 NodePort 或 LoadBalancer）或 Helm 值设置已正确设置。
+* 检查平台和容器运行时，并根据需要进行更改（例如 PKS、containerd、CRI-O）。
+
+=== 登录和初始配置
+
+* 检查防火墙是否允许对管理器（IP 地址、端口、路由）的适当访问。
+
+=== 持续操作
+
+* 目录集成。{product-name} 支持 LDAP/AD 和其他组和角色集成的特定配置。联系 {product-name} 获取额外的故障排除步骤和 AD 故障排除工具。
+* 注册表扫描。大多数问题与注册表身份验证错误或控制器无法从集群访问注册表有关。
+* 对于性能问题，请确保扫描器分配了足够的内存以扫描大型镜像。此外，可以在 Pod 策略中指定处理器和内存的最低要求，以确保在大规模运行时获得足够性能。
+* 准入控制。请参阅安全风险部分中的故障排除部分 ... -> 准入控制。
+
+=== 正在更新
+
+* 对控制器使用滚动更新。如果您正在重启主机，请确保在控制器移动到其他主机时监控它们，或者在重启的主机上重新部署，以确保它们能够启动、加入控制器集群并稳定/同步。同时或过快重启所有主机可能会导致控制器处于未知状态。
+* 使用持久卷声明来存储 {product-name} 配置，以防所有控制器/节点在集群中宕机。
+* 在更新到新版本时，请查看在线文档以识别所需的yaml更改/添加，以及其他更改，例如角色绑定或新服务（例如，准入控制Webhook、持久卷声明等）。
+
+== 调试日志
+
+要查看 {product-name} 容器的日志，例如控制器Pod的日志
+
+[,shell]
+----
+kubectl logs neuvector-controller-pod-777fdc5668-4jkjn -n neuvector
+----
+
+这些日志可能显示集群连接问题、管理员操作、扫描活动和其他有用的条目。如果有多个控制器在运行，可能需要检查每一个。这些日志可以通过管道传输到文件中，以便发送给{product-name}支持。
+
+=== 为{product-name}控制器开启调试模式
+
+对于需要深入调查的问题，可以为控制器或一体化部署启用调试模式，从而记录详细信息。这可能会大幅增加日志文件的大小，因此建议在收集完后将其关闭。
+
+=== Kubernetes、OpenShift和其他编排日志
+
+检查编排工具的日志可以帮助查看所有部署活动，包括 Pod 创建时间戳和状态、部署、守护程序集以及编排工具对 {product-name} 容器执行的其他管理操作。
+
+[,shell]
+----
+kubectl get events -n neuvector
+----
+
+== 支持日志
+
+支持日志包含对{product-name}支持有用的附加信息，包括系统配置、容器、策略、通知和{product-name}容器详细信息。
+
+要下载支持日志，请转到设置->配置并选择收集日志。
+
+== 使用CLI开启调试模式
+
+使用用户和密码登录到 {product-name} 管理器 Pod（建议在单独的终端窗口中进行）。
+
+[,shell]
+----
+kubectl exec -it neuvector-manager-pod-5bb76b6754-rlmnp -n neuvector -- cli
+----
+
+[,shell]
+----
+#neuvector-svc-controller.neuvector> login
+----
+
+获取控制器列表。找到 Leader = True 的控制器。
+
+[,shell]
+----
+show controller
+----
+
+使用控制器的 ID 或名称，在 Leader 控制器中开启调试模式。
+
+[,shell]
+----
+set controller 4fce427cf963 debug -c all
+----
+
+在所有控制器上开启调试模式。
+
+[,shell]
+----
+set system controller_debug -c all
+----
+
+在 {product-name} 中执行您希望调试的活动。然后查看控制器日志（在单独的终端窗口中）。
+
+[,shell]
+----
+kubectl logs <leader_controller_pod_name> -n neuvector
+----
+
+如有需要，捕获日志并将其发送到 {product-name}。
+
+在控制器上关闭调试模式（返回到 CLI 窗口）。
+
+[,shell]
+----
+set controller 4fce427cf963 debug
+exit
+----
+
+检查控制器调试状态。
+
+[,shell]
+----
+show controller setting 289d67396fcb
+----
+
+== 使用 REST API 开启调试模式。
+
+设置访问令牌，包含您的 IP、用户和密码：
+
+[,shell]
+----
+_controllerIP_="<your_controller_ip>"
+_controllerRESTAPIPort_="10443"
+_neuvectorUsername_="admin"
+_neuvectorPassword_="admin"
+----
+
+[NOTE]
+====
+对于基于 Kubernetes 的部署，您可以在以下命令输出中获取控制器 IP：
+====
+
+[,shell]
+----
+kubectl get pod -n neuvector -o wide | grep controller
+----
+
+[NOTE]
+====
+如果从集群外部访问 REST API，请参阅自动化部分的说明。
+====
+
+获取身份验证令牌。
+
+[,shell]
+----
+curl -k -H "Content-Type: application/json" -d '{"password": {"username": "'$_neuvectorUsername_'", "password": "'$_neuvectorPassword_'"}}' "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/auth" > /dev/null 2>&1 > token.json
+_TOKEN_=`cat token.json | jq -r '.token.token'`
+----
+
+[NOTE]
+====
+您可能需要安装 jq（$sudo yum install jq）。
+====
+
+启用调试模式。
+
+[,shell]
+----
+curl -X PATCH -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"config": {"controller_debug": ["cpath", "conn"]}}' "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/system/config"  > /dev/null 2>&1   > set_debug.json
+#debug options - cpath, conn, mutex, scan, cluster , all
+----
+
+在集群中的所有控制器上禁用调试。
+
+[,shell]
+----
+curl -X PATCH -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"config": {"controller_debug": []}}' "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/system/config"  > /dev/null 2>&1   > set_debug.json
+----
+
+检查集群中控制器的调试状态。
+
+[,bash]
+----
+curl  -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_"  "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/system/config"  > /dev/null 2>&1   > system_setting.json
+
+cat system_setting.json | jq .config.controller_debug
+----
+
+注销
+
+[,shell]
+----
+echo `date +%Y%m%d_%H%M%S` log out
+curl -k -X 'DELETE' -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/auth" > /dev/null 2>&1
+----

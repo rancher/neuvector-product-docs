@@ -1,0 +1,193 @@
+= Dépannage
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /12.troubleshooting/01.troubleshooting/01.troubleshooting.md
+:page-opendocs-slug:  /dépannage/dépannage
+
+== Dépannage {product-name} Déploiements
+
+Les conteneurs {product-name} sont déployés, gérés et mis à jour en utilisant le même outil d'orchestration que celui utilisé pour les charges de travail des applications. Veuillez vous assurer de consulter la documentation en ligne pour chaque étape nécessaire lors du déploiement. Souvent, les déploiements sont tentés simplement en copiant les fichiers yaml d'exemple et en les déployant sans examiner les étapes préalables, telles que la configuration correcte des registres, des secrets ou des RBAC/liaisons de rôles.
+
+=== Déploiement initial
+
+* Vérifiez que les conteneurs {product-name} peuvent être tirés avec une authentification correcte. Vérifiez le secret utilisé et assurez-vous que le cluster peut accéder au registre approprié.
+* Assurez-vous que les modifications nécessaires au yaml (par exemple, NodePort ou LoadBalancer) ou les paramètres de valeurs Helm sont définis correctement.
+* Vérifiez la plateforme et le temps d'exécution des conteneurs et apportez les modifications nécessaires (par exemple, PKS, containerd, CRI-O).
+
+=== Connexion et configuration initiale
+
+* Vérifiez que l'accès approprié au gestionnaire (adresse IP, port, route) est autorisé à travers les passerelles de périmètre de sécurité.
+
+=== Fonctionnement continu
+
+* Intégration de répertoire. {product-name} prend en charge des configurations spécifiques pour LDAP/AD et d'autres intégrations pour les groupes et les rôles. Contactez {product-name} pour des étapes de dépannage supplémentaires et un outil pour le dépannage AD.
+* Analyse du registre. La plupart des problèmes sont liés à des erreurs d'authentification du registre ou à l'incapacité du contrôleur d'accéder au registre depuis le cluster.
+* Pour les problèmes de performance, assurez-vous que le scanner dispose de suffisamment de mémoire pour analyser de grandes images. De plus, les minimums d'UC et de mémoire peuvent être spécifiés dans la politique de pod pour garantir des performances adéquates à grande échelle.
+* Contrôle d'admission. Consultez la section Dépannage dans la section Risques de sécurité... -> Contrôles d'admission.
+
+=== Mise à jour
+
+* Utilisez des mises à jour progressives pour le contrôleur. Si vous redémarrez des hôtes, assurez-vous de surveiller les contrôleurs lorsqu'ils passent à d'autres hôtes, ou redéployez sur les hôtes redémarrés, pour vous assurer qu'ils peuvent démarrer, rejoindre le cluster de contrôleurs et se stabiliser/synchroniser. Redémarrer tous les hôtes en même temps ou trop rapidement peut entraîner des états inconnus pour les contrôleurs.
+* Utilisez une revendication de volume persistant pour stocker la {product-name} configuration au cas où tous les contrôleurs/nœuds tomberaient en panne dans le cluster.
+* Lors de la mise à jour vers une nouvelle version, consultez la documentation en ligne pour identifier les changements/ajouts au yaml requis, ainsi que d'autres changements tels que les liaisons de rôle ou les nouveaux services (par exemple, webhook de contrôle d'admission, revendication de volume persistant, etc.).
+
+== Journaux de débogage
+
+Pour afficher les journaux d'un {product-name} conteneur, par exemple un pod de contrôleur
+
+[,shell]
+----
+kubectl logs neuvector-controller-pod-777fdc5668-4jkjn -n neuvector
+----
+
+Ces journaux peuvent montrer des problèmes de connectivité du cluster, des actions administratives, des activités d'analyse et d'autres entrées utiles. S'il y a plusieurs contrôleurs en cours d'exécution, il peut être nécessaire d'inspecter chacun d'eux. Ces journaux peuvent être redirigés vers un fichier afin de les transmettre au {product-name} support.
+
+=== Activer le mode débogage pour les {product-name} contrôleurs
+
+Pour les problèmes nécessitant une enquête approfondie, le mode débogage peut être activé pour les contrôleurs/tous-en-un, ce qui enregistrera des informations détaillées. Cela peut augmenter considérablement la taille du fichier journal, il est donc recommandé de le désactiver après les avoir collectés.
+
+=== Kubernetes, OpenShift et autres journaux d'orchestration
+
+Il peut être utile d'inspecter les journaux des outils d'orchestration pour voir toute l'activité de déploiement, y compris les horodatages de création de Pod et l'état, les déploiements, les DaemonSets et d'autres actions de gestion des {product-name} conteneurs effectuées par l'outil d'orchestration.
+
+[,shell]
+----
+kubectl get events -n neuvector
+----
+
+== Journal de support
+
+Le journal de support contient des informations supplémentaires utiles pour le {product-name} support, y compris la configuration système, les conteneurs, les politiques, les notifications et les {product-name} détails des conteneurs.
+
+Pour télécharger le journal de support, allez dans Paramètres -> Configuration et sélectionnez Collecter le journal.
+
+== Utiliser la CLI pour activer le mode débogage
+
+Connectez-vous au {product-name} pod de gestion avec l'utilisateur et le mot de passe (recommandé dans une fenêtre de terminal séparée).
+
+[,shell]
+----
+kubectl exec -it neuvector-manager-pod-5bb76b6754-rlmnp -n neuvector -- cli
+----
+
+[,shell]
+----
+#neuvector-svc-controller.neuvector> login
+----
+
+Obtenez la liste des contrôleurs. Trouvez le contrôleur avec le Leader = True.
+
+[,shell]
+----
+show controller
+----
+
+Activez le mode débogage dans le contrôleur leader en utilisant l'ID ou le nom du contrôleur
+
+[,shell]
+----
+set controller 4fce427cf963 debug -c all
+----
+
+Pour activer le mode débogage sur tous les contrôleurs
+
+[,shell]
+----
+set system controller_debug -c all
+----
+
+Effectuez l'activité dans {product-name} que vous souhaitez déboguer. Puis consultez les journaux du contrôleur (dans une fenêtre de terminal séparée).
+
+[,shell]
+----
+kubectl logs <leader_controller_pod_name> -n neuvector
+----
+
+Si nécessaire, capturez les journaux et envoyez-les à {product-name}.
+
+Désactivez le mode débogage sur le contrôleur (retournez dans la fenêtre CLI).
+
+[,shell]
+----
+set controller 4fce427cf963 debug
+exit
+----
+
+Vérifiez l'état de débogage du contrôleur.
+
+[,shell]
+----
+show controller setting 289d67396fcb
+----
+
+== Utiliser l'API REST pour activer le mode débogage
+
+Définissez le jeton d'accès avec votre IP, utilisateur, mot de passe{nbsp}:
+
+[,shell]
+----
+_controllerIP_="<your_controller_ip>"
+_controllerRESTAPIPort_="10443"
+_neuvectorUsername_="admin"
+_neuvectorPassword_="admin"
+----
+
+[NOTE]
+====
+Pour les déploiements basés sur Kubernetes, vous pouvez obtenir l'IP du contrôleur dans la sortie de la commande suivante{nbsp}:
+====
+
+[,shell]
+----
+kubectl get pod -n neuvector -o wide | grep controller
+----
+
+[NOTE]
+====
+Si vous accédez à l'API REST depuis l'extérieur du cluster, consultez les instructions de la section Automatisation.
+====
+
+Obtenez le jeton d'authentification
+
+[,shell]
+----
+curl -k -H "Content-Type: application/json" -d '{"password": {"username": "'$_neuvectorUsername_'", "password": "'$_neuvectorPassword_'"}}' "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/auth" > /dev/null 2>&1 > token.json
+_TOKEN_=`cat token.json | jq -r '.token.token'`
+----
+
+[NOTE]
+====
+Vous devrez peut-être installer jq ($sudo yum install jq)
+====
+
+Activer le mode débogage
+
+[,shell]
+----
+curl -X PATCH -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"config": {"controller_debug": ["cpath", "conn"]}}' "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/system/config"  > /dev/null 2>&1   > set_debug.json
+#debug options - cpath, conn, mutex, scan, cluster , all
+----
+
+Désactiver le débogage sur tous les contrôleurs dans un cluster
+
+[,shell]
+----
+curl -X PATCH -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"config": {"controller_debug": []}}' "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/system/config"  > /dev/null 2>&1   > set_debug.json
+----
+
+Vérifiez l'état de débogage du contrôleur dans un cluster
+
+[,bash]
+----
+curl  -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_"  "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/system/config"  > /dev/null 2>&1   > system_setting.json
+
+cat system_setting.json | jq .config.controller_debug
+----
+
+Déconnexion
+
+[,shell]
+----
+echo `date +%Y%m%d_%H%M%S` log out
+curl -k -X 'DELETE' -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/auth" > /dev/null 2>&1
+----

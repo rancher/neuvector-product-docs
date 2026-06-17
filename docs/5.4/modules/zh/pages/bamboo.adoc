@@ -1,0 +1,31 @@
+= Bamboo
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/03.build/02.bamboo/02.bamboo.md
+:page-opendocs-slug:  /scanning/build/bamboo
+
+== 在Bamboo构建管道中扫描漏洞
+
+用于{product-name}的Bamboo插件可以用于扫描Bamboo管道中的漏洞。该插件可以从Bamboo的管理员->附加组件菜单中下载。使用查找新APP来搜索{product-name}。该插件在 https://marketplace.atlassian.com/apps/1221199/neuvector[Atlassian Marketplace]中也有描述。
+
+如果您尚未在Bamboo可访问的主机上部署{product-name} Allinone或控制器容器，请进行部署。记下运行Allinone或控制器的主机的IP地址。
+
+此外，请确保已部署并配置了{product-name}扫描器容器，以连接到Allinone或控制器。在4.0及更高版本中，neuvector/scanner容器必须与allinone或控制器分开部署。
+
+=== 配置全局设置
+
+配置{product-name}控制器/Allinone的设置，包括{product-name}身份验证以及注册表身份验证。
+
+image:bamboo_nv_global_config.png[global-image]
+
+=== 配置储存库和构建策略
+
+创建一个任务，输入要扫描的储存库和标签，以及在检测到漏洞时使构建失败的构建策略。如果结果应包含对图像中每一层的漏洞分析，请启用分层扫描。
+
+image:bamboo_nv_local_config_2.png[local-image]
+
+=== 审查结果
+
+审查扫描日志中的结果，包括扫描摘要、失败原因（如适用）以及检测到的每个CVE的详细信息。
+
+image:bamboo_set_criteria_to_fail_3.png[fail-image]

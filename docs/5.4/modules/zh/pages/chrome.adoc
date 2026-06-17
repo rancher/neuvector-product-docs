@@ -1,0 +1,75 @@
+= Chrome 证书上传（MacOS）
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /03.configuration/01.console/02.chrome/02.chrome.md
+:page-opendocs-slug: /configuration/console/chrome
+
+== 在 MacOS 上启用 Chrome 浏览器接受 {product-name} 自签名证书
+
+在某些情况下，Chrome 浏览器将完全拒绝接受 {product-name} 自签名证书。 一个可能的原因是证书尚未导入到 macOS 登录证书存储中。 另一个可能性是现有证书尚未配置为受信任。 这将不允许用户接受它并使用 Chrome 继续访问 {product-name} 登录页面，如下所示的示例所示：
+
+image:chrome1.png[chrome]
+
+可以采取纠正措施，使 Chrome 能够接受存储在 macOS 钥匙串中的自签名证书。 这可以通过使用 Mac 的钥匙串访问应用程序将 {product-name} 的证书配置为受信任来完成。 这是在假设证书确实存在于 macOS 钥匙串访问存储中的前提下。 我们将首先查看如何从一个系统中导出现有 {product-name} 节点的证书，然后可以将其导入到另一个系统中。  导出证书有两种方法，我们将在下面介绍。 它们是，使用 Chrome 浏览器和使用 macOS 钥匙串访问应用程序。
+
+=== 使用 Chrome 导出证书
+
+下面的屏幕截图说明了如何使用 Chrome 访问 {product-name} 证书。
+
+image:chrome2.png[chrome]
+
+要导出证书，请将证书拖放到所选位置。
+
+image:chrome3.png[chrome]
+
+=== 使用 macOS 钥匙串访问导出证书
+
+通过同时按下 Mac 键盘上的 ⌘ + F 启动 macOS 钥匙串访问应用程序，搜索钥匙串访问，然后双击该应用程序。
+这将启动钥匙串访问应用程序。 选择 {product-name} 证书并从下拉菜单中选择导出 "`{product-name}`"。 这将允许将证书导出到所选位置。
+
+image:chrome4.png[chrome]
+
+=== 启动 macOS 钥匙串访问应用程序
+
+有两种方法可以启动 macOS 钥匙串访问应用程序。 可以通过从 macOS 中搜索来完成，如上面步骤所述，或使用 Chrome 浏览器。
+
+=== 从 Chrome 浏览器启动钥匙串访问
+
+设置 > 高级 > 管理证书
+
+image:chrome5.png[chrome]
+
+点击上面所示的管理证书将启动 macOS 钥匙串访问应用程序，如下所示。
+
+image:chrome6.png[chrome]
+
+=== 将证书导入到 macOS 钥匙串访问存储中
+
+通过同时按下 Mac 键盘上的 ⌘ + F 启动 macOS 钥匙串访问应用程序，搜索钥匙串访问，然后点击该应用程序。 然后通过将 {product-name} 证书（例如：nvcertificate.cer）拖放到钥匙串访问应用程序的证书右侧窗格中来导入证书。 现在证书已被导入，但尚未被信任。
+以下是一个示例，显示在将 {product-name} 的证书导入钥匙串访问应用程序后默认的信任设置。
+
+image:chrome7.png[chrome]
+
+请注意，没有任何参数被配置，默认情况下不被信任。 需要配置为被信任，以允许用户使用 Chrome 浏览器访问登录页面。
+
+=== 为 {product-name} 证书启用信任
+
+以下步骤详细说明如何在钥匙串访问存储中为 {product-name} 证书启用信任。
+
+image:chrome8.png[chrome]
+
+双击上面屏幕截图中的 {product-name} 证书将弹出另一个对话框，允许为不同参数配置信任权限。 配置安全套接字层（SSL）为 "`Always Trust`"。
+
+image:chrome9.png[chrome]
+
+关闭对话框，并在以下弹出对话框中输入 Mac 登录用户的密码后点击 '\`更新设置`'。
+
+image:chrome10.png[chrome]
+
+这完成了信任配置。 接下来，清除所有 Chrome 浏览器的缓存，关闭所有 Chrome 浏览器，然后重新启动 Chrome 浏览器。 接下来访问{product-name}登录页面，点击"`Advanced`"链接后，将显示继续访问...（不安全）链接。 点击继续访问...（不安全）将允许用户进入用户名和密码登录页面。
+
+image:chrome11.png[chrome]
+
+下面显示了一个屏幕截图，允许用户在点击继续访问...（不安全）链接后进入{product-name}登录页面。
+
+image:chrome12.png[chrome]

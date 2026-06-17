@@ -1,0 +1,41 @@
+= Resultado del Escaneo de Seguridad de Activos
+:page-opendocs-origin: /15.ui_extension/02.runtime_security/02.runtime_security.md
+:page-opendocs-slug:  /ui_extension/runtime_security
+
+Como Rancher Manager tiene su propia pestaña de **Nodos** y **Cargas de Trabajo** para gestionar y monitorizar el estado de los activos, NeuVector inyecta componentes para mostrar el resultado del escaneo en tiempo de ejecución.
+
+== Nodos
+
+En la vista de tabla de la pestaña **Nodos**, se inyecta la columna de **Vulnerabilidades** para mostrar la cantidad de vulnerabilidades detectadas en cada nodo, diferenciadas por gravedad alta y media.
+
+image:nodes.png[Nodos]
+
+Hacer clic en la celda de **Vulnerabilidades** abrirá una nueva página de visualización para mostrar los detalles del resultado del escaneo. La versión de la base de datos del escáner se muestra así como una lista de vulnerabilidades filtrable.
+
+image:nodes_vul.png[Nodos]
+
+Hacer clic en la celda de **Nombre** en la tabla de **Nodos** redirige a la página de detalles del nodo. NeuVector inyecta una pestaña de **Vulnerabilidades** para mostrar una tabla con las vulnerabilidades listadas.
+
+image:node_detail_vul.png[Nodos]
+
+Hacer clic en el enlace CVE en la celda de **Nombre** en la tabla de **Vulnerabilidades** abre un pop-up para mostrar las descripciones de CVE con un enlace externo en el encabezado al sitio web de información de CVE de SUSE.
+
+image:node_detail_vul_cve.png[Nodos]
+
+image:suse_cve.png[SUSE]
+
+Se proporciona un botón de descarga de archivo CSV encima de la tabla de **Vulnerabilidades**. Los datos del archivo incluyen todos los campos que están en la tabla.
+
+image:download_vul.png[CSV]
+
+image:cve_csv.png[CSV]
+
+== Cargas de trabajo
+
+Temporalmente, la columna de **Vulnerabilidades** no se inyectará en la tabla de **Cargas de Trabajo** en la versión v5.4 debido a posibles problemas de rendimiento. El equipo de NeuVector trabajará con el equipo de Rancher para integrarlo pronto.
+
+Hacer clic en un **Nombre** en la tabla de **Pods** redirige a la página de detalles del pod. NeuVector inyecta una pestaña de **Vulnerabilidades** para mostrar una tabla con las vulnerabilidades listadas.
+
+image:pods.png[Pods]
+
+image:pod_detail_vul.png[Pod_Detail]

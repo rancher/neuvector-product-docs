@@ -4,6 +4,7 @@
 :page-opendocs-origin: /08.integration/03.msad/03.msad.md
 :page-opendocs-slug:  /integration/msad
 
+[#_configuring_active_directory]
 == Configuring Active Directory
 
 This explains how {product-name} authenticates with Windows Active Directory.
@@ -43,6 +44,7 @@ image:ad7.png[ad_config]
 Group member attribute: This is a member attribute for Windows Active Directory by default and it is used for the role mapping purpose, as shown above.
 If all the requirements are met above, the Windows Active Directory user should be able to login to the {product-name} web console successfully.
 
+[#_mapping_groups_to_roles_and_namespaces]
 === Mapping Groups to Roles and Namespaces
 
 Please see the xref:users.adoc#_mapping_groups_to_roles_and_namespaces[Users and Roles] section for how to map groups to preset and custom roles as well as namespaces in {product-name}.

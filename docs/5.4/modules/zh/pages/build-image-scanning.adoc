@@ -1,0 +1,56 @@
+= 构建阶段镜像扫描
+:revdate: 2025-01-10
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/03.build/03.build.md
+:page-opendocs-slug:  /scanning/build
+
+== CI/CD构建阶段漏洞扫描
+
+在管道的构建阶段使用插件扫描漏洞，例如 https://plugins.jenkins.io/neuvector-vulnerability-scanner/[Jenkins]、 https://github.com/neuvector/azure-vsts[Azure Devops]、 https://github.com/neuvector/scan-action[Github Action]、 https://gitlab.com/neuvector/gitlab-plugin[gitlab]、Bamboo和 https://github.com/neuvector/circleci-orb[CircleCI]，或使用REST API。{product-name}支持两种类型的构建阶段扫描：注册表扫描和本地扫描。对于注册表扫描，{product-name}控制器和扫描器必须能够连接到注册表以拉取镜像。
+
+要触发构建阶段扫描，插件（例如Jenkins）必须能够连接到控制器或Allinone。注意：插件调用扫描器的默认REST API端口为10443。此端口必须由Allinone或控制器通过Kubernetes中的服务，或者通过Docker run或compose文件中的端口映射（例如 - 10443:10443）暴露。
+
+确保已部署并正确配置{product-name}扫描器容器以连接到Allinone或控制器。在4.0及更高版本中，neuvector/scanner容器必须与allinone或控制器分开部署，并包含在示例部署yaml文件中。
+
+您可以从Jenkins插件管理器下载插件。其他插件可以通过构建工具的目录访问，或在 https://github.com/neuvector[{product-name} github]页面上找到。Bamboo扫描器可在 https://github.com/neuvector/bamboo-plugin/releases/tag/1.0.1.获取，CircleCI ORB可在 https://github.com/neuvector/circleci-orb和CircleCI ORB目录中获取。
+
+=== 本地构建阶段扫描
+
+对于本地扫描，{product-name}扫描器将尝试在本地主机（或通过远程主机docker命令可达的主机）上扫描镜像。
+
+对于基于Kubernetes或OpenShift的本地扫描，请删除示例扫描器部署yaml文件中注释掉的部分，如xref:kubernetes.adoc#_deploy_using_kubernetes[部署{product-name}]部分所示。注释掉的部分如下：
+
+[,yaml]
+----
+          env:
+# Commented out sections are required only for local build-phase scanning
+#            - name: SCANNER_DOCKER_URL
+#              value: tcp://192.168.1.10:2376
+            - name: CLUSTER_JOIN_ADDR
+              value: neuvector-svc-controller.neuvector
+            - name: CLUSTER_ADVERTISED_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: CLUSTER_BIND_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+#          volumeMounts:
+#            - mountPath: /var/run/docker.sock
+#              name: docker-sock
+#              readOnly: true
+#      volumes:
+#        - name: docker-sock
+#          hostPath:
+#            path: /var/run/docker.sock
+      restartPolicy: Always
+----
+
+对于Docker原生本地扫描，请按照xref:docker.adoc#_deploy_the_suse_security_scanner_container[Docker生产部署]部分中的Docker扫描器部署说明进行操作。
+
+=== 本地构建阶段扫描 - 仅扫描器（不需要控制器）
+
+{product-name}支持本地镜像扫描的独立扫描器部署（不需要控制器）。某些插件，例如CircleCI ORB，具有在构建作业需要镜像扫描时动态部署扫描器的选项，然后在结果通过ORB发送回时移除扫描器。如果支持，这些动态扫描器部署会通过插件自动调用。
+
+有关独立扫描器的更多详细信息，请参见xref:scanners.adoc[扫描器部分]。

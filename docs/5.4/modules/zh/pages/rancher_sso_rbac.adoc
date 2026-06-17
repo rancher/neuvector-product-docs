@@ -1,0 +1,177 @@
+= 与Rancher RBAC的集成
+:revdate: 2026-02-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/12.rancher_sso_rbac.md
+:page-opendocs-slug:  /integration/12.rancher_sso_rbac
+
+
+从{product-name} 5.4开始，已包含与{product-name} Rancher RBAC的完全兼容性和集成。这为用户提供了根据应访问{product-name}的用户或组的配置文件自定义特定权限的可能性。
+
+在Rancher控制台的*用户与认证* -> *角色模板*页面，客户可以创建具有特定{product-name} 动词、资源和API组的全局、集群、项目和命名空间角色。当这样的Rancher角色分配给Rancher用户时，用户的{product-name} SSO会话会相应地分配不同的{product-name} 权限。这是为了为SSO用户提供自定义角色（即，除了保留的admin、reader、fedAdmin和fedReader角色之外的角色）。
+
+== 在Rancher SSO中支持的自定义{product-name}角色映射
+
+以下是Rancher UI中用于{product-name} 动词、资源和API组的支持角色映射，位于*用户与认证* -> *角色模板* -> *创建全局、集群或项目角色模板*。
+
+* API组：`permission.neuvector.com`
+
+* 动词：
+** `get` -> 只读（查看）
+** `*` -> 读/写（修改）
+
+* 资源（集群范围）：
+** AdmissionControl
+** 身份验证
+** CI扫描
+** 群集
+** 联合
+** 漏洞
+
+* 资源（命名空间）：
+** AuditEvents
+** 委任
+** 合规性
+** 事件活动
+** 名称空间
+** RegistryScan
+** 运行时策略
+** RuntimeScan
+** SecurityEvents
+** SystemConfig
+
+=== 资源显示和逻辑名称映射
+
+下表说明了资源的逻辑名称。
+
+|===
+| 资源显示 | 逻辑名称
+
+| 所有权限 | nv-perm.all-permissions
+| 入场控制 | nv-perm.admctrl
+| 审计事件 | nv-perm.audit-events
+| 身份验证 | nv-perm.authentication
+| 委任 | nv-perm.authorization
+| CI扫描 | nv-perm.ci-scan
+| 合规性 | nv-perm.compliance
+| 事件活动 | nv-perm.events
+| 联合 | nv-perm.fed
+| 注册扫描 | nv-perm.reg-scan
+| 运行时策略 | nv-perm.rt-policy
+| 运行时扫描 | nv-perm.rt-scan
+| 安全事件 | nv-perm.security-events
+| 系统配置 | nv-perm.config
+| 漏洞控制文件 | nv-perm.vulnerability
+|===
+
+[NOTE]
+====
+此集成支持全局、集群、项目和命名空间级别的角色。用户必须根据需求自定义并创建规则，并为SSO设定权限范围。
+====
+
+== 全局、集群和项目/命名空间角色的定义和期望
+
+* 在Rancher全局角色上具有`*`动词的集群资源：
+** 映射到{product-name} `fedAdmin`角色在{product-name}联邦主集群上（用户无法将Rancher全局角色映射到{product-name} `admin`角色，当{product-name}在联邦主集群上部署时。）
+** 映射到{product-name} `admin`角色在{product-name}联邦管理的集群上
+
+* 在Rancher集群角色上具有`*`动词的集群资源：
+** 始终映射到{product-name} `cluster-admin`角色
+
+* 具有 `*` 动词的命名空间资源，适用于 Rancher 项目角色：
+** 始终映射到{product-name} `namespace-admin`角色
+
+== 用例和示例
+
+=== 用例 1
+
+* 使用全局角色从 {product-name} SSO 会话在 Rancher 管理的所有集群上运行运行时扫描，除了本地群集。用户必须创建集群角色以将全局角色传播到所有下游集群。
+
+** 创建一个集群角色模板，参数如下：
++
+[source,yaml]
+----
+Verb: *
+Resource: RuntimeScan
+API: permission.neuvector.com
+----
+
+** 创建一个项目或命名空间角色，以允许 UI 访问并启用 SSO。您必须将此角色添加到项目中，以使其正常工作：
++
+[source,yaml]
+----
+Verb: get, patch, create
+Resource: services/proxy
+API: neuvector.com
+----
+
+** 创建一个全局角色，以在下游集群中继承集群角色：
++
+[source,yaml]
+----
+apiVersion: management.cattle.io/v3
+kind: GlobalRole
+displayName: All Downstream NV RT scan
+metadata:
+  name: all-downstream-nvrtscan
+inheritedClusterRoles:
+- rt-gpmbs
+----
+
+** 创建一个标准用户并分配全局角色。
+** 在所有下游集群上为包含 `cattle-neuvector-system` 命名空间的项目创建项目角色绑定。
+** 登录到 Rancher 管理器并从任何下游集群启动 {product-name}。
+  用户可以执行运行时扫描任务，例如容器扫描、节点扫描和浏览漏洞页面。这同样适用于新加入的集群。
+
+=== 用例 2
+
+* 创建一个 FedAdmin 用户。始终通过联邦主集群以 FedAdmin 身份登录。如果环境未联邦化，角色将降级为 reader 或 admin。
+
+** 创建一个全局角色：
++
+[source,yaml]
+----
+Verb: *
+Resource: All permissions
+API: nv-perm.all-permissions
+----
+
+** 创建一个项目或命名空间角色，以允许 UI 访问并启用 SSO：
++
+[source,yaml]
+----
+Verb: get, patch, create
+Resource: services/proxy
+API: neuvector.com
+----
+
+** 创建一个标准用户并分配全局角色。
+** 在 Rancher UI 中，转到 *主集群* -> *集群和项目成员* -> *项目成员资格* -> *添加*。
+   添加用户并分配 UI 代理项目角色。
+** 登录到 Rancher Manager 并从下游集群启动 {product-name}。{product-name} 读取 Rancher 全局角色并分配匹配的权限（FedAdmin）。
+
+[NOTE]
+====
+要在 FedAdmin 和 FedReader 之间切换，请将动词从 `*` 更改为 `get`。`get` 动词提供只读访问权限。
+====
+
+=== 用例 3
+
+用户可以在集群上执行有限的只读任务，并修改有限的任务。
+
+=== 用例 4
+
+用户可以在选定的域上执行只读任务，并在集群内的其他域上修改任务。
+
+=== 用例 5
+
+用户通过组合全局、集群和项目角色来获得权限。
+
+== 要考虑的附加因素
+
+* 在创建 SSO 和 RBAC 规则时，请使用此文档和参数作为参考。
+* 如遇错误或高级用例，请通过 SCC 联系 SUSE 支持。
+* {product-name} 5.4 向后兼容于 5.4 之前的 SSO 角色映射。有关先前结构，请参见 https://github.com/horantj/rancher-nv-rbac.
+
+从{product-name} 5.4开始，已包含与{product-name} Rancher RBAC的完全兼容性和集成。这为用户提供了根据应访问{product-name}的用户或组的配置文件自定义特定权限的可能性。
+
+在Rancher控制台的*用户与认证* -> *角色模板*页面，客户可以创建具有特定{product-name} 动词、资源和API组的全局、集群、项目和命名空间角色。当这样的Rancher角色分配给Rancher用户时，用户的{product-name} SSO会话会相应地分配不同的{product-name} 权限。这是为了为SSO用户提供自定义角色（即，除了保留的 admin、reader、fedAdmin 和 fedReader 角色之外的角色）。

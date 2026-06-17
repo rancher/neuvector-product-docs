@@ -1,0 +1,80 @@
+= Détecter l'utilisation de bande passante élevée par un pod/groupe (DDoS)
+:revdate: 2026-02-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/15.detectbandwidthddos/15.detectbandwidthddos.md
+:page-opendocs-slug:  /stratégie/detectbandwidthddos
+
+{product-name}Les utilisateurs peuvent définir la détection de violation de bande passante ou de taux de session au niveau du groupe en fonction des paramètres de seuil préconfigurés. Ces paramètres fonctionnent pour les groupes appris ou créés par l'utilisateur, mais pas pour les groupes réservés.
+
+Un chronomètre d'une minute est créé pour vérifier périodiquement le seuil de métrique du groupe pour les violations. Une fois qu'une violation est détectée, un `Group.Metric.Violation` événement est généré et un message est imprimé pour décrire l'événement.
+
+Vous pouvez configurer les seuils de métriques suivants pour chaque groupe{nbsp}:
+
+* `Mon_metric` : Active ou désactive la surveillance des métriques pour le groupe.
+
+* `Grp_sess_rate` : Seuil de taux de session, mesuré en connexions par seconde (cps). La valeur par défaut est `0`, ce qui désactive la détection.
+
+* `Grp_band_width` : Seuil de débit, mesuré en mégabits par seconde (Mbps). La valeur par défaut est `0`, ce qui désactive la détection.
+
+* `Grp_cur_sess` : Seuil du nombre de sessions actives.
+
+== Configurer les seuils de métriques du groupe
+
+Vous pouvez configurer les seuils de métriques du groupe en utilisant soit {product-name} le CLI, soit l'interface web.
+
+=== Configurer les seuils en utilisant le CLI
+
+Pour voir les options de métriques de groupe disponibles, exécutez la commande suivante{nbsp}:
+
+[source,shell]
+----
+set group <group-name> setting -h
+----
+
+Exemple de sortie :
+
+[source,shell]
+----
+--monitor_metric [enable|disable]   Monitor metric status
+--cur_sess INTEGER                  Active session threshold
+--sess_rate INTEGER                 Session rate threshold (cps)
+--bandwidth INTEGER                 Throughput threshold (Mbps)
+----
+
+=== Configurer les seuils en utilisant l'interface web
+
+Vous pouvez activer ou désactiver les seuils de métriques du groupe lors de la création ou de la modification d'un groupe.
+
+* Utilisez la vue *Add Group* pour configurer les seuils d'un nouveau groupe.
++
+image:bandwidth_ddos_1.png[Add Group]
++
+* Utilisez la vue *Modifier le groupe* pour mettre à jour les seuils d'un groupe existant.
++
+image:bandwidth_ddos_2.png[Modifier le groupe]
+
+== Exemple de workflow
+
+L'exemple suivant montre comment fonctionne la détection des seuils de métriques de groupe.
+
+. Ajoutez des seuils de métriques à un groupe appris ou créé par l'utilisateur.
++
+image:bandwidth_ddos_3.png[Add Group]
++
+. Générez du trafic vers le groupe jusqu'à ce que le nombre de sessions actives atteigne le seuil configuré.
++
+image:bandwidth_ddos_4.png[Add Group]
++
+. Lorsqu'un seuil est dépassé, {product-name} génère un `Group.Metric.Violation` événement.
++
+image:bandwidth_ddos_5.png[Add Group]
+
+
+[NOTE]
+====
+* {product-name} évalue le trafic moyen des 60 secondes précédentes pour déterminer si un seuil a été dépassé.
+* Le mode de protection fournit les mesures les plus précises, car l'enforcer fonctionne en ligne sur le chemin des données.
+* Dans les environnements multi-clusters, les clusters principaux et gérés doivent tous deux exécuter la version 5.4 ou ultérieure pour prendre en charge les seuils de métriques de groupe fédérés.
+* Si les clusters gérés exécutent des versions antérieures à 5.4, les paramètres de seuils fédérés sont ignorés jusqu'à ce que ces clusters soient mis à niveau.
+* Après avoir mis à niveau les clusters gérés vers la version 5.4 ou ultérieure, resynchronisez manuellement les clusters pour activer la surveillance DDoS pour les groupes fédérés.
+====

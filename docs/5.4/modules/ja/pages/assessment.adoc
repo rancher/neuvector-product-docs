@@ -1,0 +1,15 @@
+= Kubernetesリソースの設定評価
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/03.admission/02.assessment/02.assessment.md
+:page-opendocs-slug:  /policy/admission/assessment
+
+== Kubernetesリソースデプロイメントファイルスキャン
+
+{product-name}は、Admission Controlルールに対する設定評価のためにデプロイメントyamlファイルをスキャンすることができます。これは、デプロイメントを試みる前に、デプロイメントがルールに違反するかどうかを判断するために、パイプラインの早い段階でデプロイメントyamlファイルをスキャンするのに役立ちます。
+
+スキャンするyamlファイルをアップロードするには、ポリシー->のAdmission Controlに移動し、設定評価ボタンをクリックしてください。ウィンドウで、アップロードするファイルを選択し、次にテストをクリックします。
+
+image:assessment.png[評価]
+
+その後、ファイルの分析結果、デプロイメントが許可されるかどうか、デプロイメントファイルに適用されるルールに関するメッセージが表示されます。

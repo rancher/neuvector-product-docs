@@ -1,0 +1,15 @@
+= Evaluación de Configuración para Recursos de Kubernetes
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/03.admission/02.assessment/02.assessment.md
+:page-opendocs-slug:  /policy/admission/evaluación
+
+== Escaneo de Archivos de Despliegue de Recursos de Kubernetes
+
+{product-name} es capaz de escanear archivos yaml de despliegue para evaluaciones de configuración contra las reglas de Control de Admisión. Esto es útil para escanear archivos yaml de despliegue temprano en la canalización para determinar si el despliegue violaría alguna regla antes de intentar el despliegue.
+
+Para subir un archivo yaml a ser escaneado, ve a la Directiva -> Control de Admisión y haz clic en el botón de Evaluación de Configuración. En la ventana, selecciona un archivo para subir, luego Prueba.
+
+image:assessment.png[Evaluación]
+
+Luego verás un análisis del archivo, si el despliegue sería permitido, y mensajes para las reglas que se aplicarían al archivo de despliegue.

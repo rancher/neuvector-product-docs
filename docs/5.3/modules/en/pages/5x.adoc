@@ -4,6 +4,7 @@
 :page-opendocs-origin: /14.releasenotes/01.5x/01.5x.md
 :page-opendocs-slug:  /releasenotes/5x
 
+[#_release_notes_for_5x]
 == Release Notes for 5.x
 
 [NOTE]
@@ -220,7 +221,7 @@ The 5.3.1 version has been removed from docker hub in order to prevent the upgra
 
 ==== {product-name} UI Extension v. 1.0 for Rancher March 2024
 
-* After installation of {product-name}, xref:rancher.adoc#_suse_security_ui_extension_for_rancher[enabling/installing] the {product-name} UI Extension from Rancher will display a Dashboard for the cluster, including links to SSO to the full {product-name} cluster. NOTE: The extension may display as Third Party, which will be fixed in a future release. Also, after installation, Rancher 2.7.x users may see two {product-name} UI Ext icons in the list (bug). One icon will say Uninstall (meaning it is installed), and the other should say Install. This can be left as is, ie, don't Install again if the extension is already installed.
+* After installation of {product-name}, xref:rancher.adoc#_product_ui_extension_for_rancher[enabling/installing] the {product-name} UI Extension from Rancher will display a Dashboard for the cluster, including links to SSO to the full {product-name} cluster. NOTE: The extension may display as Third Party, which will be fixed in a future release. Also, after installation, Rancher 2.7.x users may see two {product-name} UI Ext icons in the list (bug). One icon will say Uninstall (meaning it is installed), and the other should say Install. This can be left as is, ie, don't Install again if the extension is already installed.
 
 === 5.2.4-s2 February 2024
 
@@ -344,13 +345,13 @@ docker run --rm --privileged --pid=host neuvector/scanner -n
 * Enable/disable TLS 1.0 and TLS 1.1 detection/alerting with environment variables to Enforcer THRT_SSL_TLS_1DOT0, THRT_SSL_TLS_1DOT1. Disabled by default.
 * Add environment variable AUTO_PROFILE_COLLECT for Controller and Enforcer to assist in capturing memory usage when investigating memory pressure events. Set value = 1 to enable.
 * Configuration assessments against Admission Control should show all violations with one scan.
-* Add more options for CVE report criteria in Response Rules. Example 1 - "cve-high-with-fix:X" means: When # of (high vulnerability that have been fixed) >= X, trigger the response rule. Example 2 - "cve-high-with-fix:X/Y" means: When # of (high vulnerability that were reported Y days ago & have been fixed) >= X, trigger the response rule.
+* Add more options for CVE report criteria in Response Rules. Example 1 - "cve-high-with-fix:X" means: When # of (high vulnerability that have been fixed) >= X, trigger the response rule. Example 2 _ "cve_high_with_fix:X/Y" means: When # of (high vulnerability that were reported Y days ago & have been fixed) >= X, trigger the response rule.
 
 ==== Bug Fixes
 
 * Export of group policy does not return any actual YAML contents
 * Improve pruning of namespaces with dedicated function
-* {product-name} namespace user cannot see assets-->namespaces
+* {product-name} namespace user cannot see assets__>namespaces
 * Skip handling the CRD CREATE/UPDATE requests if the CR's namespace is already deleted
 * Provide workaround for part of CRD groups which cannot be pruned successfully after namespaces are deleted.
 
@@ -358,8 +359,8 @@ docker run --rm --privileged --pid=host neuvector/scanner -n
 
 ==== Enhancements
 
-* Report layered scan results and additional CVE data in SYSLOG messages. This is enabled through a checkbox in Settings -> Configuration -> SYSLOG
-* Export NIST 800-53 mappings (to docker CIS benchmarks) in the exported csv compliance report
+* Report layered scan results and additional CVE data in SYSLOG messages. This is enabled through a checkbox in Settings _> Configuration _> SYSLOG
+* Export NIST 800_53 mappings (to docker CIS benchmarks) in the exported csv compliance report
 * Support Proxy setting in image signature verification
 * Include image signature scan result in the downloaded CVE report
 * Support pod annotations for Admission Control Policies, available through the Custom criteria
@@ -378,7 +379,7 @@ docker run --rm --privileged --pid=host neuvector/scanner -n
 
 ==== Enhancements
 
-* Support tokens for {product-name} API access. See Settings -> User, API Keys... to create a new API key. Keys can be set to default or custom roles.
+* Support tokens for {product-name} API access. See Settings _> User, API Keys... to create a new API key. Keys can be set to default or custom roles.
 * Support AWS Marketplace PAYG billing for {product-name} monthly support subscriptions. Users can subscribe to {product-name} by SUSE support, billed monthly to their AWS account based on previous month's average node count usage. For more information, refer to xref:awsmarketplace.adoc[AWS marketplace].
 * Support image signing for admission controls. Users can require {product-name} to verify that images are signed by specific parties before they can be deployed into the production environment, through an integration with Sigstore/Cosign. See Assets -> Sigstore Verifiers for creating new signature assets. Rules can then be created with criteria Image Signing and/or Image Sigstore Verifiers.
 * Enable each admission control rule to have its own mode of Monitor or Protect. A Deny action in Monitor mode will alert, and a Deny action in Protect mode will block. Allow actions are unaffected.
@@ -752,7 +753,7 @@ neuvector-scanner-pod-87474dcff-s8vgt       1/1     Running   0          114s   
 
 [NOTE]
 ====
-The instructions below apply to upgrades to 5.0.x and 5.1.x. For 5.2.x, service accounts and bindings have changed, and should be xref:kubernetes.adoc#_deploy_suse_security[reviewed]  to plan upgrades.
+The instructions below apply to upgrades to 5.0.x and 5.1.x. For 5.2.x, service accounts and bindings have changed, and should be xref:kubernetes.adoc#_deploy_product[reviewed]  to plan upgrades.
 ====
 
 

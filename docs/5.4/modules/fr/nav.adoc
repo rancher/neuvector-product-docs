@@ -1,0 +1,122 @@
+* xref:overview.adoc[{product-name} Présentation]
+
+* Compréhension {product-name}
+** xref:requirements.adoc[Configuration système requise]
+** xref:installation.adoc[Préparation au déploiement]
+** xref:ci-workflow.adoc[Flux de travail CI/CD]
+** xref:policy-overview.adoc[Modèle de politique de sécurité]
+** xref:modes.adoc[Modes{nbsp}: Découvrir, Surveiller, Protéger]
+** xref:multicluster.adoc[Architecture multi-cluster]
+
+* Déployer {product-name}
+** xref:production.adoc[Déploiement vers la production]
+** xref:configmap.adoc[Déployer en utilisant ConfigMap]
+** xref:operators.adoc[Déployer en utilisant des opérateurs]
+** xref:kubernetes.adoc[Kubernetes]
+** xref:openshift.adoc[OpenShift]
+** xref:rancher.adoc[Rancher]
+*** xref:helm.adoc[Déployer en utilisant Helm]
+** xref:publick8s.adoc[Cloud public]
+*** xref:awsmarketplace.adoc[Marketplace AWS]
+** xref:ecs.adoc[Amazon ECS]
+** xref:docker.adoc[Docker]
+** xref:airgap.adoc[Déploiement isolé physiquement]
+** xref:updating.adoc[Mettre à niveau et mettre à jour]
+** xref:testing.adoc[Évaluation et tests]
+** xref:troubleshooting.adoc[Dépannage du déploiement]
+
+* Exploiter et administrer
+** xref:users.adoc[Utilisateurs et rôles]
+** xref:restore.adoc[Sauvegarde et restauration]
+** xref:remove.adoc[Supprimer ou réinitialiser]
+** Certificats et TLS
+*** xref:internal.adoc[Remplacement des certificats internes]
+*** xref:replacecert.adoc[Remplacement des certificats auto-signés]
+*** xref:certrotate.adoc[Rotation des certificats]
+*** xref:chrome.adoc[Configuration de la confiance du navigateur]
+** xref:rest-api.adoc[Accès au gestionnaire et à l'API REST]
+** xref:automation.adoc[Automatisation avec l'API REST]
+
+* {product-name} Interface
+** xref:navigation.adoc[Navigation dans la console]
+** xref:reporting.adoc[Rapports et notifications]
+** xref:customui.adoc[Personnalisation de l'interface utilisateur]
+
+* Gestion de la politique de sécurité
+** Contrôle d'admission
+*** xref:admission.adoc[Contrôles d'admission]
+*** xref:sigstore.adoc[Vérification de Sigstore et Cosign]
+*** xref:ociimagesigning.adoc[Signature d'image OCI]
+*** xref:assessment.adoc[Évaluation de la configuration Kubernetes]
+** xref:groups.adoc[Groupes]
+** xref:networkrules.adoc[Règles réseau]
+** xref:processrules.adoc[Règles de profil de processus]
+** xref:filerules.adoc[Règles d'accès aux fichiers]
+** xref:responserules.adoc[Règles de réponse]
+** xref:dlp.adoc[Capteurs DLP et WAF]
+** xref:threats.adoc[Signatures de menaces réseau]
+** xref:customcompliance.adoc[Vérifications de conformité personnalisées]
+** xref:federated.adoc[Politique fédérée]
+** Définitions de ressources personnalisées
+*** xref:usingcrd.adoc[Utilisation des CRD]
+**** xref:import.adoc[Importation des CRD]
+** xref:namespaceboundary.adoc[Application des limites de l'espace de noms]
+** xref:detectbandwidthddos.adoc[Détection de bande passante et DDoS]
+
+* Vulnérabilités, analyse et conformité
+** xref:scanning.adoc[Aperçu de l'analyse]
+** xref:vulnerabilities.adoc[Gestion des vulnérabilités]
+** xref:compliance.adoc[Conformité et benchmarks CIS]
+** Analyse du registre
+*** xref:registry-scanning-configuration.adoc[Configuration]
+*** xref:harbor.adoc[Intégration du scanner Harbor]
+*** xref:ecr-iam.adoc[ECR avec rôles IAM]
+*** xref:gcr-sa.adoc[GCR avec comptes de service]
+** Analyse d'image au moment de la construction
+*** xref:build-image-scanning.adoc[Analyse locale]
+*** xref:jenkins.adoc[Jenkins]
+*** xref:bamboo.adoc[Bamboo]
+*** xref:circleci.adoc[CircleCI]
+*** xref:azuredevops.adoc[Azure DevOps]
+*** xref:gitlab.adoc[GitLab]
+*** xref:github.adoc[GitHub]
+** xref:improve-score.adoc[Amélioration du score de risque de sécurité]
+** xref:cve-sources.adoc[Sources et versions CVE]
+** xref:updating-cve-database.adoc[Mise à jour des bases de données CVE]
+** xref:scanners.adoc[Scanners parallèles et autonomes]
+
+* Intégrations d'entreprise
+** Gestion des identités et des accès
+*** xref:ldap.adoc[LDAP]
+*** xref:msad.adoc[Microsoft AD]
+*** xref:saml.adoc[SAML]
+*** xref:msazure.adoc[SAML (Azure AD)]
+*** xref:adfs.adoc[SAML (ADFS)]
+*** xref:openid.adoc[OpenID Connect]
+*** xref:oidc-adfs.adoc[OIDC pour ADFS]
+*** xref:rancher_sso_rbac.adoc[Intégration RBAC de Rancher]
+** SIEM et écosystème
+*** xref:ibmsa.adoc[IBM Security Advisor]
+*** xref:ibmqr.adoc[IBM QRadar]
+*** xref:splunk.adoc[Splunk]
+
+* Modèles de déploiement spéciaux
+** xref:general-guidelines.adoc[Lignes directrices All-in-One]
+** xref:docker-ee.adoc[Docker Swarm]
+
+* Extensions de l'interface utilisateur
+** xref:dashboard.adoc[Tableau de bord]
+** xref:runtime_security.adoc[Sécurité du composant d'exécution]
+** xref:notifications.adoc[Notifications]
+
+* Référence
+** xref:details.adoc[Variables d'environnement]
+** xref:cli.adoc[Référence de la ligne de commande]
+
+* Notes de version
+** xref:5x.adoc[Notes de version 5.x]
+** xref:4x.adoc[Notes de version 4.x]
+** xref:other.adoc[Intégrations et composants]
+
+* Avis de sécurité
+** xref:cve.adoc[Avis de sécurité et CVEs]

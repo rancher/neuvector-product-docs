@@ -1,0 +1,122 @@
+= Bereitstellungsvorbereitung
+:revdate: 2026-02-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /01.basics/03.installation/01.native/01.native.md
+:page-opendocs-slug: /grundlagen/installation
+
+== Verstehen, wie man {product-name} bereitstellt
+
+Stellen Sie die {product-name} Container mit Kubernetes, OpenShift, Rancher, Docker oder anderen Plattformen bereit. Jeder Typ von {product-name} Container hat einen einzigartigen Zweck und kann spezielle Leistungs- oder Knotenauswahlanforderungen für einen optimalen Betrieb erfordern.
+
+Die {product-name} Open Source Images sind auf Docker Hub unter `/neuvector/{image name}` gehostet.
+
+Siehe den Abschnitt xref:production.adoc#_best_practices_tips_qa_for_deploying_and_managing_suse_security[Onboarding/Beste Praktiken], um einen Onboarding-Leitfaden herunterzuladen.
+
+=== Bereitstellen mit Kubernetes, OpenShift, Rancher oder anderen Kubernetes-basierten Tools
+
+Um {product-name} mit Kubernetes, OpenShift, Rancher oder anderen Orchestrierungstools bereitzustellen, siehe die Vorbereitungsschritte und Beispieldateien im Abschnitt xref:production.adoc#_planning_deployments[Bereitstellung von {product-name}]. Dies stellt Manager-, Controller-, Scanner- und Enforcer-Container bereit. Für einfache Tests mit dem {product-name} Allinone-Container, siehe den Abschnitt Besondere Anwendungsfälle mit Allinone.
+
+{product-name} unterstützt die Helm-basierte Bereitstellung mit einem Helm-Chart unter https://github.com/neuvector/neuvector-helm.
+
+Automatisierte Bereitstellungen werden mit Helm, Red Hat/Community-Operatoren, der REST-API oder einem Kubernetes ConfigMap unterstützt. Siehe den Abschnitt xref:configmap.adoc#_kubernetes_configmap[Bereitstellung mit ConfigMap] für weitere Details zur Automatisierung der Bereitstellung.
+
+=== Bereitstellen mit Docker Native
+
+Bevor Sie xref:docker.adoc[bereitstellen {product-name}] mit docker run oder compose, müssen Sie die CLUSTER_JOIN_ADDR auf die entsprechende IP-Adresse setzen. Finden Sie die Knoten-IP-Adresse, den Knotennamen (wenn Sie einen Nameserver verwenden) oder die Knotenvariable (wenn Sie Orchestrierungstools einsetzen), die vom Allinone (Controller) für die "`node IP`" in den Docker-Compose-Dateien sowohl für Allinone als auch für Enforcer verwendet werden soll.  Beispiel:
+
+[,yaml]
+----
+- CLUSTER_JOIN_ADDR=192.168.33.10
+----
+
+Für Swarm-basierte Bereitstellungen fügen Sie auch die folgende Umgebungsvariable hinzu:
+
+[,yaml]
+----
+- NV_PLATFORM_INFO=platform=Docker
+----
+
+Siehe den Abschnitt Bereitstellung von {product-name} -> xref:docker.adoc[Docker Produktionsbereitstellung] für Anweisungen und Beispiele.
+
+=== Sichern von Konfigurationsdateien
+
+Standardmäßig speichert {product-name} verschiedene Konfigurationsdateien in /var/neuvector/config/backup auf dem Controller oder Allinone-Knoten.
+
+Dieses Volume kann mit xref:production.adoc#_backups_and_persistent_data[persistenter Speicher] verbunden werden, um die Konfiguration beizubehalten. Dateien im Ordner müssen möglicherweise gelöscht werden, um neu zu starten.
+
+=== Volume-Zuordnung
+
+Stellen Sie sicher, dass die Volumes richtig zugeordnet sind. {product-name} benötigt diese, um zu funktionieren (/var/neuvector ist nur auf dem Controller/Allinone erforderlich). Beispiel:
+
+[,yaml]
+----
+volumes:
+        - /lib/modules:/lib/modules:ro
+        - /var/neuvector:/var/neuvector
+        - /var/run/docker.sock:/var/run/docker.sock:ro
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup:/host/cgroup:ro
+----
+
+Außerdem müssen Sie möglicherweise sicherstellen, dass andere Tools den Zugriff auf die docker.sock-Schnittstelle nicht blockieren.
+
+=== Ports und Portzuordnung
+
+Stellen Sie sicher, dass die erforderlichen Ports richtig zugeordnet und auf dem Host geöffnet sind. Der Manager oder Allinone benötigt 8443 (wenn die Konsole verwendet wird). Der Allinone und der Controller benötigen die Ports 18300, 18301, 18400, 18401 und optional 10443, 11443, 20443, 30443. Der Enforcer benötigt 18301 und 18401.
+
+[NOTE]
+====
+Wenn Docker nativ (einschließlich SWARM) bereitgestellt wird, stellen Sie sicher, dass keine Host-Firewall den Zugriff auf erforderliche Ports wie firewalld blockiert. Wenn aktiviert, muss die docker0-Schnittstelle als vertrauenswürdige Zone für die Allinone/Controller-Hosts hinzugefügt werden.
+====
+
+==== Portübersicht
+
+Die folgende Tabelle listet die Kommunikationen von jedem {product-name} Container auf. Der Allinone-Container kombiniert die Manager-, Controller- und Enforcer-Container und benötigt daher die für diese Container aufgeführten Ports.
+
+image:Communication_Matrix_From_To.png[Ports]
+
+Die folgende Tabelle fasst die überwachten Ports für jeden {product-name} Container zusammen.
+
+image:Communication_Matrix_Listening_Ports.png[Überwacht]
+
+===== Zusätzliche Ports
+
+In Version 5.1 wurde ein neuer Überwachungsport auf 8181 im Controller hinzugefügt, der ausschließlich für die lokale Controller-Kommunikation verwendet wird.
+
+[,shell]
+----
+tcp        0      0 :::8181                 :::*                    LISTEN      8/opa
+----
+
+=== {product-name} Bilder
+
+{product-name} Bilder werden auf Docker Hub veröffentlicht. Verwenden Sie ein festes Versions-Tag für die Kernel-Komponenten und das `latest`-Tag für Scanner- und Aktualisierungsbilder.
+
+Verwenden Sie dasselbe Versions-Tag für die Manager-, Controller- und Enforcer-Bilder. Verwenden Sie `latest` für die Scanner- und Aktualisierungsbilder.
+
+.Beispielbild-Tags
+[source,text]
+----
+neuvector/manager:5.4.1
+neuvector/controller:5.4.1
+neuvector/enforcer:5.4.1
+neuvector/scanner:latest
+neuvector/updater:latest
+----
+
+Aktualisieren Sie die Bildreferenzen in Ihren Kubernetes-Manifests oder der Helm-Werte-Datei, um der Zielversion von NeuVector zu entsprechen.
+
+==== Helm-Chart-Konfiguration
+
+Beim Bereitstellen von produkt-name mit der Helm-Chart-Version 1.8.9 oder höher, aktualisieren Sie die folgenden Einstellungen in `values.yaml`:
+
+* Setzen Sie die Image-Registry auf `docker.io`
+* Aktualisieren Sie die Bildnamen und -tags auf die erforderliche Version.
+* Lassen Sie `imagePullSecrets` leer.
+
+==== Rancher-Registry-Bilder
+
+{product-name} Bilder werden auch in die Rancher-Registry für Bereitstellungen, die über Rancher verwaltet werden, gespiegelt.
+
+* Die Verfügbarkeit von Bildern kann einige Tage nach jeder Veröffentlichung verzögert sein.
+* Für Bereitstellungsdetails siehe die Rancher-Bereitstellungsdokumentation.

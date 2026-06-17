@@ -1,0 +1,159 @@
+= Mirantis Kubernetes 引擎
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /13.special/02.docker/02.docker.md
+:page-opendocs-slug:  /special/docker
+
+== 部署到 Swarm 集群
+
+要使用 Swarm 集群部署 {product-name}，首先在 Images 菜单中使用 Docker UCP 拉取 {product-name} 镜像。您可能需要添加版本号以获取 Docker Hub 上的最新版本。
+
+目前，Swarm/UCP 不支持 seccomp 功能（cap_add 选项）或在 '`privileged mode`' 中部署，因此 {product-name} 容器需要通过命令行使用 docker-compose 或 run 部署。请参阅下面的 All-in-One 和 enforcer 示例 compose 文件。
+
+Docker UCP HRM 服务使用默认端口 8443，这与 {product-name} 控制台端口冲突。如果使用默认 HRM 端口，则需要更改 {product-name} 端口映射，例如在下面的示例中将 allinone 容器的端口映射更改为 9443:8443。在 {product-name} 应用程序成功部署后，登录到 All-in-One 主机的 9443 端口控制台。
+
+== 在 Docker Swarm 中使用特权模式部署
+
+以下是 docker-compose 文件的示例，用于在第一个节点上部署 All-in-One 容器。由于 All-in-One 容器内部有一个 enforcer 模块，因此同一节点上的应用程序容器可以得到保护。支持绿色和棕色部署。
+
+使用 docker-compose 部署 All-in-One（特权模式）：
+
+[,yaml]
+----
+allinone:
+    pid: host
+    image: neuvector/allinone:<version>
+    container_name: allinone
+    privileged: true
+    environment:
+        - CLUSTER_JOIN_ADDR=node_ip
+    ports:
+        - 18300:18300
+        - 18301:18301
+        - 18400:18400
+        - 18401:18401
+        - 18301:18301/udp
+        - 9443:8443
+    volumes:
+        - /lib/modules:/lib/modules
+        - /var/neuvector:/var/neuvector
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup:/host/cgroup:ro
+----
+
+最重要的环境变量是 *CLUSTER_JOIN_ADDR*。这是其他 enforcer 连接的 IP 地址。通常，它应该设置为运行 All-in-One 容器的节点的 IP 地址。
+
+端口 18300 和 18301 是集群通信的默认端口。它们必须在集群中的所有控制器和 enforcer 之间保持一致。请参阅 _"Docker-compose 详情"_ 部分以了解如何更改默认端口。
+
+使用 docker-compose 添加一个 enforcer 容器（特权模式）
+
+这是一个将 enforcer 加入集群的 docker-compose 文件示例。支持绿色和棕色部署。
+
+[,yaml]
+----
+enforcer:
+    pid: host
+    image: neuvector/enforcer:<version>
+    container_name: enforcer
+    privileged: true
+    environment:
+        - CLUSTER_JOIN_ADDR=controller_node_ip
+    ports:
+        - 18301:18301
+        - 18401:18401
+        - 18301:18301/udp
+    volumes:
+        - /lib/modules:/lib/modules
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup/:/host/cgroup/:ro
+----
+
+最重要的环境变量是 *CLUSTER_JOIN_ADDR*。对于 enforcer，将 `<controller_node_ip>` 替换为控制器的节点 IP 地址。通常情况下，控制器/All-in-One 的 docker-compose 文件和 enforcer 的 docker-compose 文件中的 *CLUSTER_JOIN_ADDR* 具有相同的值。
+
+从 {product-name} 4.0+ 开始，必须部署一个单独的扫描器容器以执行漏洞扫描。
+
+扫描器的示例 docker-compose：
+
+[,yaml]
+----
+Scanner:
+   image: neuvector/scanner
+   container_name: scanner
+   environment:
+     - SCANNER_DOCKER_URL=tcp://192.168.1.10:2376
+     - CLUSTER_JOIN_ADDR=controller_node_ip
+   ports:
+     - 18402:18402
+   volumes:
+     - /var/run/docker.sock:/var/run/docker.sock:ro
+----
+
+== 不使用特权模式的部署
+
+对于某些平台配置，可以在不要求它们以特权模式运行的情况下部署 {product-name} 容器。配置必须支持添加能力并设置 apparmor 控制文件的功能。请注意，Docker DataCenter/UCP 和 Swarm 目前不支持此功能，但仍然可以使用 Compose 或 Run 手动部署 {product-name}。
+
+使用 docker-compose 部署 All-in-One（不使用特权模式）
+
+[,yaml]
+----
+allinone:
+    pid: host
+    image: neuvector/allinone
+    container_name: neuvector.allinone
+    cap_add:
+        - SYS_ADMIN
+        - NET_ADMIN
+        - SYS_PTRACE
+        - IPC_LOCK
+    security_opt:
+        - apparmor=unconfined
+        - seccomp=unconfined
+        - label=disable
+    environment:
+        - CLUSTER_JOIN_ADDR=[AllInOne Node IP Address]
+    ports:
+        - 18300:18300
+        - 18301:18301
+        - 18400:18400
+        - 18401:18401
+        - 18301:18301/udp
+        - 9443:8443
+    volumes:
+        - /lib/modules:/lib/modules
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup:/host/cgroup:ro
+        - /var/neuvector:/var/neuvector
+----
+
+使用 docker-compose 部署 enforcer（不使用特权模式）
+
+[,yaml]
+----
+enforcer:
+    pid: host
+    image: neuvector/enforcer
+    container_name: neuvector.enforcer
+    cap_add:
+        - SYS_ADMIN
+        - NET_ADMIN
+        - SYS_PTRACE
+        - IPC_LOCK
+    security_opt:
+        - apparmor=unconfined
+        - seccomp=unconfined
+        - label=disable
+    environment:
+        - CLUSTER_JOIN_ADDR=[AllInOne Node IP Address]
+    ports:
+        - 18301:18301
+        - 18401:18401
+        - 18301:18301/udp
+    volumes:
+        - /lib/modules:/lib/modules
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup/:/host/cgroup/:ro
+----

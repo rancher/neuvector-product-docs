@@ -4,6 +4,7 @@
 :page-opendocs-origin: /06.scanning/03.build/04.azuredevops/04.azuredevops.md
 :page-opendocs-slug:  /scanning/build/azuredevops
 
+[#_scan_for_vulnerabilities_in_the_azure_devops_build_pipeline]
 == Scan for Vulnerabilities in the Azure DevOps Build Pipeline
 
 The {product-name} scanner can be triggered from the Azure DevOps pipeline by using the {product-name} extension published in the Azure DevOps Marketplace.

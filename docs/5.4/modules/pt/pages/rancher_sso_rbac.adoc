@@ -1,0 +1,177 @@
+= Integração com Rancher RBAC
+:revdate: 2026-02-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/12.rancher_sso_rbac.md
+:page-opendocs-slug:  /integration/12.rancher_sso_rbac
+
+
+A partir da versão {product-name} 5.4, a compatibilidade total e a integração de {product-name} com o Rancher RBAC foram incluídas. Isso oferece aos usuários a possibilidade de personalizar permissões específicas com base no perfil do usuário ou grupo que deve acessar {product-name}.
+
+No console do Rancher, na página *Usuários & Autenticação* -> *Modelos de Função*, os clientes podem criar funções Globais, de Cluster, de Projeto e de namespace com {product-name} Verbos, Recursos e Grupos de API específicos. Quando tal função do Rancher é atribuída a um usuário do Rancher, a sessão {product-name} SSO do usuário recebe diferentes {product-name} permissões de acordo. Isso é para fornecer aos usuários SSO funções personalizadas (ou seja, funções diferentes das reservadas admin, leitor, fedAdmin e fedReader).
+
+== Mapeamento de função personalizada {product-name} suportado no Rancher SSO
+
+Abaixo estão os mapeamentos de função suportados para {product-name} Verbos, Recursos e Grupos de API usados na interface do Rancher em *Usuários & Autenticação* -> *Modelos de Função* -> *Criar Modelo de Função Global, de Cluster ou de Projeto*.
+
+* Grupo de API: `permission.neuvector.com`
+
+* Verbos:
+** `get` -> somente leitura (visualizar)
+** `*` -> de leitura/gravação (modificar)
+
+* Recursos (escopo de cluster):
+** AdmissionControl
+** Autenticação
+** Escaneamento CI
+** Cluster
+** Aliança
+** Vulnerabilidade
+
+* Recursos (com namespace):
+** Eventos de Auditoria
+** Autorização
+** Conformidade
+** Eventos
+** Namespace
+** Escaneamento de Registro
+** Política de Execução
+** RuntimeScan
+** Eventos de Segurança
+** Configuração do Sistema
+
+=== Exibição de recursos e mapeamento de nomes lógicos
+
+A tabela a seguir ilustra os nomes lógicos dos recursos.
+
+|===
+| Exibição de recursos | Nome lógico
+
+| Todas as Permissões | nv-perm.all-permissions
+| Controle de Admissão | nv-perm.admctrl
+| Audit Events (Eventos de Auditoria) | nv-perm.audit-events
+| Autenticação | nv-perm.autenticacao
+| Autorização | nv-perm.authorization
+| Escaneamento CI | nv-perm.ci-scan
+| Conformidade | nv-perm.compliance
+| Eventos | nv-perm.events
+| Aliança | nv-perm.fed
+| Escaneamento de Registro | nv-perm.reg-scan
+| Política de Execução | nv-perm.rt-policy
+| Verificação em tempo de execução | nv-perm.rt-scan
+| Security Events | nv-perm.security-events
+| Configuração do Sistema | nv-perm.config
+| Perfil de vulnerabilidade | nv-perm.vulnerability
+|===
+
+[NOTE]
+====
+Esta integração suporta funções nos níveis Global, Cluster, Projeto e namespace. Os usuários devem personalizar e criar regras com base em seus requisitos e escopo de permissões para SSO.
+====
+
+== Definições e expectativas com funções Global, Cluster e Projeto/namespace
+
+* Recurso de cluster com `*` verbo em uma função Global do Rancher:
+** Mapeado para a função {product-name} `fedAdmin` no cluster mestre da federação {product-name} (Os usuários não podem mapear uma função Global do Rancher para uma função {product-name} `admin` quando {product-name} está implantado em um cluster mestre da federação.)
+** Mapeado para a função {product-name} `admin` em clusters gerenciados pela federação {product-name}
+
+* Recurso de cluster com o verbo `*` em funções de cluster do Rancher:
+** Sempre mapeado para a função {product-name} `cluster-admin`
+
+* Recurso de namespace com `*` verbo em funções de Projeto do Rancher:
+** Sempre mapeado para a função {product-name} `namespace-admin`
+
+== Casos de uso e exemplos
+
+=== Caso de uso 1
+
+* Use uma função Global para executar verificações em tempo de execução a partir de uma sessão {product-name} SSO em todos os clusters gerenciados pelo Rancher Manager, exceto o cluster local. Os usuários devem criar funções de Cluster para propagar a função Global para todos os clusters downstream.
+
+** Crie um modelo de função de Cluster com os seguintes parâmetros:
++
+[source,yaml]
+----
+Verb: *
+Resource: RuntimeScan
+API: permission.neuvector.com
+----
+
+** Crie uma função de Projeto ou namespace para permitir o acesso à interface e habilitar o SSO. Você deve adicionar esta função ao projeto para que funcione corretamente:
++
+[source,yaml]
+----
+Verb: get, patch, create
+Resource: services/proxy
+API: neuvector.com
+----
+
+** Crie uma função Global para herdar a função de Cluster para todos os clusters downstream:
++
+[source,yaml]
+----
+apiVersion: management.cattle.io/v3
+kind: GlobalRole
+displayName: All Downstream NV RT scan
+metadata:
+  name: all-downstream-nvrtscan
+inheritedClusterRoles:
+- rt-gpmbs
+----
+
+** Crie um usuário padrão e atribua a função Global.
+** Crie uma vinculação de função de Projeto em todos os downstream clusters para o projeto que contém o namespace `cattle-neuvector-system`.
+** Faça login no Rancher Manager e inicie {product-name} a partir de qualquer downstream cluster.
+  O usuário pode realizar tarefas de verificação em tempo de execução, como verificações de contêiner, verificações de nó e navegação em páginas de vulnerabilidade. Isso também se aplica a clusters recém-adicionados.
+
+=== Caso de uso 2
+
+* Crie um usuário FedAdmin. Sempre faça login como um FedAdmin através do cluster mestre da federação. Se o ambiente não for federado, as funções são rebaixadas para Leitor ou Administrador.
+
+** Crie uma função Global:
++
+[source,yaml]
+----
+Verb: *
+Resource: All permissions
+API: nv-perm.all-permissions
+----
+
+** Crie uma função de Projeto ou namespace para permitir o acesso à interface e habilitar o SSO:
++
+[source,yaml]
+----
+Verb: get, patch, create
+Resource: services/proxy
+API: neuvector.com
+----
+
+** Crie um usuário padrão e atribua a função Global.
+** Na interface do Rancher, vá para *Cluster Mestre* -> *Membros do Cluster e do Projeto* -> *Membros do Projeto* -> *Adicionar*.
+   Adicione o usuário e atribua a função de projeto proxy da interface.
+** Faça login no Rancher Manager e inicie {product-name} a partir de um cluster downstream. {product-name} lê a função Global do Rancher e atribui a permissão correspondente (FedAdmin).
+
+[NOTE]
+====
+Para alternar entre FedAdmin e FedReader, mude o verbo de `*` para `get`. O verbo `get` fornece acesso somente leitura.
+====
+
+=== Caso de uso 3
+
+Um usuário pode realizar um conjunto limitado de tarefas somente leitura e modificar um conjunto limitado de tarefas em um cluster.
+
+=== Caso de uso 4
+
+Um usuário pode realizar tarefas somente leitura em domínios selecionados e modificar tarefas em outros domínios dentro de um cluster.
+
+=== Caso de uso 5
+
+Um usuário obtém permissões combinando funções Global, Cluster e Projeto.
+
+== Considerações adicionais
+
+* Use esta documentação e parâmetros como referência ao criar regras de SSO e RBAC.
+* Para erros ou casos de uso avançados, entre em contato com o Suporte SUSE através do SCC.
+* {product-name} 5.4 é compatível com mapeamentos de funções SSO anteriores à versão 5.4. Para a estrutura anterior, veja https://github.com/horantj/rancher-nv-rbac.
+
+A partir da versão {product-name} 5.4, a compatibilidade total e a integração de {product-name} com o Rancher RBAC foram incluídas. Isso oferece aos usuários a possibilidade de personalizar permissões específicas com base no perfil do usuário ou grupo que deve acessar {product-name}.
+
+No console do Rancher, na página *Usuários & Autenticação* -> *Modelos de Função*, os clientes podem criar funções Globais, de Cluster, de Projeto e de namespace com {product-name} Verbos, Recursos e Grupos de API específicos. Quando tal função do Rancher é atribuída a um usuário do Rancher, a sessão {product-name} SSO do usuário recebe diferentes {product-name} permissões de acordo. Isso é para fornecer aos usuários SSO funções personalizadas (ou seja, funções diferentes das reservadas admin, leitor, fedAdmin e fedReader).

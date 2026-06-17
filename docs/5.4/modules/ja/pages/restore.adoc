@@ -1,0 +1,97 @@
+= 設定の{product-name}復元
+:revdate: 2024-12-08
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/11.restore/11.restore.md
+:page-opendocs-slug: /deploying/restore
+
+== 設定の{product-name}復元
+
+設定ファイルのバックアップを適用することで、以前の{product-name}設定を復元できます。手動でバックアップを生成するか、{product-name}コンソールから*設定 > 設定ファイル*に移動して、次のオプションのいずれかを選択することでエクスポートすることができます。
+
+* *すべての設定*：レジストリ設定、統合、システム設定、およびポリシーが含まれます。
+* *ポリシーのみ*：ルールとセキュリティポリシーが含まれます。
+
+REST APIを使用してバックアップを自動化することもできます。例については、xref:automation.adoc#export-import-configuration-file[設定ファイルのエクスポートとインポート]を参照してください。
+
+すべてのコントローラーが停止し、リアルタイム設定状態が失われた場合、{product-name}はxref:production.adoc#_backups_and_persistent_data[永続ストレージ]が適切に設定されている場合に自動的に設定を復元できます。
+
+[WARNING]
+====
+*{product-name} v5.4.7*以降、機密設定データは、`neuvector-store-secret`ネームスペースの`neuvector`というKubernetes Secretを使用して暗号化されます。
+
+バージョン*5.3.0から5.4.6*は、固定されたハードコーディングされた暗号化キーを使用していました。アップグレードまたは復元中に、{product-name}はレガシーキーで暗号化されたデータを自動的に検出し、`neuvector-store-secret`から派生した新しいキーを使用して再暗号化します。
+
+設定データを復元する前に、必ず*v5.4.7以降*にアップグレードするようにしてください。
+
+詳細については、セキュリティアドバイザリーを参照してください： https://github.com/neuvector/neuvector/security/advisories/GHSA-h773-7gf7-9m2x
+====
+
+[NOTE]
+====
+{product-name}は部分的な復元（たとえば、ネットワークルールのみの復元）や時点復元をサポートしていません。自動化スクリプトを使用して、設定ファイルを定期的にバックアップし、タイムスタンプ付きバックアップを管理してください。
+
+詳細については、xref:automation.adoc#export-import-configuration-file[設定ファイルのエクスポートとインポート]を参照してください。
+====
+
+[WARNING]
+====
+設定ファイルのバックアップを変更しないでください。エクスポート後にバックアップファイルを編集すると、復元エラーが発生したり、予測できないシステム状態になる可能性があります。
+====
+
+[CAUTION]
+====
+設定ファイルのバックアップは、エクスポートされた同じクラスターの{product-name}を復元するためのみに使用してください。異なるクラスターに設定ファイルのバックアップを復元すると、予測できない動作が発生する可能性があります。
+====
+
+== 暗号化キー管理
+
+`neuvector-store-secret`には*キー暗号化キー (KEK)*が含まれています。{product-name}はKEKを使用して*データ暗号化キー (DEK)*を生成し、機密設定データを暗号化します。
+
+キーの動作：
+
+* `neuvector-store-secret`を維持し、バックアップする必要があります。
+* シークレットが欠落している場合やキーの値が長さ要件を満たさない場合、{product-name}は自動的に作成または更新します。
+* {product-name}がシークレットを作成または更新すると、バックアップを取るようにリマインダーのアラートが生成されます。
+* KEKが変更されるか失われた場合、以前に暗号化されたデータは復号化できません。
+
+ローリングアップグレードまたは復元中：
+
+. レガシーのハードコーディングされたキーで暗号化されたデータは、KEKから派生したDEKを使用して再暗号化されます。
+. KEKから派生したDEKで暗号化されたデータは、同じKEKを使用する{product-name}によってのみ復号化できます。
+
+image:rolling-upgrade-event.png[ローリングアップグレード再暗号化イベント]
+
+再暗号化が発生すると、{product-name}はそのアクションを記録し、イベントを生成します。
+
+== 暗号化によって保護された機密設定データ
+
+{product-name}は、以下のキー-バリューパスに保存された機密設定データを暗号化します：
+
+* `object/config/server/ldap1`
+* `object/config/server/oidc1`
+* `object/config/server/saml1`
+* `object/config/system`
+* `object/config/registry`
+* `object/config/federation/membership`
+* `object/config/federation/clusters/...`
+* `object/cert/...`
+
+image:neuvector-store-secret.png[NeuVectorストアのシークレット]
+
+[NOTE]
+====
+常に`neuvector-store-secret`を{product-name}設定データと一緒にバックアップしてください。
+
+データ損失後または新しいクラスターに{product-name}を復元する際には、*同じシークレット*を復元する必要があります。対応するシークレットがない設定ファイルのバックアップは復号化できません。
+====
+
+== 推奨される高可用性設定
+
+手動バックアップと復元は、最後の手段として扱うべきです。高可用性のために、以下の推奨事項に従ってください：
+
+. 初期設定のためにConfigMapを使用してHelmで{product-name}をデプロイします。
+. CRDを使用して、ネットワークルール、プロセスプロファイル、入場制御などのポリシーを定義します。
+. 構成をポッド間で同期させるために、複数のコントローラー（最低3つ）を実行し、異なるホストにスケジュールします。
+. すべてのコントローラーが停止するなどのクラスター全体の障害から回復するために、永続ストレージを設定します。
+. 定期的に設定をタイムスタンプ付きのバックアップファイルにバックアップします。
+. バックアップファイルから{product-name}の設定を復元するのは最後の手段としてのみ行い、バックアップ作成後に変更されたCRDを再適用します。

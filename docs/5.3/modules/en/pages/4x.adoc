@@ -4,6 +4,7 @@
 :page-opendocs-origin: /14.releasenotes/03.4x/03.4x.md
 :page-opendocs-slug:  /releasenotes/4x
 
+[#_release_notes_for_4x]
 == Release Notes for 4.x
 
 === 4.4.4-s3 Security Patch April 2022

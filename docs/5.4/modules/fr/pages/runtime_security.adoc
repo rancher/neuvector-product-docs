@@ -1,0 +1,41 @@
+= Résultat de l'analyse de sécurité des actifs
+:page-opendocs-origin: /15.ui_extension/02.runtime_security/02.runtime_security.md
+:page-opendocs-slug:  /ui_extension/runtime_security
+
+Comme Rancher Manager a son propre onglet **Nodes** et **Workloads** pour gérer et surveiller les statuts des actifs, NeuVector injecte des composants pour afficher le résultat de son analyse à l'exécution.
+
+== Noeuds
+
+Dans la vue en tableau de l'onglet **Nodes**, la colonne **Vulnerabilities** est injectée pour montrer le nombre de vulnérabilités détectées par nœud, classées par gravité élevée / moyenne.
+
+image:nodes.png[Nodes]
+
+Cliquer sur la cellule **Vulnerabilities** fera apparaître une nouvelle page d'affichage pour montrer les détails du résultat de l'analyse. La version de la base de données du scanner est affichée ainsi qu'une liste de vulnérabilités filtrable.
+
+image:nodes_vul.png[Nodes]
+
+Cliquer sur la cellule **Name** dans le tableau **Nodes** redirige vers la page de détails du nœud. NeuVector injecte un onglet **Vulnerabilities** pour afficher un tableau avec les vulnérabilités répertoriées.
+
+image:node_detail_vul.png[Nodes]
+
+Cliquer sur le lien CVE dans la cellule **Name** du tableau **Vulnerabilities** ouvre une fenêtre contextuelle pour montrer les descriptions des CVE avec un lien externe dans l'en-tête vers le site d'information sur les CVE de SUSE.
+
+image:node_detail_vul_cve.png[Nodes]
+
+image:suse_cve.png[SUSE]
+
+Un bouton de téléchargement de fichier CSV est fourni au-dessus du tableau **Vulnerabilities**. Les données du fichier incluent tous les champs qui se trouvent dans le tableau.
+
+image:download_vul.png[CSV]
+
+image:cve_csv.png[CSV]
+
+== Workloads
+
+Temporairement, la colonne **Vulnerabilities** ne sera pas injectée dans le tableau **Workloads** dans la version v5.4 en raison de préoccupations potentielles de performance. L'équipe de NeuVector travaillera avec l'équipe de Rancher pour l'intégrer bientôt.
+
+Cliquer sur un **Name** dans le tableau **Pods** redirige vers la page de détails du pod. NeuVector injecte un onglet **Vulnerabilities** pour afficher un tableau avec les vulnérabilités répertoriées.
+
+image:pods.png[Pods]
+
+image:pod_detail_vul.png[Pod_Detail]

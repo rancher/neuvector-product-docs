@@ -1,0 +1,97 @@
+= Restauration de la {product-name} configuration
+:revdate: 2024-12-08
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/11.restore/11.restore.md
+:page-opendocs-slug: /déployer/restaurer
+
+== Restauration de la {product-name} configuration
+
+Vous pouvez restaurer une {product-name} configuration précédente en appliquant un fichier de sauvegarde de configuration. Vous pouvez générer une sauvegarde manuellement ou en exporter une depuis la console {product-name} en naviguant vers *Paramètres > Configuration* et en sélectionnant l'une des options suivantes{nbsp}:
+
+* *Toute la configuration*{nbsp}: Comprend les configurations de registre, les intégrations, les paramètres système et les stratégies.
+* *Stratégie uniquement*{nbsp}: Comprend les règles et les politiques de sécurité.
+
+Vous pouvez également automatiser les sauvegardes en utilisant l'API REST. Pour un exemple, voir xref:automation.adoc#export-import-configuration-file[Exporter et importer des fichiers de configuration].
+
+Si tous les contrôleurs cessent de fonctionner et que l'état de configuration en temps réel est perdu, {product-name} peut automatiquement restaurer la configuration lorsque xref:production.adoc#_backups_and_persistent_data[le stockage persistant] est correctement configuré.
+
+[WARNING]
+====
+À partir de *{product-name} v5.4.7*, les données de configuration sensibles sont chiffrées en utilisant un Secret Kubernetes nommé `neuvector-store-secret` dans l'espace de noms `neuvector`.
+
+Les versions *5.3.0 à 5.4.6* utilisaient une clé de chiffrement fixe et codée en dur. Lors d'une mise à niveau ou d'une restauration, {product-name} détecte automatiquement les données chiffrées avec la clé héritée et les re-chiffre en utilisant une nouvelle clé dérivée de `neuvector-store-secret`.
+
+Mettez toujours à niveau vers *v5.4.7 ou version ultérieure* avant de restaurer les données de configuration.
+
+Pour plus de détails, voir l'avis de sécurité{nbsp}: https://github.com/neuvector/neuvector/security/advisories/GHSA-h773-7gf7-9m2x
+====
+
+[NOTE]
+====
+{product-name} ne prend pas en charge les restaurations partielles (par exemple, restaurer uniquement les règles réseau) ou les restaurations à un moment donné. Utilisez des scripts d'automatisation pour sauvegarder régulièrement les fichiers de configuration et gérer les sauvegardes horodatées.
+
+Pour plus d'informations, voir xref:automation.adoc#export-import-configuration-file[Exporter et importer des fichiers de configuration].
+====
+
+[WARNING]
+====
+Ne modifiez pas les fichiers de configuration de sauvegarde. Modifier un fichier de sauvegarde après exportation peut entraîner des échecs de restauration ou provoquer un état système imprévisible.
+====
+
+[CAUTION]
+====
+Utilisez les fichiers de configuration de sauvegarde uniquement pour restaurer {product-name} sur le même cluster d'où ils ont été exportés. Restaurer une sauvegarde sur un cluster différent peut entraîner un comportement imprévisible.
+====
+
+== Gestion des clés de chiffrement
+
+Le `neuvector-store-secret` contient le *Clé de chiffrement de clé (KEK)*. {product-name} utilise le KEK pour générer *Clés de chiffrement de données (DEK)*, qui chiffrent les données de configuration sensibles.
+
+Comportement de la clé{nbsp}:
+
+* Vous devez maintenir et sauvegarder le `neuvector-store-secret`.
+* Si le secret est manquant ou si la valeur de la clé ne respecte pas les exigences de longueur, {product-name} le crée ou le met à jour automatiquement.
+* Lorsque {product-name} crée ou met à jour le secret, il génère une alerte vous rappelant de le sauvegarder.
+* Si le KEK change ou est perdu, les données précédemment chiffrées ne peuvent pas être déchiffrées.
+
+Lors des mises à niveau ou des restaurations progressives{nbsp}:
+
+. Les données chiffrées avec la clé codée en dur héritée sont re-chiffrées en utilisant un DEK dérivé du KEK.
+. Les données chiffrées avec un DEK dérivé du KEK ne peuvent être déchiffrées que par {product-name} en utilisant le même KEK.
+
+image:rolling-upgrade-event.png[Événement de re-chiffrement de mise à niveau progressive]
+
+Lorsque le re-chiffrement se produit, {product-name} enregistre l'action et génère un événement.
+
+== Données sensibles protégées par chiffrement
+
+{product-name} chiffre les données sensibles stockées sous les chemins de clé-valeur suivants{nbsp}:
+
+* `object/config/server/ldap1`
+* `object/config/server/oidc1`
+* `object/config/server/saml1`
+* `object/config/system`
+* `object/config/registry`
+* `object/config/federation/membership`
+* `object/config/federation/clusters/...`
+* `object/cert/...`
+
+image:neuvector-store-secret.png[Secret de stockage NeuVector]
+
+[NOTE]
+====
+Sauvegardez toujours le `neuvector-store-secret` avec les données de configuration {product-name}.
+
+Lors de la restauration de {product-name} après une perte de données ou vers un nouveau cluster, vous devez restaurer le *même secret*. Les sauvegardes de configuration sans le secret correspondant ne peuvent pas être déchiffrées.
+====
+
+== Paramètres de haute disponibilité recommandés
+
+La sauvegarde et la restauration manuelles doivent être considérées comme une option de récupération de dernier recours. Pour une haute disponibilité, suivez ces recommandations{nbsp}:
+
+. Déployez {product-name} en utilisant Helm avec un ConfigMap pour la configuration initiale.
+. Utilisez des CRD pour définir des politiques telles que des règles réseau, des profils de processus, le contrôle d'admission et d'autres politiques.
+. Exécutez plusieurs contrôleurs (un minimum de trois) pour synchroniser la configuration entre les pods et planifiez-les sur différents hôtes.
+. Configurez un stockage persistant pour récupérer des pannes à l'échelle du cluster où tous les contrôleurs cessent de fonctionner.
+. Sauvegardez régulièrement la configuration dans des fichiers de sauvegarde horodatés.
+. Restaurez la configuration de {product-name} à partir d'un fichier de sauvegarde uniquement en dernier recours, et réappliquez toutes les CRD qui ont changé après la création de la sauvegarde.

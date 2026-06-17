@@ -1,0 +1,138 @@
+= Dateizugriffsregeln
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/07.filerules/07.filerules.md
+:page-opendocs-slug:  /policy/filerules
+
+== Richtlinie: Dateizugriffsregeln
+
+Es gibt zwei Arten von Prozess-/Dateischutz in {product-name}. Die eine ist Zero-Drift, bei der erlaubte Prozess- und Dateiaktivitäten automatisch basierend auf dem Container-Image bestimmt werden, und die zweite ist eine verhaltensbasierte Lernmethode. Jede kann bei Bedarf angepasst werden (Regeln können manuell hinzugefügt werden).
+
+{product-name} hat eine integrierte Erkennung von verdächtigen Aktivitäten im Dateisystem. Empfindliche Dateien in Containern ändern sich normalerweise zur Laufzeit nicht. Durch die Modifikation des Inhalts der sensiblen Dateien kann ein Angreifer unbefugte Berechtigungen erlangen, wie im Dirty-Cow-Angriff auf den Linux-Kernel, oder die Integrität des Systems schädigen, beispielsweise durch Manipulation der Datei /etc/hosts. Die meisten Container laufen nicht im Nur-Lese-Modus. Jede verdächtige Aktivität in Containern, Hosts oder dem {product-name} Enforcer-Container selbst wird erkannt und in den Benachrichtigungen -> Sicherheitsereignisse protokolliert.
+
+=== Zero-Drift-Dateischutz
+
+Dies ist der Standardmodus für Prozess- und Dateischutz. Zero-Drift erlaubt automatisch nur Prozesse, die vom übergeordneten Prozess stammen, der im ursprünglichen Container-Image enthalten ist, und erlaubt keine Dateiaktualisierungen oder die Installation neuer Dateien. Im Entdeckungs- oder Überwachungsmodus wird Zero-Drift bei verdächtigen Prozess- oder Dateiaktivitäten Alarm schlagen. Im Schutzmodus wird solche Aktivität blockiert. Zero-Drift erfordert nicht, dass Dateiaktivitäten zu einer Erlauben-Liste hinzugefügt werden. Das Deaktivieren von Zero-Drift für eine Gruppe bewirkt, dass die für die Gruppe aufgeführten Prozess- und Dateiregeln stattdessen wirksam werden.
+
+[NOTE]
+====
+Die für jede Gruppe aufgeführten Prozess-/Dateiregeln werden immer angewendet, selbst wenn Zero-Drift aktiviert ist. Dies bietet eine Möglichkeit, Erlauben/Verweigern-Ausnahmen zu den grundlegenden Zero-Drift-Schutzmaßnahmen hinzuzufügen. Bitte beachten Sie, dass, wenn eine Gruppe im Entdeckungsmodus startet, Prozess-/Dateiregeln automatisch zur Liste hinzugefügt werden können und vor dem Wechsel in die Überwachungs-/Schutzmodi überprüft und bearbeitet werden sollten.
+====
+
+Die Möglichkeit, den Zero-Drift-Modus zu aktivieren oder zu deaktivieren, befindet sich in der Konsole in den Richtliniengruppen ->. Mehrere Gruppen können ausgewählt werden, um diese Einstellung für alle ausgewählten Gruppen umzuschalten.
+
+=== Grundlegende Dateischutzmaßnahmen
+
+Wenn eine Paketinstallation erkannt wird, wird ein automatischer erneuter Scan des Containers oder Hosts ausgelöst, um etwaige Schwachstellen zu erkennen, WENN der automatisierte Scan in den Sicherheitsrisiken -> Schwachstellen aktiviert wurde.
+
+Zusätzlich zur Überwachung vordefinierter Dateien/Verzeichnisse können Benutzer benutzerdefinierte Dateien/Verzeichnisse hinzufügen, die überwacht werden sollen, und solche Dateien/Verzeichnisse daran hindern, geändert zu werden.
+
+[IMPORTANT]
+====
+{product-name} gibt Warnungen aus und blockiert keine Änderungen an vordefinierten Dateien/Verzeichnissen oder in Systemcontainern wie Kubernetes. Das Blockieren ist nur eine Option für benutzerkonfigurierte benutzerdefinierte Dateien/Verzeichnisse für Nicht-Systemcontainer. Dies geschieht, damit regelmäßige Aktualisierungen von Systemordnern oder sensiblen Konfigurationen nicht unbeabsichtigt blockiert werden, was zu unberechenbarem Systemverhalten führen könnte.
+====
+
+Die folgenden Dateien und Verzeichnisse werden standardmäßig überwacht:
+
+* Ausführbare Dateien
+* Sensible setuid/setgid-Dateien
+* Systembibliotheken, libc, pthread, ...
+* Paketinstallation, Debian/Ubuntu, RedHat/CentOS, Alpine
+* Sensible Systemdateien, /etc/passwd, /etc/hosts, /etc/resolv.conf ...
+* Ausführbare Dateien laufender Prozesse
+
+Die folgenden Aktivitäten werden überwacht:
+
+* Dateien, Verzeichnisse, Symlinks (Hardlink und Softlink)
+* erstellt, gelöscht, geändert (Inhaltsänderung) und verschoben
+
+Nachfolgend finden Sie eine Liste der Dateisystemüberwachung und was überwacht wird (Container, Host/Knoten und/oder {product-name} Enforcer-Container selbst):
+
+* /bin, /usr/bin, /usr/sbin, /usr/local/bin - Container, Enforcer
+* Dateien mit setuid- und setgid-Attribut - Container, Host, Enforcer
+* Bibliotheken: libc, pthread, ld-linux.* - Container, Host, Enforcer
+* Paketinstallation: dpkg, rpm, apk - Container, Host, Enforcer
+* /etc/hosts, /etc/passwd, /etc/resolv.conf - Container, Host, Enforcer
+* Binärdateien der laufenden Prozesse - Container
+
+=== Verhaltensbasiertes Lernen erlaubter Anwendungen im Entdeckungsmodus
+
+Im Entdeckungsmodus kann {product-name} Anwendungen NUR für bestimmte Verzeichnisse oder Dateien lernen und auf die Whitelist setzen. Um das Lernen zu aktivieren, muss eine benutzerdefinierte Regel erstellt werden und die Aktion muss auf Blockieren gesetzt werden, wie unten beschrieben.
+
+=== Erstellen benutzerdefinierter Datei-/Verzeichnisüberwachungsregeln
+
+Benutzerdefinierte Datei-Zugriffsregeln können sowohl für benutzerdefinierte Gruppen als auch für automatisch erlernte Gruppen erstellt werden.
+
+Benutzer können neue Einträge für Datei-/Verzeichnisregeln hinzufügen.
+
+* Filter: Konfigurieren Sie die zu schützende Datei/Verzeichnis (Wildcard-Zeichen werden unterstützt)
+* Setzen Sie das rekursive Flag (wenn alle Dateien in den Unterverzeichnissen geschützt werden sollen)
+* Wählen Sie die Aktion, Überwachen oder Blockieren (siehe Aktionen unten)
+* Geben Sie erlaubte Anwendungen ein (siehe Hinweis 1 unten)
+
+image:file_rules.png[FileRules]
+
+Aktionen:
+
+* Überwachen Sie Dateiänderungen. Generieren Sie Warnungen (Benachrichtigungen) für alle Änderungen
+* Unbefugte Zugriffe blockieren.
+** Dienst im Entdeckungsmodus: Das Zugriffsverhalten auf die Datei wird erlernt (die Prozesse/Anwendungen, die auf die geschützte Datei zugreifen) und zu den erlaubten Anwendungen hinzugefügt.
+** Dienst im Monitor-Modus: unerwartetes Dateiverhalten wird gemeldet.
+** Dienst im Schutzmodus: unerwarteter Zugriff (lesen, ändern) wird blockiert. Die Erstellung neuer Dateien in geschützten Ordnern wird ebenfalls blockiert.
+
+[NOTE]
+====
+Wenn die Regel auf Blockieren eingestellt ist und der Dienst im Entdeckungsmodus ist, wird {product-name} die Anwendungen, die auf die Datei zugreifen, lernen und diese zu den erlaubten Anwendungen für die Regel hinzufügen.
+====
+
+[NOTE]
+====
+Container-Plattformen, die den AUFS-Speicher-Driver verwenden, unterstützen die Verweigerungs- (Blockieren-) Aktion im Schutzmodus beim Erstellen/Ändern von Dateien aufgrund der Einschränkungen des Drivers nicht. Das Verhalten wird dasselbe wie im Monitor-Modus sein, wobei bei verdächtigen Aktivitäten Alarm geschlagen wird.
+====
+
+=== Reihenfolge der Dateizugriffsregel-Priorität
+
+Ein Container kann Dateizugriffsregeln von mehreren benutzerdefinierten Gruppen sowie benutzererstellte Dateizugriffsregeln in der automatisch gelernten Gruppe erben.
+
+Dateizugriffsregeln haben in der folgenden Reihenfolge Priorität, wenn der Dateiname mit vordefinierten Zugriffsregeln der automatisch gelernten Gruppe und der Regelvererbung mehrerer Gruppen in Konflikt steht.
+
+* Dateizugriffsregel mit blockierendem Zugriff (höchste Priorität)
+* Dateizugriffsregel mit aktivierter Rekursion
+* Dateizugriffsregel mit deaktivierter Rekursion
+* Benutzerdefinierte Dateizugriffsregel, die von vordefinierten Dateizugriffsregeln abweicht
+
+==== Beispiele
+
+Anzeigen der Dateizugriffsregel zum Schutz der Datei /etc/hostname des node-pod-Dienstes und Erlauben der vi-Anwendung, die Datei zu ändern.
+
+image:example1.png[FileRules]
+
+Anzeigen der Dateizugriffsregel zum Schutz von Dateien im Verzeichnis /var/opt/ rekursiv sowohl für Änderungen als auch für das Lesen. Die erlaubte Anwendung Python kann Lese- und Änderungszugriff auf diese Dateien haben.
+
+image:example2.png[FileRules]
+
+Anzeigen der Zugriffsregel, die die Datei /etc/passwd schützt – eine der Dateien, die durch die vordefinierten Zugriffsregeln abgedeckt sind – um die Datei-Zugriffsaktion für Änderungen sowie zum Lesen anzupassen. Diese benutzerdefinierte Regel ändert die Standardaktion der vordefinierten Dateizugriffsregel. Die Anwendung Nano kann Lese- und Änderungszugriff auf diese Dateien haben. Muss auch die Nano-Anwendung (Prozess) als 'erlaubte' Regel in der Prozessprofilregel hinzufügen, damit dieser Dienst die Nano-Anwendung innerhalb des Dienstes ausführen kann (falls sie dort nicht bereits auf die Whitelist gesetzt wurde), andernfalls wird der Prozess von {product-name} blockiert.
+
+image:example3.png[FileRules]
+
+Es wird gezeigt, dass die Anwendung Python beim Zugriff auf Dateien im Verzeichnis /var/opt erlernt wurde, als der Dienst des Node-Pods im Entdeckungsmodus war. Dies tritt nur auf, wenn die Regel auf Blockieren gesetzt ist und der Dienst im Entdeckungsmodus ist.
+
+image:example4.png[FileRules]
+
+Es werden vordefinierte Datei-Zugriffsregeln für den Dienst node-pod.demo-nvqa angezeigt. Dies kann für diesen Dienst durch Klicken auf das Informationssymbol "`show predefined filters`" in der rechten Ecke des Tabs für Datei-Zugriffsregeln angezeigt werden.
+
+image:predefined.png[FileRules]
+
+Es wird ein Beispiel für ein Sicherheitsereignis in Benachrichtigungen -> Sicherheitsereignisse angezeigt, das als Datei-Zugriffsverweigerung alarmiert wurde, als die Änderung der Datei /etc/hostname durch die Anwendung Python aufgrund einer benutzerdefinierten Datei-Zugriffsregel mit Blockierungsaktion verweigert wurde.
+
+image:securityevent.png[FileRules]
+
+=== Weitere Antworten
+
+Wenn andere spezielle Maßnahmen zur Risikominderung, Antworten oder Warnungen für Dateisystemverletzungen gewünscht sind, kann eine Response-Regel erstellt werden. Siehe das Beispiel unten und den Abschnitt Laufzeit-Sicherheitsrichtlinie -> Antwortregeln für weitere Details.
+
+image:file-response1.png[FileResponse]
+
+== Split-Modus-Dateischutz
+
+Containergruppen können Prozess-/Dateiregeln in einem anderen Modus als Netzwerkregeln haben, wie xref:modes.adoc#_network_service_policy_mode[hier] beschrieben.

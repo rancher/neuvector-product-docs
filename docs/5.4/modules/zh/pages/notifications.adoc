@@ -1,0 +1,50 @@
+= 事件报告
+:page-opendocs-origin: /15.ui_extension/03.notifications/03.notifications.md
+:page-opendocs-slug:  /ui_extension/notifications
+
+== 安全事件
+
+在Rancher门户的UI扩展中，**安全事件**选项卡的功能类似于NeuVector独立页面。事件可以由多个因素触发：
+
+* 从某处到终端（节点或pod）的危险通信或数据传输。
+* 端到端连接违反了网络策略。
+* 违反进程控制文件规则的操作。
+* 违反文件访问规则的操作。
+
+image:sec_events.png[安全事件]
+
+在时间滑块上向左或向右滑动点以按日期过滤事件。
+
+image:sec_events_time_filter.png[安全事件]
+
+在快速过滤框中输入关键字以过滤包含该关键字的任何事件。
+
+image:sec_events_quick_filter.png[安全事件]
+
+打开**高级过滤**侧窗格，您将找到多个支持您搜索的选项：
+
+* 严重性、位置和类别可以根据事件标题右侧的标签进行过滤。
+* 自动完成列表支持用户在主机、源和目标字段中的输入，并支持名称空间的多标签输入框。
+
+image:sec_events_adv_filter.png[安全事件]
+
+单击事件以展开面板并显示更多详细信息。在消息框中，您可以查看更多信息。
+
+image:sec_event_detail.png[安全事件]
+
+**主机名**可点击，点击后会打开主机详细信息弹出窗口。**漏洞**和**组**字段有外部链接，重定向到NeuVector SSO页面。
+
+image:node_detail_open.png[安全事件]
+
+**工作负载**可点击，点击后会打开工作负载详细信息弹出窗口。**组**字段有外部链接，重定向到NeuVector SSO页面。
+
+image:pod_detail_open.png[安全事件]
+
+消息框中的**报告人**字段是可点击的，点击后会打开执法者详细信息弹出窗口。
+
+image:enforcer_detail_open.png[安全事件]
+
+== 与NeuVector独立页面比较时未包含的功能
+
+* 审核/提议规则。
+* PDF报告。

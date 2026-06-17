@@ -1,0 +1,68 @@
+= IBM QRadar
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/10.ibmqr/10.ibmqr.md
+:page-opendocs-slug:  /integration/ibmqr
+
+== IBM QRadarとの統合
+
+IBM® QRadar® セキュリティ情報およびイベント管理 (SIEM) は、セキュリティチームが企業全体で脅威を正確に検出し、優先順位を付けるのを支援し、インシデントの影響を軽減するために迅速に対応できるようにするインテリジェントな洞察を提供します。QRadarは、ネットワーク全体に分散された数千のデバイス、エンドポイント、アプリケーションからのログイベントとネットワークフローデータを統合することで、これらの異なる情報を相関させ、関連するイベントを単一のアラートに集約し、インシデントの分析および対応を迅速化します。QRadar SIEMは、オンプレミスおよびクラウド環境で利用可能です。
+
+{product-name}は、QRadar統合を完全にサポートするライフサイクル全体をカバーするコンテナセキュリティプラットフォームです。この統合により、QRadarはコンテナおよびKubernetes環境のイベント、ログ、インシデント情報を収集できるようになります。{product-name}のQRadar用DSMを使用することで、顧客はQRadar内で{product-name}のセキュリティログデータを正規化し、その後、コンテナセキュリティイベントを分析、報告、または対応できるようになります。
+
+=== IBM QRadarと{product-name} DSM
+
+IBM QRadarとの統合のための{product-name} DSMは、IBM X-Force / App Exchangeウェブサイトで公開され、IBMによって検証されています。App Exchangeウェブサイトから https://exchange.xforce.ibmcloud.com/hub/extension/f6dcde294cac1237ce08bcd4dfbc9142[こちら]でダウンロード可能です。
+
+このサイトからもxref:attachment$NeuVectorDSM_1.0.2.zip[こちら]でダウンロード可能です。
+
+=== {product-name}をQRadarと統合する方法
+
+{product-name} DSMをQRadarにインポートする前に、すべてが期待通りに動作することを確認するため、これらのQRadar設定を確認または変更することをお勧めします：
+
+. IBM QRadarバージョン7.3.1以降
+. Syslogペイロードの長さが十分であることを確認するために、QRadar "`System Settings`"を構成します。
++
+image:Qradar1.png[QRadar]
+
+=== {product-name}をQRadarにSyslogを送信するように構成します。
+
+「設定」セクションの->構成で、Syslog設定を有効にします。サーバーのIP/URLとポートはQRadarサービスのIPとポートを指す必要があり、デフォルトのSyslogポートは514になります。UDPプロトコルと"`In Json`"ログフォーマットを使用してください。報告するログレベルとカテゴリを選択してください。マルチクラスター{product-name}環境では、すべてのクラスターのログを収集するために、この設定を各クラスターで有効にする必要があります。このページでクラスター名を設定して、クラスターイベントを区別できます。
+
+image:Qradar_syslog2.png[QRadar]
+
+=== QRadarを設定して{product-name}ログを分析します。
+
+. {product-name} DSMをQRadarに有効化またはインポートします。新しいQRadarログソースを追加する際に、QRadarログソースタイプに"`{product-name}`"が表示された場合は、以下のログソースインポート手順を無視し、次のステップ"`Add and enable log sources for {product-name}`"を進めてください。
+
+image:Qradar3.png[QRadar]
+
+QRadarで"`{product-name}`"ログソースタイプが見つからなかった場合は、QRadarユーザーマニュアルを参照して、Admin > 拡張管理から{product-name} DSMをインストールしてください。
+
+image:Qradar4.png[QRadar]
+
+. {product-name}のためにログソースを追加して有効にします。
+
+これで{product-name}ログの新しいログソースを追加できます：
+
+image:Qradar5.png[QRadar]
+
+"`Log Source Identifier`"はリードコントローラーのポッド名である必要があります。{product-name}のリードコントローラーのポッド名は、QRadarの生ログデータまたは{product-name}の管理コンソール"`Assets\Controllers`"から以下のように見つけることができます：
+
+image:Qradar6.png[QRadar]
+
+複数の{product-name}クラスターが稼働している場合は、複数のログソースを追加する必要があります。{product-name}ログソースが追加されて有効になっています：
+
+image:Qradar7.png[QRadar]
+
+=== ログアクティビティを確認します。
+
+ネットワークポリシー違反、設定変更イベント、またはコンテナ/ノードの脆弱性スキャンなど、いくつかの{product-name}ログを生成します。これらのインシデントまたはイベントログは、数秒以内にQRadarに送信されます。{product-name}ログはQRadarコンソールで正規化される必要があります。QRadarのDSMエディタを通じても確認できます：
+
+image:Qradar8.png[QRadar]
+
+image:Qradar9.png[QRadar]
+
+=== 統合の概要
+
+完了した統合により、{product-name}のセキュリティおよび管理イベントは、他のソースからのイベントデータと共にQRadarで管理できます。QRadarは{product-name}イベントの恒久的なイベントストレージとして機能し、{product-name}コントローラーはリアルタイムのセキュリティ応答とイベントの短期クラスターストレージを行います。QRadarは、重要なコンテナおよびKubernetesのセキュリティイベントに対して、高度な相関とアラートを実行することができます。

@@ -1,0 +1,48 @@
+= Microsoft AD
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/03.msad/03.msad.md
+:page-opendocs-slug:  /integration/msad
+
+== Configurando Active Directory
+
+Esto explica cómo {product-name} se autentica con Windows Active Directory.
+La página de configuración para el servidor de Windows Active Directory se muestra a continuación.
+
+image:ad1.png[ad_config]
+
+Usuario: Esto puede ser cualquier usuario que tenga permiso de acceso de lectura sobre el objeto Base DN. El atributo dn debe utilizarse como se muestra a continuación, o el nombre de inicio de sesión de Windows como user@local.nvtest.com.
+
+image:ad2.png[ad_config]
+
+DN de base: Este es un objeto raíz de Windows Active Directory para la autenticación de usuarios. El requisito mínimo de permiso de acceso es lectura. Como se muestra en el ejemplo anterior, el objeto OU=IT,DC=local,DC=nvtest,DC=com solo está permitido para una cuenta de usuario definida en el campo Nombre de usuario para permitir la lectura.
+
+image:ad3.png[ad_config]
+
+Con la configuración anterior de Nombre de usuario y Base DN, {product-name} puede enlazarse con Windows Active Directory con éxito. Haz clic en PROBAR CONEXIÓN para comprobarlo.
+
+image:ad4.png[ad_config]
+
+Usuario: Se requiere utilizar únicamente el atributo sAMAccountName para la correspondencia. Por ejemplo, en la pantalla a continuación, {product-name} va a verificar si el usuario ituser(CN=ituser,OU=IT,DC=local,DC=nvtest,DC=com) puede iniciar sesión con la consola web {product-name}.
+
+[NOTE]
+====
+{product-name} no utiliza los valores de los atributos cn, displayName, dn, givenName, name o userPrincipalName, etc., para verificar al usuario de prueba.
+====
+
+image:ad5.png[ad_config]
+
+La última parte es la asignación de roles para {product-name} para el inicio de sesión en la consola web.
+
+image:ad6.png[ad_config]
+
+En el ejemplo anterior, el grupo definido, _d_s_itgroup, en el rol {product-name} debe tener atributos de miembro y sAMAccountType. El valor del atributo sAMAccountType DEBE ser 268435456, que es el grupo de seguridad global y el nombre de usuario de inicio de sesión debe estar en las listas de miembros.
+
+image:ad7.png[ad_config]
+
+Atributo de miembro del grupo: Este es un atributo de miembro para Windows Active Directory por defecto y se utiliza para el propósito de mapeo de roles, como se muestra arriba.
+Si se cumplen todos los requisitos mencionados anteriormente, el usuario de Windows Active Directory debería poder iniciar sesión en la consola web {product-name} con éxito.
+
+=== Mapeo de Grupos a Roles y Espacios de nombres
+
+Por favor, consulta la sección xref:users.adoc#_mapping_groups_to_roles_and_namespaces[Usuarios y Roles] para saber cómo mapear grupos a roles predefinidos y personalizados, así como espacios de nombres en {product-name}.

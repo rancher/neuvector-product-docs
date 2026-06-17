@@ -4,6 +4,7 @@
 :page-opendocs-origin: /05.policy/11.customcompliance/11.customcompliance.md
 :page-opendocs-slug:  /policy/customcompliance
 
+[#_creating_custom_scripts_for_compliance_checks]
 == Creating Custom Scripts for Compliance Checks
 
 Custom scripts can be run on containers and hosts for use in compliance checks and other assessments. The Custom Compliance check is a bash script that can be run on any container to validate a condition and report result in the container or node compliance section.
@@ -26,6 +27,7 @@ Custom scripts should be used with extreme caution. The custom script can run an
 ** Custom check is pass if exit code is 0
 ** Custom check is fail if exit code is 1
 
+[#_sample_script_to_check_if_container_has_root_account_with_no_password]
 === Sample script to check if container has root account with no password.
 
 [,bash]
@@ -40,6 +42,7 @@ else
 fi
 ----
 
+[#_sample_script_to_check_dirty_cow_file_in_the_container]
 ==== Sample script to check dirty cow file in the container.
 
 [,bash]
@@ -59,6 +62,7 @@ Other Notes
 * Scripts have a timeout of 1 minute to complete, otherwise they are killed and reported as an error in the compliance result.
 * Script can be executed when in all 3-operating modes, Discover, Monitor, and Protect.
 
+[#_creating_a_custom_check_script]
 == Creating a custom check script
 
 * Select the service group (user created or auto learned) from Policy -> Group.
@@ -70,6 +74,7 @@ Other Notes
 * Scripts are run on the containers covered by the service group as soon as script is created as well as when the script is updated.
 * View the script result from Assets -> Container -> Compliance, or Assets -> Nodes -> Compliance.
 
+[#_samples]
 === Samples
 
 Creating a custom check script on demo group comprised of 3 containers
@@ -88,6 +93,7 @@ Showing compliance result for nginx container for a custom check that had a time
 
 image:compliance_timeout.png[ComplianceTimeout]
 
+[#_creating_a_response_rule_for_compliance_report]
 == Creating a response rule for compliance report
 
 Response rules can be created in Policy -> Response Rules that are based on results of custom compliance check results. The results are part of the category Compliance, and responses can be created for all events of a certain level.

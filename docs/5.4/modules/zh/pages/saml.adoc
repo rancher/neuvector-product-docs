@@ -1,0 +1,38 @@
+= SAML (Okta)
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/04.saml/04.saml.md
+:page-opendocs-slug:  /integration/saml
+
+== SAML IDP 配置
+
+要配置 {product-name} 使用 Okta SAML IDP 服务器，首先在 Okta 网站上配置 SAML IDP 服务器。
+
+image:okta.png[Okta]
+
+. 从{product-name} SAML 设置页面复制 "SAML 重定向 URI"，粘贴到 Okta 的单点登录 URL、接收者 URL 和目标 URL 字段中。
+. 断言加密：此字段必须为 *未加密。*
+. 属性声明：输入电子邮件和用户名属性。
+. 组属性声明：如果需要基于组的角色映射，请启用此选项。查找的 {product-name}默认属性名称是 NVRoleGroup。如果用户的组成员资格使用其他属性名称，可以在{product-name}的 SAML 设置页面中进行自定义。
+
+在{product-name} UI 控制台中配置 SAML 设置。
+
+image:saml1.png[SAML]
+
+使用 "查看设置说明" 按钮，如下图所示，定位以下信息，并将其复制到{product-name}的 SAML 页面中。
+
+. 身份提供者单点登录 URL
+. 身份提供者发行者
+. X.509 证书
+. 如果使用非默认值，请指定组属性名称。
+
+image:setting.png[设置]
+
+在用户通过身份验证后，可以通过基于组的角色映射配置推导出适当的角色。要设置基于组的角色映射，
+
+. 如果未配置基于组的角色映射或无法找到匹配的组，则经过身份验证的用户将被分配为默认角色。如果默认角色设置为无，当基于组的角色映射失败时，用户将无法登录。
+. 分别指定管理员和读者角色映射中的组列表。用户的组属性在用户通过身份验证后会在响应中附带。如果找到匹配的组，将把相应的角色分配给用户。
+
+=== 将组映射到角色和名称空间
+
+有关如何将组映射到{product-name}中的预设和自定义角色以及名称空间，请参见xref:users.adoc#_mapping_groups_to_roles_and_namespaces[用户和角色]部分。

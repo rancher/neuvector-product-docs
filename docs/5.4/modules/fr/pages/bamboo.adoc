@@ -1,0 +1,31 @@
+= Bamboo
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/03.build/02.bamboo/02.bamboo.md
+:page-opendocs-slug:  /scanning/build/bamboo
+
+== Analyser les vulnérabilités pendant le pipeline de build de Bamboo
+
+Le plug-in Bamboo pour {product-name} peut être utilisé pour analyser les vulnérabilités dans le pipeline de Bamboo. Le plug-in peut être téléchargé depuis le menu Admin -> des modules complémentaires dans Bamboo. Utilisez Trouver de nouvelles applications pour rechercher {product-name}. Le plug-in est également décrit dans le https://marketplace.atlassian.com/apps/1221199/neuvector[Atlassian Marketplace].
+
+Déployez le conteneur {product-name} Allinone ou Controller si vous ne l'avez pas déjà fait sur un hôte accessible par Bamboo. Notez l'adresse IP de l'hôte où l'Allinone ou le Controller est en cours d'exécution.
+
+De plus, assurez-vous qu'il y a un conteneur {product-name} scanner déployé et configuré pour se connecter à l'Allinone ou au Controller. Dans la version 4.0 et ultérieure, le conteneur neuvector/scanner doit être déployé séparément de l'Allinone ou du Controller.
+
+=== Configurer les paramètres globaux
+
+Configurer les paramètres pour le {product-name} Controller/Allinone, y compris l'{product-name} authentification ainsi que l'authentification du registre.
+
+image:bamboo_nv_global_config.png[global-image]
+
+=== Configurer le dépôt et la stratégie de build
+
+Créez une tâche et saisissez le dépôt et le tag à analyser ainsi que la stratégie de build pour faire échouer la build si des vulnérabilités sont détectées. Activez l'analyse par couches si les résultats doivent contenir une analyse des vulnérabilités pour chaque couche de l'image.
+
+image:bamboo_nv_local_config_2.png[local-image]
+
+=== Examiner les résultats
+
+Examinez les résultats dans les journaux d'analyse, y compris le résumé de l'analyse, la raison de l'échec si approprié, et les détails pour chaque CVE détecté.
+
+image:bamboo_set_criteria_to_fail_3.png[fail-image]

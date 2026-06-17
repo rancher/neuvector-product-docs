@@ -1,0 +1,193 @@
+= Solución de problemas
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /12.troubleshooting/01.troubleshooting/01.troubleshooting.md
+:page-opendocs-slug:  /troubleshooting/troubleshooting
+
+== Solución de problemas {product-name} Ampliaciones
+
+Los contenedores {product-name} se despliegan, gestionan y actualizan utilizando la misma herramienta de orquestación que se utiliza para las cargas de trabajo de la aplicación. Por favor, asegúrate de revisar la documentación en línea para cada paso necesario durante la ampliación. A menudo, las ampliaciones se intentan simplemente copiando los archivos yaml de ejemplo y desplegándolos sin revisar los pasos previos, como configurar correctamente los registros, secretos o RBACs/vinculaciones de roles.
+
+=== Ampliación inicial
+
+* Verifica que los contenedores {product-name} se puedan extraer con la autenticación correcta. Verifica el secreto utilizado y asegúrate de que el clúster pueda acceder al registro apropiado.
+* Asegúrate de que los cambios en el yaml requeridos (por ejemplo, NodePort o LoadBalancer) o la configuración de valores de Helm estén establecidos adecuadamente.
+* Verifica la plataforma y el tiempo de ejecución del contenedor y realiza cambios según sea necesario (por ejemplo, PKS, containerd, CRI-O).
+
+=== Inicio de sesión y configuración inicial
+
+* Verifica que se permita el acceso adecuado al gestor (dirección IP, puerto, ruta) a través de los firewalls.
+
+=== Operación continua
+
+* Integración de directorios. {product-name} admite configuraciones específicas para LDAP/AD y otras integraciones para grupos y roles. Contacta con {product-name} para pasos adicionales de solución de problemas y una herramienta para la solución de problemas de AD.
+* Exploración del registro. La mayoría de los problemas están relacionados con errores de autenticación del registro o la incapacidad del controlador para acceder al registro desde el clúster.
+* Para problemas de rendimiento, asegúrate de que el escáner tenga suficiente memoria asignada para escanear imágenes grandes. Además, se pueden especificar mínimos de CPU y memoria en la política del pod para garantizar un rendimiento adecuado a gran escala.
+* Control de admisión. Consulta la sección de Solución de Problemas en la sección Riesgos de Seguridad... -> Controles de admisión.
+
+=== Actualizando
+
+* Utiliza actualizaciones continuas para el controlador. Si estás reiniciando hosts, asegúrate de monitorizar los controladores mientras se trasladan a otros hosts, o redepliega en los hosts reiniciados, para asegurarte de que pueden iniciar, unirse al clúster de controladores y estabilizar/sincronizar. Reiniciar todos los hosts a la vez o demasiado rápido puede resultar en estados desconocidos para los controladores.
+* Utiliza una reclamación de volumen persistente para almacenar la configuración de {product-name} en caso de que todos los controladores/nodos fallen en el clúster.
+* Al actualizar a una nueva versión, revisa la documentación en línea para identificar cambios/adiciones al yaml requerido, así como otros cambios como rolebindings o nuevos servicios (por ejemplo, webhook de control de admisión, reclamación de volumen persistente, etc.).
+
+== Registros de Depuración
+
+Para ver los registros de un contenedor de {product-name}, por ejemplo, un pod de controlador
+
+[,shell]
+----
+kubectl logs neuvector-controller-pod-777fdc5668-4jkjn -n neuvector
+----
+
+Estos registros pueden mostrar problemas de conectividad del clúster, acciones de administración, actividad de escaneo y otras entradas útiles. Si hay múltiples controladores en ejecución, puede ser necesario inspeccionar cada uno. Estos registros pueden redirigirse a un archivo para enviarlos al soporte de {product-name}.
+
+=== Activar el modo de depuración para los controladores de {product-name}
+
+Para problemas que requieren una investigación profunda, se puede habilitar el modo de depuración para los controladores/todo en uno, lo que registrará información detallada. Esto puede aumentar el tamaño del archivo de registro considerablemente, por lo que se recomienda desactivarlo después de recopilarlos.
+
+=== Kubernetes, OpenShift y Otros Registros de Orquestación
+
+Puede ser útil inspeccionar los registros de las herramientas de orquestación para ver toda la actividad de ampliación, incluyendo marcas de tiempo de creación de pods y estado, ampliaciones, daemonsets y otras acciones de gestión de los contenedores de {product-name} realizadas por la herramienta de orquestación.
+
+[,shell]
+----
+kubectl get events -n neuvector
+----
+
+== Registro de Soporte
+
+El registro de soporte contiene información adicional que es útil para el Soporte de {product-name}, incluyendo configuración del sistema, contenedores, políticas, notificaciones y detalles del contenedor {product-name}.
+
+Para descargar el registro de soporte, ve a Configuración -> Configuración y selecciona Recopilar registro.
+
+== Usando la CLI para activar el modo de depuración
+
+Inicia sesión en el pod del gestor de {product-name} con usuario y contraseña (recomendado en una ventana de terminal separada).
+
+[,shell]
+----
+kubectl exec -it neuvector-manager-pod-5bb76b6754-rlmnp -n neuvector -- cli
+----
+
+[,shell]
+----
+#neuvector-svc-controller.neuvector> login
+----
+
+Obtén la lista de controladores. Encuentra el controlador con el Líder = Verdadero.
+
+[,shell]
+----
+show controller
+----
+
+Activa el modo de depuración en el controlador líder usando el ID o nombre del controlador
+
+[,shell]
+----
+set controller 4fce427cf963 debug -c all
+----
+
+Para activar el modo de depuración en todos los controladores
+
+[,shell]
+----
+set system controller_debug -c all
+----
+
+Realiza la actividad en {product-name} que deseas depurar. Luego, visualiza los registros del controlador (en una ventana de terminal separada).
+
+[,shell]
+----
+kubectl logs <leader_controller_pod_name> -n neuvector
+----
+
+Si es necesario, captura los registros y envíalos a {product-name}.
+
+Desactiva el modo de depuración en el controlador (de vuelta en la ventana de la CLI).
+
+[,shell]
+----
+set controller 4fce427cf963 debug
+exit
+----
+
+Verifica el estado de depuración del controlador.
+
+[,shell]
+----
+show controller setting 289d67396fcb
+----
+
+== Usando la API REST para activar el modo de depuración
+
+Establece el token con tu IP, usuario, contraseña:
+
+[,shell]
+----
+_controllerIP_="<your_controller_ip>"
+_controllerRESTAPIPort_="10443"
+_neuvectorUsername_="admin"
+_neuvectorPassword_="admin"
+----
+
+[NOTE]
+====
+Para implementaciones basadas en Kubernetes, puedes obtener la IP del Controlador en la salida del siguiente comando:
+====
+
+[,shell]
+----
+kubectl get pod -n neuvector -o wide | grep controller
+----
+
+[NOTE]
+====
+Si accedes a la API REST desde fuera del clúster, consulta las instrucciones de la sección de Automatización.
+====
+
+Obtén el testigo de autenticación
+
+[,shell]
+----
+curl -k -H "Content-Type: application/json" -d '{"password": {"username": "'$_neuvectorUsername_'", "password": "'$_neuvectorPassword_'"}}' "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/auth" > /dev/null 2>&1 > token.json
+_TOKEN_=`cat token.json | jq -r '.token.token'`
+----
+
+[NOTE]
+====
+Puede que necesites instalar jq ($sudo yum install jq)
+====
+
+Habilitar Modo de Depuración
+
+[,shell]
+----
+curl -X PATCH -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"config": {"controller_debug": ["cpath", "conn"]}}' "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/system/config"  > /dev/null 2>&1   > set_debug.json
+#debug options - cpath, conn, mutex, scan, cluster , all
+----
+
+Desactivar la depuración en todos los controladores en un clúster
+
+[,shell]
+----
+curl -X PATCH -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"config": {"controller_debug": []}}' "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/system/config"  > /dev/null 2>&1   > set_debug.json
+----
+
+Verifica el estado de depuración del controlador en un clúster
+
+[,bash]
+----
+curl  -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_"  "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/system/config"  > /dev/null 2>&1   > system_setting.json
+
+cat system_setting.json | jq .config.controller_debug
+----
+
+Cerrar sesión
+
+[,shell]
+----
+echo `date +%Y%m%d_%H%M%S` log out
+curl -k -X 'DELETE' -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/auth" > /dev/null 2>&1
+----

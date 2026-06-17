@@ -1,0 +1,349 @@
+= Amazon ECS
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/09.ecs/09.ecs.md
+:page-opendocs-slug: /deploying/ecs
+
+== Wichtig: Die Implementierung auf Amazon ECS wird nicht mehr unterstützt.
+
+Der Referenzabschnitt unten wird nicht mehr gepflegt. Er kann jedoch einige Hilfestellungen bieten, um zu verstehen, wie man das All-in-One auf ECS bereitstellt.
+
+== Bereitstellen auf AWS mit ECS
+
+Dies ist ein Beispiel, wie man {product-name} mit ECS bereitstellt.
+
+[NOTE]
+====
+Bitte sehen Sie sich die Kubernetes-Beispiele für EKS an.
+====
+
+. Bereiten Sie mehrere Amazon ECS-Instanzen vor, die über eine integrierte Docker-Engine sowie integrierte ECS-Agent-Container verfügen. Wählen Sie einen Knoten für die Verwaltungskonsole aus. Definieren Sie dann Sicherheitsgruppenregeln, die den eingehenden TCP-Port 8443 (den Standardport der {product-name}-Verwaltungskonsole) für den Zugriff durch Ihren Client-Browser zulassen.
+. Definieren Sie eine Sicherheitsgruppe, die TCP- und UDP-Ports auf 18300, 18301, 18400, 18401 zulässt. Dies wird von {product-name}-Enforcern verwendet, um mit den Controllern/All-in-One zu kommunizieren. Wenden Sie diese Sicherheitsgruppe auf alle ECS-Instanzen an, die die {product-name}-Enforcer und Controller/All-in-One bereitstellen werden.
+. Setzen Sie ein Attribut auf den Knoten, auf denen Sie {product-name} All-in-One oder den Controller-Container bereitstellen möchten. Wenn Sie beispielsweise {product-name} im Controller-HA-Modus ausführen möchten, wird empfohlen, mindestens 3 Knoten auszuwählen und das Attribut auf alle 3 Knoten anzuwenden.
++
+--
+So fügen Sie Ihren ECS-Instanzen Attribute hinzu:
+
+Wählen Sie die Instanz aus und wählen Sie dann "`View/Edit Attributes`" aus dem Dropdown-Menü "Aktionen".
+
+image:1viewattributes.png[Attribute]
+
+Fügen Sie dann ein neues Attribut hinzu. Zum Beispiel "`allinone-node`" mit dem Wert "`true`".
+
+image:2addattribute.png[AttributeHinzufügen]
+--
+. Erstellen Sie die All-in-One-Aufgabendefinition. Erstellen Sie eine neue Aufgabendefinition für den All-in-One-Container. Sie können die ECS-Oberfläche verwenden, um sie manuell zu erstellen oder die Beispiel-JSON-Datei (siehe unten für Beispiele) einzufügen. Verweisen Sie auf Abschnitt "`1. Deploying {product-name}`" dieser Dokumentation, um zu erfahren, wie Sie das All-in-One konfigurieren.
++
+--
+Geben Sie die Platzierungsbeschränkung ein. Wenn Sie beispielsweise das oben verwendete Attribut-Labeling verwendet haben, geben Sie dies in der Beschränkung ein.
+
+[,json]
+----
+attribute:allinone-node=~true
+----
+
+image:3taskdef.png[AllinoneTask]
+
+[NOTE]
+====
+Wenn Sie die aktualisierte JSON-Datei jetzt überprüfen, sehen Sie die hinzugefügte Platzierungsbeschränkung.
+====
+--
+. Erstellen Sie einen neuen Dienst für die All-in-One-Aufgabe. Setzen Sie die "`Placement Templates`" auf "`One Task Per Host`", damit nur ein All-in-One/Controller auf einem Host ausgeführt werden kann. Sie werden auch sehen, dass die Beschränkung "`memberOf(attribute:allinone-node=~true)" verwendet wird, was erfordert, dass der Knoten über dieses Attribut verfügt.
++
+--
+image:3taskplacement.png[AllinonePlace]
+--
+. Jetzt können Sie den All-in-One-Dienst bereitstellen. Setzen Sie die "`Number of tasks`" auf die gewünschte Anzahl an All-in-One/Controller. Jetzt werden die {product-name} All-in-One- oder Controller-Container auf den ausgewählten Knoten ausgeführt. Nachdem der All-in-One läuft, sollten Sie in der Lage sein, über HTTPS auf die {product-name}-Konsole zuzugreifen.
+. Erstellen Sie die Enforcer-Aufgabendefinition. Dies ist ähnlich wie die All-in-One-Aufgabe. Konfigurieren Sie manuell über die ECS-Konsole oder verwenden Sie das untenstehende JSON-Beispiel.
++
+--
+Für die Platzierungsbeschränkung des Enforcers müssen Sie sicherstellen, dass der Enforcer nicht auf demselben Knoten wie der All-in-One ist.
+
+[,json]
+----
+attribute:allinone-node!~true
+----
+
+image:4enforcertask.png[EnforcerTask]
+--
+. Erstellen Sie einen neuen Dienst für die Enforcer-Aufgabe. Setzen Sie erneut die Aufgabenplatzierung auf "`One Task Per Host`", damit nur ein Enforcer auf jedem Host bereitgestellt wird. Beachten Sie auch, dass die zusätzliche Einschränkung zeigt, dass sie die Bereitstellung auf einem All-in-One-Knoten verhindert.
++
+--
+image:5taskplacement.png[EnforcerPlacement]
+
+Stellen Sie diesen Dienst mit der gewünschten Anzahl von Enforcer-Knoten in "`Number of tasks`" bereit. In sehr kurzer Zeit werden alle Enforcer betriebsbereit sein. Von der {product-name}-Konsole aus können Sie alle Knoten sehen, die mit Enforcern erkannt werden.
+--
+
+== Beispiel für ECS JSON-Aufgabenbeschreibungen
+
+Sie können die folgenden Beispiele als Ausgangspunkte für die Konfiguration der Aufgabenbeschreibungen für die {product-name}-Container verwenden.
+
+Erstellen Sie eine neue Aufgabenbeschreibung und klicken Sie dann unten auf "Über JSON konfigurieren". Bevor Sie das untenstehende JSON einfügen, ersetzen Sie die IP-Adresse und den Bildpfad (finden Sie ERSETZEN in den Beispielen). Typischerweise wäre die IP-Adresse die private IP-Adresse der AWS-Instanz, auf der der All-in-One ausgeführt wird. Sie können auch einen anderen Familiennamen als my-allinone/my-enforcer angeben (unten im JSON).
+
+Beispiel für eine All-in-One-JSON-Datei:
+
+.Klicken Sie hier für Details
+[%collapsible]
+====
+[,json]
+----
+{
+    "networkMode": "bridge",
+    "taskRoleArn": null,
+    "pidMode": "host",
+    "containerDefinitions": [
+        {
+            "volumesFrom": [],
+            "memory": null,
+            "extraHosts": null,
+            "dnsServers": null,
+            "disableNetworking": null,
+            "dnsSearchDomains": null,
+            "portMappings": [
+                {
+                    "hostPort": 18300,
+                    "containerPort": 18300,
+                    "protocol": "tcp"
+                },
+                {
+                    "hostPort": 18301,
+                    "containerPort": 18301,
+                    "protocol": "tcp"
+                },
+                {
+                    "hostPort": 18400,
+                    "containerPort": 18400,
+                    "protocol": "tcp"
+                },
+                {
+                    "hostPort": 18401,
+                    "containerPort": 18401,
+                    "protocol": "tcp"
+                },
+                {
+                    "hostPort": 18301,
+                    "containerPort": 18301,
+                    "protocol": "udp"
+                },
+                {
+                    "hostPort": 8443,
+                    "containerPort": 8443,
+                    "protocol": "tcp"
+                },
+                {
+                    "hostPort": 1443,
+                    "containerPort": 10443,
+                    "protocol": "tcp"
+                }
+            ],
+            "hostname": null,
+            "essential": true,
+            "entryPoint": null,
+            "mountPoints": [
+                {
+                    "containerPath": "/lib/modules",
+                    "sourceVolume": "modules",
+                    "readOnly": null
+                },
+                {
+                    "containerPath": "/var/run/docker.sock",
+                    "sourceVolume": "dockersock",
+                    "readOnly": null
+                },
+                {
+                    "containerPath": "/host/proc",
+                    "sourceVolume": "proc",
+                    "readOnly": true
+                },
+                {
+                    "containerPath": "/host/cgroup",
+                    "sourceVolume": "cgroup",
+                    "readOnly": true
+                }
+            ],
+            "name": "allinone",
+            "ulimits": null,
+            "dockerSecurityOptions": null,
+            "environment": [
+                {
+                    "name": "CLUSTER_JOIN_ADDR",
+                    "value": "REPLACE: Private IP"
+                }
+            ],
+            "links": null,
+            "workingDirectory": null,
+            "readonlyRootFilesystem": false,
+            "image": "REPLACE: Image Path/Name",
+            "command": null,
+            "user": null,
+            "dockerLabels": {
+                "com.myself.name": "neuvector"
+            },
+            "logConfiguration": null,
+            "cpu": 0,
+            "privileged": true,
+            "memoryReservation": 768
+        }
+    ],
+    "volumes": [
+        {
+            "host": {
+                "sourcePath": "/lib/modules"
+            },
+            "name": "modules"
+        },
+        {
+            "host": {
+                "sourcePath": "/var/run/docker.sock"
+            },
+            "name": "dockersock"
+        },
+        {
+            "host": {
+                "sourcePath": "/proc"
+            },
+            "name": "proc"
+        },
+        {
+            "host": {
+                "sourcePath": "/sys/fs/cgroup"
+            },
+            "name": "cgroup"
+        }
+    ],
+    "family": "my-allinone",
+    "placementConstraints": []
+}
+----
+====
+
+Beispiel für eine Enforcer-JSON-Datei:
+
+.Klicken Sie hier für Details
+[%collapsible]
+====
+[,json]
+----
+{
+    "networkMode": "bridge",
+    "taskRoleArn": null,
+    "pidMode": "host",
+    "containerDefinitions": [
+        {
+            "volumesFrom": [],
+            "memory": null,
+            "extraHosts": null,
+            "dnsServers": null,
+            "disableNetworking": null,
+            "dnsSearchDomains": null,
+            "portMappings": [
+                {
+                    "hostPort": 18301,
+                    "containerPort": 18301,
+                    "protocol": "tcp"
+                },
+                {
+                    "hostPort": 18401,
+                    "containerPort": 18401,
+                    "protocol": "tcp"
+                },
+                {
+                    "hostPort": 18301,
+                    "containerPort": 18301,
+                    "protocol": "udp"
+                }
+            ],
+            "hostname": null,
+            "essential": true,
+            "entryPoint": null,
+            "mountPoints": [
+                {
+                    "containerPath": "/lib/modules",
+                    "sourceVolume": "modules",
+                    "readOnly": null
+                },
+                {
+                    "containerPath": "/var/run/docker.sock",
+                    "sourceVolume": "dockersock",
+                    "readOnly": null
+                },
+                {
+                    "containerPath": "/host/proc",
+                    "sourceVolume": "proc",
+                    "readOnly": true
+                },
+                {
+                    "containerPath": "/host/cgroup",
+                    "sourceVolume": "cgroup",
+                    "readOnly": true
+                }
+            ],
+            "name": "enforcer",
+            "ulimits": null,
+            "dockerSecurityOptions": null,
+            "environment": [
+                {
+                    "name": "CLUSTER_JOIN_ADDR",
+                    "value": "REPLACE: Private IP"
+                }
+            ],
+            "links": null,
+            "workingDirectory": null,
+            "readonlyRootFilesystem": false,
+            "image": "REPLACE: Image Path/Name",
+            "command": null,
+            "user": null,
+            "dockerLabels": {
+                "com.myself.name": "neuvector"
+            },
+            "logConfiguration": null,
+            "cpu": 0,
+            "privileged": true,
+            "memoryReservation": 512
+        }
+    ],
+    "volumes": [
+        {
+            "host": {
+                "sourcePath": "/lib/modules"
+            },
+            "name": "modules"
+        },
+        {
+            "host": {
+                "sourcePath": "/var/run/docker.sock"
+            },
+            "name": "dockersock"
+        },
+        {
+            "host": {
+                "sourcePath": "/proc"
+            },
+            "name": "proc"
+        },
+        {
+            "host": {
+                "sourcePath": "/sys/fs/cgroup"
+            },
+            "name": "cgroup"
+        }
+    ],
+    "family": "my-enforcer",
+    "placementConstraints": []
+}
+----
+====
+
+== Live-Aktualisierung {product-name}
+
+Sie können ein Live-Update der {product-name}-Container in ECS durchführen, ohne die Dienste zu unterbrechen. Die Dienste von {product-name} können einfach aktualisiert oder geupgradet werden, ohne dass laufende Dienste unterbrochen werden. Um dies in Amazon ECS zu tun:
+
+. Wenn Sie mehrere Controller oder Allinone als Cluster bereitgestellt haben, ignorieren Sie diesen Schritt. Wenn sich nur ein einzelner All-in-One/Controller im System befindet, finden Sie eine neue ECS-Instanz und stellen Sie einen zweiten All-in-One/Controller-Container darauf bereit (folgen Sie den {product-name} All-in-One/Controller ECS-Bereitstellungsschritten). Nach der Bereitstellung sehen Sie in der {product-name} Verwaltungskonsole diesen neuen Controller, der aktiv ist (unter Ressourcen > Controller). Dies ist erforderlich, damit alle zustandsbehafteten Daten zwischen den Controllern repliziert werden.
+. Setzen Sie in den ECS-Diensten den alten All-in-One/Controller-Dienst zurück und löschen Sie ihn. Ziehen Sie die aktualisierten {product-name} Bilder manuell oder lösen Sie AWS ECS aus, um neue Versionen der All-in-One/Controller-Container von Dockerhub oder Ihrem privaten Repository abzurufen.
+. Erstellen Sie eine neue Revision der All-in-One/Controller-Aufgabe und aktualisieren Sie die "`CLUSTER_JOIN_ADDR`" auf die private Knoten-IP-Adresse des 2. All-in-One/Controllers.
+. Erstellen Sie einen neuen Dienst, um diese neue Aufgabe bereitzustellen (folgen Sie denselben Schritten zur Bereitstellung in ECS). Nach Abschluss sollte die neue Version des All-in-One/Controllers aktiv sein. Aus der {product-name} Verwaltungskonsole sollten alle Protokolle und Richtlinien weiterhin vorhanden sein. Optional können Sie den 2. All-in-One/Controller-Container jetzt herunterfahren, da nun ein All-in-One/Controller-Container auf dem ursprünglichen Knoten gestartet wurde.
+. Fahren Sie die Enforcer in den ECS-Diensten herunter und aktualisieren Sie sie. Ziehen Sie manuell oder automatisch die neuen Enforcer-Bilder ab. Starten oder aktualisieren Sie dann den Enforcer auf allen Knoten neu. Aus der {product-name} Konsole sehen Sie, dass alle Enforcer auf dem neuesten Stand sind.
+. Wenn Sie den separaten Manager-Container anstelle des All-in-One verwenden (der bereits den Manager enthält), fahren Sie einfach den alten Manager-Container herunter und entfernen Sie ihn. Laden Sie dann die neue Version des Managers herunter und stellen Sie ihn bereit, wobei Sie CLUSTER_JOIN_ADDR auf die IP des Controllers verweisen.
+
+Alle {product-name} Container sind jetzt live aktualisiert. Alle Richtlinien, Protokolle und Konfigurationen sind nicht betroffen. Die Live-Diagrammansicht wird automatisch neu generiert, sobald neuer Live-Verkehr zwischen den Containern fließt.

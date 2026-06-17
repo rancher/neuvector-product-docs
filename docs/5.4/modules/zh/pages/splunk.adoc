@@ -1,0 +1,74 @@
+= Splunk
+:revdate: 2025-05-08
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/11.splunk/11.splunk.md
+:page-opendocs-slug:  /integration/splunk
+
+== 与 {product-name} Splunk APP 集成
+
+可以在 splunkbase 目录 https://splunkbase.splunk.com/app/6205/[这里] 找到 {product-name} Splunk APP，或通过搜索 {product-name}。
+
+{product-name} 安全仪表板有助于识别安全事件，例如可疑的登录尝试、网络违规和易受攻击的镜像。
+
+以下是 Splunk APP 中显示的示例屏幕。
+
+=== 镜像漏洞
+
+image:vulnerable_images.png[漏洞]
+
+=== 准入控制和安全事件
+
+image:admission_security_events.png[admission_security]
+
+=== 按 Pod/服务（部署）划分的网络违规
+
+image:network_violations.png[network]
+
+=== 出口连接摘要
+
+image:egress_destinations.png[egress]
+
+=== {product-name} 登录活动仪表板
+
+image:login_summary.png[登录]
+
+== 设置和配置
+
+=== 获取 APP
+
+==== GitHub
+
+从 https://github.com/neuvector/neuvector-splunk-app[neuvector/neuvector-splunk-app 储存库] 下载最新的 APP tarball (`neuvector_app.tar.gz`)。
+
+==== Splunkbase
+
+从 https://splunkbase.splunk.com/apps[Splunkbase] 下载最新的 APP tarball。
+
+==== Splunk APP 浏览器
+
+在 Splunk 用户界面中，点击 APP 下拉菜单，点击 "查找更多 APP"，然后搜索 {product-name} Splunk APP。
+
+=== 安装和设置
+
+通过上传 tarball 或按照 Splunkbase 提示安装 APP。
+
+==== 在 {product-name} 控制台中配置 syslog
+
+转到设置 -> 配置 -> Syslog
+
+[loweralpha]
+. 将服务器值设置为 Splunk 运行的 IP 地址
+. 选择 TCP 作为协议
+. 将端口号设置为 10514
+. 选择信息级别
+. 点击“提交”以保存设置。
+
+image:syslog-config.png[syslog]
+
+您可以配置多个集群将 syslog 发送到您的 Splunk 实例，并且您的 Splunk 实例将实时接收这些 syslog。
+
+=== 常见问题解答
+
+==== 需要什么用户角色？
+
+任何用户角色。

@@ -1,0 +1,117 @@
+= Comprobaciones de Cumplimiento Personalizadas
+:revdate: 2024-09-25
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/11.customcompliance/11.customcompliance.md
+:page-opendocs-slug:  /directiva/customcompliance
+
+== Creando Guiones Personalizados para Comprobaciones de Cumplimiento
+
+Los guiones personalizados se pueden ejecutar en contenedores y hosts para su uso en comprobaciones de cumplimiento y otras evaluaciones. La comprobación de cumplimiento personalizada es un guion bash que se puede ejecutar en cualquier contenedor para validar una condición e informar el resultado en la sección de cumplimiento del contenedor o nodo.
+
+[NOTE]
+====
+La capacidad de crear guiones personalizados está deshabilitada por defecto para proteger contra el uso indebido. Esto se puede habilitar configurando la variable de entorno CUSTOM_CHECK_CONTROL xref:details.adoc#_environment_variables[environment variable] en el Controlador y el Enforcer. Los valores son "deshabilitar" (por defecto, no permitido), "estricto" (solo rol de administrador) o "flexible" (roles de administrador, cumplimiento y directiva de tiempo de ejecución).
+====
+
+[CAUTION]
+====
+Los guiones personalizados deben usarse con extrema precaución. El guion personalizado puede ejecutar cualquier ejecutable en el espacio de nombres del contenedor con privilegios de contenedor. Los ejecutables pueden ser muy destructivos, como rm, format, fdisk, etc. Esta precaución se aplica también a hosts/nodos. Los guiones de comprobación personalizados en hosts pueden ser aún más destructivos si pueden acceder al nodo maestro en el clúster.
+====
+
+* Un guion personalizado está controlado por el permiso de directiva de tiempo de ejecución con RBAC con espacio de nombres; los usuarios deben configurar correctamente los roles de usuario de Kubernetes.
+* Los guiones personalizados se ejecutan con el mismo privilegio que el contenedor en ejecución.
+* El resultado de cumplimiento se elimina una vez que se elimina un guion personalizado.
+* Las comprobaciones de cumplimiento personalizadas deben seguir un formato para informar el resultado correctamente en el informe de cumplimiento para el contenedor o nodo.
+** El guion comienza con una declaración 'if' para comprobar alguna condición
+** La comprobación personalizada se considera aprobada si el código de salida es 0
+** La verificación personalizada falla si el código de salida es 1
+
+=== Guion de muestra para comprobar si el contenedor tiene una cuenta [root] sin contraseña.
+
+[,bash]
+----
+if [ $(cat /etc/shadow | grep  'root:::0:::::') ]; then
+     DESCRIPTION="CVE-2019-5021 fails."
+     echo $DESCRIPTION;
+     exit 1;
+else
+     echo "CVE-2019-5021 pass";
+     exit 0;
+fi
+----
+
+==== Guion de muestra para comprobar el archivo dirty cow en el contenedor.
+
+[,bash]
+----
+if [ $(find . / | grep -w 'cow') ]; then
+     DESCRIPTION="dirty cow seen in the container"
+    echo $DESCRIPTION;
+    exit 1;
+else
+    echo "no dirty cow found pass";
+    exit 0;
+fi
+----
+
+Otras notas
+
+* Los guiones tienen un tiempo de espera de 1 minuto para completarse, de lo contrario, se terminan y se informan como un error en el resultado de cumplimiento.
+* El guion se puede ejecutar en los 3 modos de operación: Descubrir, Monitorizar y Proteger.
+
+== Creando un guion de comprobación personalizada
+
+* Selecciona el grupo de servicio (creado por el usuario o aprendido automáticamente) del Grupo de Directivas ->.
+* Haz clic en la pestaña de verificación personalizada.
+* Introduce el nombre del guion. No se permiten espacios.
+* Copia y pega el guion en la sección del guion.
+* Haz clic en el botón AÑADIR para añadir el guion.
+* Se pueden crear y gestionar múltiples guiones desde la opción proporcionada en la esquina derecha.
+* Los guiones se ejecutan en los contenedores cubiertos por el grupo de servicio tan pronto como se crea el guion, así como cuando se actualiza el guion.
+* Visualiza el resultado del guion desde Activos -> Contenedor -> Cumplimiento, o Activos -> Nodos -> Cumplimiento.
+
+=== Muestras
+
+Creando un guion de comprobación personalizada en el grupo de demostración compuesto por 3 contenedores
+
+image:compliance1.png[ComplianceDemo]
+
+Mostrando los resultados de cumplimiento para el contenedor nginx, que tiene un archivo dirty cow, por lo que se informa una advertencia.
+
+image:compliance2.png[ComplianceNginx]
+
+Mostrando el resultado de cumplimiento para el contenedor nodejs, que no tiene un archivo dirty cow, por lo que se informa un aprobado desde el script.
+
+image:compliance_nodejs.png[ComplianceNodejs]
+
+Mostrando el resultado de cumplimiento para el contenedor nginx para una comprobación personalizada que tuvo un tiempo de espera.
+
+image:compliance_timeout.png[ComplianceTimeout]
+
+== Creando una regla de respuesta para el informe de cumplimiento
+
+Las reglas de respuesta se pueden crear en la directiva -> Reglas de Respuesta que se basan en los resultados de las comprobaciones de cumplimiento personalizadas. Los resultados son parte de la categoría Cumplimiento, y se pueden crear respuestas para todos los eventos de un cierto nivel.
+
+* Elegir categoría de cumplimiento
+* Escribe el nombre del grupo de servicio en la opción de grupo y elige el grupo deseado de la opción de selección automática
+* Escribe el nivel y elige el nivel: Advertencia de la opción de selección automática
+* Habilitar acciones deseadas Cuarentena, webhook y/o suprimir registro
+* Habilitar botón de estado
+* Haz clic en el botón Añadir para agregar la regla de respuesta
+
+El siguiente evento de cumplimiento con resultado de advertencia activará la acción de la regla de respuesta correspondiente.
+
+image:compliance_response_1.png[ComplianceResponse]
+
+Crea una regla de respuesta para el informe de cumplimiento y el guion de comprobación personalizada por nombre:
+
+* Elegir categoría de cumplimiento
+* Escribe el nombre del grupo de servicio en la opción de grupo y elige el grupo deseado de las opciones desplegables, o deja el nombre del grupo en blanco para aplicar a todos
+* Escribe 'n' y elige el nombre del guion de comprobación personalizada del menú desplegable de opciones.
+* Habilitar acciones deseadas Cuarentena, webhook y/o suprimir registro
+* Habilitar botón de estado
+* Haz clic en el botón Añadir para agregar la regla de respuesta
+
+El siguiente evento de cumplimiento con advertencia activará la acción de la regla de respuesta correspondiente.
+
+image:compliance_report_2.png[ComplianceResponse]

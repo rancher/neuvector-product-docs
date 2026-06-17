@@ -1,0 +1,41 @@
+= Ergebnis der Sicherheitsüberprüfung von Assets
+:page-opendocs-origin: /15.ui_extension/02.runtime_security/02.runtime_security.md
+:page-opendocs-slug:  /ui_extension/runtime_security
+
+Da Rancher Manager über eigene Registerkarten **Nodes** und **Workloads** zur Verwaltung und Überwachung des Zustands der Assets verfügt, injiziert NeuVector Komponenten, um das Ergebnis des Laufzeit-Scans anzuzeigen.
+
+== Knoten
+
+In der Tabellenansicht der Registerkarte **Nodes** wird die Spalte **Vulnerabilities** injiziert, um die Anzahl der erkannten Schwachstellen jedes Knotens nach hoher/mittlerer Schwere anzuzeigen.
+
+image:nodes.png[Nodes]
+
+Ein Klick auf die **Vulnerabilities** Zelle öffnet eine neue Seite, um die Details des Scan-Ergebnisses anzuzeigen. Die Datenbankversion des Scanners wird angezeigt, ebenso wie eine filterbare Liste von Schwachstellen.
+
+image:nodes_vul.png[Nodes]
+
+Ein Klick auf die **Name** Zelle in der **Nodes** Tabelle leitet zur Detailseite des Knotens weiter. NeuVector injiziert eine **Vulnerabilities** Registerkarte, um eine Tabelle mit aufgelisteten Schwachstellen anzuzeigen.
+
+image:node_detail_vul.png[Nodes]
+
+Ein Klick auf den CVE-Link in der **Name** Zelle in der **Vulnerabilities** Tabelle öffnet ein Popup, um die CVE-Beschreibungen anzuzeigen, mit einem externen Link im Header zur SUSE-CVE-Informationswebsite.
+
+image:node_detail_vul_cve.png[Nodes]
+
+image:suse_cve.png[SUSE]
+
+Eine Schaltfläche zum Herunterladen einer CSV-Datei wird über der **Vulnerabilities** Tabelle bereitgestellt. Die Dateidaten enthalten alle Felder, die in der Tabelle vorhanden sind.
+
+image:download_vul.png[CSV]
+
+image:cve_csv.png[CSV]
+
+== Workloads
+
+Vorübergehend wird die **Vulnerabilities** Spalte in der **Workloads** Tabelle in der Version 5.4 aufgrund potenzieller Leistungsbedenken nicht injiziert. Das NeuVector-Team wird mit dem Rancher-Team zusammenarbeiten, um dies bald zu integrieren.
+
+Ein Klick auf einen **Name** in der **Pods** Tabelle leitet zur Detailseite des Pods weiter. NeuVector injiziert eine **Vulnerabilities** Registerkarte, um eine Tabelle mit aufgelisteten Schwachstellen anzuzeigen.
+
+image:pods.png[Pods]
+
+image:pod_detail_vul.png[Pod_Detail]

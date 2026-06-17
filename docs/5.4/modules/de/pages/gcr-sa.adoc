@@ -1,0 +1,120 @@
+= GCR-Scanning mit Dienstkonten
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/02.registry/03.gcr-sa/03.gcr-sa.md
+:page-opendocs-slug:  /scanning/registry/gcr-sa
+
+== Google GCR - Authentifizierung/Scanning mit GCP-Dienstkonten
+
+Es ist eine bewährte Praxis, nicht von benutzerspezifischen Konten für Integrationen abhängig zu sein.  GCP unterstützt die Verwendung eines Dienstkontos, um auf GCR zuzugreifen.  Hier sind die Schritte, um ein Dienstkonto für GCR zu aktivieren und es zu verwenden, um Repository-Scans von {product-name} auszulösen.
+
+Beginnen Sie in {product-name}, wo Sie zunächst ein neues Registry einrichten:
+
+image:gcr1.png[GCR]
+
+Durch die Auswahl von Google Container Registry als Repo-Typ wird dieses Panel angepasst, um die Eingaben zu akzeptieren, die erforderlich sind, um Ihr GCR zu verwenden.
+
+. Name - Hier geben Sie diesem speziellen Repo-Eintrag einen Namen Ihrer Wahl. Es dient lediglich dazu, es später in der {product-name}-Benutzeroberfläche zu identifizieren.
+. Registry - Dies ist der erste Ort, an dem Sie sicherstellen möchten, dass die richtigen Daten von Ihrer GCR-Instanz gesammelt werden. Während das Beispiel von https://gcr.io das häufigste ist, möchten wir sicherstellen, dass es genau widerspiegelt, wie Ihr GCR in GCP eingerichtet wurde. Es könnte beispielsweise https://us.gcr.io sein. Wir werden es im nächsten Abschnitt überprüfen.
+. JSON-Schlüssel - Wie offensichtlich ist, wird dies ein im JSON-Format vorliegender Schlüssel sein. Und, wie Sie wahrscheinlich ein Muster erkennen, werden wir das über GCP finden.
+. Filter - Seien Sie sich bewusst, dass Sie wahrscheinlich alle Filter hier durch den tatsächlichen Namen des Repos ersetzen müssen. Das befindet sich in der GCR-Oberfläche.
+
+image:gcr2.png[GCR]
+
+Jetzt gehen wir zu diesem GCR-Bildschirm in GCP. Vieles von dem, was wir brauchen, befindet sich direkt hier auf dieser Seite.
+
+[upperalpha]
+. Sehen Sie die "`gcr.io`" unter Hostname? Das gehört in Punkt #2, Registry in der {product-name}-Benutzeroberfläche. (Vergessen Sie nicht den https:// Teil)
+. Die ID des Repos befindet sich tatsächlich unter dem obersten Projekt. Das ist es, was Sie in #3, Filter verwenden werden. Siehe Beispiel von env-demo unten.
+
+image:gcr3.png[GCR]
+
+Der JSON-Schlüssel führt uns dazu, einen weiteren sehr wichtigen Schritt zu erkunden, und das bringt uns zum IAM & Admin-Bereich von GCP, wo wir ein Dienstkonto erstellen (oder die Einstellungen bestätigen) werden. Siehe unten:
+
+image:gcr4.png[GCR]
+
+Sobald Sie die Daten für den ersten Schritt zur Erstellung eines Dienstkontos eingegeben haben, müssen Sie die "`CREATE`" Schaltfläche drücken, damit Schritt 2 bereit ist, Eingaben zu akzeptieren.
+
+image:gcr5.png[GCR]
+
+Stellen Sie sicher, dass Sie Basic --> Viewer für den Zugriff auswählen. Wenn Sie ein bestehendes Dienstkonto haben, stellen Sie sicher, dass der Zugriff so eingestellt ist. (Tipp: Selbst Zugriffsberechtigungen, die mächtiger erscheinen, scheinen keinen ordnungsgemäßen Zugriff zu ermöglichen. Überspringen Sie diesen Schritt nicht.
+
+Sobald Sie diesen Schritt abgeschlossen haben, können Sie Schritt 3 problemlos überspringen und mit der Erstellung des Dienstkontos fortfahren.
+
+Wenn Sie nicht sofort auf das Informationsfeld für Ihr neues Dienstkonto gelangen, stellen Sie sicher, dass Sie in der Liste der Dienstkonten dorthin wechseln. Siehe Abbildung 5 unten.
+
+image:gcr6.png[GCR]
+
+Klicken Sie auf "`ADD KEY`" --> "`Create New Key`"
+
+image:gcr7.png[GCR]
+
+Wie Sie bereits festgestellt haben, ist JSON hier die beste Wahl. Die Auswahl von "`CREATE`" führt zu einer Datei, die Sie in Ihrem Browser herunterladen können. Der Inhalt dieser Datei sollte in das Feld 3 JSON-Schlüssel in {product-name} eingefügt werden; siehe Abbildung 1.
+
+Bevor Sie sich zu sehr freuen, gibt es noch eine Sache zu beachten. Damit der Scanner in {product-name} die API nutzen kann, um Ihre Bilder zu scannen und zu schützen, muss die genannte API in Ihrem GCP-Konto aktiviert sein. Sie können sie entweder über die Kommandozeilenschnittstelle aktivieren, indem Sie
+
+[,shell]
+----
+gcloud services enable artifactregistry.googleapis.com
+----
+
+Oder Sie können die GCP-GUI verwenden. Gehen Sie zu "`API Library`" und suchen Sie nach "`Artifact Registry API`" und stellen Sie sicher, dass es für Ihr Projekt aktiviert ist. Siehe Abbildung 7.
+
+image:gcr8.png[GCR]
+
+Sie sollten bereit sein! Siehe Abbildung 8 unten für ein korrekt konfiguriertes Registry, das die Daten aus unserem Beispiel verwendet:
+
+image:gcr9.png[GCR]
+
+=== Erhalten Sie das Zugriffstoken über die REST-API
+
+Die {product-name} REST-API kann verwendet werden, um sich mit dem Dienstkonto zu authentifizieren. Das folgende Beispiel verwendet gcloud, um das Zugriffstoken zu erhalten.  Der Benutzername ist "`oauth2accesstoken`".
+
+[,shell]
+----
+gcloud auth print-access-token
+ya29.a0AfH6SMAvyZ2zkD3MZD_K8Lqr7qkIsRkGNqhAGthJ_A7lp8OGRe7xh5KmuQY-VJfqu83C9e1gi7A_m1InNm8QIoTGf9WHXnOeAr1gT_O6b6K667NUz1_YDunjdW09jt0XvcBGQaxjJ3c4aHlxdehBFiE_9PMk13JDt_T6f0_6vzS7
+----
+
+=== Verwenden Sie das Token mit dem {product-name} Repository-Scan.
+
+Das folgende Beispielskript integriert das Zugriffstoken, um den GCR-Repository-Scan auszulösen.
+
+[,shell]
+----
+_curCase_=`echo $0 | awk -F"." '{print $(NF-1)}' | awk -F"/" '{print $NF}'`
+_DESC_="able to scan ubuntu:16.04 image"
+_ERRCODE_=0
+_ERRTYPE_=1
+_RESULT_="pass"
+
+# please remember to specify the controller ip address here
+_controllerIP_="10.1.24.252"
+_controllerRESTAPIPort_="10443"
+_neuvectorUsername_="admin"
+_neuvectorPassword_="admin"
+_registryURL_="https://us.gcr.io/"
+
+# registry urls could also be gcr.io, eu.gcr.io, asia.gcr.io etc
+_registryUsername_="oauth2accesstoken"
+_registryPassword_=$(gcloud auth print-access-token)
+_repository_="bionic-union-271100/alpine"
+_tag_="latest"
+
+curl -k -H "Content-Type: application/json" -d '{"password": {"username": "'$_neuvectorUsername_'", "password": "'$_neuvectorPassword_'"}}' "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/auth" > /dev/null 2>&1 > token.json
+_TOKEN_=`cat token.json | jq -r '.token.token'`
+echo `date +%Y%m%d_%H%M%S` scanning an image ...
+curl -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"request": {"registry": "'$_registryURL_'", "username": "'$_registryUsername_'", "password": "'$_registryPassword_'", "repository": "'$_repository_'", "tag": "'$_tag_'"}}' "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/scan/repository" > /dev/null 2>&1 > scan_repository.json
+
+while [ `wc -c < scan_repository.json` = "0" ]; do
+ echo `date +%Y%m%d_%H%M%S` scanning is still in progress ...
+    sleep 5
+    curl -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"request": {"registry": "'$_registryURL_'", "username": "'$_registryUsername_'", "password": "'$_registryPassword_'", "repository": "'$_repository_'", "tag": "'$_tag_'"}}' "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/scan/repository" > /dev/null 2>&1 > scan_repository.json
+done
+
+echo `date +%Y%m%d_%H%M%S` log out
+curl -k -X 'DELETE' -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/auth" > /dev/null 2>&1
+cat scan_repository.json | jq .
+rm *.json
+echo `date +%Y%m%d_%H%M%S` [$_curCase_] $_DESC_: $_RESULT_-$_ERRCODE_
+----

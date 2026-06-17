@@ -1,0 +1,56 @@
+= Exploración de imágenes en la fase de compilación
+:revdate: 2025-01-10
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/03.build/03.build.md
+:page-opendocs-slug:  /exploración/compilación
+
+== Exploración de vulnerabilidades en la fase de compilación de la canalización CI/CD
+
+Escanea en busca de vulnerabilidades durante la fase de compilación de la canalización utilizando complementos como https://plugins.jenkins.io/neuvector-vulnerability-scanner/[Jenkins], https://github.com/neuvector/azure-vsts[Azure Devops], https://github.com/neuvector/scan-action[Github Action], https://gitlab.com/neuvector/gitlab-plugin[gitlab], Bamboo y https://github.com/neuvector/circleci-orb[CircleCI], o utiliza la API REST. {product-name} admite dos tipos de exploración en la fase de compilación: registro y local. Para la exploración de registro, el {product-name} controlador y el escáner deben poder conectarse al registro para obtener la imagen.
+
+Para activar un escaneo en la fase de compilación, el complemento (por ejemplo, Jenkins) debe poder conectarse al Controlador o Allinone. Nota: El puerto REST API predeterminado para que los complementos llamen al escáner es 10443. Este puerto debe estar expuesto a través del Allinone o Controlador mediante un servicio en Kubernetes o un mapeo de puertos (por ejemplo, - 10443:10443) en el archivo de ejecución o composición de Docker.
+
+Asegúrate de que haya un {product-name} contenedor de escáner desplegado y correctamente configurado para conectarse al Allinone o Controlador. En la versión 4.0 y posteriores, el contenedor neuvector/scanner debe desplegarse por separado del allinone o controlador, y está incluido en los archivos yaml de despliegue de muestra.
+
+Puedes descargar el complemento desde el Gestor de Complementos de Jenkins. Otros complementos son accesibles a través de los catálogos de la herramienta de creación, o en la página https://github.com/neuvector[{product-name} github]. El escáner de Bamboo está disponible en https://github.com/neuvector/bamboo-plugin/releases/tag/1.0.1. El ORB de CircleCI está disponible en https://github.com/neuvector/circleci-orb y a través del catálogo ORB de CircleCI.
+
+=== Exploración local en la fase de compilación
+
+Para la exploración local, el {product-name} escáner intentará escanear la imagen en un host local (o un host accesible mediante el comando docker del host remoto).
+
+Para la exploración local basada en Kubernetes u OpenShift, elimina la sección comentada del archivo yaml de ampliación del escáner de muestra, que se muestra en las secciones xref:kubernetes.adoc#_deploy_using_kubernetes[Desplegando {product-name}]. La sección comentada se ve así:
+
+[,yaml]
+----
+          env:
+# Commented out sections are required only for local build-phase scanning
+#            - name: SCANNER_DOCKER_URL
+#              value: tcp://192.168.1.10:2376
+            - name: CLUSTER_JOIN_ADDR
+              value: neuvector-svc-controller.neuvector
+            - name: CLUSTER_ADVERTISED_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: CLUSTER_BIND_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+#          volumeMounts:
+#            - mountPath: /var/run/docker.sock
+#              name: docker-sock
+#              readOnly: true
+#      volumes:
+#        - name: docker-sock
+#          hostPath:
+#            path: /var/run/docker.sock
+      restartPolicy: Always
+----
+
+Para la exploración local nativa de Docker, sigue las instrucciones para los ampliaciones de Producción de Docker en la sección xref:docker.adoc#_deploy_the_suse_security_scanner_container[Ampliaciones de Producción de Docker] para el escáner.
+
+=== Escaneo local en la fase de compilación - Solo escáner (no se requiere controlador)
+
+{product-name} admite implementaciones de escáner independiente para el escaneo de imágenes local (lo que no requiere un Controlador). Ciertos complementos, como el CircleCI ORB, tienen una opción para implementar dinámicamente un escáner cuando un trabajo de construcción requiere escaneo de imágenes, y luego eliminar el escáner cuando los resultados se envían de vuelta a través del ORB. Estas ampliaciones de escáner dinámico se invocan automáticamente a través del complemento si se admite.
+
+Por favor, consulta la xref:scanners.adoc[sección del escáner] para más detalles sobre escáneres independientes.

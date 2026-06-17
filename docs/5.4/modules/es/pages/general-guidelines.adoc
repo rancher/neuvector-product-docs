@@ -1,0 +1,39 @@
+= Directrices generales
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /13.special/01.general/01.general.md
+:page-opendocs-slug:  /special/general
+
+== Pruebas {product-name} utilizando el contenedor Allinone
+
+Los ejemplos en esta sección muestran cómo desplegar los contenedores Allinone y Enforcer. Esta configuración es útil para probar {product-name} en entornos que no son de Kubernetes. Para despliegues en Kubernetes, utiliza el último {product-name} chart de Helm. Para más información, consulta xref:./production.adoc[Planificación de despliegues].
+
+[IMPORTANT]
+====
+El equipo de {product-name} desaconseja encarecidamente utilizar esta configuración en entornos de producción, y no es compatible para uso en producción.
+====
+
+== Directrices Generales para el Despliegue
+
+Prepara tu entorno de host para una instalación adecuada. Asegúrate de que los contenedores {product-name} puedan comunicarse entre sí entre los hosts. Luego revisa y edita los archivos de muestra para tu entorno.
+
+En general, es importante hacer lo siguiente:
+
+. Etiqueta los nodos adecuadamente. Si utilizas etiquetas de nodo para controlar dónde se despliega el allinone o el controlador, etiquétalos antes de desplegar.
+. Asegúrate de que los volúmenes se puedan mapear correctamente. Por ejemplo
++
+[,yaml]
+----
+volumes:
+        - /var/neuvector:/var/neuvector
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup:/host/cgroup:ro
+----
+
+. Abre los puertos requeridos en los hosts. Asegúrate de que los puertos requeridos estén mapeados correctamente y abiertos en el host. El Allinone requiere 8443 (si se utiliza la consola), 18300, 18301, 18400 y 18401. El Enforcer requiere 18301 y 18401.
+. Edita la dirección CLUSTER_JOIN_ADDR. Encuentra la dirección IP del nodo, el nombre del nodo (si utilizas un servidor de nombres) o la variable del nodo (si utilizas herramientas de orquestación) para que el Allinone (controlador) utilice para el "`node IP`" en los archivos de muestra tanto para el Allinone como para el enforcer.
+
+== Accediendo a la Consola
+
+Por favor, consulta la primera sección Básicos -> Conectar al Gestor para opciones para desactivar https o acceder a la consola a través de un firewall corporativo que no permite el puerto 8443 para el acceso a la consola.

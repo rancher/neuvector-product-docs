@@ -1,0 +1,15 @@
+= Kubernetes 资源的配置评估
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/03.admission/02.assessment/02.assessment.md
+:page-opendocs-slug:  /policy/admission/assessment
+
+== Kubernetes 资源部署文件扫描
+
+{product-name} 能够扫描部署 yaml 文件，以评估其是否符合准入控制规则。这在管道早期扫描部署 yaml 文件时非常有用，以确定部署是否会违反任何规则，避免在尝试部署之前出现问题。
+
+要上传要扫描的 yaml 文件，请转到策略 -> 准入控制并点击配置评估按钮。在窗口中，选择要上传的文件，然后点击测试。
+
+image:assessment.png[评估]
+
+然后您将看到文件的分析结果，包括部署是否被允许，以及适用于该部署文件的规则消息。

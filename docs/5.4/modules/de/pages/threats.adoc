@@ -1,0 +1,33 @@
+= Netzwerkbedrohungssignaturen
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/10.threats/10.threats.md
+:page-opendocs-slug:  /policy/threats
+
+== Erkennung von Netzwerkbedrohungen
+
+{product-name} Deep Packet Inspection kann verwendet werden, um die Netzwerkpakete und den Payload auf Angriffe wie die im OWASP Top 10 und die häufig in Web Application Firewalls (WAFs) verwendeten zu überprüfen.
+
+=== OWASP-Signaturen
+
+DLP-Sensoren können erstellt werden, um OWASP-Angriffe mit den folgenden Schema-Beispielen zu erkennen. Wie immer müssen diese möglicherweise an Ihre Umgebung und Anwendungen angepasst werden.
+
+[,shell]
+----
+img src=javascript
+/servlet/.*/org.apache.
+/modules.php?.*name=Wiki.*<script
+/error/500error.jsp.*et=.*<script
+/mailman/.*?.*info=.*<script
+\x0aReferer\x3a res\x3a/C\x3a
+/cgi-bin/cgictl?action=setTaskSettings.*settings={\x22.*taskId=
+/cgi-bin/cgictl.*scriptName=.*[?&]scriptName=[^&]*?([\x22\x27\x3c\x3e\x28\x29]|script|onload|src)
+----
+
+Hier sind weitere einfache Beispiele:
+
+image:owasp_top10_dlp.png[owasp]
+
+=== Integrierte Bedrohungserkennung
+
+{product-name} hat auch eine integrierte Erkennung anderer Netzwerkbedrohungen wie SQL-Injection-Angriffe, DDoS (z. B. Ping Death) und Tunneling-Angriffe. Bei SQL-Injection-Angriffen überprüft {product-name} die Netzwerkverbindung (SQL-Protokoll) zwischen dem Frontend und dem SQL-Datenbank-Pod, wodurch Fehlalarme reduziert und die Genauigkeit erhöht wird.

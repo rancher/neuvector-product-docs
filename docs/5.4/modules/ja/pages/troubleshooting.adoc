@@ -1,0 +1,193 @@
+= トラブルシューティング
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /12.troubleshooting/01.troubleshooting/01.troubleshooting.md
+:page-opendocs-slug:  /troubleshooting/troubleshooting
+
+== デプロイメント{product-name}のトラブルシューティング
+
+{product-name}コンテナは、アプリケーションワークロードに使用されるのと同じオーケストレーションツールを使用してデプロイ、管理、更新されます。デプロイメント中に必要な各ステップについて、オンラインドキュメントを必ず確認してください。多くの場合、デプロイメントはサンプルyamlファイルをコピーして、事前にステップを確認せずにデプロイすることによって試みられます。たとえば、レジストリ、シークレット、RBAC/ロールバインディングを適切に構成することなどです。
+
+=== 初期デプロイメント
+
+* {product-name}コンテナが正しい認証でプルできることを確認してください。使用されるシークレットを確認し、クラスターが適切なレジストリにアクセスできることを確認してください。
+* yamlに必要な変更（例：NodePortまたはLoadBalancer）やHelm値設定が適切に設定されていることを確認してください。
+* プラットフォームとコンテナランタイムを確認し、必要に応じて変更を加えてください（例：PKS、containerd、CRI-O）。
+
+=== ログインと初期設定
+
+* マネージャーへの適切なアクセス（IPアドレス、ポート、ルート）がファイアウォールを通じて許可されていることを確認してください。
+
+=== 継続的な運用
+
+* ディレクトリ統合。{product-name}は、LDAP/ADおよびグループとロールの他の統合のための特定の構成をサポートしています。追加のトラブルシューティング手順とADトラブルシューティング用のツールについては{product-name}にお問い合わせください。
+* レジストリスキャン。ほとんどの問題は、レジストリアクセスの認証エラーや、コントローラーがクラスターからレジストリにアクセスできないことに関連しています。
+* パフォーマンスの問題については、大きなイメージをスキャンするためにスキャナーに十分なメモリが割り当てられていることを確認してください。また、CPUとメモリの最小値は、スケールでの適切なパフォーマンスを確保するためにポッドポリシーで指定できます。
+* アドミッションコントロール。トラブルシューティングセクションは、セキュリティリスク... ->アドミッションコントロールのセクションにあります。
+
+=== 更新中
+
+* コントローラーにはローリングアップデートを使用してください。ホストを再起動する場合は、コントローラーが他のホストに移動する際や再起動されたホストに再デプロイする際に監視し、コントローラーが起動し、コントローラークラスターに参加し、安定化/syncできることを確認してください。すべてのホストを一度に、またはあまりにも早く再起動すると、コントローラーに未知の状態が発生する可能性があります。
+* すべてのコントローラー/ノードがクラスター内でダウンした場合に備えて、{product-name}の設定を保存するために永続ボリュームクレームを使用してください。
+* 新しいバージョンに更新する際は、yamlに必要な変更/追加を特定するためにオンラインドキュメントを確認し、ロールバインディングや新しいサービス（例：アドミッションコントロールWebhook、永続ボリュームクレームなど）といったその他の変更も確認してください。
+
+== デバッグログ
+
+例えば、コントローラーポッドの場合は、{product-name}コンテナのログを表示してください。
+
+[,shell]
+----
+kubectl logs neuvector-controller-pod-777fdc5668-4jkjn -n neuvector
+----
+
+これらのログは、クラスターの接続問題、管理者のアクション、スキャン活動、その他の有用なエントリを示す場合があります。複数のコントローラーが実行されている場合は、それぞれを検査する必要があるかもしれません。これらのログは、{product-name} サポートに送信するためにファイルに出力することができます。
+
+=== {product-name} コントローラーのデバッグモードをオンにする
+
+詳細な調査が必要な問題については、コントローラー/オールインワンのデバッグモードを有効にすることができ、詳細な情報がログに記録されます。これにより、ログファイルのサイズが大幅に増加する可能性があるため、収集後はオフにすることをお勧めします。
+
+=== Kubernetes、OpenShift、およびその他のオーケストレーションログ
+
+オーケストレーションツールからのログを検査することで、ポッド作成のタイムスタンプやステータス、デプロイメント、デーモンセット、オーケストレーションツールによって実行された{product-name} コンテナのその他の管理アクションを含むすべてのデプロイメント活動を確認するのに役立ちます。
+
+[,shell]
+----
+kubectl get events -n neuvector
+----
+
+== サポートログ
+
+サポートログには、{product-name} サポートに役立つ追加情報が含まれており、システム構成、コンテナ、ポリシー、通知、および{product-name} コンテナの詳細が含まれています。
+
+サポートログをダウンロードするには、設定->設定に移動し、Collect Logを選択してください。
+
+== CLIを使用してデバッグモードをオンにする
+
+{product-name}マネージャーポッドにユーザーとパスワードでログインします（別のターミナルウィンドウでの使用を推奨します）。
+
+[,shell]
+----
+kubectl exec -it neuvector-manager-pod-5bb76b6754-rlmnp -n neuvector -- cli
+----
+
+[,shell]
+----
+#neuvector-svc-controller.neuvector> login
+----
+
+コントローラーのリストを取得します。Leader = Trueのコントローラーを見つけます。
+
+[,shell]
+----
+show controller
+----
+
+コントローラーのIDまたは名前を使用して、リーダーコントローラーでデバッグモードをオンにします。
+
+[,shell]
+----
+set controller 4fce427cf963 debug -c all
+----
+
+すべてのコントローラーでデバッグモードをオンにするには。
+
+[,shell]
+----
+set system controller_debug -c all
+----
+
+デバッグしたい{product-name}でアクティビティを実行します。その後、コントローラーログを表示します（別のターミナルウィンドウで）。
+
+[,shell]
+----
+kubectl logs <leader_controller_pod_name> -n neuvector
+----
+
+必要に応じて、ログをキャプチャして{product-name}に送信します。
+
+コントローラーでデバッグモードをオフにします（CLIウィンドウに戻ります）。
+
+[,shell]
+----
+set controller 4fce427cf963 debug
+exit
+----
+
+コントローラーのデバッグステータスを確認します。
+
+[,shell]
+----
+show controller setting 289d67396fcb
+----
+
+== REST APIを使用してデバッグモードをオンにします。
+
+あなたのIP、ユーザー、パスワードでアクセストークンを設定します：
+
+[,shell]
+----
+_controllerIP_="<your_controller_ip>"
+_controllerRESTAPIPort_="10443"
+_neuvectorUsername_="admin"
+_neuvectorPassword_="admin"
+----
+
+[NOTE]
+====
+Kubernetesベースのデプロイメントの場合、次のコマンド出力でコントローラーのIPを取得できます。
+====
+
+[,shell]
+----
+kubectl get pod -n neuvector -o wide | grep controller
+----
+
+[NOTE]
+====
+クラスターの外部からREST APIにアクセスする場合は、オートメーションセクションの指示を参照してください。
+====
+
+認証トークンを取得します。
+
+[,shell]
+----
+curl -k -H "Content-Type: application/json" -d '{"password": {"username": "'$_neuvectorUsername_'", "password": "'$_neuvectorPassword_'"}}' "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/auth" > /dev/null 2>&1 > token.json
+_TOKEN_=`cat token.json | jq -r '.token.token'`
+----
+
+[NOTE]
+====
+jqをインストールする必要があるかもしれません（$sudo yum install jq）。
+====
+
+デバッグモードを有効にします。
+
+[,shell]
+----
+curl -X PATCH -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"config": {"controller_debug": ["cpath", "conn"]}}' "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/system/config"  > /dev/null 2>&1   > set_debug.json
+#debug options - cpath, conn, mutex, scan, cluster , all
+----
+
+クラスター内のすべてのコントローラーでデバッグを無効にします。
+
+[,shell]
+----
+curl -X PATCH -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" -d '{"config": {"controller_debug": []}}' "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/system/config"  > /dev/null 2>&1   > set_debug.json
+----
+
+クラスター内のコントローラーのデバッグステータスを確認します。
+
+[,bash]
+----
+curl  -k -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_"  "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/system/config"  > /dev/null 2>&1   > system_setting.json
+
+cat system_setting.json | jq .config.controller_debug
+----
+
+Logout (ログアウト)
+
+[,shell]
+----
+echo `date +%Y%m%d_%H%M%S` log out
+curl -k -X 'DELETE' -H "Content-Type: application/json" -H "X-Auth-Token: $_TOKEN_" "https://$_controllerIP_:$_controllerRESTAPIPort_/v1/auth" > /dev/null 2>&1
+----

@@ -1,0 +1,129 @@
+= Verificação e conformidade
+:revdate: 2025-01-16
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/01.scanning/01.scanning.md
+:page-opendocs-slug:  /verificacao/verificacao
+
+{product-name} permite verificação e conformidade em todo o ciclo de vida por meio de verificação de vulnerabilidades e execução dos benchmarks CIS para segurança, além de verificações de conformidade personalizadas. O menu de Riscos de Segurança permite investigação, triagem e relatórios personalizáveis de gerenciamento de Vulnerabilidades e Conformidade. Pesquise facilmente vulnerabilidades de imagem e descubra quais nós ou contêineres contêm essas vulnerabilidades. Filtragem avançada torna fácil a revisão dos resultados de verificação e conformidade e fornece relatórios personalizados. Também fornece relatórios e modelos de conformidade padrão e personalizáveis para PCI, GDPR e outras regulamentações.
+
+== Visão geral da Verificação {product-name}
+
+A verificação é realizada em todas as fases do pipeline, desde a Construção até o Registro e Tempo de Execução, em vários ativos, conforme mostrado abaixo.
+
+|===
+| *Tipo de verificação* | Imagem | Nó | Container | Orchestrator
+
+| *Vulnerabilidades*
+| Sim
+| Sim
+| Sim
+| Sim
+
+| *CIS Benchmarks*
+| Sim
+| Sim
+| Sim
+| Sim
+
+| *Conformidade Personalizada*
+| Não
+| Sim
+| Sim
+| Não
+
+| *Segredos*
+| Sim
+| Sim
+| Sim
+| Não
+
+| *Módulos*
+| Sim
+| N/A
+| N/A
+| N/A
+|===
+
+As imagens são verificadas tanto na verificação de Registro quanto por meio de plug-ins da fase de Construção, como Jenkins, CircleCI, Gitlab, etc.
+
+Os benchmarks CIS suportados por {product-name} incluem:
+
+* Kubernetes
+* Docker
+* Red Hat OpenShift rascunho de benchmarks 'Inspirados pelo CIS'
+* Google GKE
+
+A implementação de código aberto desses benchmarks pode ser encontrada na https://github.com/neuvector[{product-name} Github page].
+
+[NOTE]
+====
+Segredos também podem ser detectados em Nós e em Contêineres com xref:customcompliance.adoc[Scripts Personalizados].
+====
+
+
+=== Escaneamento de arquivos de implantação de recursos Kubernetes
+
+{product-name} é capaz de escanear arquivos yaml de implantação para avaliações de configuração em relação às regras de Controle de Admissão. Isso é útil para escanear arquivos yaml de implantação no início do pipeline para determinar se a implantação violaria alguma regra antes de tentar a implantação. Por favor, veja xref:assessment.adoc[Avaliação de Configuração] sob Controles de Admissão para mais detalhes.
+
+== Gerenciando Vulnerabilidades e Conformidade
+
+{product-name} fornece várias maneiras de revisar os resultados de verificação de vulnerabilidade e conformidade e gerar relatórios. Esses direitos incluem:
+
+* *Painel.* Revise o resumo das vulnerabilidades e veja como elas impactam a xref:improve-score.adoc[Pontuação de Risco de Segurança] geral.
+* *Menu de Riscos de Segurança.* Veja o impacto das vulnerabilidades e problemas de conformidade e gere relatórios com filtragem avançada.
+* *Menu de Ativos.* Veja os resultados de vulnerabilidades e conformidade para cada ativo, como registros, nós e contêineres.
+* *Notificações -> Relatórios de Risco.* Veja eventos de varredura para cada ativo.
+* *Regras de Resposta.* Crie respostas, como notificações de web hook ou quarentenas, com base nos resultados da varredura.
+* *API REST.* Acione verificações e obtenha resultados de verificação programaticamente para automatizar o processo.
+* *Alertas SYSLOG/Webhook.* Envie resultados de varredura para um SIEM ou outras plataformas empresariais.
+
+=== Menu de Riscos de Segurança
+
+Esses menus combinam os resultados das varreduras de vulnerabilidades e verificações de conformidade de registros (imagens), nós e contêineres encontrados no menu de Ativos para permitir a gestão e relatórios de vulnerabilidades de ponta a ponta. O menu de perfil de conformidade permite a personalização das verificações de conformidade PCI, GDPR e outras para gerar relatórios de conformidade.
+
+image:vulnerabilities_4_4.png[SecurityRisks]
+
+Veja a próxima seção sobre xref:vulnerabilities.adoc[Gestão de Vulnerabilidades] para saber como gerenciar vulnerabilidades neste menu, e a seção xref:compliance.adoc[Conformidade e Benchmarks CIS] para relatórios sobre Benchmarks CIS e conformidade do setor, como PCI, GDPR, HIPAA, NIST, PCIv4 e DISA STIG.
+
+=== Menu de Ativos
+
+O menu de Ativos reporta vulnerabilidades e resultados de verificações de conformidade organizados pelo ativo.
+
+* Plataformas. A plataforma de orquestração, como Kubernetes, e as varreduras de vulnerabilidades da plataforma.
+* Nós. Nós/hospedeiros protegidos por {product-name} Enforcers, e resultados de verificações de conformidade, como benchmarks CIS e verificações personalizadas, bem como varreduras de vulnerabilidades de host.
+* Contêineres. Todos os contêineres no cluster, incluindo contêineres do sistema, e os resultados de verificações de conformidade, como benchmarks CIS e verificações personalizadas, bem como varreduras de vulnerabilidades em tempo de execução dos contêineres. Atividade de processos e estatísticas de desempenho também podem ser encontradas aqui.
+* Registros. Registros/repositórios escaneados por {product-name}. Os resultados da varredura de imagens em camadas são encontrados aqui, e os resultados da varredura podem ser usados em regras de controle de admissão (encontradas na Política -> Controles de Admissão).
+
+[NOTE]
+====
+xref:customcompliance.adoc[Verificações de conformidade personalizadas] como mencionado acima são definidas no menu xref:groups.adoc[Política -> Grupos].
+====
+
+=== Varredura Automatizada em Tempo de Execução
+
+{product-name} pode escanear contêineres em execução, nós de host e a plataforma de orquestração em busca de vulnerabilidades. No menu de Ativos para Nós ou Contêineres, ative a Varredura Automática clicando na aba de Vulnerabilidades para um nó ou contêiner, em seguida, Varredura Automática (aparece no canto superior direito) para escanear todos os contêineres em execução, nós e a plataforma, incluindo os recém-iniciados assim que começarem a ser executados. Você também pode selecionar um contêiner ou nó e escaneá-lo manualmente.
+
+Você pode clicar em cada nome de vulnerabilidade/CVE que for descoberto para recuperar uma descrição dela e clicar na seta de inspeção no pop-up para ver a descrição detalhada da vulnerabilidade.
+
+image:Vuln1.png[Vulnerabilidades]
+
+A varredura automática também será acionada sempre que houver uma atualização no {product-name} banco de dados de CVE. Por favor, veja a seção xref:updating.adoc[Atualizando o Banco de Dados CVE] para mais detalhes.
+
+== Ações Automatizadas, Mitigações e Respostas Baseadas em Vulnerabilidades
+
+Regras de controle de admissão podem ser criadas para impedir a implantação de imagens vulneráveis com base nos resultados da varredura do Registro. Veja a Política de Segurança -> na seção xref:admission.adoc[Controle de Admissão] para mais detalhes.
+
+Por favor, veja a seção Política de Segurança -> na xref:responserules.adoc[Seção de Regras de Resposta] para instruções sobre como criar respostas automatizadas para vulnerabilidades detectadas durante a varredura do registro, varredura em tempo de execução ou benchmarks CIS. As respostas podem incluir quarentena, notificação via webhook e supressão.
+
+=== Registros Federados para Resultados de Varredura de Imagens Distribuídas
+
+O cluster primário (mestre) pode escanear um registro/repositório designado como um registro federado. Os resultados da varredura desses registros serão sincronizados para todos os clusters gerenciados (remotos). Isso permite a exibição dos resultados da varredura no console do cluster gerenciado, bem como o uso dos resultados nas regras de controle de admissão do cluster gerenciado. Os registros precisam ser escaneados apenas uma vez, em vez de por cada cluster, reduzindo o uso de CPU/memória e largura de banda da rede. Veja a seção xref:multicluster.adoc[multi-cluster] para mais detalhes.
+
+=== Autoescalonamento de Pods de Scanner
+
+Os pods de scanner podem ser configurados para autoescalar com base em certos critérios. Isso garantirá que os trabalhos de varredura sejam tratados de forma rápida e eficiente, especialmente se houver milhares de imagens a serem escaneadas ou re-escaneadas. Existem três configurações possíveis: atrasado, imediato e desativado. Quando as imagens estão na fila para varredura pelo controlador, ele mantém uma 'contagem de tarefas' do tamanho da fila. Por favor, veja a seção xref:scanners.adoc[múltiplos scanners] para mais detalhes.
+
+[IMPORTANT]
+====
+O autoescalonamento do scanner não é suportado quando o scanner é implantado com um operador OpenShift, pois o operador sempre mudará o número de pods para seu valor configurado.
+====

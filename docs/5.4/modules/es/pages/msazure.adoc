@@ -1,0 +1,72 @@
+= SAML (Azure AD)
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/05.msazure/05.msazure.md
+:page-opendocs-slug:  /integration/msazure
+
+== Integra con la autenticación SAML de Azure AD
+
+. En la consola de gestión de Azure, selecciona el elemento de menú "Aplicaciones empresariales" en Azure Active Directory
++
+image:azure1.png[azure_config1]
+
+. Selecciona "`New Application`"
++
+image:azure2.png[azure_config2]
+
+. Crea una aplicación no de galería y dale un nombre único
++
+image:azure3.png[azure_config3]
+
+. En la página de configuración de la aplicación, selecciona "Inicio de sesión único" en el panel lateral izquierdo y elige el inicio de sesión basado en SAML
++
+image:azure4.png[azure_config4]
+
+. Descarga el certificado en formato base64 y anota la URL de inicio de sesión de la aplicación y el identificador de Azure AD
++
+image:azure5.png[azure_config5]
+
+. En la consola de gestión de {product-name}, inicia sesión como administrador. Selecciona "Configuración" en el menú desplegable de administrador en la esquina superior derecha. Haz clic en Configuración SAML
++
+image:azure6.png[azure_config6]
+
+. Configura el servidor SAML de la siguiente manera:
+* Copia la "URL de inicio de sesión" de la aplicación como la URL de inicio de sesión único.
+* Copia el "Identificador de Azure AD" como el emisor.
+* Abre el certificado descargado y copia el texto en el cuadro de Certificado X.509.
+* Establece un rol predeterminado.
+* Introduce el nombre del grupo para la asignación de roles. La reclamación de grupo devuelta por Azure se identifica por el "ID de objeto" en lugar del nombre. El ID de objeto del grupo se puede localizar en menu:Azure Active Directory[Grupos> Página del nombre del grupo]. Utiliza este valor para configurar el mapeo de roles basado en grupos en {product-name}.
++
+image:openid5.png[OpenID5]
++
+Luego, habilita el servidor SAML.
++
+image:azure7.png[azure_config7]
+
+. Copia la URL de redirección.
++
+image:azure8.png[azure_config8]
+
+. Regresa a la consola de gestión de Azure para configurar la "Configuración básica de SAML". Copia la URL de redirección de la consola {product-name} en los cuadros de "Identificador" y "URL de respuesta".
++
+image:azure9.png[azure_config9]
+
+. Edita el "Certificado de firma SAML", cambiando la opción de firma a "Firmar respuesta SAML".
++
+image:azure10.png[azure_config10]
+
+. Edita "Atributos y reclamaciones de usuario" para que la respuesta pueda llevar los atributos del usuario que inicia sesión de vuelta a {product-name}. Haz clic en "Añadir nueva reclamación" para añadir las reclamaciones de "Nombre de usuario" y "Correo electrónico" con "user.userprincipalname" y "user.mail" respectivamente.
++
+image:azure11.png[azure_config11]
+
+. Si los usuarios están asignados a los grupos en el directorio activo, su pertenencia a grupos puede añadirse a la reclamación. Encuentra la aplicación en "Registros de aplicaciones" y edita el manifiesto. Modifica el valor de "groupMembershipClaims" a "Todos".
++
+image:azure12.png[azure_config12]
+
+. Autoriza a los usuarios y grupos para acceder a la aplicación para que puedan iniciar sesión en la consola {product-name} con Azure AD SAML SSO.
++
+image:azure13.png[azure_config13]
+
+=== Mapeo de grupos a roles y espacios de nombres.
+
+Por favor, consulta la sección xref:users.adoc#_mapping_groups_to_roles_and_namespaces[Usuarios y Roles] para ver cómo mapear grupos a roles predefinidos y personalizados, así como espacios de nombres en {product-name}.

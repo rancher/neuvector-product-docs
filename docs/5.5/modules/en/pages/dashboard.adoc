@@ -28,6 +28,7 @@ In the **Top Vulnerable Assets** tab, the bar charts show the top 5 pods / nodes
 
 image:dashboard_top_vul_assets.png[Dashboard]
 
+[#_functions_not_included_when_comparing_with_the_neuvector_standalone_page]
 == Functions Not Included When Comparing with the NeuVector Standalone Page
 
 * Score improvement dialog.

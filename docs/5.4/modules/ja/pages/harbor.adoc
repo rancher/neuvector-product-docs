@@ -1,0 +1,43 @@
+= ハーバープラグインスキャナーモジュール
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/02.registry/01.harbor/01.harbor.md
+:page-opendocs-slug:  /スキャン/レジストリ/ハーバー
+
+== プラグインスキャナーを使用したハーバーレジストリのスキャン
+
+{product-name}は、{product-name} https://github.com/goharbor/pluggable-scanner-spec[プラグインスキャナー]インターフェースを介してハーバーレジストリからスキャナーを呼び出すことをサポートしています。これには、コントローラーへの接続の設定が必要です（公開API）。ハーバーアダプターは、プッシュ時に自動的にスキャンできるスキャンをトリガーするためにコントローラーエンドポイントを呼び出します。定期的なスキャンには、インタロゲーションサービスを使用できます。連邦プライマリコントローラーからのスキャン結果は、リモートクラスターに伝播されます。
+
+[NOTE]
+====
+HTTPSベースのアダプターエンドポイントエラーに問題があります：テスト接続エラーは無視してください、エラーが表示されていても動作します（証明書の検証をスキップ）。
+====
+
+
+=== {product-name}レジストリアダプターをデプロイする
+
+5.2 Helmチャートには、ハーバー用の https://github.com/neuvector/neuvector-helm/blob/master/charts/core/templates/registry-adapter.yaml[レジストリアダプター]をデプロイするオプションが含まれています。また、Docker Hubのneuvector/registry-adapterリポジトリから手動でプルすることもできます。オプションには、ハーバーレジストリリクエストプロトコルの設定と基本認証シークレット名の設定も含まれます。
+
+アダプターのデプロイメント後、これをハーバーで設定する必要があります。
+
+image:5_2_adapter_configuration.png[ハーバー]
+
+アダプターエンドポイントを入力する必要があり、アダプターはコントローラーに接続します。コントローラーは通常、アダプターが接続できるように外部にサービスとして公開されます。さらに、有効な{product-name}ユーザーの認証情報を入力する必要があります。
+
+=== ハーバーレジストリからのイメージスキャン
+
+コントローラーへの接続が成功した後、ハーバーから手動または自動的にイメージスキャンをトリガーできます。
+
+image:2_Scan_image.png[ハーバー]
+
+定期的なスキャン（スケジュールされた）は、ハーバーのインタロゲーションサービスを通じて設定でき、最新のCVEデータベースを使用してレジストリ内のイメージを再スキャンすることができます。
+
+image:4_interrogation.png[ハーバー]
+
+スキャン結果はハーバーで直接表示できます。
+
+image:3_scanresults.png[結果]
+
+=== サンプルデプロイメントYaml
+
+https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.3.0/neuvector-registry-adapter-k8s.yaml[Kubernetes]と https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.3.0/neuvector-registry-adapter-oc.yaml[OpenShift]のサンプル

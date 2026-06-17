@@ -1,0 +1,74 @@
+= Splunk
+:revdate: 2025-05-08
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/11.splunk/11.splunk.md
+:page-opendocs-slug:  /integration/splunk
+
+== {product-name} Splunk アプリを使用して Splunk と統合する
+
+{product-name} Splunk アプリは splunkbase カタログ https://splunkbase.splunk.com/app/6205/[こちら] で見つけることができます。または {product-name} を検索してください。
+
+{product-name} セキュリティダッシュボードは、疑わしいログイン試行、ネットワーク違反、脆弱なイメージなどのセキュリティイベントを特定するのに役立ちます。
+
+以下は、Splunk アプリに表示されるサンプル画面です。
+
+=== イメージの脆弱性
+
+image:vulnerable_images.png[脆弱性]
+
+=== アドミッションコントロールとセキュリティイベント
+
+image:admission_security_events.png[admission_security]
+
+=== ポッド/サービスによるネットワーク違反（デプロイメント）
+
+image:network_violations.png[network]
+
+=== Egress 接続の概要
+
+image:egress_destinations.png[egress]
+
+=== {product-name} ログインアクティビティダッシュボード
+
+image:login_summary.png[ログイン]
+
+== セットアップおよび設定
+
+=== アプリの取得
+
+==== GitHub
+
+https://github.com/neuvector/neuvector-splunk-app[neuvector/neuvector-splunk-app リポジトリ] から最新のアプリ tarball (`neuvector_app.tar.gz`) をダウンロードしてください。
+
+==== Splunkbase
+
+https://splunkbase.splunk.com/apps[Splunkbase] から最新のアプリ tarball をダウンロードしてください。
+
+==== Splunk アプリブラウザ
+
+Splunk UIで、アプリのドロップダウンをクリックし、「さらにアプリを探す」をクリックして、{product-name} Splunk Appを検索します。
+
+=== インストールおよびセットアップ
+
+tarballをアップロードするか、Splunkbaseのプロンプトに従ってアプリをインストールします。
+
+==== {product-name}コンソールでsyslogを設定します。
+
+設定に移動し、->構成 ->syslogを選択します。
+
+[loweralpha]
+. サーバーの値をSplunkが実行されているIPアドレスとして設定します。
+. プロトコルとしてTCPを選択します。
+. ポート番号を10514に設定します。
+. 情報レベルを選択します。
+. 設定を保存するには、SUBMITをクリックします。
+
+image:syslog-config.png[syslog]
+
+複数のクラスターを設定して、syslogをあなたのSplunkインスタンスに送信することができ、あなたのSplunkインスタンスはこれらのsyslogをリアルタイムで受信します。
+
+=== FAQ
+
+==== 必要なユーザーロールは何ですか？
+
+任意のユーザーロールです。

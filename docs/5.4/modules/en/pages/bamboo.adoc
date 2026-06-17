@@ -4,6 +4,7 @@
 :page-opendocs-origin: /06.scanning/03.build/02.bamboo/02.bamboo.md
 :page-opendocs-slug:  /scanning/build/bamboo
 
+[#_scan_for_vulnerabilities_during_bamboo_build_pipeline]
 == Scan for Vulnerabilities during Bamboo Build Pipeline
 
 The Bamboo plug-in for {product-name} can be used to scan for vulnerabilities in the Bamboo pipeline. The plug-in can be downloaded from the Admin -> Add-ons menu in Bamboo. Use Find New Apps to search for {product-name}. The plug-in is also described in the https://marketplace.atlassian.com/apps/1221199/neuvector[Atlassian Marketplace].
@@ -12,18 +13,21 @@ Deploy the {product-name} Allinone or Controller container if you haven't alread
 
 In addition, make sure there is a {product-name} scanner container deployed and configured to connect to the Allinone or Controller. In 4.0 and later, the neuvector/scanner container must be deployed separate from the allinone or controller.
 
+[#_configure_global_settings]
 === Configure Global Settings
 
 Configure settings for the {product-name} Controller/Allinone including the {product-name} authentication as well as the registry authentication.
 
 image:bamboo_nv_global_config.png[global-image]
 
+[#_configure_the_repository_and_build_policy]
 === Configure the Repository and Build Policy
 
 Create a task and enter the repository and tag to scan as well as the build policy to fail the build if vulnerabilities are detected. Enable layered scanning if the results should contain an analysis of vulnerabilities for each layer in the image.
 
 image:bamboo_nv_local_config_2.png[local-image]
 
+[#_review_results]
 === Review Results
 
 Review the results in the scan logs, including the scan summary, reason for failing if appropriate, and details for each CVE detected.

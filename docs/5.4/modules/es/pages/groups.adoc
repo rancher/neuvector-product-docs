@@ -1,0 +1,172 @@
+= Grupos
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/04.groups/04.groups.md
+:page-opendocs-slug:  /directiva/grupos
+
+== Directiva: Grupos
+
+Este menú es el área clave para ver y gestionar las reglas de seguridad y personalizar los grupos para su uso en las reglas. También se utiliza para cambiar los modos de los grupos entre Descubrir, Monitorizar y Proteger. Los grupos de contenedores pueden tener reglas de Proceso/Archivo en un modo diferente al de las reglas de Red, como se describe xref:modes.adoc#_network_service_policy_mode[aquí]. Por favor, consulta las siguientes secciones individuales para explicaciones sobre Comprobaciones de Cumplimiento Personalizadas, Reglas de Red, Reglas de Acceso a Procesos y Archivos y detección DLP/WAF. Nota: Las reglas de red se pueden ver en el menú de grupos para cualquier grupo, pero deben ser editadas por separado en el menú xref:networkrules.adoc[Reglas de Red].
+
+{product-name} crea automáticamente grupos a partir de tus aplicaciones en ejecución. Estos grupos comienzan con el prefijo 'nv.'. También puedes añadirlos manualmente utilizando un CRD o la API REST y pueden ser creados en cualquier modo, Descubrir, Monitorizar o Proteger. Las reglas de Red y Respuesta requieren estas definiciones de grupo. Para los grupos creados automáticamente ('grupos aprendidos' que comienzan con 'nv'), {product-name} aprenderá las reglas de red y proceso y las añadirá mientras esté en modo Descubrir. Los grupos personalizados no aprenderán automáticamente y no poblarán reglas. Nota: los grupos 'nv.' comienzan con xref:processrules.adoc#_zero_drift_process_protection[deriva cero] habilitada por defecto para las protecciones de proceso/archivo.
+
+image:5_groups.png[grupos]
+
+Es conveniente ver grupos de contenedores y aplicar reglas a cada grupo. {product-name} crea una lista de grupos basada en las imágenes de contenedores. Por ejemplo, todos los contenedores iniciados a partir de una imagen de Wordpress estarán en el mismo grupo. Las reglas se crean y aplican automáticamente al grupo de contenedores.
+
+La pantalla de Grupos también muestra un icono 'Puntuable' en la esquina superior derecha, y se puede seleccionar un grupo aprendido y habilitar o deshabilitar la casilla de verificación Puntuable. Esto controla qué contenedores se utilizan para calcular el Puntaje de Riesgo de Seguridad en el Panel. Consulta xref:improve-score.adoc#_improving_the_security_risk_score[Mejorar la puntuación de riesgo de seguridad] para más detalles.
+
+La pantalla de Grupos es también donde se puede importar y exportar el archivo yaml de CRD para 'directiva de seguridad como código'. Selecciona uno o más grupos y haz clic en el botón Exportar política de grupo para descargar el archivo yaml. Consulta la sección xref:usingcrd.adoc[CRD] para más detalles sobre cómo utilizar los CRDs. Importante: Cada grupo seleccionado Y cualquier grupo vinculado a través de reglas de red será exportado (es decir, el grupo y cualquier otro grupo al que se conecte a través de las reglas de red de la lista blanca).
+
+=== Eliminación automática de grupos no utilizados
+
+Los grupos aprendidos (no reservados o grupos personalizados) pueden ser eliminados automáticamente por {product-name} si no hay miembros (contenedores) en el grupo. El período de tiempo para esto es configurable en Configuración -> Configuración.
+
+=== Protección del host - el grupo 'Nodos'
+
+{product-name} crea automáticamente un grupo llamado 'nodos' que representa cada nodo (host) en el clúster. {product-name} proporciona monitoreo básico automatizado de los hosts para procesos sospechosos (como escaneos de puertos, shells inversas, etc.) y escaladas de privilegios. Además, {product-name} aprenderá el comportamiento del proceso de cada nodo mientras está en modo Descubrir para incluir en la lista blanca esos procesos, similar a cómo se hace con los procesos de contenedor.  La lista de reglas de procesos 'locales' (aprendidos) es una combinación de todos los procesos de todos los nodos en el clúster mientras está en modo Descubrir.
+
+Los nodos pueden ser luego puestos en modo Monitor o Proteger, donde {product-name} alertará si algún proceso comienza mientras está en modo Monitor, y bloqueará ese proceso en modo Proteger.
+
+image:host_protection.png[nodeGroup]
+
+Para habilitar la protección del host con reglas de perfil de proceso, selecciona el grupo 'nodos' y revisa los procesos aprendidos en el nodo. Personaliza si es necesario añadiendo, eliminando o editando reglas de proceso. Luego cambia el modo a Monitor o Proteger.
+
+[NOTE]
+====
+Las violaciones de conexión de red de las reglas mostradas en las Reglas de Red para Nodos nunca son bloqueadas, incluso en modo Proteger. Solo las violaciones de procesos son bloqueadas en modo Proteger en los nodos.
+====
+
+=== Grupos personalizados
+
+Los grupos pueden ser añadidos manualmente introduciendo los criterios para el grupo. Nota: Los grupos creados de forma personalizada no tienen un modo de Protección. Esto se debe a que pueden contener contenedores de diferentes grupos subyacentes, cada uno de los cuales puede estar en un modo diferente, causando confusión sobre el comportamiento.
+
+Los grupos se pueden crear mediante:
+
+* *Imágenes*
++
+____
+Seleccionar contenedores por sus nombres de imagen. Ejemplos: image=wordpress, image@redis
+____
+
+* *Nodos*
++
+____
+Seleccionar contenedores por los nodos en los que se están ejecutando. Ejemplos: node=ip-12-34-56-78.us-west-2
+____
+
+* *Contenedores individuales*
++
+____
+Seleccionar contenedores por sus nombres de instancia. Ejemplos: container=nodejs_1, container@nodejs
+____
+
+* *Servicios*
++
+____
+Seleccionar contenedores por sus servicios. Si un contenedor es desplegado por Docker Compose, su valor de etiqueta de servicio será "project_name:service_name"; si un contenedor es desplegado por el servicio de modo swarm de Docker, su valor de etiqueta de servicio será el nombre del servicio de swarm.
+____
+
+* *Etiquetas*
++
+____
+Seleccionar contenedores por sus etiquetas. Ejemplos: com.docker.compose.project=wordpress, location@us-west
+____
+
+* *Direcciones*
++
+____
+Crear un grupo por nombre DNS o rangos de direcciones IP. Ejemplos: address=www.google.com, address=10.1.0.1, address=10.1.0.0/24, address=10.1.0.1-10.1.0.25. El nombre DNS puede ser cualquier nombre que se pueda resolver. Los criterios de dirección no aceptan el operador !=. Vea a continuación los grupos de direcciones de host virtual 'vh' especiales.
+____
+
+Se puede crear un grupo con tipos de criterios mixtos, excepto el tipo 'dirección', que no se puede utilizar junto con otros criterios. Los criterios mixtos imponen una operación '`AND`' entre los criterios, por ejemplo, etiqueta service_type=data Y imagen=mysql. Las entradas múltiples para uno o más criterios se tratan como OR, por ejemplo, dirección=google.com O dirección=yahoo.com. Nota: Para ayudar en el análisis de conexiones de entrada/salida, se puede descargar una lista de IPs de entrada y salida desde la sección de detalles de Ingress/Egress del Dashboard -> como un Informe de Exposición.
+
+Se admite la coincidencia parcial para criterios de imagen, nodo, contenedor, servicio y etiqueta. Por ejemplo, image@redis selecciona contenedores cuyo nombre de imagen contiene la subcadena 'redis'; image{caret}redis selecciona contenedores cuyo nombre de imagen comienza con 'redis'.
+
+No se recomienda utilizar criterios de dirección para coincidir con IPs internas o subredes, especialmente aquellas protegidas por aplicadores; en su lugar, se recomienda utilizar sus metadatos, como imagen, servicio o etiquetas. Los casos de uso típicos para el grupo de direcciones son definir políticas entre contenedores gestionados y subredes de IP externas, por ejemplo, servicios que se ejecutan en Internet o en otro centro de datos. El grupo de direcciones no tiene miembros de grupo.
+
+Los comodines '_' se pueden utilizar en criterios, por ejemplo, 'dirección=_.google.com'. Para una coincidencia más flexible, utiliza la tilde '~' para indicar que se desea una coincidencia regex. Por ejemplo, para coincidir con etiquetas 'policy~public.*-ext1' para la etiqueta policy.
+
+[NOTE]
+====
+Los caracteres especiales utilizados después de un igual '=' en los criterios pueden no coincidir correctamente. Por ejemplo, el punto '.' En 'policy=public._' no coincidirá correctamente, y se debe utilizar una coincidencia regex en su lugar, como 'policy~public._'.
+====
+
+Después de guardar un nuevo grupo, {product-name} mostrará los miembros de ese grupo. Las reglas se pueden crear utilizando estos grupos.
+
+==== Directiva de Red Basada en Host Virtual ('vh')
+
+Los grupos personalizados pueden soportar grupos de direcciones basados en host virtual. Esto permite un caso de uso donde dos direcciones FQDN diferentes se resuelven a la misma dirección IP, pero se deben aplicar diferentes reglas para cada FQDN. Se puede crear un nuevo grupo personalizado con '`address=vh:xxx.yyy`' utilizando el indicador '`vh:`' para habilitar esta protección. Una regla de red puede utilizar el grupo personalizado como la fuente '`From`' basada en el nombre de host virtual (en lugar de la dirección IP resuelta) para aplicar diferentes reglas a los hosts virtuales.
+
+== Ejemplos de Grupo Personalizado
+
+=== Criterios Generales
+
+* Para seleccionar todos los contenedores (cualquiera de los ejemplos a continuación funcionará)
++
+____
+contenedor=&lowast;
+servicio=&lowast;
+____
+
+* Para seleccionar todos los contenedores en el espacio de nombres 'default' (espacio de nombres soportado desde v2.2)
++
+____
+namespace=default
+____
+
+* Para seleccionar todos los contenedores cuyo nombre de servicio comienza con 'nginx'
++
+____
+service=nginx&lowast;
+____
+
+* Para seleccionar todos los contenedores cuyo nombre de servicio contiene 'etcd'
++
+____
+service=&lowast;etcd&lowast;
+____
+
+* Para seleccionar todos los contenedores en el espacio de nombres 'apache1' o 'apache2' (presiona enter después de cada entrada)
++
+____
+namespace=apache1 namespace=apache2
+____
+
+* Para seleccionar todos los contenedores NO en el espacio de nombres 'apache1' y 'apache2' (pulsa enter después de cada entrada)
++
+____
+namespace!=apache1 namespace!=apache2
+____
+
+* Para seleccionar todos los contenedores en el espacio de nombres 'apache1~9'
++
+____
+namespace~apache[1-9]
+____
+
+=== Criterios de Dirección IP
+
+* Todas las direcciones IP externas
++
+____
+Por favor, utiliza el grupo predeterminado '`external`' en las reglas
+____
+
+* Subred IP 10.0.0.0/8
++
+____
+Dirección=10.0.0.0/8
+____
+
+* rango IP
++
+____
+address=10.0.0.0-10.0.0.15
+____
+
+* dropbox.com y sus subdominios (pulsa enter después de cada entrada)
++
+____
+address=dropbox.com address=*.dropbox.com
+____

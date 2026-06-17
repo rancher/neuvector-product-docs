@@ -1,0 +1,48 @@
+= Microsoft AD
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/03.msad/03.msad.md
+:page-opendocs-slug:  /integration/msad
+
+== Konfiguration von Active Directory
+
+Dies erklärt, wie {product-name} sich mit Windows Active Directory authentifiziert.
+Die Konfigurationsseite für den Windows Active Directory-Server ist unten dargestellt.
+
+image:ad1.png[ad_config]
+
+Benutzername: Dies kann jeder Benutzer sein, der Leseberechtigungen für das Base DN-Objekt hat. Das dn-Attribut sollte wie unten gezeigt verwendet werden, oder der Windows-Anmeldename wie user@local.nvtest.com.
+
+image:ad2.png[ad_config]
+
+Basis-DN: Dies ist ein Root-Objekt von Windows Active Directory zur Benutzerauthentifizierung. Die Mindestanforderung an die Zugriffsberechtigung ist das Leserecht. Wie im obigen Beispiel gezeigt, ist das Objekt OU=IT,DC=local,DC=nvtest,DC=com nur für ein Benutzerkonto erlaubt, das im Feld Benutzername definiert ist, um einen Lesezugriff zu ermöglichen.
+
+image:ad3.png[ad_config]
+
+Mit den obigen Einstellungen für Benutzername und Base DN kann sich {product-name} erfolgreich an Windows Active Directory anbinden. Klicken Sie auf TESTVERBINDUNG, um dies zu überprüfen.
+
+image:ad4.png[ad_config]
+
+Benutzername: Es ist erforderlich, das Attribut sAMAccountName NUR zur Übereinstimmung zu verwenden. Zum Beispiel wird im untenstehenden Bildschirm {product-name} überprüfen, ob der Benutzer ituser(CN=ituser,OU=IT,DC=local,DC=nvtest,DC=com) sich mit der {product-name} Webkonsole anmelden kann.
+
+[NOTE]
+====
+{product-name} verwendet nicht die Werte der Attribute cn, displayName, dn, givenName, name oder userPrincipalName usw., um den Testbenutzer zu überprüfen.
+====
+
+image:ad5.png[ad_config]
+
+Der letzte Teil ist die Rollenzuordnung für {product-name} für die Anmeldung an der Webkonsole.
+
+image:ad6.png[ad_config]
+
+Im obigen Beispiel muss die definierte Gruppe _d_s_itgroup in der {product-name}-Rolle die member- und sAMAccountType-Attribute besitzen. Der Wert des sAMAccountType-Attributs MUSS 268435456 sein, was die globale Sicherheitsgruppe ist, und der Anmeldename muss in den Mitgliedslisten enthalten sein.
+
+image:ad7.png[ad_config]
+
+Attribut für Gruppenmitglied: Dies ist ein Mitgliederattribut, das standardmäßig in Windows Active Directory verwendet wird und zur Rollenzuordnung dient, wie oben gezeigt.
+Wenn alle oben genannten Anforderungen erfüllt sind, sollte der Windows Active Directory-Benutzer sich erfolgreich an der {product-name} Webkonsole anmelden können.
+
+=== Gruppen zu Rollen und Namespaces zuordnen
+
+Bitte sehen Sie sich den Abschnitt xref:users.adoc#_mapping_groups_to_roles_and_namespaces[Benutzer und Rollen] an, um zu erfahren, wie Gruppen den vordefinierten und benutzerdefinierten Rollen sowie Namespaces in {product-name} zugeordnet werden.

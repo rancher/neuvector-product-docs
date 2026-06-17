@@ -1,0 +1,70 @@
+= Föderierte Richtlinie
+:revdate: 2024-09-25
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/12.federated/12.federated.md
+:page-opendocs-slug:  /policy/federated
+
+== Föderierte Richtlinie
+
+Nachdem ein Master-Cluster erstellt wurde, können föderierte Regeln im Master erstellt werden, die automatisch in jedes Cluster propagiert werden. Dies ist nützlich, um globale Regeln zu erstellen, die auf jedes Cluster angewendet werden sollen, wie z.B. globale Netzwerkregeln. Föderierte Regeln erscheinen in jedem Cluster als schreibgeschützt und können vom lokalen Administrator des Clusters NICHT gelöscht oder bearbeitet werden.
+
+Um föderierte Regeln zu konfigurieren, klicken Sie im oberen rechten Dropdown-Menü auf Föderierte Richtlinie. Sie sehen Registerkarten für Gruppen, Zulassungssteuerung, Netzwerkregeln und andere Regeln, die föderiert werden können. Wählen Sie die Registerkarte aus und erstellen Sie eine neue Gruppe oder Regel. Im folgenden Beispiel wurden zwei föderierte Gruppen erstellt, die in jedes Cluster propagiert werden.
+
+image:fed_group.png[Föderierte Gruppe]
+
+Und die folgende föderierte Netzwerkregel wurde erstellt, um den SSL-Zugriff von den Demo-Pods des Knotens auf google.com zu ermöglichen.
+
+image:fed_network.png[Föderiertes Netzwerk]
+
+Nachdem diese Regeln und Gruppen in die entfernten Cluster propagiert wurden, erscheinen sie als föderierte Regeln und Gruppen in der Konsole des lokalen Clusters.
+
+image:fed_rule_remote.png[FederatedRuleRemote]
+
+Im obigen Beispiel wird die föderierte Regel angezeigt, die sich von gelernten Regeln und 'benutzerdefinierten' Regeln unterscheidet, die im lokalen Cluster erstellt wurden. Die benutzerdefinierte Regel 1 kann zum Bearbeiten oder Löschen ausgewählt werden, während die föderierte Regel dies NICHT kann. Darüber hinaus werden föderierte Netzwerkregeln immer oben in der Liste angezeigt und haben somit Vorrang vor anderen Regeln.
+
+Andere Regeln wie Zulassungssteuerung, Antwortregeln, Prozessregeln und Dateiregeln verhalten sich auf dieselbe Weise, außer dass die Reihenfolge der Regeln nur für die Netzwerkregeln relevant ist.
+
+Beachten Sie, dass die Konfiguration von Prozess- und Dateiregeln die Auswahl einer föderierten Gruppe erfordert, da diese auf eine Zielgruppe angewendet werden müssen, wie in der Registerkarte "Föderierte Gruppen" definiert. Nachdem eine neue Gruppe in den föderierten -> Gruppen konfiguriert wurde, wird sie als auswählbare Option angezeigt, wenn eine Gruppe in den Prozess- oder Dateiregeln konfiguriert wird.
+
+== Exportieren/Importieren der Föderationsrichtlinie
+
+Föderationsrichtlinien – einschließlich *Gruppen*, *Zugangssteuerung*, *DLP-Sensoren*, *WAF-Sensoren*, *Reaktionsregeln* und *Konfiguration* – können importiert und exportiert werden.
+
+Sie können einen oder mehrere Einträge auswählen und auf **Exportieren** klicken, um die YAML-Datei lokal herunterzuladen oder sie in ein entferntes Repository zu exportieren.
+
+Föderationsrichtlinien können nur im primären Cluster importiert werden. Nach dem Import stellt der primäre Cluster die Richtlinien auf alle verwalteten Cluster bereit.
+
+Das folgende Beispiel zeigt, wie man eine föderierte Gruppe exportiert.
+
+. Wählen Sie eine oder mehrere föderierte Gruppen aus und klicken Sie auf **Gruppenrichtlinie exportieren**.
++
+image::select-group.png[Wählen Sie die föderierte Gruppe]
+
+. Wählen Sie **Auf lokalen Computer herunterladen**, und klicken Sie dann auf **Einreichen**, um die YAML-Datei herunterzuladen.
++
+image::download-to-local.png[Auf lokalen Computer herunterladen]
+
+. Wählen Sie **In entferntes Repository exportieren**, und klicken Sie dann auf **Einreichen**, um die YAML-Datei in das konfigurierte entfernte Repository zu exportieren.
++
+[NOTE]
+====
+Die Option **In entferntes Repository exportieren** ist deaktiviert, bis ein entferntes Repository unter *Einstellungen > Konfiguration* konfiguriert ist.
+====
++
+image::Remote-repo-configurations.png[Konfiguration des entfernten Repositories]
+
+. Nach einem erfolgreichen Export zeigt die Antwortnachricht den exportierten Dateipfad und den Dateinamen an.
+
+Wenn das Feld *Ziel* leer ist, generiert NeuVector einen Standarddateinamen und zeigt ihn in der Antwort an.
+
+image::response-for-empty-destination.png[Antwort für leeres Ziel]
+
+Wenn Sie einen benutzerdefinierten Dateinamen angeben, zeigt die Antwortnachricht den angegebenen Namen an.
+
+* Definieren Sie einen benutzerdefinierten Namen für die exportierte Datei:
++
+image::define-name-for-exported-file.png[Definieren Sie den Namen für die exportierte Datei]
+
+* Antwort für ein angepasstes Ziel:
++
+image::response-for-customized-destination.png[Antwort für angepasstes Ziel]

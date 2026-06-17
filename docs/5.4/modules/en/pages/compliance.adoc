@@ -4,6 +4,7 @@
 :page-opendocs-origin: /06.scanning/01.scanning/02.compliance/02.compliance.md
 :page-opendocs-slug:  /scanning/scanning/compliance
 
+[#_managing_compliance_and_cis_benchmarks]
 == Managing Compliance and CIS Benchmarks
 
 Compliance auditing with {product-name} includes CIS Benchmarks, custom checks, secrets auditing, and industry standard templates for PCI, GDPR and other regulations.
@@ -19,6 +20,7 @@ Compliance scan results can be seen for individual Assets in the Registries (for
 
 The Security Risks -> Compliance menu enables consolidated compliance reporting, similar to how the Vulnerabilities menu works.
 
+[#_security_risks_compliance_and_compliance_profile]
 === Security Risks - Compliance and Compliance Profile
 
 Compliance results are show in the list by Category and Name. Categories include Docker, Kubernetes, OpenShift, and Custom. The names of each item correspond to the CIS benchmark. For example, K.4.2.3 corresponds to the Kubernetes CIS benchmark 4.2.3. Docker benchmarks are preceded with 'D' with the exception of Image related benchmarks, which are preceded by 'I'.
@@ -33,6 +35,7 @@ The following screenshot shows an example of a secret found in an image scan.
 
 image:secret_compliance_4.png[secrets]
 
+[#_customizing_compliance_templates_for_pci_gdpr_hipaa_nist_pciv4_and_disa_stig]
 === Customizing Compliance Templates for PCI, GDPR, HIPAA, NIST, PCIv4, and DISA STIG
 
 The Compliance profile menu enables customization of the built-in templates for industry standards such as PCI, GDPR, HIPAA, NIST, PCIv4, and DISA STIG. These reports can be generated from the Security Risks -> Compliance menu by selecting one of the standards to filter, then exporting. The NIST profile is for https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-190.pdf[NIST SP 800-190].
@@ -59,6 +62,7 @@ image:DocheckASSETSEnableNS.png[namespace]
 
 After the templates and assets are customized (if desired) in the Security Risks -> Compliance Profiles menu, reports can be generated in the Security Risks -> Compliance menu by opening the advanced filter and selecting the compliance template desired. For example, selecting GDPR will filter the display and reports for only the GDPR profile.
 
+[#_sample_helm_installation_with_prime_compliance]
 === Sample Helm Installation with Prime Compliance
 
 The following is a sample Helm installation command to install SUSE Security 5.4.0 with prime compliance. Users can modify the install version to 5.4.0 or later as prime compliance begins with 5.4.0. After installation prime users can check the available regulations from the SUSE Security web UI **Compliance > Regulations** tab view.
@@ -72,6 +76,7 @@ tag=5.4.0-b2,controller.image.repository=nvpublic/co,enforcer.image.repository=n
 en,manager.image.repository=nvpublic/ma
 ----
 
+[#_secrets_auditing]
 === Secrets Auditing
 
 {product-name} checks for over 40 common types of secrets as part of the image compliance scans and run-time scans. In addition, xref:customcompliance.adoc[custom compliance scripts] can be configured for containers or hosts, and the xref:dlp.adoc[DLP packet inspection] feature can be used to check for secrets in network payloads.

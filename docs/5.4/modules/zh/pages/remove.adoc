@@ -1,0 +1,76 @@
+= 移除或重置 {product-name}
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/10.remove/10.remove.md
+:page-opendocs-slug: /deploying/remove
+
+== 移除 {product-name} 部署/容器
+
+要在 Kubernetes 上移除 {product-name} 部署，请在删除命令中使用相同的 yaml 文件进行部署。
+
+[,shell]
+----
+kubectl delete -f neuvector.yaml
+----
+
+这将移除 {product-name} 的服务和容器部署。您可能还想删除在部署步骤中创建的 neuvector 名称空间、持久卷、集群角色和集群角色绑定。
+
+如果您使用 Helm 图表或操作员部署了 {product-name}，则应使用 Helm 或相应的操作员命令删除 {product-name}。
+
+== 将 {product-name} 重置为初始状态
+
+除了如上所述删除和重新部署 {product-name}，在 Kubernetes 中可以采取以下步骤重置 {product-name}，这将移除学习的规则、组和其他配置，但保留 {product-name} 部署不变。
+
+. 将控制器部署缩放为 0。
+. （可选）如果使用了持久卷，请删除创建的持久卷备份和注册表文件夹。
+. 将控制器部署缩放为 3。
+
+== 重置管理员密码
+
+管理员密码是管理 {product-name} 部署和查看集群网络活动的关键。 安装后应立即更改密码并妥善保管。 有时，密码被保管得过于严格而导致遗失，或者管理员离开公司。 如果您可以访问集群的 kubectl，您可以使用以下步骤将管理员密码重置为默认值。
+
+进入其中一个控制器。
+
+[,shell]
+----
+kubectl exec -it <controller> -n neuvector -- sh
+----
+
+检查管理员条目是否存在，并将输出的 json 保存到安全的地方。
+
+[,shell]
+----
+consul kv get object/config/user/admin
+----
+
+从上述 consul kv get 命令中获取输出，并用以下字符串替换 password_hash 字符串。
+
+[,shell]
+----
+c7ad44cbad762a5da0a452f9e854fdc1e0e7a52a38015f23f3eab1d80b931dd472634dfac71cd34ebc35d16ab7fb8a90c81f975113d6c7538dc69dd8de9077ec
+----
+
+将管理员账户密码重置为默认值。（在执行之前请替换 <UPDATED_consul_kv_get_output_with_new_password_hash>！！！）
+
+[,shell]
+----
+consul kv put object/config/user/admin '<UPDATED_consul_kv_get_output_with_new_password_hash>'
+----
+
+[WARNING]
+.以下示例：（在替换为输出之前请勿执行）
+====
+[,shell]
+----
+consul kv put object/config/user/admin '{"fullname":"admin","username":"admin","password_hash":"c7ad44cbad762a5da0a452f9e854fdc1e0e7a52a38015f23f3eab1d80b931dd472634dfac71cd34ebc35d16ab7fb8a90c81f975113d6c7538dc69dd8de9077ec","pwd_reset_time":"2022-03-24T20:50:15.341074451Z","pwd_hash_history":null,"domain":"","server":"","email":"","role":"admin","role_oride":false,"timeout":300,"locale":"en","role_domains":{},"last_login_at":"2022-03-24T20:49:32.577877044Z","login_count":1,"failed_login_count":0,"block_login_since":"0001-01-01T00:00:00Z"}'
+----
+
+响应：
+
+[,shell]
+----
+Success! Data written to: object/config/user/admin
+----
+
+使用 admin/admin 登录并更改密码。
+====

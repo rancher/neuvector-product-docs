@@ -4,6 +4,7 @@
 :page-opendocs-origin: /05.policy/13.usingcrd/1.import/1.import.md
 :page-opendocs-slug:  /policy/usingcrd/import
 
+[#_importing_a_crd_format_file_from_the_console_or_api]
 == Importing a CRD format file from the Console or API
 
 {product-name} supports importing a CRD formatted file from the console. However, this is not the same as applying it in Kubernetes as a custom resource definition (CRD).

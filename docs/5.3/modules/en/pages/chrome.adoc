@@ -4,6 +4,7 @@
 :page-opendocs-origin: /03.configuration/01.console/02.chrome/02.chrome.md
 :page-opendocs-slug: /configuration/console/chrome
 
+[#_enabling_chrome_browsers_to_accept_the_product_self_signed_certificate_on_macos]
 == Enabling Chrome Browsers to Accept the {product-name} Self-Signed Certificate on MacOS
 
 Under certain circumstances the Chrome browser will flat out refuse to accept a {product-name} self-signed certificate.  A possible reason could be that the certificate has not yet been imported into macOS login certificates store.  Another possibility is that an existing certificate has not yet been configured to be trusted.  This will disallow the user from accepting it and proceeding to the {product-name} login page with the use of Chrome as illustrated with the example shown below:
@@ -12,6 +13,7 @@ image:chrome1.png[chrome]
 
 Corrective steps can be taken to enable Chrome on accepting the self-signed certificate placed on macOS Keychain store.  This can be done by configuring the {product-name}'s certificate to be trusted using the Mac's Keychain Access application.  This is with the assumption that the certificate does indeed exists in the macOS Keychain Access store.  We will first look at how to export a certificate from an existing {product-name} node from one system, and later can be imported into another system.   There are 2 ways to go about exporting the certificate which we will go over below.  They are, using the Chrome browser, and using the macOS Keychain Access application.
 
+[#_certificate_export_using_chrome]
 === Certificate export using Chrome
 
 The screen capture below illustrates how to access the {product-name} certificate using Chrome.
@@ -22,6 +24,7 @@ To export the certificate, drag and drop the certificate to a location of choice
 
 image:chrome3.png[chrome]
 
+[#_certificate_export_using_macos_keychain_access]
 === Certificate export using macOS Keychain-Access
 
 Launch the macOS Keychain Access application by simultaneously entering the keys ⌘ + F using a Mac keyboard, search for Keychain Access, and double click on the  application.
@@ -29,10 +32,12 @@ This launches the Keychain Access application.  Select the {product-name} certif
 
 image:chrome4.png[chrome]
 
+[#_launching_the_macos_keychain_access_application]
 === Launching the macOS Keychain-Access Application
 
 There are two ways to launch the macOS Keychain Access Application.  This can be done by searching from the macOS, which has been described from the steps immediately above, or using the Chrome browser.
 
+[#_launching_keychain_access_from_the_chrome_browser]
 === Launching Keychain-Access from the Chrome Browser
 
 Settings > Advanced > Manage certificates
@@ -44,6 +49,7 @@ application as shown below.
 
 image:chrome6.png[chrome]
 
+[#_certificate_import_into_the_macos_keychain_access_store]
 === Certificate import into the macOS Keychain-Access Store
 
 Launch the macOS Keychain Access application by simultaneously entering the keys ⌘ + F using a Mac keyboard, search for Keychain Access, and click on the application.  Then import the certificate by drag and dropping a {product-name} certificate (example:  nvcertificate.cer) into the Certificate right pane of the Keychain Access application.  Now that the certificate has been imported, it is not yet trusted.
@@ -53,6 +59,7 @@ image:chrome7.png[chrome]
 
 Notice that none of the parameters have been configured, and it is not trusted by default.  It needs to be configured to be trusted to allow the user to access the login page using the Chrome browser.
 
+[#_enabling_trust_for_the_product_certificate]
 === Enabling trust for the {product-name} Certificate
 
 The following steps details on how to enable trust for the {product-name} certificate in the Keychain Access store.

@@ -1,0 +1,48 @@
+= Microsoft AD
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/03.msad/03.msad.md
+:page-opendocs-slug:  /integration/msad
+
+== Active Directoryの設定
+
+これは{product-name}がWindows Active Directoryで認証される方法を説明します。
+Windows Active Directoryサーバーの設定ページは以下に示されています。
+
+image:ad1.png[ad_config]
+
+ユーザ名:これはBase DNオブジェクトに対する読み取り権限を持つ任意のユーザーです。dn属性は以下のように使用する必要があります。または、user@local.nvtest.comのようなWindowsログイン名を使用します。
+
+image:ad2.png[ad_config]
+
+ベースDN:これはユーザー認証のためのルートWindows Active Directoryオブジェクトです。最小アクセスパーミッションの要件は読み取りです。上記の例に示すように、OU=IT,DC=local,DC=nvtest,DC=comオブジェクトは、読み取りを許可するためにユーザー名フィールドに定義されたユーザーアカウントのみに許可されます。
+
+image:ad3.png[ad_config]
+
+上記のユーザー名とBase DN設定により、{product-name}はWindows Active Directoryに正常にバインドできます。接続を確認するには、TEST CONNECTIONをクリックしてください。
+
+image:ad4.png[ad_config]
+
+ユーザ名:一致させるためにはsAMAccountName属性のみを使用する必要があります。例えば、以下の画面で{product-name}はituser(CN=ituser,OU=IT,DC=local,DC=nvtest,DC=com)ユーザーが{product-name}ウェブコンソールにログインできるかどうかを確認します。
+
+[NOTE]
+====
+{product-name}はテストユーザーを確認するためにcn、displayName、dn、givenName、name、またはuserPrincipalName属性の値を使用しません。
+====
+
+image:ad5.png[ad_config]
+
+最後の部分は、ウェブコンソールログインのための{product-name}のロールマッピングです。
+
+image:ad6.png[ad_config]
+
+上記の例では、{product-name}ロールに定義されたグループ_d_s_itgroupは、メンバーおよびsAMAccountType属性を持っている必要があります。sAMAccountType属性の値は268435456でなければならず、これはグローバルセキュリティグループであり、ログインユーザー名はメンバーリストに含まれている必要があります。
+
+image:ad7.png[ad_config]
+
+グループメンバー属性：これはデフォルトでWindows Active Directoryのメンバー属性であり、上記のようにロールマッピングの目的で使用されます。
+上記のすべての要件が満たされている場合、Windows Active Directoryユーザーは{product-name}ウェブコンソールに正常にログインできるはずです。
+
+=== グループを役割とネームスペースにマッピングする
+
+グループをプリセットおよびカスタム役割、さらに{product-name}のネームスペースにマッピングする方法については、xref:users.adoc#_mapping_groups_to_roles_and_namespaces[ユーザーと役割]のセクションをご覧ください。

@@ -1,0 +1,89 @@
+= Visão geral 5.x
+:revdate: 2025-01-10
+:page-revdate: {revdate}
+:page-opendocs-origin: /01.basics/01.overview/01.overview.adoc
+:page-opendocs-slug: /basics/overview
+
+== A Plataforma Completa de Segurança de Contêineres ao Longo do Ciclo de Vida
+
+[NOTE]
+====
+Estes documentos descrevem a versão 5.x (Código Aberto). As imagens 5.x estão acessíveis no Docker Hub com a tag apropriada, por exemplo, `neuvector/controller:(version)`.
+====
+
+{product-name} oferece uma plataforma poderosa de segurança de contêineres de ponta a ponta. Isso inclui verificação integral de vulnerabilidades e proteção completa em tempo de execução para contêineres, pods e hosts, incluindo:
+
+. Gerenciamento de Vulnerabilidades CI/CD e Controle de Admissão. Escaneie imagens com um plug-in do Jenkins, escaneie registros e aplique regras de controle de admissão para implantações em produção.
+. Proteção contra Violações. Descobre comportamentos e cria uma política baseada em lista branca para detectar violações de comportamento normal.
+. Detecção de Ameaças. Detecta ataques comuns a aplicativos, como DDoS e ataques DNS em contêineres.
+. Sensores DLP e WAF. Inspeciona o tráfego de rede para Prevenção de Perda de Dados de informações sensíveis e detecta ataques comuns do OWASP Top10 em WAF.
+. Verificação de Vulnerabilidades em Tempo de Execução. Escaneia registros, imagens e plataformas de orquestração de contêineres em execução e hosts para vulnerabilidades comuns (CVE) e vulnerabilidades específicas de aplicativos.
+. Conformidade e Auditoria. Executa testes do Docker Bench e benchmarks do Kubernetes CIS automaticamente.
+. Segurança de Endpoint/Host. Detecta elevações de privilégio, monitora processos e atividades de arquivos em hosts e dentro de contêineres, e monitora sistema de arquivos de contêineres em busca de atividades suspeitas.
+. Gerenciamento de múltiplos clusters. Monitore e gerencie múltiplos clusters Kubernetes a partir de um único console.
+
+Outras funcionalidades do {product-name} incluem a capacidade de colocar contêineres em quarentena e exportar logs através de SYSLOG e webhooks, iniciar captura de pacotes para investigação e integração com RBACs do OpenShift, LDAP, Microsoft AD e SSO com SAML. Nota: Quarentena significa que todo o tráfego de rede é bloqueado.  O contêiner permanecerá e continuará em execução - apenas sem conexões de rede.  O Kubernetes não iniciará um contêiner para substituir um contêiner em quarentena, pois o servidor API ainda consegue acessar o contêiner.
+
+== Contêineres de Segurança
+
+A solução de segurança de contêiner em tempo de execução {product-name} contém quatro tipos de contêineres de segurança: *Controllers*, *Enforcers*, *Managers* e *Scanners*. Um contêiner especial chamado *All-in-One* também é fornecido para combinar as funções de Controller, Enforcer e Manager em um único contêiner, principalmente para implantações nativas do Docker.
+
+{product-name} pode ser implantado em máquinas virtuais ou em sistemas bare metal com um único sistema operacional.
+
+image:1Overview.png[Implantação]
+
+=== Controlador
+
+O Controlador gerencia o cluster de contêineres Enforcer do {product-name}. Ele também fornece APIs REST para o console de gerenciamento. Embora implantações de teste típicas tenham um Controlador, recomenda-se múltiplos Controladores em uma configuração de alta disponibilidade. 3 controladores é o padrão no exemplo de yaml de implantação de produção do Kubernetes.
+
+=== Enforcer
+
+O Enforcer é um contêiner leve que aplica as políticas de segurança. Um Enforcer deve ser implantado em cada nó (host), por exemplo, como um DaemonSet.
+
+[NOTE]
+====
+Para implantações nativas do Docker (não Kubernetes), o contêiner Enforcer e o Controlador não podem ser implantados no mesmo nó (exceto no caso All-in-One abaixo).
+====
+
+
+=== Gerente
+
+O Manager é um contêiner sem estado que fornece um console web-UI (apenas HTTPS) para os usuários gerenciarem a solução de segurança {product-name}. Mais de um contêiner Manager pode ser implantado conforme necessário.
+
+=== All-in-One
+
+O contêiner All-in-One inclui um Controlador, um Enforcer e um Manager em um único pacote. É útil para instalação fácil em implantações de nó único ou em pequena escala.
+
+=== Scanner
+
+O Scanner é um contêiner que realiza a varredura de vulnerabilidades e conformidade para imagens, contêineres e nós. Normalmente, é implantado como um replicaset e pode ser escalado para quantos scanners paralelos forem desejados, a fim de aumentar o desempenho da varredura. O Controlador atribui trabalhos de varredura a cada scanner disponível de forma round-robin até que todas as varreduras sejam concluídas. O scanner também contém o banco de dados CVE mais recente e é atualizado regularmente por {product-name}.
+
+=== Atualizador
+
+O Atualizador é um contêiner que, quando executado, atualiza o banco de dados CVE para {product-name}. {product-name} publica regularmente novas imagens de scanner para incluir o CVE mais recente para varreduras de vulnerabilidade. O atualizador reimplanta todos os pods de scanner reduzindo a implantação a zero e escalando-a novamente, forçando a obtenção de uma imagem de scanner atualizada.
+
+== Arquitetura
+
+Aqui está uma visão geral da arquitetura de {product-name}. Não está mostrado o contêiner de scanner separado, que também pode ser executado como um scanner de pipeline autônomo.
+
+image:architecture.png[Arquitetura]
+
+== Exemplos de Implantação
+
+Para padrões comuns de implantação e melhores práticas, consulte a seção xref:production.adoc#_best_practices_tips_qa_for_deploying_and_managing_suse_security[Onboarding/Melhores Práticas].
+
+=== All-in-One e Enforcers
+
+Esta implantação é ideal para ambientes de nó único ou de pequena escala, por exemplo, para avaliação, teste e pequenas implantações. Um contêiner All-in-One é implantado em um nó, que também pode ser um nó com contêineres de aplicação em execução. Um Enforcer pode ser implantado em todos os outros nós, sendo necessário um Enforcer em cada nó que você deseja proteger com {product-name}. Isso também é útil para implantações nativas do Docker, onde um Controlador e um Enforcer não podem ser executados no mesmo host.
+
+=== Contêineres Controller, Manager e Enforcer
+
+Este é um caso de uso de implantação mais genérico que consiste em um ou mais Controllers, um Manager e um conjunto de Enforcers. O Controller e o Manager podem ser implantados no mesmo nó ou em nós diferentes do Enforcer.
+
+=== Apenas All-in-One
+
+Você pode implantar apenas o contêiner All-in-One para varredura de registro, usando o plug-in do Jenkins, ou testes simples em um nó de {product-name}.
+
+=== Apenas Controlador
+
+É possível implantar um único contêiner Controller e/ou scanner para gerenciar a varredura de vulnerabilidade fora de um cluster, por exemplo, para uso com o plug-in do Jenkins. A varredura de registro também pode ser realizada pelo Controller usando exclusivamente a API REST, mas tipicamente um contêiner Manager também é desejado para fornecer configuração baseada em console e visualização de resultados para a varredura de registro.

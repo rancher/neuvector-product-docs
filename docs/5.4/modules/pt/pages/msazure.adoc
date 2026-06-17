@@ -1,0 +1,72 @@
+= SAML (Azure AD)
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/05.msazure/05.msazure.md
+:page-opendocs-slug:  /integration/msazure
+
+== Integre com a autenticação SAML do Azure AD
+
+. No console de gerenciamento do Azure, selecione o item de menu "Aplicativos corporativos" no Azure Active Directory
++
+image:azure1.png[azure_config1]
+
+. Selecione "`New Application`"
++
+image:azure2.png[azure_config2]
+
+. Crie um aplicativo não-galeria e dê a ele um nome exclusivo
++
+image:azure3.png[azure_config3]
+
+. Na página de configuração do aplicativo, selecione "Single sign-on" no painel lateral e escolha o login baseado em SAML.
++
+image:azure4.png[azure_config4]
+
+. Baixe o certificado no formato base64 e anote a URL de Login do aplicativo e o Identificador do Azure AD
++
+image:azure5.png[azure_config5]
+
+. No {product-name} console de gerenciamento, faça login como administrador. Selecione "Configurações" no menu suspenso do administrador no canto superior direito. Clique em configurações SAML
++
+image:azure6.png[azure_config6]
+
+. Configure o servidor SAML da seguinte forma:
+* Copie a "URL de Login" do aplicativo como a URL de Single Sign-On.
+* Copie o "Identificador do Azure AD" como o Emissor.
+* Abra o certificado baixado e copie o texto para a caixa de Certificado X.509.
+* Defina uma função padrão.
+* Digite o nome do grupo para mapeamento de funções. A reivindicação de grupo retornada pelo Azure é identificada pelo "ID do Objeto" em vez do nome. O ID do objeto do grupo pode ser localizado em menu:Azure Active Directory[Grupos> Página do nome do grupo]. Você deve usar este valor para configurar o mapeamento de funções baseado em grupos em {product-name}.
++
+image:openid5.png[OpenID5]
++
+Em seguida, ative o servidor SAML.
++
+image:azure7.png[azure_config7]
+
+. Copie a URL de Redirecionamento
++
+image:azure8.png[azure_config8]
+
+. Retorne ao console de gerenciamento do Azure para configurar a "Configuração Básica do SAML". Copie a URL de Redirecionamento do console {product-name} para os campos "Identificador" e "URL de Resposta"
++
+image:azure9.png[azure_config9]
+
+. Edite o "Certificado de Assinatura SAML", alterando a Opção de Assinatura para "Assinar resposta SAML"
++
+image:azure10.png[azure_config10]
+
+. Edite "Atributos e Declarações do Usuário" para que a resposta possa carregar os atributos do usuário que faz login de volta para {product-name}. Clique em "Adicionar nova declaração" para adicionar as declarações "Nome de Usuário" e "Email" com "user.userprincipalname" e "user.mail", respectivamente.
++
+image:azure11.png[azure_config11]
+
+. Se os usuários estiverem atribuídos aos grupos no diretório ativo, a associação ao grupo pode ser adicionada à declaração. Encontre o aplicativo em "Registros de Aplicativos" e edite o manifesto. Modifique o valor de "groupMembershipClaims" para "Todos".
++
+image:azure12.png[azure_config12]
+
+. Autorize usuários e grupos a acessar o aplicativo para que possam fazer login {product-name} no console com Azure AD SAML SSO
++
+image:azure13.png[azure_config13]
+
+=== Mapeamento de Grupos para Funções e Namespaces
+
+Consulte a seção xref:users.adoc#_mapping_groups_to_roles_and_namespaces[Usuários e Funções] para saber como mapear grupos para funções predefinidas e personalizadas, bem como namespaces em {product-name}.

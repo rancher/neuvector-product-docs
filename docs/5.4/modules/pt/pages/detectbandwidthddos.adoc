@@ -1,0 +1,80 @@
+= Detectar Alto Uso de Largura de Banda por um Pod/Grupo (DDoS)
+:revdate: 2026-02-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/15.detectbandwidthddos/15.detectbandwidthddos.md
+:page-opendocs-slug:  /política/detectbandwidthddos
+
+{product-name} usuários podem definir a detecção de violação de largura de banda ou de taxa de sessão em nível de Grupo com base nas configurações de limite pré-configuradas. Essas configurações funcionam para Grupos Aprendidos ou criados pelo usuário, mas não para Grupos Reservados.
+
+Um temporizador de um minuto é criado para verificar periodicamente o limite de métrica do Grupo em busca de violações. Uma vez que uma violação é detectada, um `Group.Metric.Violation` evento é gerado e uma mensagem é impressa para descrever o evento.
+
+Você pode configurar os seguintes limites de métrica para cada grupo:
+
+* `Mon_metric`: Habilita ou desabilita o monitoramento de métricas para o grupo.
+
+* `Grp_sess_rate`: Limite de taxa de sessão, medido em conexões por segundo (cps). O valor padrão é `0`, que desabilita a detecção.
+
+* `Grp_band_width`: Limite de vazão, medido em megabits por segundo (Mbps). O valor padrão é `0`, que desabilita a detecção.
+
+* `Grp_cur_sess`: Limite de contagem de sessões ativas.
+
+== Configurar limites de métricas do grupo
+
+Você pode configurar limites de métricas do grupo usando o {product-name} CLI ou a interface web.
+
+=== Configurar limites usando o CLI
+
+Para visualizar as opções de métricas do grupo disponíveis, execute o seguinte comando:
+
+[source,shell]
+----
+set group <group-name> setting -h
+----
+
+Saída de exemplo:
+
+[source,shell]
+----
+--monitor_metric [enable|disable]   Monitor metric status
+--cur_sess INTEGER                  Active session threshold
+--sess_rate INTEGER                 Session rate threshold (cps)
+--bandwidth INTEGER                 Throughput threshold (Mbps)
+----
+
+=== Configurar limites usando a interface web
+
+Você pode habilitar ou desabilitar limites de métricas do grupo ao criar ou editar um grupo.
+
+* Use a visualização *Adicionar Grupo* para configurar limites para um novo grupo.
++
+image:bandwidth_ddos_1.png[Adicionar Grupo]
++
+* Use a visualização *Editar Grupo* para atualizar os limites de um grupo existente.
++
+image:bandwidth_ddos_2.png[Editar Grupo]
+
+== Exemplo de fluxo de trabalho
+
+O exemplo a seguir mostra como funciona a detecção de limites de métricas de grupo.
+
+. Adicione limites de métricas a um grupo aprendido ou criado pelo usuário.
++
+image:bandwidth_ddos_3.png[Adicionar Grupo]
++
+. Gere tráfego para o grupo até que a contagem de sessões ativas atinja o limite configurado.
++
+image:bandwidth_ddos_4.png[Adicionar Grupo]
++
+. Quando um limite é excedido, {product-name} gera um `Group.Metric.Violation` evento.
++
+image:bandwidth_ddos_5.png[Adicionar Grupo]
+
+
+[NOTE]
+====
+* {product-name} avalia o tráfego médio nos 60 segundos anteriores para determinar se um limite foi excedido.
+* O modo de proteção fornece as medições mais precisas porque o aplicador opera em linha no caminho dos dados.
+* Em ambientes de múltiplos clusters, tanto os clusters primários quanto os gerenciados devem executar a versão 5.4 ou posterior para suportar limites de métricas de grupo federados.
+* Se os clusters gerenciados executarem versões anteriores à 5.4, as configurações de limite federado são ignoradas até que esses clusters façam upgrade.
+* Após fazer upgrade dos clusters gerenciados para a versão 5.4 ou posterior, ressincronize manualmente os clusters para habilitar o monitoramento de DDoS para grupos federados.
+====

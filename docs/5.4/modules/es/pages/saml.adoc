@@ -1,0 +1,38 @@
+= SAML (Okta)
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/04.saml/04.saml.md
+:page-opendocs-slug:  /integration/saml
+
+== Configuración del IDP SAML
+
+Para configurar {product-name} para usar el servidor IDP SAML de Okta, primero, configura el servidor IDP SAML en el sitio de Okta.
+
+image:okta.png[Okta]
+
+. Copia "URI de redirección SAML" de la página de configuración SAML de {product-name}, pégalo en la URL de inicio de sesión único de Okta, en los campos de URL de destinatario y URL de destino.
+. Cifrado de aserciones: Este campo debe ser *sin cifrar.*
+. Declaraciones de atributos: Introduce los atributos de correo electrónico y nombre de usuario.
+. Declaraciones de atributos de grupo: Habilita esto si se requiere mapeo de roles basado en grupos. El nombre de atributo predeterminado que busca {product-name} es NVRoleGroup. Si se utiliza otro nombre de atributo para la pertenencia al grupo del usuario, se puede personalizar en la página de configuración SAML de {product-name}.
+
+Configura los ajustes SAML en la consola de la interfaz de usuario de {product-name}.
+
+image:saml1.png[SAML]
+
+Utiliza el botón "Ver instrucciones de configuración" como se muestra en la siguiente captura de pantalla para localizar la siguiente información y cópiala en la página SAML de {product-name}.
+
+. URL de inicio de sesión único del proveedor de identidad
+. Emisor del proveedor de identidad
+. Certificado X.509
+. Especifica el nombre del atributo del grupo si se utiliza un valor no predeterminado.
+
+image:setting.png[Configuración]
+
+Después de que el usuario esté autenticado, se puede derivar el rol adecuado con la configuración de mapeo de roles basada en grupos. Para configurar el mapeo de roles basado en grupos,
+
+. Si el mapeo de roles basado en grupos no está configurado o no se pueden localizar los grupos coincidentes, al usuario autenticado se le asignará el rol predeterminado. Si el rol predeterminado está configurado como Ninguno, cuando falla el mapeo de roles basado en grupos, el usuario no podrá iniciar sesión.
+. Especifica una lista de grupos respectivamente en el mapa de roles de Administrador y Lector. El atributo de grupo del usuario se incluye en la respuesta después de que el usuario esté autenticado. Si se localiza el grupo coincidente, se asignará el rol correspondiente al usuario.
+
+=== Mapeo de Grupos a Roles y Espacios de Nombres
+
+Por favor, consulta la sección xref:users.adoc#_mapping_groups_to_roles_and_namespaces[Usuarios y Roles] para saber cómo mapear grupos a roles predefinidos y personalizados, así como espacios de nombres en {product-name}.

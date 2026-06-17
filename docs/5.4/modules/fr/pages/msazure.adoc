@@ -1,0 +1,72 @@
+= SAML (Azure AD)
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/05.msazure/05.msazure.md
+:page-opendocs-slug:  /integration/msazure
+
+== Intégrer l'authentification SAML avec Azure AD
+
+. Dans la console de gestion Azure, sélectionnez l'élément de menu "Applications d'entreprise" dans Azure Active Directory
++
+image:azure1.png[azure_config1]
+
+. Sélectionnez "`New Application`"
++
+image:azure2.png[azure_config2]
+
+. Créez une application non répertoriée et donnez-lui un nom unique
++
+image:azure3.png[azure_config3]
+
+. Dans la page de configuration de l'application, sélectionnez "Authentification unique" dans le volet latéral et choisissez l'authentification unique basée sur SAML
++
+image:azure4.png[azure_config4]
+
+. Téléchargez le certificat au format base64 et notez l'URL de connexion de l'application et l'identifiant Azure AD
++
+image:azure5.png[azure_config5]
+
+. Dans la {product-name} console de gestion, connectez-vous en tant qu'administrateur. Sélectionnez "Paramètres" dans le menu déroulant de l'administrateur en haut à droite. Cliquez sur les paramètres SAML
++
+image:azure6.png[azure_config6]
+
+. Configurez le serveur SAML comme suit :
+* Copiez l'URL de connexion de l'application comme URL d'authentification unique.
+* Copiez l'"Identifiant Azure AD" comme l'émetteur.
+* Ouvrez le certificat téléchargé et copiez le texte dans le champ Certificat X.509.
+* Définissez un rôle par défaut.
+* Entrez le nom du groupe pour le mappage des rôles. La revendication de groupe renvoyée par Azure est identifiée par l'"ID d'objet" au lieu du nom. L'ID d'objet du groupe peut être localisé dans menu:Azure Active Directory[Groupes> Page du nom du groupe]. Vous devez utiliser cette valeur pour configurer le mappage des rôles basé sur les groupes dans {product-name}.
++
+image:openid5.png[OpenID5]
++
+Ensuite, activez le serveur SAML.
++
+image:azure7.png[azure_config7]
+
+. Copiez l'URL de redirection
++
+image:azure8.png[azure_config8]
+
+. Retournez à la console de gestion Azure pour configurer « Configuration SAML de base ». Copiez {product-name} l'URL de redirection de la console dans les champs « Identifiant » et « URL de réponse ».
++
+image:azure9.png[azure_config9]
+
+. Modifiez le "Certificat de signature SAML", en changeant l'option de signature en "Signer la réponse SAML"
++
+image:azure10.png[azure_config10]
+
+. Modifiez "Attributs et revendications de l'utilisateur" afin que la réponse puisse renvoyer les attributs de l'utilisateur connecté à {product-name}. Cliquez sur "Ajouter une nouvelle revendication" pour ajouter les revendications "Nom d'utilisateur" et "Email" avec "user.userprincipalname" et "user.mail" respectivement.
++
+image:azure11.png[azure_config11]
+
+. Si les utilisateurs sont assignés aux groupes dans l'annuaire actif, leur appartenance aux groupes peut être ajoutée à la revendication. Trouvez l'application dans "Enregistrements d'applications" et modifiez le manifeste. Modifiez la valeur de "groupMembershipClaims" en "Tous".
++
+image:azure12.png[azure_config12]
+
+. Autorisez les utilisateurs et les groupes à accéder à l'application afin qu'ils puissent se connecter à {product-name} la console avec Azure AD SAML SSO.
++
+image:azure13.png[azure_config13]
+
+=== Mappage des groupes aux rôles et espaces de noms
+
+Veuillez consulter la section xref:users.adoc#_mapping_groups_to_roles_and_namespaces[Utilisateurs et rôles] pour savoir comment mapper les groupes aux rôles prédéfinis et personnalisés ainsi qu'aux espaces de noms dans {product-name}.

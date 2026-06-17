@@ -1,0 +1,129 @@
+= Scannen und Compliance
+:revdate: 2025-01-16
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/01.scanning/01.scanning.md
+:page-opendocs-slug:  /scanning/scanning
+
+{product-name} ermöglicht vollständiges Scannen über den gesamten Lebenszyklus und Compliance durch Schwachstellenscans und die Ausführung der CIS-Benchmarks für Sicherheit sowie benutzerdefinierte Compliance-Prüfungen. Das Menü „Sicherheitsrisiken“ ermöglicht anpassbare Untersuchungen, Triage und Berichterstattung im Bereich Schwachstellen- und Compliance-Management. Führen Sie einfach Recherchen zu Schwachstellen in Images durch und finden Sie heraus, welche Knoten oder Container diese Schwachstellen enthalten. Erweiterte Filterung erleichtert die Überprüfung von Scan- und Compliance-Prüfergebnissen und bietet maßgeschneiderte Berichterstattung. Es bietet auch standardisierte und anpassbare Compliance-Berichte und Vorlagen für PCI, DSGVO und andere Vorschriften.
+
+== Übersicht über {product-name} Scannen
+
+Das Scannen erfolgt in allen Phasen der Pipeline von Build über Registry bis Run-Time, auf verschiedenen Assets, wie unten gezeigt.
+
+|===
+| *Scan-Typ* | Abbild | Knoten | Container | Orchestrator
+
+| *Risiken*
+| Ja
+| Ja
+| Ja
+| Ja
+
+| *CIS-Benchmarks*
+| Ja
+| Ja
+| Ja
+| Ja
+
+| *Benutzerdefinierte Compliance*
+| Nein
+| Ja
+| Ja
+| Nein
+
+| *Geheimnisse*
+| Ja
+| Ja
+| Ja
+| Nein
+
+| *Module*
+| Ja
+| Nicht zutreffend
+| Nicht zutreffend
+| Nicht zutreffend
+|===
+
+Images werden entweder im Registry-Scanning oder über Build-Phasen-Plugins wie Jenkins, CircleCI, Gitlab etc. gescannt.
+
+Die von {product-name} unterstützten CIS-Benchmarks umfassen:
+
+* Kubernetes
+* Docker
+* Red Hat OpenShift Entwurf 'Inspiriert von CIS' Benchmarks
+* Google GKE
+
+Die Open Source-Implementierung dieser Benchmarks finden Sie auf der https://github.com/neuvector[{product-name} GitHub-Seite].
+
+[NOTE]
+====
+Geheimnisse können auch auf Knoten und in Containern mit xref:customcompliance.adoc[benutzerdefinierten Skripten] erkannt werden.
+====
+
+
+=== Scannen von Kubernetes-Ressourcendateien
+
+{product-name} kann Deployment-YAML-Dateien auf Konfigurationsbewertung gemäß den Admission Control-Regeln scannen. Dies ist nützlich, um Deployment-YAML-Dateien früh im Pipeline-Prozess zu scannen, um festzustellen, ob das Deployment gegen irgendwelche Regeln verstoßen würde, bevor der Deployment-Versuch unternommen wird. Weitere Informationen finden Sie unter xref:assessment.adoc[Konfigurationsbewertung] bei Admission Controls.
+
+== Verwaltung von Schwachstellen und Compliance
+
+{product-name} bietet mehrere Möglichkeiten, die Ergebnisse von Schwachstellen- und Compliance-Scans zu überprüfen und Berichte zu erstellen. Nachfolgend die Möglichkeiten der einzelnen Treiber:
+
+* *Dashboard.* Überprüfen Sie die Zusammenfassung der Schwachstellen und sehen Sie, wie sie den gesamten xref:improve-score.adoc[Sicherheitsrisikowert] beeinflussen.
+* *Sicherheitsrisiken-Menü.* Sehen Sie die Auswirkungen von Schwachstellen und Compliance-Problemen und erstellen Sie Berichte mit erweiterten Filtermöglichkeiten.
+* *Assets-Menü.* Sehen Sie die Ergebnisse von Schwachstellen und Compliance für jedes Asset, wie Registries, Knoten und Container.
+* *Benachrichtigungen -> Risikoberichte.* Sehen Sie die Scan-Ereignisse für jedes Asset.
+* *Reaktionsregeln.* Erstellen Sie Reaktionen wie Webhook-Benachrichtigungen oder Quarantänen basierend auf den Scan-Ergebnissen.
+* *REST-API.* Lösen Sie Scans aus und ziehen Sie Scan-Ergebnisse programmgesteuert ab, um den Prozess zu automatisieren.
+* *SYSLOG/Webhook-Benachrichtigungen.* Senden Sie Scan-Ergebnisse an ein SIEM oder andere Unternehmensplattformen.
+
+=== Sicherheitsrisiken-Menü
+
+Diese Menüs kombinieren die Ergebnisse aus Registry- (Image-), Knoten- und Container-Schwachstellenscans sowie Compliance-Prüfungen, die im Menü „Assets“ aufgeführt sind, um ein durchgängiges Schwachstellenmanagement und Reporting zu ermöglichen. Das Menü für Compliance-Profile ermöglicht die Anpassung der PCI-, DSGVO- und anderer Compliance-Prüfungen zur Erstellung von Compliance-Berichten.
+
+image:vulnerabilities_4_4.png[SecurityRisks]
+
+Siehe den nächsten Abschnitt zu xref:vulnerabilities.adoc[Schwachstellenmanagement] für Informationen zum Management von Schwachstellen in diesem Menü und den Abschnitt xref:compliance.adoc[Compliance & CIS-Benchmarks] für Berichte über CIS-Benchmarks und branchenspezifische Compliance wie PCI, GDPR, HIPAA, NIST, PCIv4 und DISA STIG.
+
+=== Assets-Menü
+
+Das Menü "Assets" zeigt Schwachstellen und Ergebnisse von Compliance-Prüfungen, die nach dem Asset organisiert sind.
+
+* Plattformen. Die Orchestrierungsplattform wie Kubernetes und Schwachstellenscans der Plattform.
+* Knoten. Knoten/Hosts, die durch {product-name} Durchsetzer geschützt sind, sowie Ergebnisse von Compliance-Prüfungen wie CIS-Benchmarks und benutzerdefinierten Prüfungen sowie Schwachstellenscans von Hosts.
+* Container. Alle Container im Cluster, einschließlich Systemcontainern, sowie die Ergebnisse von Compliance-Prüfungen wie CIS-Benchmarks und benutzerdefinierten Prüfungen sowie Schwachstellenscans zur Laufzeit von Containern. Prozessaktivitäten und Leistungsstatistiken sind hier ebenfalls zu finden.
+* Registries. Registries/Repositories, die von {product-name} gescannt wurden. Die Ergebnisse des mehrschichtigen Image-Scannings sind hier zu finden, und die Scan-Ergebnisse können in Zulassungssteuerungsregeln (zu finden in der Richtlinie -> Zulassungssteuerungen) verwendet werden.
+
+[NOTE]
+====
+xref:customcompliance.adoc[Benutzerdefinierte Compliance-Prüfungen], wie oben erwähnt, sind im Menü xref:groups.adoc[Richtlinie -> Gruppen] definiert.
+====
+
+=== Automatisierte Laufzeitscans
+
+{product-name} kann laufende Container, Host-Knoten und die Orchestrierungsplattform auf Schwachstellen scannen. Im Assets-Menü für Knoten oder Container aktivieren Sie den Auto-Scan, indem Sie auf die Registerkarte „Schwachstellen“ eines Knotens oder Containers klicken und anschließend auf „Auto-Scan“ (oben rechts erscheint dies), um alle laufenden Container, Knoten und die Plattform zu scannen – auch neu gestartete, sobald sie in Betrieb genommen wurden. Sie können auch einen Container oder Knoten auswählen und ihn manuell scannen.
+
+Sie können auf jeden entdeckten Schwachstellennamen/CVE klicken, um eine Beschreibung zu erhalten, und auf den Inspektorpfeil im Popup klicken, um die detaillierte Beschreibung der Schwachstelle zu sehen.
+
+image:Vuln1.png[Schwachstellen]
+
+Der Auto-Scan wird auch ausgelöst, wenn es eine Aktualisierung der {product-name} CVE-Datenbank gibt. Bitte sehen Sie sich den Abschnitt xref:updating.adoc[Aktualisierung der CVE-Datenbank] für Details an.
+
+== Automatisierte Aktionen, Risikominderung und Reaktionen basierend auf Schwachstellen
+
+Zulassungssteuerungsregeln können erstellt werden, um die Bereitstellung von verwundbaren Images basierend auf den Ergebnissen des Registry-Scans zu verhindern. Siehe den Abschnitt Sicherheitsrichtlinien -> xref:admission.adoc[Zulassungssteuerung] für Details.
+
+Bitte sehen Sie sich den Abschnitt Sicherheitsrichtlinien -> xref:responserules.adoc[Reaktionsregeln] für Anweisungen zur Erstellung automatisierter Reaktionen auf Schwachstellen, die entweder während des Registry-Scans, des Laufzeit-Scans oder der CIS-Benchmarks erkannt wurden, an. Reaktionen können Quarantäne, Webhook-Benachrichtigungen und Unterdrückung umfassen.
+
+=== Föderierte Registries für verteilte Ergebnisse von Image-Scans
+
+Der primäre (Master-)Cluster kann ein als föderierte Registry bezeichnetes Registry/Repository scannen. Die Scanergebnisse dieser Registries werden auf alle verwalteten (remote) Cluster synchronisiert. Dies ermöglicht die Anzeige der Scanergebnisse in der Konsole des verwalteten Clusters sowie die Verwendung der Ergebnisse für die Zulassungssteuerungsregeln des verwalteten Clusters. Registries müssen nur einmal gescannt werden, anstatt von jedem Cluster, was die CPU-/Speicher- und Netzwerkbandbreitennutzung reduziert. Siehe den Abschnitt xref:multicluster.adoc[Multi-Cluster] für weitere Details.
+
+=== Automatische Skalierung von Scanner-Pods
+
+Scanner-Pods können so konfiguriert werden, dass sie basierend auf bestimmten Kriterien automatisch skaliert werden. Dies stellt sicher, dass Scan-Jobs schnell und effizient bearbeitet werden, insbesondere wenn es Tausende von Images zu scannen oder erneut zu scannen gibt. Es gibt drei mögliche Einstellungen: verzögert, sofort und deaktiviert. Wenn Images vom Controller zum Scannen in die Warteschlange gestellt werden, wird die Anzahl der Aufgaben in der Warteschlange erfasst. Bitte sehen Sie sich den Abschnitt xref:scanners.adoc[Mehrere Scanner] für weitere Details an.
+
+[IMPORTANT]
+====
+Die automatische Skalierung von Scanner wird nicht unterstützt, wenn der Scanner mit einem OpenShift-Operator bereitgestellt wird, da der Operator die Anzahl der Pods immer auf den konfigurierten Wert ändert.
+====

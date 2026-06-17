@@ -4,6 +4,7 @@
 :page-opendocs-origin: /02.deploying/11.restore/11.restore.md
 :page-opendocs-slug: /deploying/restore
 
+[#_restoring_product_configuration]
 == Restoring {product-name} Configuration
 
 You can restore a previous {product-name} configuration by applying a configuration backup file. You can generate a backup manually or export one from the {product-name} console by navigating to *Settings > Configuration* and selecting one of the following options:
@@ -48,6 +49,7 @@ Do not modify backup configuration files. Editing a backup file after export can
 Use backup configuration files only to restore {product-name} on the same cluster from which they were exported. Restoring a backup to a different cluster can result in unpredictable behavior.
 ====
 
+[#_encryption_key_management]
 == Encryption Key Management
 
 The `neuvector-store-secret` contains the *Key Encryption Key (KEK)*. {product-name} uses the KEK to generate *Data Encryption Keys (DEKs)*, which encrypt sensitive configuration data.
@@ -68,6 +70,7 @@ image:rolling-upgrade-event.png[Rolling upgrade re-encryption event]
 
 When re-encryption occurs, {product-name} records the action and generates an event.
 
+[#_sensitive_data_protected_by_encryption]
 == Sensitive Data Protected by Encryption
 
 {product-name} encrypts sensitive data stored under the following key-value paths:
@@ -90,6 +93,7 @@ Always back up the `neuvector-store-secret` together with {product-name} configu
 When restoring {product-name} after data loss or to a new cluster, you must restore the *same secret*. Configuration backups without the corresponding secret cannot be decrypted.
 ====
 
+[#_recommended_high_availability_settings]
 == Recommended High Availability Settings
 
 Manual backup and restore should be treated as a last-resort recovery option. For high availability, follow these recommendations:

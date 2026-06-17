@@ -1,0 +1,211 @@
+= 正在更新{product-name}
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /10.updating/01.updating/01.updating.md
+:page-opendocs-slug:  /updating/updating
+
+== 正在更新{product-name}组件
+
+更新您的{product-name}容器非常简单。如果有新版本可用，请从 Docker Hub 拉取。建议使用 '`rolling update`' 策略，以确保在更新期间始终运行至少一个 Allinone 或 Controller 容器。
+
+[IMPORTANT]
+====
+主机操作系统更新、重启和编排器更新可能会导致 Pod 被驱逐或停止。如果一个 Controller 受到影响，并且没有其他 Controller 处于活动状态以维持系统状态，那么在启动新 Controller、组建带有领导者的集群并尝试访问配置持久存储备份以恢复集群的过程中，受影响的 Controller 可能会暂时恢复可用状态。在调度主机或编排器更新和重启时要小心，这可能会影响任何时候可用的 Controllers 数量。请参见下面的 Pod 中断预算，以获取可能的缓解方法。
+
+如果使用 {product-name} Helm 图表进行部署，更新将处理额外的服务、角色绑定或其他升级要求。
+
+如果手动进行更新或仅运行一个 Allinone 或 Controller，请注意当前的网络连接数据不会被存储，并且在{product-name}容器停止时将丢失。
+
+{product-name} 支持 {product-name} 策略和配置的持久数据。这配置了一个实时备份，以在 /var/neuvector/ 挂载一个卷。主要用例是当持久卷被挂载时，配置和策略在运行时存储到持久卷中。在集群完全失败的情况下，创建新集群时配置会自动恢复。配置和策略也可以手动从 /var/neuvector/ 卷中恢复或去除。
+====
+
+[IMPORTANT]
+====
+如果没有挂载持久卷，{product-name} 不会将配置或策略作为持久数据存储。在停止 Allinone 或 Controller 容器之前，请务必备份 Controller 配置和策略。这可以在设置 -> 配置中完成。另外，Controller 可以以高可用性配置部署，运行 3 个或 5 个 Controller，这样在更新其中一个 Controller 时，策略会在其他 Controller 上继续有效。
+====
+
+要手动使用 docker-compose 更新{product-name}：
+
+[,shell]
+----
+sudo docker-compose -f <filename> down
+----
+
+[TIP]
+====
+如果未指定文件名，则使用 docker-compose.yml 文件。
+====
+
+确保 docker-compose.yml 或其他适当文件已根据需要编辑为所需的镜像版本，然后：
+
+[,shell]
+----
+$sudo docker-compose -f <filename> up -d
+----
+
+[NOTE]
+====
+我们建议同时将所有{product-name}组件更新到最新版本。向后兼容性至少支持一个小版本。尽管大多数旧版本将向后兼容，但可能会有例外情况导致意外行为。
+====
+
+== 滚动更新
+
+Kubernetes、RedHat OpenShift和Rancher等编排工具支持具有可配置策略的滚动更新。您可以使用此功能更新 {product-name} 容器。最重要的是确保至少有一个Allinone/Controller在运行，以便不会丢失策略、日志和连接数据。确保容器更新之间至少间隔30秒，以便可以选举新的领导者并在控制器之间同步数据。
+
+=== Kubernetes 滚动更新示例
+
+如果您的Deployment或Daemonset已经在运行，您可以将yaml文件更改为新版本，然后应用更新：
+
+[,shell]
+----
+kubectl apply -f <yaml file>
+----
+
+要从命令行更新到新版本的{product-name}。
+
+[,shell]
+----
+kubectl set image deployment/neuvector-controller-pod neuvector-controller-pod=neuvector/controller:4.2.2 -n neuvector
+kubectl set image deployment/neuvector-manager-pod neuvector-manager-pod=neuvector/manager:4.2.2 -n neuvector
+kubectl set image DaemonSet/neuvector-enforcer-pod neuvector-enforcer-pod=neuvector/enforcer:4.2.2 -n neuvector
+----
+
+要检查滚动更新的状态：
+
+[,shell]
+----
+kubectl rollout status -n neuvector ds/neuvector-enforcer-pod
+kubectl rollout status -n neuvector deployment/neuvector-controller-pod  # same for manager, scanner etc
+----
+
+要回滚更新：
+
+[,shell]
+----
+kubectl rollout undo -n neuvector ds/neuvector-enforcer-pod
+kubectl rollout undo -n neuvector deployment/neuvector-controller-pod  # same for manager, scanner etc
+----
+
+== 更新漏洞CVE数据库
+
+{product-name}扫描器镜像会定期在neuvector上更新新的CVE数据库更新，使用'latest'标签。
+
+默认的{product-name}部署包括扫描器Pod的部署以及一个Updater定时任务，以便每天更新扫描器。
+
+请参阅 xref:updating.adoc[更新CVE数据库] 部分以获取更多详细信息。
+
+CVE数据库版本可以在漏洞选项卡的控制台中查看。您还可以检查更新器容器镜像。最新的数据库版本号也可以在 https://raw.githubusercontent.com/neuvector/manifests/main/versions/scanner[这里] 找到。
+
+[,shell]
+----
+docker inspect neuvector/updater
+----
+
+[,json]
+----
+"Labels": {
+                "neuvector.image": "neuvector/updater",
+                "neuvector.role": "updater",
+                "neuvector.vuln_db": "1.255"
+            }
+----
+
+您还可以检查控制器/全能日志以查找 '版本'。例如在Kubernetes中：
+
+[,bash]
+----
+kubectl logs neuvector-controller-pod-777fdc5668-4jkjn -n neuvector | grep version
+----
+
+[,shell]
+----
+2019-07-29T17:04:02.43 |DEBU|SCN|main.dbUpdate: New DB found - create=2019-07-24T11:59:13Z version=1.576
+2019-07-29T17:04:02.454|DEBU|SCN|memdb.ReadCveDb: New DB found - update=2019-07-24T11:59:13Z version=1.576
+2019-07-29T17:04:12.224|DEBU|SCN|main.scannerRegister: - version=1.576
+----
+
+== Pod中断预算
+
+Kubernetes的一个功能可以确保任何时候都有最少数量的控制器在运行。这对于节点排水或其他可能移除控制器Pod的维护活动非常有用。例如，创建并应用下面的文件 nv_pdb.yaml，以确保任何时候至少有2个控制器在运行。
+
+[,yaml]
+----
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: neuvector-controller-pdb
+  namespace: neuvector
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: neuvector-controller-pod
+----
+
+== 从 {product-name} 4.x 升级到 5.1.x
+
+首先升级到 5.1.x 版本，例如 5.1.3，然后查看 xref:kubernetes.adoc[Kubernetes部署部分] 以获取有关更新到 5.2.x+ 的重要更改的信息，包括服务帐户和绑定。
+
+对于Helm用户，更新到 {product-name} Helm图表 2.0.0 或更高版本（在 {product-name} 5.2.0 之前）。如果在OpenShift上更新 Operator 或Helm安装，请参阅下面的说明。
+
+. 删除旧的 neuvector-binding-customresourcedefinition 集群角色
++
+[,shell]
+----
+kubectl delete clusterrole neuvector-binding-customresourcedefinition
+----
+
+. 为 neuvector-binding-customresourcedefinition 集群角色应用新的更新动词
++
+[,shell]
+----
+kubectl create clusterrole neuvector-binding-customresourcedefinition --verb=watch,create,get,update --resource=customresourcedefinitions
+----
+
+. 删除Kubernetes 1.19+ 的旧crd模式
++
+[,shell]
+----
+kubectl delete -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/crd-k8s-1.19.yaml
+----
+
+. 为Kubernetes 1.19+ 创建新的crd模式
++
+[,shell]
+----
+kubectl apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.0.0/crd-k8s-1.19.yaml
+kubectl apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.0.0/waf-crd-k8s-1.19.yaml
+kubectl apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.0.0/dlp-crd-k8s-1.19.yaml
+kubectl apply -f https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.0.0/admission-crd-k8s-1.19.yaml
+----
+
+. 创建新的DLP、WAP、Admission集群角色和集群角色绑定
++
+[,shell]
+----
+kubectl create clusterrole neuvector-binding-nvwafsecurityrules --verb=list,delete --resource=nvwafsecurityrules
+kubectl create clusterrolebinding neuvector-binding-nvwafsecurityrules --clusterrole=neuvector-binding-nvwafsecurityrules --serviceaccount=neuvector:default
+kubectl create clusterrole neuvector-binding-nvadmissioncontrolsecurityrules --verb=list,delete --resource=nvadmissioncontrolsecurityrules
+kubectl create clusterrolebinding neuvector-binding-nvadmissioncontrolsecurityrules --clusterrole=neuvector-binding-nvadmissioncontrolsecurityrules --serviceaccount=neuvector:default
+kubectl create clusterrole neuvector-binding-nvdlpsecurityrules --verb=list,delete --resource=nvdlpsecurityrules
+kubectl create clusterrolebinding neuvector-binding-nvdlpsecurityrules --clusterrole=neuvector-binding-nvdlpsecurityrules --serviceaccount=neuvector:default
+----
+
+. 更新从 Docker hub (docker.io) 拉取 {product-name} 镜像的名称和路径。
+这些图像位于 {product-name} Docker Hub 注册表中。请为管理器、控制器、执行者使用适当的版本标签，并将扫描器和更新器的版本保留为 'latest'。例如：
+* neuvector/manager:5.1.3
+* neuvector/controller:5.1.3
+* neuvector/enforcer:5.1.3
+* neuvector/scanner:latest
+* neuvector/updater:latest
+
+可选择性地，在 Helm 图表、部署 yaml、配置映射、脚本等中去除对 {product-name} 许可证和机密的任何引用，因为这些不再需要拉取图像或开始使用 {product-name}。
+
+=== 关于 SCC 和通过 Operator/Helm 升级的说明
+
+特权 SCC 在新部署中由 Operator 版本 1.3.4 及以上添加到部署 yaml 中指定的服务账户。在将 {product-name} Operator 从先前版本升级到 1.3.4 或将 Helm 升级到 2.0.0 的情况下，请在升级之前删除特权 SCC。
+
+[,shell]
+----
+oc delete rolebinding -n neuvector system:openshift:scc:privileged
+----

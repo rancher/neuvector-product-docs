@@ -1,0 +1,122 @@
+= Préparation au déploiement
+:revdate: 2026-02-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /01.basics/03.installation/01.native/01.native.md
+:page-opendocs-slug: /basics/installation
+
+== Comprendre comment déployer {product-name}
+
+Déployez les conteneurs {product-name} en utilisant Kubernetes, OpenShift, Rancher, Docker ou d'autres plateformes. Chaque type de conteneur {product-name} a un but unique et peut nécessiter des exigences de performance ou de sélection de nœuds spécifiques pour un fonctionnement optimal.
+
+Les images open source {product-name} sont hébergées sur Docker Hub à `/neuvector/{image name}`.
+
+Consultez la section xref:production.adoc#_best_practices_tips_qa_for_deploying_and_managing_suse_security[Intégration/Meilleures Pratiques] pour télécharger un guide d'intégration.
+
+=== Déployez en utilisant Kubernetes, OpenShift, Rancher ou d'autres outils basés sur Kubernetes
+
+Pour déployer {product-name} en utilisant Kubernetes, OpenShift, Rancher ou d'autres outils d'orchestration, consultez les étapes de préparation et les fichiers d'exemple dans la section xref:production.adoc#_planning_deployments[Déploiement de {product-name}]. Cela déploie les conteneurs manager, controller, scanner et enforcer. Pour des tests simples utilisant le conteneur {product-name} Allinone, consultez la section Cas d'utilisation spéciaux avec Allinone.
+
+{product-name} prend en charge le déploiement basé sur Helm avec un chart Helm à https://github.com/neuvector/neuvector-helm.
+
+Les déploiements automatisés sont pris en charge en utilisant Helm, Red Hat/Community Operators, l'API REST ou un ConfigMap Kubernetes. Consultez la section xref:configmap.adoc#_kubernetes_configmap[Déployer en utilisant ConfigMap] pour plus de détails sur l'automatisation du déploiement.
+
+=== Déployez en utilisant Docker Native
+
+Avant de xref:docker.adoc[déployer {product-name}] avec docker run ou compose, vous DEVEZ définir le CLUSTER_JOIN_ADDR à l'adresse IP appropriée. Trouvez l'adresse IP du nœud, le nom du nœud (si vous utilisez un serveur de noms) ou la variable de nœud (si vous utilisez des outils d'orchestration) pour que l'Allinone (contrôleur) utilise pour le "`node IP`" dans les fichiers docker-compose pour l'Allinone et l'enforcer.  Par exemple :
+
+[,yaml]
+----
+- CLUSTER_JOIN_ADDR=192.168.33.10
+----
+
+Pour les déploiements basés sur Swarm, ajoutez également la variable d'environnement suivante{nbsp}:
+
+[,yaml]
+----
+- NV_PLATFORM_INFO=platform=Docker
+----
+
+Consultez la section Déploiement de {product-name} -> xref:docker.adoc[Déploiement de Production Docker] pour des instructions et des exemples.
+
+=== Sauvegarde des fichiers de configuration
+
+Par défaut, {product-name} stocke divers fichiers de configuration dans /var/neuvector/config/backup sur le contrôleur ou le nœud Allinone.
+
+Ce volume peut être mappé à xref:production.adoc#_backups_and_persistent_data[stockage persistant] pour maintenir la configuration. Les fichiers dans le dossier peuvent devoir être supprimés pour repartir à zéro.
+
+=== Assignation de volume
+
+Assurez-vous que les volumes sont correctement mappés. {product-name} nécessite cela pour fonctionner (/var/neuvector n'est requis que sur le contrôleur/allinone). Par exemple :
+
+[,yaml]
+----
+volumes:
+        - /lib/modules:/lib/modules:ro
+        - /var/neuvector:/var/neuvector
+        - /var/run/docker.sock:/var/run/docker.sock:ro
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup:/host/cgroup:ro
+----
+
+De plus, vous devrez peut-être vous assurer que d'autres outils ne bloquent pas l'accès à l'interface docker.sock.
+
+=== Ports et mappage des ports
+
+Assurez-vous que les ports requis sont correctement mappés et ouverts sur l'hôte. Le Manager ou Allinone nécessite 8443 (si vous utilisez la console). L'Allinone et le contrôleur nécessitent 18300, 18301, 18400, 18401 et éventuellement 10443, 11443, 20443, 30443. L'Enforcer nécessite 18301 et 18401.
+
+[NOTE]
+====
+Si vous déployez Docker natif (y compris SWARM), assurez-vous qu'aucune passerelle de périmètre de sécurité de l'hôte ne bloque l'accès aux ports requis comme firewalld. Si activé, l'interface docker0 doit être ajoutée comme zone de confiance pour les hôtes allinone/contrôleur.
+====
+
+==== Résumé des ports
+
+Le tableau suivant répertorie les communications de chaque conteneur {product-name}. Le conteneur Allinone combine les conteneurs Manager, Contrôleur et Enforcer, donc nécessite les ports listés pour ces conteneurs.
+
+image:Communication_Matrix_From_To.png[Ports]
+
+Le tableau suivant résume les ports d'écoute pour chaque conteneur {product-name}.
+
+image:Communication_Matrix_Listening_Ports.png[Écoute]
+
+===== Ports supplémentaires
+
+Dans la version 5.1, un nouveau port d'écoute a été ajouté sur 8181 dans le contrôleur pour la communication locale entre contrôleurs uniquement.
+
+[,shell]
+----
+tcp        0      0 :::8181                 :::*                    LISTEN      8/opa
+----
+
+=== {product-name} images
+
+Les images {product-name} sont publiées sur Docker Hub. Utilisez un tag de version fixe pour les composants noyau et le tag `latest` pour les images de scanner et de mise à jour.
+
+Utilisez le même tag de version pour les images du manager, du contrôleur et de l'enforcer. Utilisez `latest` pour les images de scanner et de mise à jour.
+
+.Exemples de tags d'images
+[source,text]
+----
+neuvector/manager:5.4.1
+neuvector/controller:5.4.1
+neuvector/enforcer:5.4.1
+neuvector/scanner:latest
+neuvector/updater:latest
+----
+
+Mettez à jour les références d'images dans vos manifests Kubernetes ou votre fichier de valeurs Helm pour correspondre à la version cible de NeuVector.
+
+==== Configuration du chart Helm
+
+Lors du déploiement de product-nam en utilisant la version 1.8.9 ou ultérieure du chart Helm, mettez à jour les paramètres suivants dans `values.yaml`{nbsp}:
+
+* Définissez le registre d'images sur `docker.io`
+* Mettez à jour les noms et les tags d'images vers la version requise
+* Laissez `imagePullSecrets` vide
+
+==== Images du registre Rancher
+
+Les images {product-name} sont également mises en miroir dans le registre Rancher pour les déploiements gérés via Rancher.
+
+* La disponibilité des images peut être retardée de quelques jours après chaque publication
+* Pour les détails de déploiement, consultez la documentation de déploiement de Rancher.

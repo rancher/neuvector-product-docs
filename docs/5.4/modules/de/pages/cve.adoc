@@ -1,0 +1,298 @@
+= Sicherheitswarnungen und CVEs
+:revdate: 2025-08-26
+:page-revdate: {revdate}
+
+NeuVector verpflichtet sich, die Gemeinschaft über Sicherheitsprobleme zu informieren. Die folgende Tabelle listet veröffentlichte Sicherheitswarnungen und CVEs (Common Vulnerabilities and Exposures) für gelöste Probleme auf.
+[cols="1,4,1,1", options="header"]
+|===
+| ID | Beschreibung | Datum | Lösung
+
+| https://github.com/neuvector/neuvector/security/advisories/GHSA-4jj9-cgqc-x9h5[CVE-2025-66001]
+| In der gepatchten Version aktivieren neue NeuVector-Implementierungen standardmäßig die TLS-Überprüfung. Bei rollierenden Upgrades ändert NeuVector diese Einstellung nicht automatisch, um Unterbrechungen zu vermeiden.
+| 12. Dez. 2025
+| https://github.com/neuvector/neuvector/releases/tag/v5.4.8[NeuVector v5.4.8]
+
+| https://github.com/neuvector/neuvector/security/advisories/GHSA-8pxw-9c75-6w56[CVE-2025-8077]
+| Für NeuVector-Implementierungen in Kubernetes-basierten Umgebungen wird das Bootstrap-Passwort des Standard-Admin-Benutzers jetzt zufällig generiert und in einem Kubernetes-Secret gespeichert. Der Standard-Admin muss das Bootstrap-Passwort aus dem Secret abrufen und es nach dem ersten erfolgreichen UI-Login ändern.
+| 25. Aug. 2025
+| https://github.com/neuvector/neuvector/releases/tag/v5.4.6[NeuVector v5.4.6]
+
+| https://github.com/neuvector/neuvector/security/advisories/GHSA-8ff6-pc43-jwv3[CVE-2025-53884]
+| NeuVector verwendet jetzt ein kryptographisch sicheres Salt mit dem PBKDF2-Algorithmus anstelle eines einfachen Hashs, um Benutzerpasswörter zu schützen. Während rollierender Upgrades von früheren Versionen berechnet NeuVector den neuen Passwort-Hash nach jedem erfolgreichen Login des Benutzers neu und speichert ihn.
+| 25. Aug. 2025
+| https://github.com/neuvector/neuvector/releases/tag/v5.4.6[NeuVector v5.4.6]
+
+| https://github.com/neuvector/neuvector/security/advisories/GHSA-w54x-xfxg-4gxq[CVE-2025-54467]
+| NeuVector entfernt jetzt standardmäßig Prozessbefehle, die `password`, `passwd`, `pwd`, `token` oder `key` enthalten, aus Protokollen und Debug-Ausgaben. Benutzer können eine Kubernetes ConfigMap konfigurieren, um zusätzliche Regex-Schemata für die Schwärzung zu definieren.
+| 25. Aug. 2025
+| https://github.com/neuvector/neuvector/releases/tag/v5.4.6[NeuVector v5.4.6]
+
+| https://github.com/neuvector/manager/security/advisories/GHSA-fggw-hv56-8m6r[CVE-2025-46808]
+| Empfindliche Informationen können je nach Protokollkonfiguration und Berechtigungen für Anmeldeinformationen im Manager-Container protokolliert werden.
+| 09. Juli 2025
+| https://github.com/neuvector/neuvector/releases/tag/v5.4.5[NeuVector v5.4.5]
+
+| https://www.suse.com/security/cve/CVE-2024-38095.html[CVE-2024-38095]
+| In .NET kann ein bösartiges X.509-Zertifikat oder eine Kette übermäßige CPU-Nutzung verursachen, was zu einem Denial-of-Service führt. Dieses CVE wurde als ein Problem bei der Erkennung betroffener .NET-Bibliotheken gekennzeichnet.
+| 9. Juli 2024
+| https://github.com/neuvector/neuvector/releases/tag/v5.4.5[NeuVector v5.4.5]
+
+| https://www.suse.com/security/cve/CVE-2024-7347.html[CVE-2024-7347]
+| Die NGINX `ngx_http_mp4_module`-Schwachstelle ermöglicht es, dass manipulierte MP4-Dateien zu übermäßigen Speicherlesungen und zur Beendigung des Worker-Prozesses führen. In NeuVector 5.4.2 als mögliches *false negative* bei der Erkennung im Schwachstellenscanner gemeldet; kein Problem des NeuVector-Produkts.
+| 14. August 2024
+| https://github.com/neuvector/neuvector/releases/tag/v5.4.2[NeuVector v5.4.2]
+
+| https://www.suse.com/security/cve/CVE-2018-20796.html[CVE-2018-20796]
+| In der GNU C-Bibliothek bis 2.29 hat `check_dst_limits_calc_pos_1` in `posix/regexec.c` unkontrollierte Rekursion.
+| 15. Januar 2025
+| Nicht zutreffend. In https://github.com/neuvector/neuvector/releases/tag/v5.4.2[v5.4.2] als *Fehlalarm* gekennzeichnet.
+
+| https://github.com/advisories/GHSA-v23v-6jw2-98fq[CVE-2024-41110]
+| Eine Sicherheitslücke in einigen Docker Engine-Versionen kann es einem Angreifer ermöglichen, https://docs.docker.com/engine/extend/plugins_authorization/[Autorisierungs-Plugins (AuthZ)] zu umgehen. Die Wahrscheinlichkeit einer Ausnutzung ist gering.
+| 16. November 2024
+| https://github.com/neuvector/neuvector/releases/tag/v5.4.1[NeuVector v5.4.1]
+
+| https://github.com/advisories/GHSA-w73w-5m7g-f7qc[CVE-2020-26160]
+| `jwt-go` ermöglicht es Angreifern, Zugriffsrestriktionen zu umgehen, wenn `[]string{}` für `m["aud"]` verwendet wird. Benutzer sollten auf https://github.com/golang-jwt/jwt[`golang-jwt`] v3.2.1 migrieren.
+| 16. November 2024
+| https://github.com/neuvector/neuvector/releases/tag/v5.4.1[NeuVector v5.4.1]
+|===
+
+== OpenID Connect ist anfällig für MITM.
+
+* **CVE-ID:** https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H&version=3.1[CVE-2025-66001 (AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H)]
+* **CVSS-Score:** 8.8
+
+=== Betroffene Versionen
+
+* Alle Versionen vor `5.3.0`
+* Versionen `5.3.0` bis `5.4.7`
+
+*Behobene Version:* `5.4.8`
+
+=== Auswirkung
+
+NeuVector unterstützt die Authentifizierung mit OpenID Connect. Die TLS-Überprüfung, die die Authentizität und Integrität des Remote-Servers validiert, ist standardmäßig nicht aktiviert. Dies kann das System Man-in-the-Middle-Angriffen aussetzen.
+
+Beginnend mit Version `5.4.0` unterstützt NeuVector die TLS-Überprüfung für:
+
+* Registry-Verbindungen
+* Auth-Server-Verbindungen (SAML, LDAP und OIDC)
+* Webhook-Verbindungen
+
+Standardmäßig bleibt die TLS-Überprüfung deaktiviert. Die Einstellung ist unter *Einstellungen → Konfiguration* in der NeuVector-Benutzeroberfläche verfügbar.
+
+In der gepatchten Version ermöglichen neue NeuVector-Implementierungen standardmäßig die TLS-Überprüfung. Rolling Upgrades ändern keine bestehenden Konfigurationen, um Dienstunterbrechungen zu vermeiden.
+
+[NOTE]
+====
+Wenn die TLS-Überprüfung aktiviert ist, gilt sie für:
+
+* Registry-Server
+* Auth-Server (SAML, LDAP und OIDC)
+* Webhook-Server
+====
+
+=== Patches
+
+Gepatchte Versionen umfassen die Version `v5.4.8` und später.
+
+=== Workarounds
+
+Um die TLS-Überprüfung manuell zu aktivieren:
+
+. Öffnen Sie die NeuVector-Benutzeroberfläche.
+. Navigieren Sie zu *Einstellungen → Konfiguration*.
+. Wählen Sie in **TLS-Konfiguration für selbstsignierte Zertifikate** *TLS-Überprüfung aktivieren* aus.
+. (Optional) Laden Sie das selbstsignierte TLS-Zertifikat hoch oder fügen Sie es ein.
+
+== Fragen und Unterstützung
+
+* Kontaktieren Sie das SUSE Rancher Sicherheitsteam bei sicherheitsrelevanten Anfragen.
+* Öffnen Sie ein Ticket im NeuVector-Repository.
+* Überprüfen Sie die Unterstützungsmatrix und den Produktlebenszyklus.
+
+---
+
+== NeuVector versendet kryptografisches Material in seinem Binärformat.
+
+* **CVE-ID:** CVE-2025-54471
+* **CVSS-Score:** 6.5 – https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N&version=3.1[AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N]
+
+=== Betroffene Versionen
+
+* Alle Versionen vor `5.3.0`
+* Versionen `5.3.0` bis `5.4.6`
+
+*Behobene Version:* `5.4.7`
+
+=== Auswirkung
+
+NeuVector verwendete zuvor einen fest codierten kryptografischen Schlüssel, der im Quellcode eingebettet war. Während der Kompilierung wurde dieser Wert durch einen statischen geheimen Schlüssel ersetzt, der verwendet wurde, um sensible Konfigurationsfelder zu verschlüsseln.
+
+In der gepatchten Version verwendet NeuVector das Kubernetes-Geheimnis `neuvector-store-secret` (im `neuvector` Namespace), um sichere, dynamische Verschlüsselungsschlüssel zu generieren. Dies beseitigt die Abhängigkeit von statischen Schlüsseln und verbessert die Sicherheit, indem Schlüssel in von Kubernetes verwalteten Geheimnissen gespeichert werden.
+
+Während der schrittweisen Upgrades oder beim Wiederherstellen aus persistentem Speicher überprüft der NeuVector-Controller die verschlüsselten Konfigurationsfelder. Wenn ein Feld mit dem standardmäßigen festen Schlüssel verschlüsselt ist, wird es entschlüsselt und mit dem neuen dynamischen Schlüssel erneut verschlüsselt.
+
+Wenn dem Controller die RBAC-Berechtigungen fehlen, um auf das Kubernetes-Geheimnis zuzugreifen, protokolliert er:
+
+`Required Kubernetes RBAC for secrets are not found`
+
+und beendet.
+
+Die Verschlüsselungsschlüssel für Geräte rotieren alle 3 Monate. Weitere Informationen finden Sie unter:
+xref:certrotate.adoc#_rotating_sensitive_field_in_configuration[Rotierendes sensibles Feld in der Konfiguration].
+
+=== Patches
+
+Gepatchte Versionen beinhalten die Version `v5.4.7` und neuer.
+
+=== Workarounds
+
+Es stehen keine Ausweichlösungen zur Verfügung. Aktualisieren Sie so schnell wie möglich auf eine gepatchte Version.
+
+== Fragen und Unterstützung
+
+* Kontaktieren Sie das https://github.com/rancher/rancher/security/policy[SUSE Rancher Sicherheitsteam].
+* Öffnen Sie ein Problem im https://github.com/neuvector/neuvector/issues/new/choose[NeuVector GitHub-Repository].
+* Referenzen:
+  ** https://www.suse.com/suse-neuvector/support-matrix/all-supported-versions/neuvector-v-all-versions/[NeuVector Support Matrix]
+  ** https://www.suse.com/lifecycle/#suse-security[Produktsupport-Lebenszyklus]
+
+---
+
+== Der Telemetrie-Sender ist anfällig für MITM- und DoS-Angriffe.
+
+* **CVE-ID:** CVE-2025-54470
+* **CVSS-Score:** 8.6 – https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:H&version=3.1[AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:H]
+
+=== Betroffene Versionen
+
+* Alle Versionen vor `5.3.0`
+* Versionen `5.3.0` bis `5.4.6`
+
+*Behobene Versionen:* `5.4.7`, `5.3.5`
+
+=== Auswirkung
+
+Diese Schwachstelle betrifft NeuVector-Implementierungen nur, wenn **Anonyme Clusterdaten melden** aktiviert ist. Wenn aktiv, sendet NeuVector anonyme Telemetriedaten an:
+
+`https://upgrades.neuvector-upgrade-responder.livestock.rancher.io`
+
+In betroffenen Versionen wird die TLS-Zertifikatsüberprüfung nicht durchgesetzt, wodurch die Telemetriekommunikation anfällig für MITM-Angriffe wird. Ein Angreifer könnte die übertragenen Daten abfangen oder ändern.
+
+NeuVector hat auch die Antwort des Telemetrie-Servers ohne Größenbeschränkungen in den Speicher geladen, wodurch das System Denial-of-Service (DoS)-Risiken ausgesetzt wird.
+
+Die gepatchte Version enthält:
+
+* Überprüfung der TLS-Zertifikatkette und des Hostnamens für den Telemetrie-Server.
+* Eine Größenbeschränkung der Antwort von 256 Bytes zur Minderung von Speichererschöpfung.
+
+Diese Verbesserungen sind standardmäßig aktiviert und erfordern keine Benutzeraktion.
+
+=== Patches
+
+Gepatchte Versionen beinhalten die Version `v5.4.7` und neuer.
+
+=== Workarounds
+
+Wenn Sie nicht aktualisieren können, deaktivieren Sie **Anonyme Clusterdaten melden**:
+
+*Einstellungen → Konfiguration → Anonyme Clusterdaten melden*
+
+Das Deaktivieren dieser Einstellung verhindert, dass NeuVector Telemetriedaten sendet, wodurch die Exposition gegenüber dieser Schwachstelle verringert wird.
+
+*Empfehlung:* Führen Sie ein Upgrade auf eine gepatchte Version so schnell wie möglich durch.
+
+== Fragen und Unterstützung
+
+* Kontaktieren Sie das https://github.com/rancher/rancher/security/policy[SUSE Rancher Sicherheitsteam].
+* Öffnen Sie ein Problem im https://github.com/neuvector/neuvector/issues/new/choose[NeuVector GitHub-Repository].
+* Referenzen:
+  ** https://www.suse.com/suse-neuvector/support-matrix/all-supported-versions/neuvector-v-all-versions/[NeuVector Support Matrix]
+  ** https://www.suse.com/lifecycle/#suse-security[Produktsupport-Lebenszyklus]
+
+== Offenlegung sensibler Informationen in den Container-Protokollen des NeuVector Managers.
+
+*CVEs:* CVE-2025-46808 +
+*CVSS Score:* 6.8 — https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:N/AC:L/PR:L/UI:R/S:C/C:H/I:N/A:N&version=3.1[CVSS v3.1 Vektor] +
+*CWE:* https://cwe.mitre.org/data/definitions/532[CWE-532: Einfügen sensibler Informationen in eine Protokolldatei]
+
+=== Betroffene Versionen
+
+* Alle Versionen vor `5.0.0`
+* Versionen `5.0.0` bis `5.4.4`
+
+*Feste Version:* `5.4.5`
+
+=== Auswirkung
+
+Eine Schwachstelle in NeuVector-Versionen bis einschließlich `5.4.4` könnte sensible Informationen in den Container-Protokollen des NeuVector Managers offenlegen. Die folgenden Felder können in Protokollen erscheinen:
+
+[cols="1,3,2,2,1", options="header"]
+|===
+| Feld | Feldbeschreibung | Wo es erscheint | Reproduktion | Umgebung
+
+| `X-R-Sess`
+| Rancher-Sitzungstoken für Single Sign-On
+| Anforderungsheader
+| Melden Sie sich über die Rancher-Benutzeroberfläche an und greifen Sie auf NeuVector SSO zu
+| Rancher mit NeuVector SSO
+
+| `personal_access_token`
+| GitHub- oder Azure DevOps-Token
+| Anforderungskörper
+| Reichen Sie die Konfiguration des Remote-Repository unter *Konfiguration > Einstellungen* ein
+| NeuVector
+
+| `token1.token`
+| NeuVector-Benutzersitzungstoken
+| Antwortkörper
+| Senden Sie eine GET-Anfrage über die NeuVector-API: `https://<neuvector-ui-url>/user?name=<username>`
+| NeuVector
+
+| `rekor_public_key`, `root_cert`, `sct_public_key`
+| Öffentlicher Rekor-Schlüssel, Root-Zertifikat, öffentlicher Schlüssel des signierten Zertifikatzeitstempels (SCT) im privaten Vertrauensanker
+| Anforderungskörper
+| Erstellen oder aktualisieren Sie den privaten Vertrauensanker auf der Sigstore-Seite
+| NeuVector
+
+| `public_key`
+| Öffentlicher Schlüssel des Verifiers
+| Anforderungskörper
+| Erstellen oder aktualisieren Sie den Verifier auf der Sigstore-Seite
+| NeuVector
+|===
+
+[NOTE]
+====
+NeuVector-Installationen mit Single Sign-On-Integration mit Rancher Manager *und* Remote-Repository-Konfiguration deaktiviert sind nicht betroffen.
+====
+
+In der gepatchten Version ist `X-R-Sess` teilweise maskiert. Andere sensible Felder (`personal_access_token`, `token`, `rekor_public_key`, `root_cert`, `sct_public_key`, `public_key`) werden aus den Protokollen entfernt.
+
+[NOTE]
+====
+* Die Schwere hängt von Ihrer Protokollierungsstrategie ab:
+** *Lokale Protokollierung (Standard)* — begrenzt die Exposition.
+** *Externe Protokollierung* — die Schwere steigt, abhängig von den Sicherheitskontrollen bei externen Protokollsammlern.
+* Die endgültige Schwere des Einflusses hängt von den Berechtigungen der geleakten Anmeldeinformationen ab.
+====
+
+Für weitere Informationen siehe https://attack.mitre.org/techniques/T1552/[Ungesicherte Anmeldeinformationen (MITRE ATT&CK T1552)].
+
+=== Patches
+
+Gepatchte Versionen umfassen die Version `5.4.5` und später. Setzen Sie das in der Remote-Repository-Konfiguration verwendete GitHub-Token nach dem Upgrade zurück.
+
+=== Workarounds
+
+Es stehen keine Ausweichlösungen zur Verfügung. Upgrade auf eine feste Version so schnell wie möglich.
+
+== Fragen und Unterstützung
+
+* Kontaktieren Sie das https://github.com/rancher/rancher/security/policy[SUSE Rancher Sicherheitsteam].
+* Öffnen Sie ein Problem im https://github.com/neuvector/neuvector/issues/new/choose[NeuVector GitHub-Repository].
+* Referenzen:
+** https://www.suse.com/suse-neuvector/support-matrix/all-supported-versions/neuvector-v-all-versions/[NeuVector Support Matrix]
+** https://www.suse.com/lifecycle/#suse-security[Produktsupport-Lebenszyklus]

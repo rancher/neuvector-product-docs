@@ -1,0 +1,23 @@
+= Azure DevOps
+:revdate: 2025-05-08
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/03.build/04.azuredevops/04.azuredevops.md
+:page-opendocs-slug:  /scanning/build/azuredevops
+
+== Scannen nach Schwachstellen in der Azure DevOps-Build-Pipeline
+
+Der {product-name} Scanner kann über die {product-name} Erweiterung, die im Azure DevOps Marketplace veröffentlicht wurde, aus der Azure DevOps-Pipeline ausgelöst werden.
+
+image:azure_devops.png[AzureDevOps]
+
+Die Erweiterung unterstützt sowohl das Remote- als auch das lokale Scannen, wobei der {product-name} Controller ein Image in einer Registry während des Builds remote scannen oder dynamisch einen lokalen Controller starten kann, um das Image auf der Azure-Agent-VM zu scannen.
+
+Stellen Sie außerdem sicher, dass ein {product-name} Scanner-Container bereitgestellt und konfiguriert ist, um sich mit dem Allinone oder Controller zu verbinden. In Version 4.0 und später muss der neuvector/scanner-Container getrennt vom Allinone oder Controller bereitgestellt werden.
+
+* Das Scannen eines Images mit der {product-name}-Aufgabe integriert den {product-name} Schwachstellenscanner in eine Azure DevOps-Pipeline.
+* Führen Sie Schwachstellenscans eines Container-Images nach der Image-Erstellung auf einer externen {product-name} Controller-Instanz oder auf einer lokalen {product-name} Controller-Instanz durch, die in einem Dienstcontainer innerhalb einer Pipeline läuft.
+* Definieren Sie Schwellenwerte für fehlgeschlagene Builds basierend auf der Anzahl der erkannten Schwachstellen unterschiedlicher Schweregrade.
+* Stellen Sie einen detaillierten Bericht über einen Image-Scan zur Analyse im Tab "Build-Zusammenfassung" bereit.
+* Externe {product-name} Controller-Instanzen werden als Dienstendpunkte definiert, um die Definitionen der Build-Pipeline von Verbindungsparametern und Anmeldeinformationen zu entkoppeln.
+
+Eine Übersicht mit Beispielbildschirmen finden Sie unter https://marketplace.visualstudio.com/items?itemName=NeuVector.neuvector-vsts.

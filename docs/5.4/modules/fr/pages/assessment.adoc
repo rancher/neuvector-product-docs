@@ -1,0 +1,15 @@
+= Évaluation de la configuration pour les ressources Kubernetes
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/03.admission/02.assessment/02.assessment.md
+:page-opendocs-slug:  /stratégie/admission/évaluation
+
+== Analyse des fichiers de déploiement des ressources Kubernetes
+
+{product-name} est capable de scanner les fichiers yaml de déploiement pour des évaluations de configuration par rapport aux règles de contrôle d'admission. Cela est utile pour scanner les fichiers yaml de déploiement tôt dans le pipeline afin de déterminer si le déploiement violerait des règles avant d'essayer le déploiement.
+
+Pour télécharger un fichier yaml à scanner, allez à la stratégie -> Contrôle d'admission et cliquez sur le bouton Évaluation de la configuration. Dans la fenêtre, sélectionnez un fichier à téléverser, puis Test.
+
+image:assessment.png[Évaluation]
+
+Vous verrez alors une analyse du fichier, si le déploiement serait autorisé, et des messages pour les règles qui s'appliqueraient au fichier de déploiement.

@@ -1,0 +1,48 @@
+= Microsoft AD
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/03.msad/03.msad.md
+:page-opendocs-slug:  /integration/msad
+
+== 配置 Active Directory
+
+这解释了 {product-name} 如何与 Windows Active Directory 进行身份验证。
+Windows Active Directory 服务器的配置页面如下所示。
+
+image:ad1.png[ad_config]
+
+用户名：这可以是任何对 Base DN 对象具有读取权限的用户。dn 属性应如下所示使用，或使用 Windows 登录名，例如 user@local.nvtest.com。
+
+image:ad2.png[ad_config]
+
+基本 DN：这是用于用户身份验证的 root Windows Active Directory 对象。最低访问权限要求为读取。如上例所示，OU=IT,DC=local,DC=nvtest,DC=com 对象仅允许在用户名字段中定义的用户帐户进行读取。
+
+image:ad3.png[ad_config]
+
+使用上述用户名和 Base DN 设置，{product-name} 能够成功与 Windows Active Directory 绑定。单击 TEST CONNECTION 进行检查。
+
+image:ad4.png[ad_config]
+
+用户名：仅需使用 sAMAccountName 属性进行匹配。例如，在下面的屏幕中，{product-name} 将验证 ituser(CN=ituser,OU=IT,DC=local,DC=nvtest,DC=com) 用户是否能够使用 {product-name} Web 控制台登录。
+
+[NOTE]
+====
+{product-name} 不使用 cn、displayName、dn、givenName、name 或 userPrincipalName 属性等的值来验证测试用户。
+====
+
+image:ad5.png[ad_config]
+
+最后一部分是 {product-name} 的角色映射，用于 Web 控制台登录。
+
+image:ad6.png[ad_config]
+
+在上面的示例中，定义的组 _d_s_itgroup 在 {product-name} 角色中必须具有 member 和 sAMAccountType 属性。sAMAccountType 属性的值必须为 268435456，这是全局安全组，登录用户名必须在成员列表中。
+
+image:ad7.png[ad_config]
+
+组成员属性：这是 Windows Active Directory 的成员属性，默认情况下用于角色映射，如上所示。
+如果满足上述所有要求，Windows Active Directory 用户应能够成功登录到 {product-name} Web 控制台。
+
+=== 将组映射到角色和名称空间
+
+请参阅xref:users.adoc#_mapping_groups_to_roles_and_namespaces[用户和角色]部分，以了解如何将组映射到预设和自定义角色，以及{product-name}中的名称空间。

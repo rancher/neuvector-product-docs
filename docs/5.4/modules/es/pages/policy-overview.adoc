@@ -1,0 +1,67 @@
+= Resumen de la política de seguridad
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/01.overview/01.overview.md
+:page-opendocs-slug:  /policy/overview
+
+== {product-name} Política de seguridad
+
+Para detectar violaciones del comportamiento normal, {product-name} mantiene una política de seguridad que se puede gestionar desde la GUI, CLI, CRD o API REST.
+
+=== Grupos
+
+Esto proporciona la vista principal de los grupos de servicio y grupos personalizados para establecer el modo (Descubrir, Monitorizar, Proteger) para cada servicio y gestionar reglas. Los grupos son creados automáticamente por {product-name}, pero se pueden añadir grupos personalizados. Las reglas para cada grupo son creadas automáticamente por {product-name} cuando los contenedores comienzan a ejecutarse. Los grupos de contenedores pueden tener un modo de política dividida donde las reglas de proceso/archivo están en un modo de aplicación diferente al de las reglas de red, como se describe xref:modes.adoc#_network_service_policy_mode[aquí].
+
+Para seleccionar un grupo para ver o gestionar, selecciona la casilla de verificación junto a él. Aquí es donde se gestionan las reglas de perfil de proceso, reglas de acceso a archivos, DLP y verificaciones de cumplimiento personalizadas. Las reglas de red se pueden ver aquí, pero se gestionan en un menú separado.
+Las reglas de red y respuesta en {product-name} se crean utilizando un campo '`from`' y '`to`', que requiere un grupo como entrada. Un grupo puede ser una aplicación, derivada de etiquetas de imagen, nombre DNS u otro agrupamiento personalizado. Se admiten subdominios DNS, p. ej. *.foo.com. Las direcciones IP o subredes también se pueden utilizar, lo que es útil para controlar la entrada y salida de cargas de trabajo no contenedorizadas.
+
+image:groups_node_demo.png[grupos]
+
+Los nombres de grupo reservados creados automáticamente por {product-name} incluyen:
+
+* Contenedores. Todos los contenedores en ejecución.
+* Externo. Conexiones que entran en el clúster (ingreso).
+* Nodos. Nodos o hosts identificados por {product-name}.
+
+El menú Grupos es también donde se puede realizar la "Exportar Política de Grupo". Esto exporta la política de seguridad (reglas) para los grupos seleccionados como un archivo yaml en el formato de la {product-name} definición de recurso personalizado (CRD) que puede ser revisado y luego desplegado en otros clústeres.
+
+Tenga en cuenta que el Estado de los contenedores de un Grupo se muestra en Política -> Grupos -> Miembros, lo que indica el modo de protección {product-name} (Descubrir, Monitorizar, Proteger). Si el contenedor se muestra en un estado de 'Salida', todavía está en el host pero está detenido. Eliminar el contenedor lo sacará de un estado de Salida.
+
+=== Reglas de red
+
+Una lista de reglas de lista blanca y lista negra para que {product-name} haga cumplir. {product-name} puede descubrir automáticamente y crear un conjunto de reglas de lista blanca mientras está en modo Descubrir. Las reglas se pueden añadir manualmente si se desea.
+
+{product-name} crea automáticamente reglas de lista blanca de Capa 7 (capa de aplicación) cuando está en modo Descubrir, observando las conexiones de red y creando reglas que hacen cumplir los protocolos de aplicación.
+
+{product-name} también tiene detección de ataques de red integrada que está habilitada todo el tiempo, independientemente del modo (Descubrir, Monitorizar, Proteger). Las amenazas de red detectadas incluyen ataques DDoS, tunelización e inyección SQL. Por favor, consulte la sección Reglas de Red para una lista completa de detección de amenazas integrada.
+
+Las reglas DLP (Prevención de Pérdida de Datos) también se pueden aplicar a los Grupos de contenedores para inspeccionar la carga útil de la red en busca de posibles robos de datos o violaciones de privacidad, como datos de tarjetas de crédito no cifrados. Las violaciones pueden ser bloqueadas. Por favor, consulte la sección sobre DLP para detalles sobre cómo crear y aplicar filtros DLP.
+
+=== Perfil de Proceso y Reglas de Acceso a Archivos
+
+{product-name} tiene detección integrada de procesos y actividades de archivos sospechosos, así como una tecnología de establecimiento de línea base para contenedores. La detección integrada incluye procesos como el escaneo de puertos (por ejemplo, NMAP), shell inverso e incluso escalaciones de privilegios a root. Los archivos y directorios del sistema son monitoreados automáticamente. Cada servicio descubierto por {product-name} creará una línea base del comportamiento de procesos y archivos '`normal`' para ese servicio de contenedor. Estas reglas pueden ser personalizadas si se desea.
+
+=== Reglas de Respuesta
+
+Las Reglas de Respuesta permiten a los usuarios definir acciones para responder a eventos de seguridad. Los eventos incluyen Amenazas, Violaciones, Incidentes y resultados de Escaneos de Vulnerabilidades. Las acciones incluyen cuarentena de contenedores, webhooks y supresión de alertas.
+
+Las Reglas de Respuesta proporcionan un motor de reglas flexible y personalizable para automatizar respuestas a eventos de seguridad importantes.
+
+=== Reglas de Control de Admisión
+
+Las reglas de control de admisión permiten o bloquean ampliaciones. Más detalles se pueden encontrar en esta sección bajo Controles de Admisión.
+
+=== Sensores de DLP y WAF
+
+La Prevención de Pérdida de Datos (Protección contra Filtraciones de Datos) y las reglas de WAF pueden ser habilitadas en cualquier Grupo de contenedores seleccionado. Esto utiliza Inspección Profunda de Paquetes para aplicar coincidencias basadas en expresiones regulares al contenido de la red que entra o sale del grupo de contenedores seleccionado. Se incluyen sensores incorporados para números de tarjeta de crédito y números de seguro social de EE. UU. como ejemplos, y se pueden agregar expresiones regulares personalizadas.
+
+=== Migración, Copia de seguridad, Importar/Exportar
+
+La migración de la política de seguridad se puede realizar mediante CRD, API REST o importación/exportación. Por ejemplo, las reglas aprendidas y personalizadas pueden generar un archivo(s) yaml de CRD en un entorno de preparación para su ampliación en el entorno de producción.
+
+La Política de Seguridad para {product-name} se puede exportar e importar en la Configuración ->. Se recomienda hacer una copia de seguridad de toda la configuración antes de cualquier actualización de {product-name} a una nueva versión.
+
+[IMPORTANT]
+====
+Importar TODO (Configuración y Política) sobrescribirá todo, incluyendo las credenciales de inicio de sesión del administrador principal. Asegúrate de conocer el inicio de sesión del administrador principal para el archivo importado antes de importar.
+====

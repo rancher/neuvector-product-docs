@@ -4,10 +4,12 @@
 :page-opendocs-origin: /02.deploying/01.production/02.operators/02.operators.md
 :page-opendocs-slug: /deploying/production/operators
 
+[#_operators]
 == Operators
 
 Operators take human operational knowledge and encode it into software that is more easily shared with consumers. Operators are pieces of software that ease the operational complexity of running another piece of software. More technically, Operators are a method of packaging, deploying, and managing a Kubernetes application.
 
+[#_product_operators]
 == {product-name} Operators
 
 The {product-name} Operator is based on the {product-name} Helm chart. The {product-name} RedHat OpenShift Operator runs in the OpenShift container platform to deploy and manage the {product-name} Security cluster components. The {product-name} Operator contains all necessary information to deploy {product-name} using Helm charts. You simply need to install the {product-name} operator from the OpenShift embedded Operator hub and create the {product-name} instance.
@@ -83,7 +85,7 @@ image:operator_cert.png[]
 ** Open the Resources tab 
 ** Verify that resources are in status Created or Running
 
-After you have successfully deployed the {product-name} Platform to your cluster, login to the {product-name} console at `+https://neuvector-route-webui-neuvector.(OC_INGRESS)+`. 
+After you have successfully deployed the {product-name} Platform to your cluster, login to the {product-name} console at `\https://neuvector-route-webui-neuvector.(OC_INGRESS)`. 
 * Login with the initial username admin and password admin. 
 * Accept the {product-name} end user license agreement. 
 * Change the password of the admin user. Optionally, you can also create additional users in the Settings -> Users & Roles menu. Now you are ready to navigate the {product-name} console to start vulnerability scanning, observe running application pods, and apply security protections to containers.
@@ -197,7 +199,7 @@ spec:
 ** Select the neuvector-default instance 
 ** Open the Resources tab 
 ** Verify that resources are in status Created or Running
-. After you have successfully deployed the {product-name} Platform to your cluster, login to the {product-name} console at `+https://neuvector-route-webui-neuvector.(INGRESS_DOMAIN)+`. 
+. After you have successfully deployed the {product-name} Platform to your cluster, login to the {product-name} console at `\https://neuvector-route-webui-neuvector.(INGRESS_DOMAIN)`. 
 ** Login with the initial username admin and password admin. 
 ** Accept the {product-name} end user license agreement. 
 ** Change the password of the admin user. 
@@ -221,6 +223,7 @@ image:3_YAML.png[]
 image:4_tag_save.png[]
 ======
 
+[#_troubleshooting]
 === Troubleshooting
 
 * Check the Operator deployment values in the deployed yaml file

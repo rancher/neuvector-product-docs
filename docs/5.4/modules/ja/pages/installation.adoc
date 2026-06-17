@@ -1,0 +1,122 @@
+= デプロイメント準備
+:revdate: 2026-02-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /01.basics/03.installation/01.native/01.native.md
+:page-opendocs-slug: /基本/インストール
+
+== {product-name}のデプロイ方法を理解する
+
+Kubernetes、OpenShift、Rancher、Docker、または他のプラットフォームを使用して{product-name}コンテナをデプロイします。各タイプの{product-name}コンテナは独自の目的を持ち、最適な操作のために特別なパフォーマンスやノード選択要件が必要な場合があります。
+
+{product-name}のオープンソースイメージは、`/neuvector/{image name}`のDocker Hubにホストされています。
+
+オンボーディングガイドをダウンロードするには、xref:production.adoc#_best_practices_tips_qa_for_deploying_and_managing_suse_security[オンボーディング/ベストプラクティスセクション]を参照してください。
+
+=== Kubernetes、OpenShift、Rancher、または他のKubernetesベースのツールを使用してデプロイします。
+
+Kubernetes、OpenShift、Rancher、または他のオーケストレーションツールを使用して{product-name}をデプロイするには、xref:production.adoc#_planning_deployments[デプロイする{product-name}]セクションの準備手順とサンプルファイルを参照してください。これにより、マネージャー、コントローラー、スキャナー、およびエンフォーサーコンテナがデプロイされます。{product-name} オールインワンコンテナを使用した簡単なテストについては、オールインワンの特別な使用ケースに関するセクションを参照してください。
+
+{product-name}は、 https://github.com/neuvector/neuvector-helm.にあるHelmチャートを使用したHelmベースのデプロイをサポートしています。
+
+自動デプロイは、Helm、Red Hat/Community Operators、REST API、またはKubernetes ConfigMapを使用してサポートされています。デプロイの自動化に関する詳細は、xref:configmap.adoc#_kubernetes_configmap[ConfigMapを使用してデプロイする]セクションを参照してください。
+
+=== Dockerネイティブを使用してデプロイします。
+
+docker runまたはcomposeでxref:docker.adoc[デプロイする{product-name}]前に、CLUSTER_JOIN_ADDRを適切なIPアドレスに設定する必要があります。オールインワン（コントローラー）が"`node IP`"のdocker-composeファイルで使用するためのノードIPアドレス、ノード名（ネームサーバを使用している場合）またはノード変数（オーケストレーションツールを使用している場合）を見つけてください。 次に例を示します。
+
+[,yaml]
+----
+- CLUSTER_JOIN_ADDR=192.168.33.10
+----
+
+Swarmベースのデプロイメントの場合、次の環境変数も追加してください：
+
+[,yaml]
+----
+- NV_PLATFORM_INFO=platform=Docker
+----
+
+指示と例については、{product-name} -> xref:docker.adoc[Docker本番デプロイメント]というセクションを参照してください。
+
+=== 設定ファイルのバックアップ
+
+デフォルトでは{product-name}はコントローラーまたはオールインワンノードの/var/neuvector/config/backupにさまざまな設定ファイルを保存します。
+
+このボリュームはxref:production.adoc#_backups_and_persistent_data[永続ストレージ]にマッピングして設定を維持できます。フォルダー内のファイルは、一から再構築するために削除する必要がある場合があります。
+
+=== ボリュームマッピング
+
+ボリュームが正しくマッピングされていることを確認してください。{product-name}は正しく動作するために、これらのボリュームが必要です（/var/neuvectorはコントローラーまたはオールインワンでのみ必要です）。次に例を示します。
+
+[,yaml]
+----
+volumes:
+        - /lib/modules:/lib/modules:ro
+        - /var/neuvector:/var/neuvector
+        - /var/run/docker.sock:/var/run/docker.sock:ro
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup:/host/cgroup:ro
+----
+
+また、他のツールがdocker.sockインターフェースへのアクセスをブロックしていないことを確認する必要があります。
+
+=== ポートとポートマッピング
+
+必要なポートが正しくマッピングされ、ホストで開いていることを確認してください。マネージャーまたはオールインワンは8443を必要とします（コンソールを使用する場合）。オールインワンとコントローラーは18300、18301、18400、18401を必要とし、オプションで10443、11443、20443、30443も必要です。エンフォーサーは18301と18401を必要とします。
+
+[NOTE]
+====
+Dockerネイティブ（SWARMを含む）をデプロイする場合、firewalldなどの必要なポートへのアクセスをブロックしているホストファイアウォールがないことを確認してください。有効になっている場合、docker0インターフェースはオールインワン/コントローラーのホストの信頼ゾーンとして追加する必要があります。
+====
+
+==== ポートの概要
+
+以下の表は各{product-name}コンテナからの通信をリストしています。オールインワンコンテナは、マネージャー、コントローラー、エンフォーサーコンテナを統合しているため、それぞれのコンテナに必要なポートを備えています。
+
+image:Communication_Matrix_From_To.png[ポート]
+
+以下の表は各{product-name}コンテナのリスニングポートを要約しています。
+
+image:Communication_Matrix_Listening_Ports.png[リスニング]
+
+===== 追加のポート
+
+バージョン5.1では、ローカルコントローラー間の通信専用として、コントローラー上の8181番ポートが新たにリスナーとして追加されました。
+
+[,shell]
+----
+tcp        0      0 :::8181                 :::*                    LISTEN      8/opa
+----
+
+=== {product-name} 画像
+
+{product-name} 画像は Docker Hub に公開されています。コアコンポーネントには固定バージョンタグを使用し、スキャナーおよびアップデーター画像には `latest` タグを使用してください。
+
+マネージャー、コントローラー、およびエンフォーサー画像には同じバージョンタグを使用してください。スキャナーおよびアップデーター画像には `latest` を使用してください。
+
+.画像タグの例
+[source,text]
+----
+neuvector/manager:5.4.1
+neuvector/controller:5.4.1
+neuvector/enforcer:5.4.1
+neuvector/scanner:latest
+neuvector/updater:latest
+----
+
+Kubernetes マニフェストまたは Helm 値ファイル内の画像参照をターゲットの NeuVector バージョンに合わせて更新してください。
+
+==== Helm チャートの設定
+
+Helm チャートバージョン 1.8.9 以降を使用して product-nam をデプロイする際は、`values.yaml` 内の以下の設定を更新してください：
+
+* 画像レジストリを `docker.io` に設定してください。
+* 画像名とタグを必要なバージョンに更新してください。
+* `imagePullSecrets` を空のままにしてください。
+
+==== Rancher レジストリ画像
+
+{product-name} 画像は、Rancher を通じて管理されるデプロイメントのために Rancher レジストリにもミラーリングされます。
+
+* 画像の可用性は、各リリース後に数日遅れる場合があります。
+* デプロイメントの詳細については、Rancher のデプロイメント ドキュメントを参照してください。

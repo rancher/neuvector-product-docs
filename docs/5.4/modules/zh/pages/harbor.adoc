@@ -1,0 +1,43 @@
+= Harbor 可插拔扫描模块
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/02.registry/01.harbor/01.harbor.md
+:page-opendocs-slug:  /scanning/registry/harbor
+
+== 使用可插拔扫描器扫描 Harbor 注册表
+
+{product-name} 支持通过 https://github.com/goharbor/pluggable-scanner-spec[可插拔扫描器] 接口从 Harbor 注册表调用 {product-name} 扫描器。这需要配置与控制器的连接（公开的 API）。Harbor 适配器调用控制器端点以触发扫描，该扫描可以在推送时自动进行。可以使用询问服务进行定期扫描。来自联邦主控制器的扫描结果会传播到远程集群。
+
+[NOTE]
+====
+HTTPS 适配器端点存在错误：请忽略测试连接错误，虽然显示错误，但实际上仍能正常工作（跳过证书验证）。
+====
+
+
+=== 部署 {product-name} 注册表适配器
+
+5.2 Helm 图表包含用于部署 Harbor https://github.com/neuvector/neuvector-helm/blob/master/charts/core/templates/registry-adapter.yaml[注册表适配器] 的选项。它也可以从 Docker Hub 上的 neuvector/registry-adapter 仓库手动拉取。选项还包括设置 Harbor 注册表请求协议和基本身份验证密钥名称。
+
+适配器部署后，必须在 Harbor 中进行配置。
+
+image:5_2_adapter_configuration.png[Harbor]
+
+必须输入适配器端点，适配器连接到控制器，通常作为外部服务公开，以便适配器可以连接。此外，必须输入有效 {product-name} 用户的身份验证凭据。
+
+=== 从 Harbor 注册表扫描镜像
+
+在成功部署并连接到控制器后，可以从 Harbor 手动或自动触发镜像扫描。
+
+image:2_Scan_image.png[Harbor]
+
+可以通过 Harbor 中的询问服务配置定期扫描（计划），以确保使用最新的 CVE 数据库重新扫描注册表中的镜像。
+
+image:4_interrogation.png[Harbor]
+
+扫描结果可以直接在 Harbor 中查看。
+
+image:3_scanresults.png[结果]
+
+=== 示例部署 Yaml
+
+https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.3.0/neuvector-registry-adapter-k8s.yaml[Kubernetes]和 https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.3.0/neuvector-registry-adapter-oc.yaml[OpenShift]的示例

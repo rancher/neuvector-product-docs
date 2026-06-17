@@ -1,0 +1,172 @@
+= Implantando SUSE Security na nuvem pública
+:revdate: 2025-06-25
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/08.publick8s/08.publick8s.md
+:page-opendocs-slug: /deploying/publick8s
+
+== Implante {product-name} em um serviço Kubernetes na nuvem pública
+
+Implante {product-name} em qualquer serviço K8s na nuvem pública, como AWS EKS, Azure AKS, IBM Cloud K8s, Google Cloud, Alibaba Cloud ou Oracle Cloud.
+{product-name} passou pelo Framework de Conformidade e Validação do Amazon EKS Anywhere e, como tal, é uma solução validada e está disponível como um complemento para EKS-Anywhere em dispositivos Snowball Edge através do Console AWS.
+
+Primeiro, crie seu cluster K8s e confirme o acesso com `kubectl get nodes`.
+
+Para implantar {product-name}, use as instruções de implantação de exemplo e exemplos da seção Kubernetes da implantação de produção. Edite o yaml de exemplo se você estiver puxando imagens {product-name} de um registro local ou na nuvem, como ECR ou ACR.
+
+Alguns provedores de nuvem têm balanceadores de carga integrados que são fáceis de implantar usando `Type: LoadBalancer` em vez de NodePort para a {product-name} webui.
+
+{product-name} também suporta implantação baseada em Helm com um gráfico Helm em https://github.com/neuvector/neuvector-helm.
+
+=== Acesso à Rede
+
+Certifique-se de que o acesso de entrada interno e externo esteja configurado corretamente. Para o serviço NodePort, a porta aleatória na faixa 3xxxx deve ser acessível em um IP público de um nó trabalhador ou nó mestre do lado de fora. Você pode acessar o console usando o endereço IP público de qualquer nó trabalhador e essa porta (NodePort), ou o IP público do balanceador de carga e a porta padrão 8443. Você pode visualizar o IP/porta usando:
+
+[,shell]
+----
+kubectl get svc -n neuvector
+----
+
+A maioria dos serviços K8s habilita/permite automaticamente toda a comunicação inter-pod / inter-cluster entre nós, o que também permite que os contêineres {product-name} (executores, controladores, gerenciador) se comuniquem dentro do cluster.
+
+O arquivo yaml de exemplo do Kubernetes implantará um gerenciador e 3 controladores. Ele implantará um executor em cada nó como um daemonset. Nota: Não é recomendável implantar (escalar) mais de um gerenciador atrás de um balanceador de carga devido a possíveis problemas de estado de sessão.
+
+== Microsoft Azure AKS
+
+Ao implantar um cluster K8s no Azure, a configuração padrão para RBACs do Kubernetes está desativada. Por favor, ative os RBACs para habilitar o cluster-admin clusterrole, caso contrário, você precisará criá-lo manualmente mais tarde para suportar implantações baseadas em Helm.
+
+== Google Cloud Platform / GKE
+
+Você pode usar os balanceadores de carga integrados, que são fáceis de implantar usando '`Type: LoadBalancer`' em vez de NodePort para a {product-name} webui. Configurar armazenamento persistente com o tipo RWM (leitura/gravação para muitos) pode exigir a criação de um serviço de armazenamento como NFS antes de implantar {product-name}.
+
+{product-name} requer um plug-in SDN como flannel, weave ou calico.
+
+Use a variável de ambiente NV_PLATFORM_INFO com o valor platform=Kubernetes:GKE para permitir que {product-name} execute ações específicas do GKE, como executar os Benchmarks CIS do Kubernetes GKE.
+
+== Suporte ao GKE Autopilot
+
+O suporte ao GKE Autopilot está disponível com NeuVector v5.4.3 e versões posteriores. Por favor, siga os passos abaixo para implantar o NeuVector no cluster Autopilot.
+
+Um `AllowlistSynchronizer` deve ser criado no cluster antes de implantar o NeuVector. Aqui está o YAML de configuração com `allowlistPath` e o comando para aplicar o YAML:
+
+Comando de exemplo para aplicar o YAML:
+
+[,shell]
+----
+kubectl apply -f allowlist.yaml
+----
+
+Configuração YAML de exemplo:
+
+[,yaml]
+----
+apiVersion: auto.gke.io/v1
+kind: AllowlistSynchronizer
+metadata:
+  name: neuvector-allowlist
+spec:
+  allowlistPaths:
+  - SUSE/neuvector-enforcer/v1.0.0/suse-neuvector-enforcer.yaml
+  - SUSE/neuvector-scanner/v1.0.0/suse-neuvector-scanner.yaml
+----
+
+Após executar o comando `kubectl apply -f <YAML file>`, verifique se o `AllowlistSynchronizer` está pronto.
+
+Comando de exemplo:
+
+[,shell]
+----
+kubectl get AllowlistSynchronizer neuvector-allowlist -o yaml
+----
+
+Configuração YAML de exemplo:
+
+[,yaml]
+----
+apiVersion: auto.gke.io/v1
+kind: AllowlistSynchronizer
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"auto.gke.io/v1","kind":"AllowlistSynchronizer","metadata":{"annotations":{},"name":"neuvector-allowlist"},"spec":{"allowlistPaths":["SUSE/neuvector-enforcer/v1.0.0/suse-neuvector-enforcer.yaml","SUSE/neuvector-scanner/v1.0.0/suse-neuvector-scanner.yaml"]}}
+  creationTimestamp: "2025-04-28T18:17:16Z"
+  generation: 1
+  name: neuvector-allowlist
+  resourceVersion: "13326"
+  uid: 3e425c28-9bef-4459-b769-381d974f17f6
+spec:
+  allowlistPaths:
+  - SUSE/neuvector-enforcer/v1.0.0/suse-neuvector-enforcer.yaml
+  - SUSE/neuvector-scanner/v1.0.0/suse-neuvector-scanner.yaml
+status:
+  conditions:
+  - lastTransitionTime: "2025-04-28T18:17:17Z"
+    message: Synchronization completed successfully; allowlists up to date
+    observedGeneration: 1
+    reason: SyncSuccessful
+    status: "True"
+    type: Ready
+  lastSyncAttempt: "2025-04-28T18:17:17Z"
+  managedAllowlistStatus:
+  - filePath: SUSE/neuvector-enforcer/v1.0.0/suse-neuvector-enforcer.yaml
+    generation: 1
+    lastSuccessfulSync: "2025-04-28T18:17:16Z"
+    phase: Installed
+  - filePath: SUSE/neuvector-scanner/v1.0.0/suse-neuvector-scanner.yaml
+    generation: 1
+    lastSuccessfulSync: "2025-04-28T18:17:17Z"
+    phase: Installed
+----
+
+O arquivo `override.yaml` abaixo precisa ser usado para implantar o NeuVector no cluster GKE Autopilot ao usar o Helm.
+
+[,yaml]
+----
+cve:
+  scanner:
+    podLabels:
+      # The scanner allowlist should be mapped with scanner deployment workload.
+      cloud.google.com/matching-allowlist: suse-neuvector-scanner
+    resources:
+      # Below are the tested limits for scanner deployment in GKE Auto-Pilot cluster for scanner pod.
+      limits:
+        ephemeral-storage: "3Gi"
+      requests:
+        ephemeral-storage: "2Gi"
+enforcer:
+  podLabels:
+     # The enforcer allowlist should be mapped with the enforcer daemon set workload.
+    cloud.google.com/matching-allowlist: suse-neuvector-enforcer
+----
+
+Se estiver usando a implantação YAML, por favor, adicione o `podLabels` e os limites de recursos nas configurações YAML de `enforcer` e `scanner` conforme necessário.
+
+Para saber mais sobre o `allowlistSynchronizer`, por favor, consulte a https://cloud.google.com/kubernetes-engine/docs/how-to/run-autopilot-partner-workloads[documentação do GKE].
+
+== Gerenciando nós de escalonamento automático com um orçamento de interrupção de pod.
+
+Provedores de nuvem pública suportam a capacidade de autoescalar nós, o que pode expulsar dinamicamente pods, incluindo os controladores {product-name}. Para evitar interrupções nos controladores, um orçamento de interrupção de pod {product-name} pode ser criado.
+
+Por exemplo, crie o arquivo abaixo nv_pdr.yaml para garantir que haja pelo menos 2 controladores em execução a qualquer momento.
+
+[,yaml]
+----
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: neuvector-controller-pdb
+  namespace: neuvector
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: neuvector-controller-pod
+----
+
+Em seguida,
+
+[,shell]
+----
+kubectl create -f nv_pdr.yaml
+----
+
+Para mais detalhes: https://kubernetes.io/docs/tasks/run-application/configure-pdb/

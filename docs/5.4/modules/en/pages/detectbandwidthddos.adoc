@@ -18,10 +18,12 @@ You can configure the following metric thresholds for each group:
 
 * `Grp_cur_sess`: Active session count threshold.
 
+[#_configure_group_metric_thresholds]
 == Configure group metric thresholds
 
 You can configure group metric thresholds by using either the {product-name} CLI or the web UI.
 
+[#_configure_thresholds_by_using_the_cli]
 === Configure thresholds by using the CLI
 
 To view available group metric options, run the following command:
@@ -41,6 +43,7 @@ Example output:
 --bandwidth INTEGER                 Throughput threshold (Mbps)
 ----
 
+[#_configure_thresholds_by_using_the_web_ui]
 === Configure thresholds by using the web UI
 
 You can enable or disable group metric thresholds when creating or editing a group.
@@ -53,6 +56,7 @@ image:bandwidth_ddos_1.png[Add Group]
 +
 image:bandwidth_ddos_2.png[Edit Group]
 
+[#_example_workflow]
 == Example workflow
 
 The following example shows how group metric threshold detection works.

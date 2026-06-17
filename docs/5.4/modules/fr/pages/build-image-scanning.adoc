@@ -1,0 +1,56 @@
+= Analyse des images lors de la phase de build
+:revdate: 2025-01-10
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/03.build/03.build.md
+:page-opendocs-slug:  /scanning/build
+
+== Analyse des vulnérabilités lors de la phase de build CI/CD
+
+Analysez les vulnérabilités pendant la phase de build du pipeline en utilisant des plug-ins tels que https://plugins.jenkins.io/neuvector-vulnerability-scanner/[Jenkins], https://github.com/neuvector/azure-vsts[Azure Devops], https://github.com/neuvector/scan-action[Github Action], https://gitlab.com/neuvector/gitlab-plugin[gitlab], Bamboo, et https://github.com/neuvector/circleci-orb[CircleCI], ou utilisez l'API REST. {product-name} prend en charge deux types d'analyse de phase de build{nbsp}: registre et local. Pour l'analyse de registre, le contrôleur et le scanner {product-name} doivent être capables de se connecter au registre pour récupérer l'image.
+
+Pour déclencher une analyse de phase de build, le plug-in (par exemple, Jenkins) doit être capable de se connecter au Contrôleur ou à Allinone. Remarque : Le port API REST par défaut pour que les plug-ins appellent le scanner est 10443. Ce port doit être exposé via l'Allinone ou le Contrôleur, soit par un service dans Kubernetes, soit par un mappage de ports (par exemple, -10443:10443) dans le fichier Docker run ou compose.
+
+Assurez-vous qu'il y a un {product-name} conteneur de scanner déployé et correctement configuré pour se connecter à l'Allinone ou au Contrôleur. Dans la version 4.0 et ultérieure, le conteneur neuvector/scanner doit être déployé séparément de l'allinone ou du contrôleur, et est inclus dans les fichiers yaml de déploiement d'exemple.
+
+Vous pouvez télécharger le plug-in depuis le Gestionnaire de plug-ins Jenkins. D'autres plug-ins sont accessibles via les catalogues de l'outil de build, ou sur la page https://github.com/neuvector[{product-name} github]. Le scanner Bamboo est disponible à https://github.com/neuvector/bamboo-plugin/releases/tag/1.0.1. L'ORB CircleCI est disponible à https://github.com/neuvector/circleci-orb et à travers le catalogue ORB CircleCI.
+
+=== Analyse locale de la phase de build
+
+Pour l'analyse locale, le {product-name} scanner essaiera de scanner l'image sur un hôte local (ou un hôte accessible par la commande docker de l'hôte distant).
+
+Pour l'analyse locale basée sur Kubernetes ou OpenShift, retirez la section commentée du fichier yaml de déploiement de scanner d'exemple, montrée dans les sections xref:kubernetes.adoc#_deploy_using_kubernetes[Déploiement {product-name}]. La section commentée ressemble à ceci{nbsp}:
+
+[,yaml]
+----
+          env:
+# Commented out sections are required only for local build-phase scanning
+#            - name: SCANNER_DOCKER_URL
+#              value: tcp://192.168.1.10:2376
+            - name: CLUSTER_JOIN_ADDR
+              value: neuvector-svc-controller.neuvector
+            - name: CLUSTER_ADVERTISED_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: CLUSTER_BIND_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+#          volumeMounts:
+#            - mountPath: /var/run/docker.sock
+#              name: docker-sock
+#              readOnly: true
+#      volumes:
+#        - name: docker-sock
+#          hostPath:
+#            path: /var/run/docker.sock
+      restartPolicy: Always
+----
+
+Pour l'analyse locale native Docker, suivez les instructions pour les déploiements de scanner Docker dans la section xref:docker.adoc#_deploy_the_suse_security_scanner_container[Déploiements de production Docker] pour le scanner.
+
+=== Analyse locale de la phase de build - Scanner uniquement (aucun contrôleur requis)
+
+{product-name} prend en charge les déploiements de scanner autonomes pour l'analyse d'images locales (ce qui ne nécessite pas de contrôleur). Certains plug-ins tels que l'ORB CircleCI disposent d'une option permettant de déployer dynamiquement un scanner lorsqu'un job de build nécessite l'analyse d'images, puis de retirer le scanner lorsque les résultats sont renvoyés via l'ORB. Ces déploiements de scanner dynamiques sont automatiquement invoqués par le plug-in si cela est pris en charge.
+
+Veuillez consulter la xref:scanners.adoc[section du scanner] pour plus de détails sur les scanners autonomes.

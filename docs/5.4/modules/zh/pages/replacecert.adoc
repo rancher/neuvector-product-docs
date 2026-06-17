@@ -1,0 +1,143 @@
+= 替换自签名证书
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /03.configuration/01.console/01.replacecert/01.replacecert.md
+:page-opendocs-slug: /configuration/console/replacecert
+
+== 用 PKCS 证书替换自签名证书以进行外部访问
+
+用于从浏览器访问管理器或通过 REST API 访问控制器的内置自签名证书可以被受支持的 PKCS 证书替换。这些证书应在管理器和控制器的部署中都进行替换。注意：要替换控制器、执法者和扫描仪之间的内部通信所包含的证书，请参见xref:internal.adoc[本节]。
+
+{product-name} 网络控制台支持两种不同类型的自签名证书，具体为 PKCS8（私钥信息语法标准）和 PKCS1（RSA 加密标准）。 自签名证书可以替换为这两种 PKCS 类型中的任意一种。
+
+下面将说明生成将由 {product-name} 的网络控制台使用的秘密的步骤，该秘密源自使用任一 PKCS 方法生成的密钥和证书。 这里的重要说明是，在密钥和证书创建过程中，将通配符用作备用主题名称参数，这使得您选择的名称可以映射到管理控制台的 IP 地址，而不限制于特定的 CN。
+
+=== 生成并使用自签名证书 PKCS8 或 PKCS1
+
+. 创建密钥和证书
++
+--
+[tabs]
+======
+PKCS8::
++
+====
+[,shell]
+----
+openssl req -x509 -nodes -days 730 -newkey rsa:2048 -keyout tls.key -out tls.pem -config ca.cfg -extensions 'v3_req'
+Sample ca.cfg
+[req]
+distinguished_name = req_distinguished_name
+x509_extensions = v3_req
+prompt = no
+[req_distinguished_name]
+C = US
+ST = California
+L = San Jose
+O = {product-name} Inc.
+OU = Neuvector
+CN = Neuvector
+[v3_req]
+keyUsage = keyEncipherment, dataEncipherment
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = *
+----
+====
+
+PKCS1::
++
+====
+[,shell]
+----
+openssl genrsa -out tls.key 2048
+openssl req -x509 -nodes -days 730 -config openssl.cnf  -new -key tls.key -out tls.pem
+Sample openssl.cnf
+[req]
+distinguished_name = req_distinguished_name
+x509_extensions = v3_req
+prompt = no
+[req_distinguished_name]
+C = US
+ST = California
+L = San Jose
+O = {product-name} Inc.
+OU = Neuvector
+CN = Neuvector(PKCS#1)
+[v3_req]
+keyUsage = keyEncipherment, dataEncipherment
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = *
+----
+====
+======
+--
+. 从上述生成的密钥和证书文件中创建秘密
++
+--
+[,shell]
+----
+kubectl create secret generic https-cert -n neuvector --from-file=tls.key --from-file=tls.pem
+----
+--
+. 直接编辑管理器和控制器部署的 yaml 以添加挂载
++
+--
+[,yaml]
+----
+spec:
+  template:
+    spec:
+      containers:
+        volumeMounts:
+        - mountPath: /etc/neuvector/certs/ssl-cert.key
+          name: cert
+          readOnly: true
+          subPath: tls.key
+        - mountPath: /etc/neuvector/certs/ssl-cert.pem
+          name: cert
+          readOnly: true
+          subPath: tls.pem
+      volumes:
+      - name: cert
+        secret:
+          defaultMode: 420
+          secretName: https-cert
+----
+
+或使用类似的 values.yaml 文件更新 helm 图表
+
+[,yaml]
+----
+manager:
+  certificate:
+    secret: https-cert
+    keyFile: tls.key
+    pemFile: tls.pem
+  ingress:
+    enabled: true
+    host:  %CHANGE_HOST_NAME%
+    ingressClassName: ""
+    path: "/"  # or this could be "/api", but might need "rewrite-target" annotation
+    annotations:
+      ingress.kubernetes.io/protocol: https
+    tls: true
+    secretName: https-cert
+controller:
+  certificate:
+    secret: https-cert
+    keyFile: tls.key
+    pemFile: tls.pem
+----
+
+然后使用 `helm upgrade -i neuvector ...` 更新。作为参考，这里是所有值 https://github.com/neuvector/neuvector-helm/tree/master/charts/core.
+--
+
+=== 支持链式证书
+
+为了支持端到端 TLS，一些入口/应用网关仅支持可以信任的后端服务器。{product-name} 在版本 3.2.2 中添加了对链式证书的支持。 微软的应用网关是一个需要链式证书的应用网关示例，当使用不知名的 CA 时。
+
+要添加链式证书，示例 tls.pem 文件应为证书的串联。

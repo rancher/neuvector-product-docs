@@ -1,0 +1,125 @@
+= エアギャップ {product-name}
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/09.airgap/09.airgap.md
+:page-opendocs-slug: /デプロイ/エアギャップ
+
+== 必要なツール
+
+のすべてのビットをダウンロードするために{product-name}、3つのツールをインストールする必要があります。
+
+* https://helm.sh/[Helm] - アプリケーションライフサイクルマネージャー
+* https://github.com/containers/skopeo[Skopeo] - イメージ/レジストリツール
+* https://github.com/facebook/zstd[ZStandard] - 圧縮アルゴリズム
+
+[,bash]
+----
+# install helm
+curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+# install skopeo - rocky linux based
+yum install zstd skopeo -y
+----
+
+== イメージとチャートを取得する
+
+すべてのイメージを取得するために、チャート自体を使用します。 https://helm.sh/[Helm]を使用して、リポジトリを追加し、チャートをダウンロードしましょう。ダウンロードとアップロードには、 https://github.com/containers/skopeo[skopeo]も使用します。
+
+[,bash]
+----
+# make a directory
+mkdir -p neuvector/images
+
+# add repo
+helm repo add neuvector https://neuvector.github.io/neuvector-helm/
+
+# update local chart
+helm repo update
+
+# pull
+helm pull neuvector/core -d neuvector
+----
+
+今、`core-2.4.0.tgz`のようなファイルが表示されるはずです。バージョンは異なる場合がありますが、これは正しいです。これはダウンロードしたチャートです。今、イメージが必要です。チャートを使ってこれを解決できるのは良いことです。
+
+[,bash]
+----
+# create image list
+helm template neuvector/core-*.tgz | awk '$1 ~ /image:/ {print $2}' | sed -e 's/\"//g' > neuvector/images/list.txt
+
+# get images
+for i in $(cat neuvector/images/list.txt); do
+  skopeo copy docker://$i docker-archive:neuvector/images/$(echo $i| awk -F/ '{print $3}'|sed 's/:/_/g').tar:$(echo $i| awk -F/ '{print $3}')
+done
+----
+
+素晴らしい、次のようなディレクトリがあるはずです：
+
+[,bash]
+----
+[root@flux ~]# ls -lR neuvector
+neuvector:
+total 16
+-rw-r--r--. 1 root root 15892 Jan  8 14:33 core-2.4.0.tgz
+drwxr-xr-x. 2 root root   153 Jan  8 14:35 images
+
+neuvector/images:
+total 953920
+-rw-r--r--. 1 root root 236693504 Jan  8 14:35 controller_5.3.2.tar
+-rw-r--r--. 1 root root 226704384 Jan  8 14:35 enforcer_5.3.2.tar
+-rw-r--r--. 1 root root       176 Jan  8 14:34 list.txt
+-rw-r--r--. 1 root root 331550208 Jan  8 14:35 manager_5.3.2.tar
+-rw-r--r--. 1 root root 169589760 Jan  8 14:35 scanner_latest.tar
+-rw-r--r--. 1 root root  12265472 Jan  8 14:35 updater_latest.tar
+----
+
+そして、すべてを圧縮して移動できます。
+
+== 圧縮と移動
+
+圧縮は非常に簡単です。最大圧縮のために、ZST形式で`tar`を使用します。
+
+[,bash]
+----
+# compress
+tar -I zstd -vcf neuvector_airgap.zst neuvector
+----
+
+次に、400Mの`neuvector_airgap.zst`をネットワークに移動してください。
+
+== 解凍して読み込みます。
+
+今必要なのは、同様のコマンドで解凍することだけです。以下は、`neuvector`というディレクトリに出力されます。
+
+[,bash]
+----
+tar -I zstd -vxf neuvector_airgap.zst
+----
+
+イメージをレジストリに読み込むには、内部ネットワークの理解が必要です。このドキュメントでは、DNS名として「registry.awesome.sauce」を使用しましょう。再びを使用すると、イメージの読み込みは非常に簡単です。`skopeo`「内部」マシンにインストールされていることを確認してください。動作させるためには、`skopeo login`で認証する必要があるかもしれません。
+
+[,bash]
+----
+# skopeo load
+export REGISTRY=registry.awesome.sauce
+for file in $(ls neuvector/images | grep -v txt ); do
+     skopeo copy docker-archive:neuvector/images/$file docker://$(echo $file | sed 's/.tar//g' | awk -F_ '{print "'$REGISTRY'/neuvector/"$1":"$2}')
+done
+----
+
+すべてのイメージがレジストリに読み込まれたら、Helmでインストールできます。
+
+== Helmでデプロイします。
+
+Helmでのデプロイは非常に簡単です。イメージがローカルレジストリから取得されることを保証するために必要な値がいくつかあります。こちらは良い例です。いくつかの設定を調整する必要があるかもしれません。`values.yaml`のためにHelmのベストプラクティスに従ってください。`imagePullSecrets`フィールドに注意してください。これは、クラスターがレジストリに認証するための秘密です。
+
+[,bash]
+----
+# helm install example
+# variables
+export REGISTRY=registry.awesome.sauce  # registry URL
+export NEU_URL=neuvector.awesome.sauce   # neuvector URL
+
+# helm all the things -- read all the options being set
+helm upgrade -i neuvector --namespace neuvector neuvector/core --create-namespace  --set imagePullSecrets=regsecret --set k3s.enabled=true --set k3s.runtimePath=/run/k3s/containerd/containerd.sock  --set manager.ingress.enabled=true --set controller.pvc.enabled=true --set controller.pvc.capacity=10Gi --set manager.svc.type=ClusterIP --set registry=$REGISTRY --set tag=5.3.2 --set controller.image.repository=neuvector/controller --set enforcer.image.repository=neuvector/enforcer --set manager.image.repository=neuvector/manager --set cve.updater.image.repository=neuvector/updater --set manager.ingress.host=$NEU_URL
+----

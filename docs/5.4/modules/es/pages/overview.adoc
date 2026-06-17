@@ -1,0 +1,89 @@
+= 5.x Descripción general
+:revdate: 2025-01-10
+:page-revdate: {revdate}
+:page-opendocs-origin: /01.basics/01.overview/01.overview.adoc
+:page-opendocs-slug: /basics/overview
+
+== La plataforma de seguridad de contenedores de ciclo de vida completo
+
+[NOTE]
+====
+Estos documentos describen la versión 5.x (Código Abierto). Las imágenes de 5.x son accesibles desde Docker Hub con la etiqueta apropiada, por ejemplo, `neuvector/controller:(version)`.
+====
+
+{product-name} proporciona una potente plataforma de seguridad de contenedores de extremo a extremo. Esto incluye la búsqueda de vulnerabilidades de extremo a extremo y la protección completa del entorno de ejecución para contenedores, pods y hosts, incluyendo:
+
+. Gestión de Vulnerabilidades CI/CD y Control de Admisión. Escanea imágenes con un complemento de Jenkins, escanea registros y aplica reglas de control de admisión para ampliaciones en producción.
+. Protección contra Violaciones. Descubre comportamientos y crea una política basada en listas blancas para detectar violaciones del comportamiento normal.
+. Detección de Amenazas. Detecta ataques comunes a aplicaciones como DDoS y ataques DNS en contenedores.
+. Sensores DLP y WAF. Inspecciona el tráfico de red para la Prevención de Pérdida de Datos de información sensible y detecta ataques comunes de OWASP Top10 WAF.
+. Escaneo de Vulnerabilidades en Tiempo de Ejecución. Escanea registros, imágenes y plataformas de orquestación de contenedores en ejecución y hosts para vulnerabilidades comunes (CVE) así como vulnerabilidades específicas de la aplicación.
+. Cumplimiento y Auditoría. Ejecuta pruebas de Docker Bench y Benchmarks de Kubernetes CIS automáticamente.
+. Seguridad de Endpoint/Host. Detecta escalaciones de privilegios, monitoriza procesos y actividad de archivos en hosts y dentro de contenedores, y monitoriza sistemas de archivos de contenedores en busca de actividad sospechosa.
+. Gestión de múltiples clústeres. Monitorea y gestiona múltiples clústeres de Kubernetes desde una única consola.
+
+Otras características de {product-name} incluyen la capacidad de poner en cuarentena contenedores y exportar registros a través de SYSLOG y webhooks, iniciar la captura de paquetes para investigación, e integración con RBAC de OpenShift, LDAP, Microsoft AD y SSO con SAML. Nota: Poner en cuarentena significa que todo el tráfico de red está bloqueado.  El contenedor permanecerá y seguirá funcionando, solo que sin ninguna conexión de red.  Kubernetes no iniciará un contenedor para reemplazar un contenedor en cuarentena, ya que el servidor API aún puede acceder al contenedor.
+
+== Contenedores de Seguridad
+
+La solución de seguridad de contenedores en tiempo de ejecución {product-name} contiene cuatro tipos de contenedores de seguridad: *Controladores*, *Enforcers*, *Gestores*, y *Escáneres*. También se proporciona un contenedor especial llamado *All-in-One* para combinar las funciones de Controlador, Enforcer y Gestor en un solo contenedor, principalmente para implementaciones nativas de Docker.
+
+{product-name} puede ser desplegado en máquinas virtuales o en equipos sin sistema operativo con un único sistema operativo.
+
+image:1Overview.png[Ampliación]
+
+=== Controlador
+
+El Controlador gestiona el clúster de contenedores Aplicador de {product-name}. También proporciona APIs REST para la consola de gestión. Aunque las implementaciones de prueba típicas tienen un Controlador, se recomienda múltiples Controladores en una configuración de alta disponibilidad. 3 controladores es el valor predeterminado en el ejemplo de ampliación de producción de Kubernetes en yaml.
+
+=== Enforcer
+
+El Enforcer es un contenedor ligero que aplica las políticas de seguridad. Un Enforcer debe ser desplegado en cada nodo (host), por ejemplo, como un DaemonSet.
+
+[NOTE]
+====
+Para las implementaciones nativas de Docker (no Kubernetes), el contenedor Enforcer y el Controlador no pueden desplegarse en el mismo nodo (excepto en el caso de All-in-One que se menciona a continuación).
+====
+
+
+=== Manager
+
+El Manager es un contenedor sin estado que proporciona una consola web-UI (solo HTTPS) para que los usuarios gestionen la {product-name} solución de seguridad. Se puede desplegar más de un contenedor Manager según sea necesario.
+
+=== All-in-One
+
+El contenedor All-in-One incluye un Controlador, un Enforcer y un Manager en un solo paquete. Es útil para una instalación fácil en implementaciones de nodo único o a pequeña escala.
+
+=== Escáner
+
+El Scanner es un contenedor que realiza el escaneo de vulnerabilidades y cumplimiento para imágenes, contenedores y nodos. Se despliega típicamente como un replicaset y se puede escalar hasta tantos escáneres paralelos como se desee para aumentar el rendimiento del escaneo. El Controlador asigna trabajos de escaneo a cada escáner disponible de manera round-robin hasta que se completan todos los escaneos. El escáner también contiene la última base de datos CVE y se actualiza regularmente por {product-name}.
+
+=== Actualizador
+
+El Actualizador es un contenedor que, al ejecutarse, actualiza la base de datos CVE para {product-name}. {product-name} publica regularmente nuevas imágenes de escáner para incluir la última CVE para escaneos de vulnerabilidades. El actualizador vuelve a desplegar todos los pods de escáner llevando el despliegue a cero y escalándolo de nuevo, forzando la descarga de una imagen de escáner actualizada.
+
+== Arquitectura
+
+Aquí hay una visión general de la arquitectura de {product-name}. No se muestra el contenedor de escáner separado, que también se puede ejecutar como un escáner de pipeline independiente.
+
+image:architecture.png[Arquitectura]
+
+== Ejemplos de ampliación
+
+Para patrones de ampliación comunes y mejores prácticas, consulta la sección xref:production.adoc#_best_practices_tips_qa_for_deploying_and_managing_suse_security[Onboarding/Mejores Prácticas].
+
+=== All-in-One y Enforcers
+
+Esta ampliación es ideal para entornos de nodo único o a pequeña escala, por ejemplo, para evaluación, pruebas y ampliaciones pequeñas. Un contenedor All-in-One se despliega en un nodo, que también puede ser un nodo con contenedores de aplicación en ejecución. Un Enforcer puede ser desplegado en todos los demás nodos, siendo necesario un Enforcer en cada nodo que desees proteger con {product-name}. Esto también es útil para ampliaciones nativas de Docker donde un controlador y un Enforcer no pueden ejecutarse en el mismo host.
+
+=== Contenedores de Controlador, Gestor y Enforcer
+
+Este es un caso de uso de ampliación más genérico que consiste en uno o más Controladores, un Gestor y un conjunto de Enforcers. El Controlador y el Gestor pueden ser desplegados en el mismo nodo o en nodos diferentes al Enforcer.
+
+=== Solo All-in-One
+
+Puedes desplegar solo el contenedor All-in-One para el escaneo de registros, utilizando el complemento de Jenkins, o pruebas simples en un solo nodo de {product-name}.
+
+=== Solo Controlador
+
+Es posible desplegar un único contenedor de Controlador y/o escáner para gestionar el escaneo de vulnerabilidades fuera de un clúster, por ejemplo, para su uso con el complemento de Jenkins. El escaneo de registros también puede ser realizado por el Controlador utilizando exclusivamente la API REST, pero típicamente se desea también un contenedor de Gestor para proporcionar configuración basada en consola y visualización de resultados para el escaneo de registros.

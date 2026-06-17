@@ -1,0 +1,56 @@
+= Image-Scanning in der Build-Phase
+:revdate: 2025-01-10
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/03.build/03.build.md
+:page-opendocs-slug:  /scanning/build
+
+== CI/CD-Bauphasen-Schwachstellen-Scan
+
+Scannen Sie nach Schwachstellen während der Bauphase der Pipeline mit Plug-ins wie https://plugins.jenkins.io/neuvector-vulnerability-scanner/[Jenkins], https://github.com/neuvector/azure-vsts[Azure Devops], https://github.com/neuvector/scan-action[Github Action], https://gitlab.com/neuvector/gitlab-plugin[gitlab], Bamboo und https://github.com/neuvector/circleci-orb[CircleCI] oder verwenden Sie die REST-API. {product-name} unterstützt zwei Arten von Scans in der Bauphase: Registry und lokal. Für das Scannen der Registry müssen der {product-name} Controller und der Scanner in der Lage sein, sich mit der Registry zu verbinden, um das Image abzurufen.
+
+Um einen Scan in der Bauphase auszulösen, muss das Plug-in (z. B. Jenkins) in der Lage sein, sich mit dem Controller oder Allinone zu verbinden. Hinweis: Der Standard-REST-API-Port für Plug-ins, um den Scanner aufzurufen, ist 10443. Dieser Port muss über das Allinone oder den Controller durch einen Dienst in Kubernetes oder eine Portzuordnung (z. B. - 10443:10443) in der Docker-Run- oder Compose-Datei freigegeben werden.
+
+Stellen Sie sicher, dass ein {product-name} Scanner-Container bereitgestellt und ordnungsgemäß konfiguriert ist, um sich mit dem Allinone oder Controller zu verbinden. In Version 4.0 und später muss der neuvector/scanner-Container separat vom Allinone oder Controller bereitgestellt werden und ist in den Beispielbereitstellungs-YAML-Dateien enthalten.
+
+Sie können das Plug-in im Jenkins Plug-in-Manager herunterladen. Andere Plug-ins sind über die Kataloge des Build-Tools oder auf der https://github.com/neuvector[{product-name}GitHub] Seite zugänglich. Der Bamboo-Scanner ist verfügbar unter https://github.com/neuvector/bamboo-plugin/releases/tag/1.0.1.. Der CircleCI ORB ist verfügbar unter https://github.com/neuvector/circleci-orb und über den CircleCI ORB-Katalog.
+
+=== Lokales Scannen in der Bauphase
+
+Für das lokale Scannen wird der {product-name} Scanner versuchen, das Image auf einem lokalen Host (oder einem Host, der über den Remote-Host-Docker-Befehl erreichbar ist) zu scannen.
+
+Für Kubernetes- oder OpenShift-basiertes lokales Scannen entfernen Sie den auskommentierten Abschnitt der Beispiel-Scanner-Bereitstellungs-YAML-Datei, der in den xref:kubernetes.adoc#_deploy_using_kubernetes[Bereitstellung {product-name}] Abschnitten angezeigt wird. Der auskommentierte Abschnitt sieht so aus:
+
+[,yaml]
+----
+          env:
+# Commented out sections are required only for local build-phase scanning
+#            - name: SCANNER_DOCKER_URL
+#              value: tcp://192.168.1.10:2376
+            - name: CLUSTER_JOIN_ADDR
+              value: neuvector-svc-controller.neuvector
+            - name: CLUSTER_ADVERTISED_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: CLUSTER_BIND_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+#          volumeMounts:
+#            - mountPath: /var/run/docker.sock
+#              name: docker-sock
+#              readOnly: true
+#      volumes:
+#        - name: docker-sock
+#          hostPath:
+#            path: /var/run/docker.sock
+      restartPolicy: Always
+----
+
+Für Docker-natives lokales Scannen folgen Sie den Anweisungen für Docker-Scanner-Bereitstellungen im Abschnitt xref:docker.adoc#_deploy_the_suse_security_scanner_container[Docker-Produktionsbereitstellungen] für den Scanner.
+
+=== Lokales Scannen in der Bauphase - Nur Scanner (Kein Controller erforderlich)
+
+{product-name} unterstützt eigenständige Scanner-Implementierungen für lokales Image-Scanning (die keinen Controller erfordern). Bestimmte Plug-ins, wie der CircleCI ORB, bieten die Möglichkeit, einen Scanner dynamisch bereitzustellen, wenn ein Build-Job Image-Scanning erfordert, und den Scanner zu entfernen, wenn die Ergebnisse über den ORB zurückgesendet werden. Diese dynamischen Scanner-Implementierungen werden automatisch über das Plug-in aufgerufen, sofern unterstützt.
+
+Bitte beachten Sie den xref:scanners.adoc[Scanner-Bereich] für weitere Details zu eigenständigen Scannern.

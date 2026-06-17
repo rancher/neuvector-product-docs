@@ -1,0 +1,33 @@
+= Firmas de Amenazas de Red
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/10.threats/10.threats.md
+:page-opendocs-slug:  /directiva/amenazas
+
+== Detección de Amenazas de Red
+
+{product-name} la inspección profunda de paquetes puede ser utilizada para inspeccionar los paquetes de red y la carga útil en busca de ataques como los que se encuentran en el OWASP Top 10 y aquellos comúnmente utilizados en los firewall de aplicaciones web (WAFs).
+
+=== Firmas de OWASP
+
+Se pueden crear Sensores DLP para detectar ataques OWASP utilizando los siguientes ejemplos de patrones. Como siempre, estos pueden necesitar ser ajustados para su entorno y aplicaciones.
+
+[,shell]
+----
+img src=javascript
+/servlet/.*/org.apache.
+/modules.php?.*name=Wiki.*<script
+/error/500error.jsp.*et=.*<script
+/mailman/.*?.*info=.*<script
+\x0aReferer\x3a res\x3a/C\x3a
+/cgi-bin/cgictl?action=setTaskSettings.*settings={\x22.*taskId=
+/cgi-bin/cgictl.*scriptName=.*[?&]scriptName=[^&]*?([\x22\x27\x3c\x3e\x28\x29]|script|onload|src)
+----
+
+Aquí hay otros ejemplos simples:
+
+image:owasp_top10_dlp.png[owasp]
+
+=== Detección de Amenazas Integrada
+
+{product-name} también tiene detección integrada de otras amenazas de red como ataques de inyección SQL, DDoS (por ejemplo, Ping de Muerte) y ataques de tunelización. Para ataques de inyección SQL, {product-name} inspecciona la conexión de red (protocolo SQL) entre el front end y el pod de la base de datos SQL, reduciendo falsos positivos y aumentando la precisión.

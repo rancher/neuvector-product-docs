@@ -1,0 +1,38 @@
+= SAML (Okta)
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/04.saml/04.saml.md
+:page-opendocs-slug:  /integration/saml
+
+== Configuration de l'IDP SAML
+
+Pour configurer {product-name} pour utiliser le serveur IDP SAML d'Okta, commencez par configurer le serveur IDP SAML sur le site d'Okta.
+
+image:okta.png[Okta]
+
+. Copiez l'URI de redirection SAML depuis la page des paramètres SAML de {product-name}, puis collez-le dans les champs d'URL de connexion unique, d'URL de destinataire et d'URL de destination d'Okta.
+. Chiffrement de l'assertion{nbsp}: Ce champ doit être *non chiffré.*
+. Déclarations d'attributs{nbsp}: Entrez les attributs d'email et de nom d'utilisateur.
+. Déclarations d'attributs de groupe{nbsp}: Activez ceci si un mappage de rôle basé sur des groupes est requis. Le nom d'attribut par défaut que {product-name} recherche est NVRoleGroup. Si un autre nom d'attribut est utilisé pour l'appartenance au groupe de l'utilisateur, il peut être personnalisé dans la page des paramètres SAML de {product-name}.
+
+Configurez les paramètres SAML dans la console UI de {product-name}.
+
+image:saml1.png[SAML]
+
+Utilisez le bouton "Voir les instructions de configuration" comme indiqué dans la capture d'écran suivante pour localiser les informations suivantes, et copiez-les dans la page SAML de {product-name}.
+
+. URL de connexion unique du fournisseur d'identité
+. Émetteur du fournisseur d'identité
+. Certificat X.509
+. Spécifiez le nom de l'attribut de groupe si une valeur non par défaut est utilisée.
+
+image:setting.png[Paramètre]
+
+Après que l'utilisateur a été authentifié, le rôle approprié peut être dérivé grâce à la configuration de mappage de rôle basée sur les groupes. Pour configurer le mappage de rôle basé sur les groupes,
+
+. Si le mappage de rôle basé sur les groupes n'est pas configuré ou si les groupes correspondants ne peuvent pas être localisés, l'utilisateur authentifié se verra attribuer le rôle par défaut. Si le rôle par défaut est défini sur Aucun, lorsque le mappage de rôle basé sur les groupes échoue, l'utilisateur ne peut pas se connecter.
+. Spécifiez une liste de groupes respectivement dans le mappage de rôle Administrateur et Lecteur. L'attribut de groupe de l'utilisateur est inclus dans la réponse après que l'utilisateur a été authentifié. Si le groupe correspondant est localisé, le rôle correspondant sera attribué à l'utilisateur.
+
+=== Mappage des groupes aux rôles et aux espaces de noms
+
+Veuillez consulter la section xref:users.adoc#_mapping_groups_to_roles_and_namespaces[Utilisateurs et Rôles] pour savoir comment mapper les groupes aux rôles prédéfinis et personnalisés ainsi qu'aux espaces de noms dans {product-name}.

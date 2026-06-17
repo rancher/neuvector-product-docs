@@ -1,0 +1,55 @@
+= CircleCI
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/03.build/03.circleci/03.circleci.md
+:page-opendocs-slug:  /scanning/build/circleci
+
+== CircleCIビルドパイプラインの脆弱性をスキャンする
+
+{product-name} CircleCI ORBは、CircleCIパイプライン内のイメージに対して脆弱性スキャンをトリガーします。ORBは https://circleci.com/orbs/registry/orb/neuvector/neuvector-orb[CircleCIカタログ]で利用可能で、 https://github.com/neuvector/circleci-orb[{product-name} GitHubページ]にも文書化されています。
+
+まだ行っていない場合は、CircleCI ORBからアクセス可能なホストに{product-name} AllinoneまたはControllerコンテナをデプロイしてください。AllinoneまたはControllerが実行されているホストのIPアドレスをメモしてください。
+
+ORBは2つのユースケースをサポートしています：
+
+. CircleCIインフラストラクチャの外部でスキャンをトリガーすること。ORBは{product-name}スキャナーに連絡し、その後、スキャンするためにレジストリからイメージを取得します。ORBが{product-name} Controller/Allinoneが実行されているホストにネットワーク接続できることを確認してください。
+. CircleCIプラットフォーム上で実行されている一時的なVM上に{product-name}コントローラーとスキャナーを動的に起動します。起動して自動構成した後、ビルド内のイメージに対してスキャンが行われ、完了後に{product-name}デプロイメントが停止されて削除されます。 このユースケースについては、 https://circleci.com/orbs/registry/orb/neuvector/neuvector-orb[CircleCI ORBの{product-name}]に関する文書を参照してください。
+
+さらに、AllinoneまたはControllerに接続できるようにデプロイおよび構成された{product-name}スキャナーコンテナがあることを確認してください。4.0以降では、neuvector/scannerコンテナはallinoneまたはcontrollerとは別にデプロイする必要があります。
+
+=== CircleCIアプリでコンテキストを作成する
+
+image:context.png[context]
+
+=== 設定を構成する
+
+接続および認証のための環境変数を構成する
+
+image:circleci_settings.png[設定]
+
+{product-name}ORBをビルドのconfig.yamlに追加します。
+
+[,yaml]
+----
+version: 2.1
+orbs:
+  neuvector: neuvector/neuvector-orb@1.0.0
+workflows:
+  scan-image:
+    jobs:
+      - neuvector/scan-image:
+          context: myContext
+          registry_url: https://registry.hub.docker.com
+          repository: alpine
+          tag: "3.4"
+          scan_layers: false
+          high_vul_to_fail: 0
+          medium_vul_to_fail: 3
+----
+
+registry_urlはスキャン対象のイメージを見つける場所です。リポジトリ名、タグ、およびレイヤースキャンを実行するかどうかを設定します。検出された高リスクまたは中リスクの脆弱性の数に基づいてビルドタスクが失敗するための基準を追加します。
+
+=== 結果を確認します。
+
+ビルドタスクは設定された基準に基づいて合格または不合格となります。いずれの場合でも、完全なスキャンレポートを確認できます。
+image:circleci_fail.png[失敗]

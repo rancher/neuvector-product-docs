@@ -1,0 +1,76 @@
+= {product-name}を削除またはリセットする
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/10.remove/10.remove.md
+:page-opendocs-slug: /deploying/remove
+
+== {product-name}のデプロイメント/コンテナを削除する
+
+Kubernetesで{product-name}のデプロイメントを削除するには、削除コマンドに同じyamlファイルを使用してください。
+
+[,shell]
+----
+kubectl delete -f neuvector.yaml
+----
+
+これにより、{product-name}のサービスとコンテナのデプロイメントが削除されます。デプロイメント手順で作成されたneuvectorネームスペース、永続ボリューム、クラスター役割、およびクラスター役割バインディングを削除することも検討してください。
+
+Helmチャートまたはオペレーターを使用して{product-name}をデプロイした場合は、Helmまたは適切なオペレーターコマンドを使用して{product-name}を削除する必要があります。
+
+== {product-name}を初期状態にリセットする
+
+上記で説明した削除と{product-name}の再デプロイに加え、Kubernetesでは{product-name}をリセットするために以下の手順を実行できます。これにより、学習済みのルール、グループ、およびその他の設定が削除されますが、{product-name}のデプロイメントはそのまま残ります。
+
+. コントローラーデプロイメントを0にスケールします。
+. （オプション）永続ボリュームが使用されている場合は、作成された永続ボリュームバックアップとレジストリフォルダーを削除します。
+. コントローラーデプロイメントを3にスケールします。
+
+== 管理者パスワードをリセットする
+
+管理者パスワードは、{product-name}のデプロイメントを管理し、クラスターのネットワーク活動を表示するための鍵です。 インストール時にパスワードを変更し、安全に保管することが重要です。 時には、パスワードがあまりにも厳重に保護されてしまい、失われたり、管理者が会社を辞めたりすることがあります。 クラスターにkubectlアクセスがある場合は、以下の手順を使用して管理者パスワードをデフォルトにリセットできます。
+
+コントローラーの1つにexecします。
+
+[,shell]
+----
+kubectl exec -it <controller> -n neuvector -- sh
+----
+
+管理者エントリが存在することを確認し、出力jsonを安全に保管するためにどこかに保存します。
+
+[,shell]
+----
+consul kv get object/config/user/admin
+----
+
+上記の consul kv get コマンドの出力から password_hash 文字列を以下の文字列に置き換えてください。
+
+[,shell]
+----
+c7ad44cbad762a5da0a452f9e854fdc1e0e7a52a38015f23f3eab1d80b931dd472634dfac71cd34ebc35d16ab7fb8a90c81f975113d6c7538dc69dd8de9077ec
+----
+
+管理者アカウントのパスワードをデフォルトにリセットしてください。（実行前に <UPDATED_consul_kv_get_output_with_new_password_hash> を置き換えてください!!!）
+
+[,shell]
+----
+consul kv put object/config/user/admin '<UPDATED_consul_kv_get_output_with_new_password_hash>'
+----
+
+[WARNING]
+.以下の例：（出力を置き換えずに実行しないでください）
+====
+[,shell]
+----
+consul kv put object/config/user/admin '{"fullname":"admin","username":"admin","password_hash":"c7ad44cbad762a5da0a452f9e854fdc1e0e7a52a38015f23f3eab1d80b931dd472634dfac71cd34ebc35d16ab7fb8a90c81f975113d6c7538dc69dd8de9077ec","pwd_reset_time":"2022-03-24T20:50:15.341074451Z","pwd_hash_history":null,"domain":"","server":"","email":"","role":"admin","role_oride":false,"timeout":300,"locale":"en","role_domains":{},"last_login_at":"2022-03-24T20:49:32.577877044Z","login_count":1,"failed_login_count":0,"block_login_since":"0001-01-01T00:00:00Z"}'
+----
+
+応答:
+
+[,shell]
+----
+Success! Data written to: object/config/user/admin
+----
+
+admin/admin でログインし、パスワードを変更してください。
+====

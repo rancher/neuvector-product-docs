@@ -1,0 +1,39 @@
+= Diretrizes Gerais
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /13.special/01.general/01.general.md
+:page-opendocs-slug:  /special/general
+
+== Testando {product-name} Usando o contêiner Allinone
+
+Os exemplos nesta seção mostram como implantar os contêineres Allinone e Enforcer. Esta configuração é útil para testar {product-name} em ambientes não Kubernetes. Para implantações no Kubernetes, use o gráfico Helm {product-name} mais recente. Para mais informações, consulte xref:./production.adoc[Planejamento de Implantação].
+
+[IMPORTANT]
+====
+A equipe {product-name} desencoraja fortemente o uso desta configuração em ambientes de produção, e ela não é suportada para uso em produção.
+====
+
+== Diretrizes Gerais para Implantação
+
+Prepare seu ambiente de host para uma instalação adequada. Certifique-se de que os contêineres {product-name} possam se comunicar entre si entre os hosts. Em seguida, revise e edite os arquivos de amostra para seu ambiente.
+
+Geralmente, é importante fazer o seguinte:
+
+. Rotule os nós de forma apropriada. Se você usar rótulos de nó para controlar onde o allinone ou o controlador é implantado, rotule-os antes de implantar.
+. Certifique-se de que os volumes possam ser mapeados corretamente. Por exemplo
++
+[,yaml]
+----
+volumes:
+        - /var/neuvector:/var/neuvector
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup:/host/cgroup:ro
+----
+
+. Abra as portas necessárias nos hosts. Certifique-se de que as portas necessárias estão mapeadas corretamente e abertas no host. O Allinone requer 8443 (se estiver usando o console), 18300, 18301, 18400 e 18401. O Enforcer requer 18301 e 18401.
+. Edite o CLUSTER_JOIN_ADDR. Encontre o endereço IP do nó, o nome do nó (se estiver usando um servidor de nomes) ou a variável do nó (se estiver usando ferramentas de orquestração) para o Allinone (controlador) usar para o "`node IP`" nos arquivos de exemplo tanto para o Allinone quanto para o Enforcer.
+
+== Acessando o Console
+
+Por favor, veja a primeira seção Básicos -> Conectar ao Gerente para opções de desativação do https ou acesso ao console através de um gateway de segurança corporativo que não permite a porta 8443 para o acesso ao console.

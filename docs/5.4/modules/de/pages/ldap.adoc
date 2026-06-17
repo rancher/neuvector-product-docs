@@ -1,0 +1,21 @@
+= LDAP
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/02.ldap/02.ldap.md
+:page-opendocs-slug:  /integration/ldap
+
+== LDAP
+
+Konfigurieren Sie die erforderlichen Felder, um eine Verbindung zu Ihrem LDAP-Server herzustellen.
+
+image:ldap-ad.png[LDAPAD]
+
+. Anschluss. Der Standardport ist 389 für deaktiviertes SSL und 636 für aktiviertes SSL.
+. Benutzername (optional). Wir verwenden diesen Admin-Benutzernamen, um den LDAP-Server für jede Abfrage zu binden.
+. Basis-DN. Dies sollte ein Wurzelknoten im LDAP-Server sein, um nach dem LDAP-Benutzer und der Gruppe zu suchen.
+. Standardrolle. Dies ist die Rolle, die ein Benutzer übernehmen wird, wenn die Rollengruppenzuordnung (unten) fehlschlägt. Wenn das Gruppenattribut des Benutzers gefunden wird, das einer Rolle zugeordnet werden kann, wird die Standardrolle nicht verwendet. Wenn kein passendes Gruppenattribut gefunden wird, wird die Standardrolle übernommen. Wenn die Standardrolle in diesem Fall None ist, schlägt die Benutzeranmeldung fehl. Der '`test connection`' Button überprüft, ob ein Benutzername/Passwort vom konfigurierten LDAP-Server authentifiziert werden kann.
+. Admin- und Leserrollenzuordnung. Dies definiert, wie die LDAP-Gruppenmitgliedschaft eines Benutzers der Benutzerrolle in {product-name} zugeordnet wird. Fügen Sie die LDAP-Gruppenliste den entsprechenden Rollen hinzu. Bei der Suche nach der Gruppenmitgliedschaft eines Benutzers im LDAP-Schema gehen wir davon aus, dass das Mitgliederattribut der Gruppe als "`memberUid`" benannt ist.
+
+=== Zuordnung von Gruppen zu Rollen und Namespaces
+
+Bitte beachten Sie den Abschnitt xref:users.adoc#_mapping_groups_to_roles_and_namespaces[Benutzer und Rollen], um zu erfahren, wie Gruppen auf vordefinierte und benutzerdefinierte Rollen sowie Namespaces in {product-name} abgebildet werden.

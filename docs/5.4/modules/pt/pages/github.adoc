@@ -1,0 +1,11 @@
+= GitHub
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/03.build/06.github/06.github.md
+:page-opendocs-slug:  /escaneamento/construir/github
+
+== Procurar por vulnerabilidades em um pipeline de Ação do GitHub
+
+O scanner {product-name} pode ser acionado a partir de um pipeline de Ação do GitHub usando a https://github.com/marketplace/actions/neuvector-vulnerability-scan-action[{product-name} Ação de Escaneamento de Vulnerabilidades] publicada no Marketplace de Ações do GitHub.
+
+image:github_action.png[GithubAction]

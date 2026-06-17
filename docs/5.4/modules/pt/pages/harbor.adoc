@@ -1,0 +1,43 @@
+= Módulo de Scanner Pluggable do Harbor
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/02.registry/01.harbor/01.harbor.md
+:page-opendocs-slug:  /scanning/registry/harbor
+
+== Escaneando Registros do Harbor Usando o Scanner Pluggable
+
+{product-name} suporta a invocação do scanner {product-name} a partir de registros do Harbor através da interface https://github.com/goharbor/pluggable-scanner-spec[scanner pluggable]. Isso requer a configuração da conexão com o controlador (API exposta). O adaptador do Harbor chama o endpoint do controlador para acionar um escaneamento, que pode ser realizado automaticamente no momento do push. Serviços de interrogação podem ser usados para escaneamentos periódicos. Os resultados de escaneamento dos controladores primários da Federação SÃO propagados para clusters remotos.
+
+[NOTE]
+====
+Há um problema com o erro do endpoint do adaptador baseado em HTTPS: por favor, ignore o erro de Testar Conexão, ele funciona mesmo que um erro seja exibido (pule a validação do certificado).
+====
+
+
+=== Implantando o {product-name} Adaptador de Registro
+
+O gráfico Helm 5.2 contém opções para implantar o https://github.com/neuvector/neuvector-helm/blob/master/charts/core/templates/registry-adapter.yaml[adaptador de registro] para o Harbor. Ele também pode ser puxado manualmente do repositório neuvector/registry-adapter no Docker Hub. As opções também incluem definir o protocolo de solicitação do registro do Harbor e o nome do segredo de autenticação básica.
+
+Após a implantação do adaptador, é necessário configurá-lo no Harbor.
+
+image:5_2_adapter_configuration.png[Harbor]
+
+O endpoint do adaptador deve ser inserido, e o adaptador se conecta ao controlador, que geralmente é exposto como um serviço externamente para que o adaptador possa se conectar a ele. Além disso, as credenciais de autenticação para um {product-name} usuário válido devem ser inseridas.
+
+=== Escaneando Imagens de um Registro do Harbor
+
+Após a implantação bem-sucedida e a conexão com um controlador, um escaneamento de imagem pode ser acionado manualmente ou automaticamente a partir do Harbor.
+
+image:2_Scan_image.png[Harbor]
+
+Os escaneamentos periódicos (agendados) podem ser configurados através dos Serviços de Interrogação no Harbor, para garantir que o banco de dados CVE mais recente seja utilizado para reescaneamento das imagens nos registros.
+
+image:4_interrogation.png[Harbor]
+
+Os resultados dos escaneamentos podem ser visualizados diretamente no Harbor.
+
+image:3_scanresults.png[resultados]
+
+=== Exemplo de Yaml de Implantação
+
+Exemplos para https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.3.0/neuvector-registry-adapter-k8s.yaml[Kubernetes] e https://raw.githubusercontent.com/neuvector/manifests/main/kubernetes/5.3.0/neuvector-registry-adapter-oc.yaml[OpenShift]

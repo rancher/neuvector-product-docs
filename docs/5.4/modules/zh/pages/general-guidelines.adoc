@@ -1,0 +1,39 @@
+= 一般指导
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /13.special/01.general/01.general.md
+:page-opendocs-slug:  /special/general
+
+== 测试 {product-name} 使用Allinone容器
+
+本节中的示例展示了如何部署Allinone和Enforcer容器。在非Kubernetes环境中测试{product-name}时，此设置非常有用。对于Kubernetes部署，请使用最新的{product-name} Helm chart。有关更多信息，请参见xref:./production.adoc[规划部署]。
+
+[IMPORTANT]
+====
+{product-name}团队强烈不建议在生产环境中使用此设置，并且不支持生产使用。
+====
+
+== 部署的一般指南
+
+为正确安装准备您的主机环境。确保{product-name}容器可以在主机之间相互通信。然后检查并编辑您的环境的示例文件。
+
+通常，重要的是要执行以下操作：
+
+. 适当地标记节点。如果您使用节点标签来控制allinone或控制器的部署，请在部署之前标记它们。
+. 确保卷可以正确映射。例如，
++
+[,yaml]
+----
+volumes:
+        - /var/neuvector:/var/neuvector
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup:/host/cgroup:ro
+----
+
+. 在主机上打开所需的端口。确保所需的端口在主机上正确映射并打开。Allinone需要8443（如果使用控制台）、18300、18301、18400和18401。Enforcer需要18301和18401。
+. 编辑CLUSTER_JOIN_ADDR。找到节点IP地址、节点名称（如果使用名称服务器）或节点变量（如果使用编排工具），以供Allinone（控制器）在示例文件中使用"`node IP`"，适用于Allinone和Enforcer。
+
+== 访问控制台
+
+请参阅第一部分基础 -> 连接到管理器，了解如何关闭 https 或在公司防火墙不允许使用8443端口的情况下访问控制台的选项。

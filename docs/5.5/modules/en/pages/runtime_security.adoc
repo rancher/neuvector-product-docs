@@ -4,6 +4,7 @@
 
 As Rancher Manager has its own **Nodes** and **Workloads** tab to manage and monitor the assets statuses, NeuVector injects components to display its runtime scan result.
 
+[#_nodes]
 == Nodes
 
 In the **Nodes** tab table view, the **Vulnerabilities** column is injected to show each node's detected vulnerabilities amount by high / medium severity.
@@ -30,6 +31,7 @@ image:download_vul.png[CSV]
 
 image:cve_csv.png[CSV]
 
+[#_workloads]
 == Workloads
 
 Temporarily, the **Vulnerabilities** column will not be injected in the **Workloads** table in the v5.4 release due to potential performance concern. The NeuVector team will work with the Rancher team to integrate it soon.

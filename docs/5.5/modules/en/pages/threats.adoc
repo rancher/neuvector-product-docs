@@ -4,10 +4,12 @@
 :page-opendocs-origin: /05.policy/10.threats/10.threats.md
 :page-opendocs-slug:  /policy/threats
 
+[#_detecting_network_threats]
 == Detecting Network Threats
 
 {product-name} deep packet inspection can be used to inspect the network packets and payload for attacks such as those in the OWASP Top 10 and those commonly used in Web Application Firewalls (WAFs).
 
+[#_owasp_signatures]
 === OWASP Signatures
 
 DLP Sensors can be created to detect OWASP attacks using the following pattern examples. As always, these may need to be tuned for your environment and applications.
@@ -28,6 +30,7 @@ Here are other simple examples:
 
 image:owasp_top10_dlp.png[owasp]
 
+[#_built_in_threat_detection]
 === Built-In Threat Detection
 
 {product-name} also has built-in detection of other network threats such as SQL Injection attacks, DDoS (e.g. Ping Death), and tunneling attacks. For SQL injection attacks, {product-name} inspects the network connection (SQL protocol) between the front end and the sql database pod, reducing false positives and increasing accuracy.

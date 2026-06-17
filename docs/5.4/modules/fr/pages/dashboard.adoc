@@ -1,0 +1,35 @@
+= Aperçu de l'état de sécurité
+:page-opendocs-origin: /15.ui_extension/01.dashboard/01.dashboard.md
+:page-opendocs-slug:  /ui_extension/dashboard
+
+Dans l'extension UI du portail Rancher, le **Tableau de bord NeuVector** fonctionne de manière similaire à sa page autonome. Il fournit des facteurs de score de risque de sécurité pour informer les utilisateurs du statut de sécurité de leurs clusters. Dans le panneau inférieur, il fournit 4 onglets permettant aux utilisateurs de changer les graphiques pour surveiller différentes catégories.
+
+Dans l'onglet **Événements de sécurité**, le graphique linéaire montre un compte d'événements basé sur la date dans une chronologie. Le graphique à barres des événements de sécurité en haut affiche les 5 principaux points de terminaison source et destination.
+
+image:dashboard_security_events.png[Tableau de bord]
+
+Dans l'onglet **Exposition d'entrée et de sortie**, le graphique à barres empilées montre le nombre de points de terminaison exposés par actions. Sur le côté droit, les tableaux d'exposition montrent les services de points de terminaison d'egress et d'ingress avec des informations de scan.
+
+image:dashboard_exposure.png[Tableau de bord]
+
+Cliquer sur une ligne du tableau d'egress/ingress montre les conversations sur des services spécifiques. Le nom FQDN / l'adresse IP est affiché avec un drapeau national basé sur la localisation géographique dans le champ **Hôte externe**.
+
+image:dashboard_conversations.png[Tableau de bord]
+
+Cliquer sur le **Hôte externe** redirige vers whois.com pour afficher les informations détaillées de l'adresse IP.
+
+image:whois.png[Tableau de bord]
+
+Dans l'onglet **Mode de stratégie**, les graphiques en secteurs montrent le ratio et le nombre de pods / services sous différents modes de stratégie.
+
+image:dashboard_policy_mode.png[Tableau de bord]
+
+Dans l'onglet **Actifs les plus vulnérables**, les graphiques à barres montrent les 5 principaux pods / nœuds contenant des vulnérabilités de gravité élevée ou moyenne.
+
+image:dashboard_top_vul_assets.png[Tableau de bord]
+
+== Fonctions non incluses lors de la comparaison avec la page autonome NeuVector
+
+* Boîte de dialogue d'amélioration du score.
+* Protocoles d'application détectés et protégés par des règles réseau de couche 7.
+* Rapports PDF basés sur l'espace de noms.

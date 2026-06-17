@@ -1,0 +1,25 @@
+= {product-name}のワークフロー
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /11.automation/01.ci_workflow/01.ci_workflow.md
+:page-opendocs-slug:  /automation/ci_workflow
+
+== {product-name} CI/CDワークフローへの統合
+
+{product-name}は、CI/CDプロセス全体をサポートし、開発およびデプロイメントプロセス全体にわたってセキュリティを提供するために、ワークフローに簡単に統合できます。
+
+=== 開発および継続的インテグレーションワークフロー
+
+{product-name}は、脆弱性スキャンを自動化するために、開発および継続的インテグレーションプロセスに統合できます。{product-name}Jenkinsプラグインとレジストリスキャン機能の使用により、このフェーズでのイメージスキャンが可能になります。
+
+image:ci_workflow.png[統合]
+
+さらに、{product-name}は自動アプリケーションテスト中にネットワーク接続やコンテナの動作を分析し、ステージングや本番環境での問題を予測するために使用できます。
+
+=== 継続的デプロイメントおよび本番ワークフロー
+
+{product-name}は、本番前および本番中にコンプライアンステストとセキュリティ監査を実施できます。
+
+image:cd_workflow.png[本番]
+
+マルチベクターセキュリティプラットフォームは、ネットワークセキュリティ、コンテナ検査、およびホストセキュリティを組み合わせて、ランタイムでコンテナを保護することができます。

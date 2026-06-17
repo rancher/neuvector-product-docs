@@ -1,0 +1,121 @@
+= 企业多集群管理
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /04.navigation/02.multicluster/02.multicluster.md
+:page-opendocs-slug:  /navigation/multicluster
+
+== 企业控制台
+
+{product-name} 控制台可用于管理大型企业多集群和多云部署。应选择一个集群作为主集群，其他远程集群将能够加入主集群。连接后，主集群可以将联邦规则推送到每个远程集群，这些规则在每个远程集群的控制台中显示为联邦规则。扫描的联邦注册表也会将扫描结果与远程集群同步。只有具有管理员权限的本地用户和Rancher用户可以将集群提升为主集群。
+
+除了联邦策略外，多集群管理还支持在摘要页面上监控每个远程集群，如下所示。
+
+image:multicluster_summary.png[摘要]
+
+每个集群中的控制器之间必须在所需端口上具有网络连接。控制器通过主服务或远程服务暴露在其集群外部，如示例 {product-name} 部署 yaml 文件中所示。
+
+== 配置主集群和远程集群
+
+登录到将成为主集群的集群控制台。在右上角的下拉菜单中，选择多个集群，然后提升以配置主集群。注意：只有具有管理员权限的本地用户和Rancher用户可以将集群提升为主集群。目前，具有管理员角色的SSO/LDAP/OIDC用户不允许将集群提升为主集群。
+image:master1.png[主配置]
+
+输入fed-master服务的公共IP和端口。您可以通过运行以下命令找到此信息
+
+[,shell]
+----
+kubectl get svc -n neuvector
+----
+
+输出将如下所示：
+
+[,shell]
+----
+NAME                                      TYPE           CLUSTER-IP      EXTERNAL-IP      PORT(S)                         AGE
+neuvector-service-controller-fed-master   LoadBalancer   10.27.249.147   35.238.131.23    11443:31878/TCP                 17d
+neuvector-service-controller-fed-worker   LoadBalancer   10.27.251.1     35.226.199.111   10443:32736/TCP                 17d
+----
+
+在上述示例中，主控制器的主机名/IP为35.238.131.23，端口为11443.注意：确保此IP地址和端口可以从远程集群外部访问。注意：系统时钟（时间）必须在每个主集群和远程集群之间保持一致，以确保正常运行。
+
+重新登录控制台后，从右上角的菜单中再次选择多个集群，然后点击图标生成连接远程集群所需的词元。复制词元以便在下一步中使用。词元有效期约为1小时，过期后必须重新生成以连接未来的远程集群。
+
+image:master_token.png[词元]
+
+要将远程集群加入主集群，请以管理员身份登录远程集群控制台。从右上角的下拉菜单中选择多个集群，然后点击加入。输入远程集群的控制器IP或主机名以及端口。同样，您可以通过以下方式从远程集群获取此信息：
+
+[,shell]
+----
+kubectl get svc -n neuvector
+----
+
+使用远程集群的fed-worker输出配置IP地址和端口。然后输入从主集群复制的词元。请注意，输入词元后，主集群的IP地址和端口将自动填入，但可以编辑或手动输入。
+
+image:join_remote.png[加入远程集群]
+
+退出远程集群并重新登录主集群。或者，如果已经登录，请点击刷新，远程集群将显示在多个集群菜单中。
+
+image:fed_master_list.png[FedMaster]
+
+您可以在列表中点击管理图标，或随时使用顶部的下拉多集群菜单切换集群。一旦切换到远程集群，左侧的所有菜单项现在适用于远程集群。
+
+== 查错
+
+为了确保服务按预期响应，您可以从集群外部运行测试，或者在需要时从`fed-master`和`fed-managed`集群的测试Pod中运行，以确保集群之间的网络连接是允许的。
+
+=== 验证 fed-master 服务
+
+集群服务端口 `11443` 仅在启用 `fed-master` 服务后可访问。下面的命令在 `fed-master` 服务响应以指示请求的资源不可用时返回错误代码。
+
+.输出示例
+[,shell]
+----
+{"code":1,"error":"URL not found","message":"URL not found"}
+----
+
+[IMPORTANT]
+====
+`curl` 命令的 URL 取决于 `fed-master` 服务的暴露方式。如果配置了 `ingress` 服务，则无需指定端口。
+====
+
+[,shell]
+----
+curl -v https://<fed-master>[:<port>]/v1/eula
+----
+
+=== 验证 fed-managed 服务
+
+集群服务端口 `10443` 在 `REST API` 和 `fed-managed` 服务之间共享。下面的命令在 `fed-managed` 服务响应以指示可用时返回成功代码。
+
+.输出示例
+[,shell]
+----
+{"eula":{"accepted":true}})
+----
+
+[IMPORTANT]
+====
+`curl` 命令的 URL 取决于 `fed-managed` 服务的暴露方式。如果配置了 `ingress` 服务，则无需指定端口。
+====
+
+[,shell]
+----
+curl -v https://<fed-managed>[:<port>]/v1/eula
+----
+
+== 联邦策略
+
+请参阅政策 -> 联邦政策部分，了解如何创建将推送到每个集群的联邦规则。
+
+== 用于分布式镜像扫描结果的联邦注册表
+
+主集群可以扫描指定为联邦注册表的注册表/储存库。来自这些注册表的扫描结果将同步到所有托管（远程）集群。这使得在托管集群控制台中显示扫描结果成为可能，并且可以在托管集群的准入控制规则中使用这些结果。注册表只需扫描一次，而不是每个集群都扫描，从而减少处理器/内存和网络带宽的使用。
+
+联邦注册表只能由主集群中的联邦管理员在资产 -> 注册表中配置。添加并扫描联邦储存库后，扫描结果将同步到所有托管集群。每个托管集群中的准入控制规则需要镜像扫描（例如 CVE、合规性基于的规则），将自动使用联邦扫描结果以及任何本地配置的注册表扫描结果。
+
+=== 从 CI/CD 扫描器联邦结果（可选）
+
+联邦注册表扫描结果始终与管理的集群同步，如上所述。主集群还可以接收 xref:scanners.adoc#_standalone_scanner_for_local_scanning[来自独立扫描仪扫描的扫描结果]或从构建 CI/CD 管道调用的扫描仪插件。要使构建阶段（CI/CD）储存库扫描结果也同步到受管集群，首先按照下方所示，通过编辑主（master）集群设置来启用该功能。
+
+image:fed_primary_config.png[master_settings]
+
+image:fed_reg_sync.png[fed_sync]

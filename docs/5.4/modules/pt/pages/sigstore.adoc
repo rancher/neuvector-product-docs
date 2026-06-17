@@ -1,0 +1,50 @@
+= Verificadores de Assinatura Sigstore Cosign
+:revdate: 2025-05-08
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/03.admission/01.sigstore/01.sigstore.md
+:page-opendocs-slug:  /policy/admission/sigstore
+
+== Configurando Verificadores Sigstore/Cosign para Requerer Assinatura de Imagem
+
+{product-name} permite que um usuário execute a lógica de verificação de assinatura integrando assinaturas de imagem geradas pela ferramenta cosign da Sigstore.
+
+[NOTE]
+====
+A NeuVector atualmente suporta apenas o escaneamento de assinaturas de imagem geradas com cosign v2. Assinaturas criadas com cosign v3 não acionam a verificação da Sigstore.
+====
+
+O seguinte é um exemplo de uma configuração de controle de admissão que requer que a imagem de uma implantação seja assinada por uma chave ou identidade apropriada.
+
+Primeiro, configure uma raiz de confiança. Isso pode ser uma raiz de confiança pública ou privada, dependendo da implantação da Sigstore usada para gerar assinaturas. Se você implantou suas próprias instâncias dos serviços da Sigstore, selecione a opção de raiz de confiança privada.
+
+Uma raiz de confiança pública não precisa de nenhuma configuração adicional além de receber um nome facilmente referenciado.
+
+image:1configure-public-root-of-trust.png[sigstore]
+
+Uma raiz de confiança privada requer as chaves e/ou certificados de suas instâncias privadas dos serviços da Sigstore.
+
+image:2configure-private-root-of-trust.png[sigstore]
+
+Em seguida, para uma dada raiz de confiança, configure cada um dos verificadores que você gostaria de usar durante o controle de admissão. Existem dois tipos de verificadores: par de chaves e sem chave. Um verificador de par de chaves seria usado ao tentar verificar uma imagem assinada por uma chave privada definida pelo usuário. Um verificador sem chave seria usado ao verificar uma assinatura gerada pelo padrão 'keyless' da Sigstore. Mais informações sobre os métodos de assinatura da Sigstore podem ser consultadas na documentação https://docs.sigstore.dev/quickstart/quickstart-cosign/[Visão Geral da Assinatura Sigstore].
+
+Para configurar um verificador de par de chaves, forneça um nome e uma chave pública correspondente a uma chave privada de destino.
+
+image:3add-keypair-verifier-for-public-root-of-trust.png[sigstore]
+
+Para configurar um verificador sem chave, forneça o emissor OIDC e a identidade utilizada durante a assinatura.
+
+image:4add-keyless-verifier-for-public-root-of-trust.png[sigstore]
+
+Observe que, após a configuração da raiz de confiança e do verificador, uma imagem deve ser escaneada para determinar quais verificadores as assinaturas da imagem satisfazem.
+
+Os verificadores configurados que uma imagem satisfaz podem ser visualizados na seção superior direita dos resultados do escaneamento de uma imagem em Ativos->Registros. Se uma imagem não for assinada por um verificador, ela não aparecerá nos resultados do escaneamento.
+
+image:6new_show_verifiers.scanresults.png[sigstore]
+
+Para referenciar uma raiz de confiança e um verificador específicos em uma regra de controle de admissão, junte os dois nomes com uma barra, assim: `my-root-of-trust/my-verifier`.
+
+image:5new_admission_rule_signature.png[sigstore]
+
+Para exigir que uma imagem seja assinada em uma regra de controle de admissão, defina o valor Verdadeiro/Falso para o critério Imagem Assinada.
+
+image:7image_signed.png[sigstore]

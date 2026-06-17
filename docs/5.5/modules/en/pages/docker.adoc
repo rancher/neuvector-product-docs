@@ -9,6 +9,7 @@
 This page is deprecated and will be removed in a future release.
 ====
 
+[#_kubernetes_deployment_on_mirantis_kubernetes_engine]
 == Kubernetes Deployment on Mirantis Kubernetes Engine
 
 Follow the instructions in the xref:kubernetes.adoc[Kubernetes section].
@@ -18,18 +19,21 @@ Follow the instructions in the xref:kubernetes.adoc[Kubernetes section].
 {product-name} does not support mixed Kubernetes / Swarm clusters.
 ====
 
+[#_deploy_product_containers_using_docker_native_or_ucp_swarm]
 == Deploy {product-name} Containers Using Docker Native or UCP/Swarm
 
-Note that native Docker deployment on Mirantis Kubernetes Engine using Swarm DOES NOT support deployment of services with containers in privileged mode, or with seccomp capabilities added. To deploy in this environment, you must use Docker Compose or Run to deploy the {product-name} containers. You can use the remote host deployment (docker-compose -H HOST) to make this task easier.
+Note that native Docker deployment on Mirantis Kubernetes Engine using Swarm DOES NOT support deployment of services with containers in privileged mode, or with seccomp capabilities added. To deploy in this environment, you must use Docker Compose or Run to deploy the {product-name} containers. You can use the remote host deployment (docker_compose _H HOST) to make this task easier.
 
 Here are the sample docker compose configuration files. Note that using docker native does not support deploying the enforcer on the same node as the controller, requiring the use of the Allinone container if controller and enforcer functions are desired on a node.
 
-NOTE: The environment variable NV_PLATFORM_INFO=platform=Docker is used to notify {product-name} that the platform is Docker/Swarm, even though there may be unused Kubernetes containers detected by {product-name} on a Docker EE deployment. Also to be able to see these in Network Activity -> View -> Show System, add the environment variable for the Enforcer NV_SYSTEM_GROUPS.
+NOTE: The environment variable NV_PLATFORM_INFO=platform=Docker is used to notify {product-name} that the platform is Docker/Swarm, even though there may be unused Kubernetes containers detected by {product-name} on a Docker EE deployment. Also to be able to see these in Network Activity _> View _> Show System, add the environment variable for the Enforcer NV_SYSTEM_GROUPS.
 
+[#_deploy_allinone_for_high_availability]
 === Deploy Allinone for High Availability
 
 For HA in production Docker native or EE environments, deploy the Allinone container on the first three production hosts. Each Allinone should point to the IP addresses of all Allinone hosts. For example, three Allinone containers is the minimum for HA, and the CLUSTER_JOIN_ADDR should list the three IP addresses separated by comma's. Additional HA Allinone's can be deployed in odd numbers, e.g. 5, 7. The deploy the Enforcer on the remaining hosts in the cluster, in any.
 
+[#_deploy_allinone_using_docker_compose_privileged_mode]
 === Deploy Allinone using docker-compose (privileged mode)
 
 The following is an example of the docker-compose file to deploy the allinone container on the first node. Because the allinone container has an enforcer module inside, application containers on the same node can be secured. Both greenfield and brownfield deployment are supported.
@@ -68,6 +72,7 @@ Port 18300 and 18301 are default ports for cluster communication. They must be i
 To expose the REST API in the Allinone, add the port map for 10443, for example - 10443:10443.
 ====
 
+[#_add_an_enforcer_container_using_docker_compose_privileged_mode]
 === Add an enforcer container using docker-compose (privileged mode)
 
 This is an example of docker-compose file to join an enforcer into the cluster. Both greenfield and brownfield deployment are supported.
@@ -95,6 +100,7 @@ enforcer:
 
 The most important environment variable is *CLUSTER_JOIN_ADDR*. For enforcers, replace `<controller_node_ip>` with the controller's node IP address. Typically, *CLUSTER_JOIN_ADDR* in the controller/all-in-one's docker-compose file and enforcer's docker-compose file have the same value.
 
+[#_deploy_the_product_scanner_container]
 === Deploy the {product-name} Scanner Container
 
 From {product-name} 4.0+, a separate scanner container must be deployed to perform vulnerability scanning. Important: Always use the :latest tag when pulling and running the scanner image to ensure the latest CVE database is deployed.
@@ -141,10 +147,12 @@ To deploy a stand alone scanner (no controller/allinone), please see the section
 
 To update the Scanner in order to get the latest CVE database updates from {product-name}, create a cron job to stop and restart the scanner, pulling the latest. See xref:docker.adoc#_docker_native_updates[this section] for details.
 
+[#_deployment_without_using_privileged_mode]
 === Deployment Without Using Privileged Mode
 
 For some platform configurations it is possible to deploy the {product-name} containers without requiring them to run in privileged mode. The configuration must support the ability to add capabilities and set the apparmor profile. Note that Docker DataCenter/UCP and Swarm currently do not support this, but it is still possible to deploy {product-name} manually using Compose or Run.
 
+[#_deploy_allinone_no_privileged_mode_with_docker_compose]
 === Deploy allinone (NO privileged mode) with docker-compose
 
 [,yaml]
@@ -180,6 +188,7 @@ allinone:
         - /var/neuvector:/var/neuvector
 ----
 
+[#_deploy_enforcer_no_privileged_mode_with_docker_compose]
 === Deploy enforcer (NO privileged mode) with docker-compose
 
 [,yaml]
@@ -211,6 +220,7 @@ enforcer:
         - /sys/fs/cgroup/:/host/cgroup/:ro
 ----
 
+[#_deploy_allinone_privileged_mode_with_docker_run]
 === Deploy allinone (privileged mode) with docker run
 
 You can use docker run instead of compose to deploy. Here are samples.
@@ -236,6 +246,7 @@ docker run -d --name allinone \
 neuvector/allinone:<version>
 ----
 
+[#_deploy_enforcer_privileged_mode_with_docker_run]
 === Deploy enforcer (privileged mode) with docker run
 
 [,shell]
@@ -255,6 +266,7 @@ docker run -d --name enforcer \
 neuvector/enforcer:<version>
 ----
 
+[#_deploy_allinone_no_privileged_mode_with_docker_run]
 === Deploy allinone (NO privileged mode) with docker run
 
 You can use docker run instead of compose to deploy. Here are samples.
@@ -286,6 +298,7 @@ docker run -d --name allinone \
 neuvector/allinone:<version>
 ----
 
+[#_deploy_enforcer_no_privileged_mode_with_docker_run]
 === Deploy enforcer (NO privileged mode) with docker run
 
 [,shell]
@@ -311,6 +324,7 @@ docker run -d --name enforcer \
 neuvector/enforcer:<version>
 ----
 
+[#_deploy_separate_product_components_on_different_hosts]
 == Deploy Separate {product-name} Components on Different Hosts
 
 If planning to dedicate a docker host to a Controller and/or Manager (no Enforcer) these containers can be deployed individually instead of the Allinone. Note that docker does not support deploying the enforcer on the same node as the controller as separate components, requiring the use of the Allinone container if controller and enforcer functions are desired on a node.
@@ -384,10 +398,12 @@ enforcer:
         - /sys/fs/cgroup/:/host/cgroup/:ro
 ----
 
+[#_monitoring_and_restarting_product]
 == Monitoring and Restarting {product-name}
 
 Since the {product-name} containers are not deployed as a UCP/Swarm service, they are not automatically started/restarted on nodes. You should set up alerting through your SIEM system for {product-name} SYSLOG events or through DataCenter to detect if a {product-name} container is not running.
 
+[#_deploying_without_privileged_mode]
 == Deploying Without Privileged Mode
 
 In general you'll need to replace the privileged setting with:
@@ -407,6 +423,7 @@ In general you'll need to replace the privileged setting with:
 
 The above syntax is for Docker EE v17.06.0+. Versions prior to this use the : instead of =, for example apparmor:unconfined.
 
+[#_docker_native_updates]
 == Docker Native Updates
 
 [CAUTION]

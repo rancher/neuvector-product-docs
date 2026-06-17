@@ -1,0 +1,23 @@
+= Azure DevOps
+:revdate: 2025-05-08
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/03.build/04.azuredevops/04.azuredevops.md
+:page-opendocs-slug:  /scanning/build/azuredevops
+
+== Escanea en busca de vulnerabilidades en la canalización de compilación de Azure DevOps
+
+El escáner {product-name} se puede activar desde la canalización de Azure DevOps utilizando la extensión {product-name} publicada en el Marketplace de Azure DevOps.
+
+image:azure_devops.png[AzureDevOps]
+
+La extensión admite tanto el escaneo remoto como el local, donde el controlador {product-name} puede escanear remotamente una imagen en un registro durante la compilación, o iniciar dinámicamente un controlador local para escanear la imagen en la máquina virtual del agente de Azure.
+
+Además, asegúrate de que hay un contenedor de escáner {product-name} desplegado y configurado para conectarse al Allinone o al Controlador. En la versión 4.0 y posteriores, el contenedor neuvector/scanner debe desplegarse separado del allinone o del controlador.
+
+* La tarea 'Escanear imagen con {product-name}' integra el escáner de vulnerabilidades {product-name} en una canalización de Azure DevOps.
+* Realiza escaneos de vulnerabilidades de una imagen de contenedor después de la compilación de la imagen en una instancia de controlador {product-name} externa o en una instancia de controlador {product-name} local que se esté ejecutando en un contenedor de servicio dentro de una canalización.
+* Define umbrales para fallar compilaciones basados en el número de vulnerabilidades detectadas de diferentes severidades.
+* Proporciona un informe detallado de un escaneo de imagen para análisis en la pestaña de resumen de la compilación.
+* Las instancias de controlador {product-name} externas se definen como puntos finales de servicio para desacoplar las definiciones de la canalización de compilación de los parámetros de conexión y credenciales.
+
+Se puede encontrar una visión general con pantallas de muestra en https://marketplace.visualstudio.com/items?itemName=NeuVector.neuvector-vsts.

@@ -4,6 +4,7 @@
 :page-opendocs-origin: /08.integration/04.saml/04.saml.md
 :page-opendocs-slug:  /integration/saml
 
+[#_saml_idp_configuration]
 == SAML IDP Configuration
 
 To configure {product-name} to use Okta SAML IDP server, first, configure the SAML IDP server on the Okta site.
@@ -33,6 +34,7 @@ After the user is authenticated, the proper role can be derived with group-based
 . If group-based role mapping is not configured or the matched groups cannot be located, the authenticated user will be assigned with the Default role. If the Default role is set to None, when group-based role mapping fails, the user is not able to login.
 . Specify a list of groups respectively in Admin and Reader role map. The user's group attribute is piggybacked in the response after the user is authenticated. If the matched group is located, the corresponding role will be assigned to the user.
 
+[#_mapping_groups_to_roles_and_namespaces]
 === Mapping Groups to Roles and Namespaces
 
 Please see the xref:users.adoc#_mapping_groups_to_roles_and_namespaces[Users and Roles] section for how to map groups to preset and custom roles as well as namespaces in {product-name}.

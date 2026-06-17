@@ -1,0 +1,177 @@
+= Rancher RBACとの統合
+:revdate: 2026-02-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/12.rancher_sso_rbac.md
+:page-opendocs-slug:  /integration/12.rancher_sso_rbac
+
+
+{product-name} 5.4から、{product-name}とRancher RBACの完全な互換性と統合が含まれています。これにより、{product-name}にアクセスすべきユーザーまたはグループのプロファイルに基づいて、特定の権限をカスタマイズすることが可能になります。
+
+Rancherコンソールの*ユーザーと認証* -> *ロールテンプレート*ページでは、ユーザーは特定の{product-name}動詞、リソース、およびAPIグループに基づいて、グローバル、クラスター、プロジェクト、およびネームスペースのロールを作成できます。そのようなRancherロールがRancherユーザーに割り当てられると、ユーザーの{product-name} SSOセッションには、それに応じた異なる{product-name}権限が割り当てられます。これは、SSOユーザーにカスタムロール（予約されたadmin、reader、fedAdmin、およびfedReaderロール以外のロール）を提供するためです。
+
+== Rancher SSOでサポートされているカスタム{product-name}ロールマッピング
+
+以下は、Rancher UIの*ユーザーと認証* -> *ロールテンプレート* -> *グローバル、クラスター、またはプロジェクトロールテンプレートを作成*で使用される{product-name}動詞、リソース、およびAPIグループのサポートされているロールマッピングです。
+
+* APIグループ: `permission.neuvector.com`
+
+* 動詞：
+** `get` -> 読み取り専用（表示）
+** `*` -> 読み取り/書き込み（修正）
+
+* リソース（クラスター範囲）：
+** AdmissionControl
+** 認証
+** CIスキャン
+** クラスタ
+** フェデレーション
+** 脆弱性
+
+* リソース（ネームスペース範囲）：
+** AuditEvents
+** 権限付与
+** コンプライアンス
+** ［Events (イベント)］
+** ネームスペース
+** RegistryScan
+** ランタイムポリシー
+** RuntimeScan
+** SecurityEvents
+** システム設定
+
+=== リソース表示と論理名のマッピング
+
+以下の表はリソースの論理名を示しています。
+
+|===
+| リソース表示 | 論理名
+
+| すべての権限 | nv-perm.all-permissions
+| アドミッションコントロール | nv-perm.admctrl
+| 監査イベント | nv-perm.audit-events
+| 認証 | nv-perm.authentication
+| 権限付与 | nv-perm.authorization
+| CIスキャン | nv-perm.ci-scan
+| コンプライアンス | nv-perm.compliance
+| ［Events (イベント)］ | nv-perm.events
+| フェデレーション | nv-perm.fed
+| レジストリスキャン | nv-perm.reg-scan
+| ランタイムポリシー | nv-perm.rt-policy
+| ランタイムスキャン | nv-perm.rt-scan
+| セキュリティイベント | nv-perm.security-events
+| システム設定 | nv-perm.config
+| 脆弱性プロファイル | nv-perm.vulnerability
+|===
+
+[NOTE]
+====
+この統合は、グローバル、クラスター、プロジェクト、およびネームスペースレベルのロールをサポートしています。ユーザーは、要件に基づいてルールをカスタマイズし、SSOのための権限を設定する必要があります。
+====
+
+== グローバル、クラスター、およびプロジェクト/ネームスペースの役割に関する定義と期待
+
+* Rancherグローバル役割における`*`動詞を持つクラスターリソース：
+** {product-name}フェデレーションマスタークラスターにおける{product-name} `fedAdmin`役割にマッピングされています（ユーザーは、フェデレーションマスタークラスターに{product-name}がデプロイされている場合、Rancherグローバル役割を{product-name} `admin`役割にマッピングすることはできません）。
+** {product-name}フェデレーション管理クラスターにおける{product-name} `admin`役割にマッピングされています
+
+* Rancherクラスター役割における`*`動詞を持つクラスターリソース：
+** 常に{product-name} `cluster-admin`役割にマッピングされています
+
+* Rancherプロジェクト役割における`*`動詞を持つネームスペースリソース：
+** 常に{product-name} `namespace-admin`役割にマッピングされています
+
+== ユースケースと例
+
+=== ユースケース1
+
+* ローカルクラスタを除く、Rancher Managerによって管理されているすべてのクラスターで、{product-name} SSOセッションからランタイムスキャンを実行するためにグローバル役割を使用します。ユーザーは、グローバル役割をすべてのダウンストリームクラスタに伝播させるために、クラスター役割を作成する必要があります。
+
+** 次のパラメータを使用してクラスター役割テンプレートを作成します：
++
+[source,yaml]
+----
+Verb: *
+Resource: RuntimeScan
+API: permission.neuvector.com
+----
+
+** UIアクセスを許可し、SSOを有効にするためにプロジェクトまたはネームスペース役割を作成します。この役割をプロジェクトに追加する必要があります。そうしないと、正しく機能しません：
++
+[source,yaml]
+----
+Verb: get, patch, create
+Resource: services/proxy
+API: neuvector.com
+----
+
+** ダウンストリームクラスタ全体にクラスター役割を継承するグローバルロールを作成します。
++
+[source,yaml]
+----
+apiVersion: management.cattle.io/v3
+kind: GlobalRole
+displayName: All Downstream NV RT scan
+metadata:
+  name: all-downstream-nvrtscan
+inheritedClusterRoles:
+- rt-gpmbs
+----
+
+** 標準ユーザーを作成し、グローバルロールを割り当てます。
+** `cattle-neuvector-system` ネームスペースを含むプロジェクトのために、すべてのダウンストリームクラスタでプロジェクトロールバインディングを作成します。
+** Rancher Managerにログインし、任意のダウンストリームクラスタから{product-name}を起動します。
+  ユーザーは、コンテナスキャン、ノードスキャン、脆弱性ページの閲覧などのランタイムスキャンタスクを実行できます。これは新しく参加したクラスタにも適用されます。
+
+=== 使用事例2
+
+* FedAdminユーザーを作成します。常にフェデレーションマスタークラスタを通じてFedAdminとしてログインします。環境がフェデレートされていない場合、ロールはリーダーまたは管理者にダウングレードされます。
+
+** グローバルロールを作成します。
++
+[source,yaml]
+----
+Verb: *
+Resource: All permissions
+API: nv-perm.all-permissions
+----
+
+** UIアクセスを許可し、SSOを有効にするためにプロジェクトまたはネームスペースロールを作成します。
++
+[source,yaml]
+----
+Verb: get, patch, create
+Resource: services/proxy
+API: neuvector.com
+----
+
+** 標準ユーザーを作成し、グローバルロールを割り当てます。
+** Rancher UIで、*マスタークラスタ* -> *クラスタとプロジェクトメンバー* -> *プロジェクトメンバーシップ* -> *追加*に移動します。
+   ユーザーを追加し、UIプロキシプロジェクトロールを割り当てます。
+** Rancher Managerにログインし、ダウンストリームクラスタから{product-name}を起動します。{product-name}はRancherグローバルロールを読み取り、一致する権限（FedAdmin）を割り当てます。
+
+[NOTE]
+====
+FedAdminとFedReaderの間を切り替えるには、動詞を`*`から`get`に変更します。`get`動詞は読み取り専用アクセスを提供します。
+====
+
+=== 使用事例 3
+
+ユーザーは、クラスタ上で限られたセットの読み取り専用タスクを実行し、限られたセットのタスクを修正できます。
+
+=== 使用事例 4
+
+ユーザーは、クラスター内の選択されたドメインで読み取り専用のタスクを実行し、他のドメインでタスクを変更できます。
+
+=== 使用事例 5
+
+ユーザーは、グローバル、クラスター、およびプロジェクトの役割を組み合わせることで権限を取得します。
+
+== 追加の考慮事項
+
+* SSOおよびRBACルールを作成する際は、このドキュメントとパラメータを参照してください。
+* エラーや高度なユースケースについては、SCCを通じてSUSEサポートにお問い合わせください。
+* {product-name} 5.4は、5.4以前のSSOロールマッピングと後方互換性があります。以前の構造については、 https://github.com/horantj/rancher-nv-rbac.を参照してください。
+
+{product-name} 5.4から、{product-name}とRancher RBACの完全な互換性と統合が含まれています。これにより、{product-name}にアクセスすべきユーザーまたはグループのプロファイルに基づいて、特定の権限をカスタマイズすることが可能になります。
+
+Rancherコンソールの*ユーザーと認証* -> *ロールテンプレート*ページでは、ユーザーは特定の{product-name}動詞、リソース、およびAPIグループに基づいて、グローバル、クラスター、プロジェクト、およびネームスペースのロールを作成できます。そのようなRancherロールがRancherユーザーに割り当てられると、ユーザーの{product-name} SSOセッションには、それに応じた異なる{product-name}権限が割り当てられます。これは、SSOユーザーにカスタムロール（予約されたadmin、reader、fedAdmin、およびfedReaderロール以外のロール）を提供するためです。

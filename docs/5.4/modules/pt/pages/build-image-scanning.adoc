@@ -1,0 +1,56 @@
+= Verificação de imagem da fase de build
+:revdate: 2025-01-10
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/03.build/03.build.md
+:page-opendocs-slug:  /scanning/build
+
+== Verificação de vulnerabilidades na fase de build do CI/CD
+
+Verifique se há vulnerabilidades durante a fase de build do pipeline usando plug-ins como https://plugins.jenkins.io/neuvector-vulnerability-scanner/[Jenkins], https://github.com/neuvector/azure-vsts[Azure Devops], https://github.com/neuvector/scan-action[Github Action], https://gitlab.com/neuvector/gitlab-plugin[gitlab], Bamboo e https://github.com/neuvector/circleci-orb[CircleCI], ou use a API REST. {product-name} suporta dois tipos de verificação na fase de build: registro e local. Para a verificação de registro, o {product-name} controlador e o scanner devem ser capazes de se conectar ao registro para puxar a imagem.
+
+Para acionar uma verificação na fase de build, o plug-in (por exemplo, Jenkins) deve ser capaz de se conectar ao Controlador ou Allinone. Nota: A porta padrão da API REST para os plug-ins chamarem o scanner é 10443. Essa porta deve ser exposta através do Allinone ou Controlador por meio de um serviço no Kubernetes ou um mapeamento de porta (por exemplo, - 10443:10443) no arquivo de execução ou compose do Docker.
+
+Certifique-se de que há um {product-name} contêiner de scanner implantado e configurado corretamente para se conectar ao Allinone ou Controlador. Na versão 4.0 e posteriores, o contêiner neuvector/scanner deve ser implantado separadamente do allinone ou controlador, e está incluído nos arquivos yaml de implantação de exemplo.
+
+Você pode baixar o plug-in do Gerenciador de Plug-ins do Jenkins. Outros plug-ins estão acessíveis através dos catálogos da ferramenta de build, ou na página https://github.com/neuvector[{product-name} github]. O scanner do Bamboo está disponível em https://github.com/neuvector/bamboo-plugin/releases/tag/1.0.1. O ORB do CircleCI está disponível em https://github.com/neuvector/circleci-orb e através do catálogo ORB do CircleCI.
+
+=== Verificação Local na Fase de Build
+
+Para verificação local, o {product-name} scanner tentará escanear a imagem em um host local (ou um host acessível pelo comando docker do host remoto).
+
+Para verificação local baseada em Kubernetes ou OpenShift, remova a seção comentada do arquivo yaml de implantação do scanner de exemplo, mostrada nas seções xref:kubernetes.adoc#_deploy_using_kubernetes[Implantando {product-name}]. A seção comentada se parece com isto:
+
+[,yaml]
+----
+          env:
+# Commented out sections are required only for local build-phase scanning
+#            - name: SCANNER_DOCKER_URL
+#              value: tcp://192.168.1.10:2376
+            - name: CLUSTER_JOIN_ADDR
+              value: neuvector-svc-controller.neuvector
+            - name: CLUSTER_ADVERTISED_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: CLUSTER_BIND_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+#          volumeMounts:
+#            - mountPath: /var/run/docker.sock
+#              name: docker-sock
+#              readOnly: true
+#      volumes:
+#        - name: docker-sock
+#          hostPath:
+#            path: /var/run/docker.sock
+      restartPolicy: Always
+----
+
+Para verificação local nativa do Docker, siga as instruções para implantações do scanner Docker na seção xref:docker.adoc#_deploy_the_suse_security_scanner_container[Implantações de Produção do Docker] para o scanner.
+
+=== Escaneamento de Fase de Build Local - Somente Scanner (Sem Controlador Necessário)
+
+{product-name} suporta implantações de scanner autônomas para escaneamento de imagens local (que não requer um Controlador). Certos plug-ins, como o CircleCI ORB, têm uma opção para implantar dinamicamente um scanner quando um trabalho de build requer escaneamento de imagens, e depois remover o scanner quando os resultados são enviados de volta através do ORB. Essas implantações dinâmicas de scanner são automaticamente invocadas através do plug-in, se suportadas.
+
+Por favor, consulte a xref:scanners.adoc[seção scanner] para mais detalhes sobre scanners autônomos.

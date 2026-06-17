@@ -4,12 +4,14 @@
 :page-opendocs-origin: /09.testing/01.testing/01.testing.md
 :page-opendocs-slug:  /testing/testing
 
+[#_sample_applications]
 == Sample Applications
 
 After you've deployed the {product-name} components you can evaluate it using the sample test applications we provide. These are located in the `'nvbeta`' repository on docker hub.
 
 A typical Kubernetes-based test environment would have a master node and two to three worker nodes. You can control if application pods and {product-name} containers are deployed on a master node (off by default).
 
+[#_kubernetes_test_plan]
 == Kubernetes Test Plan
 
 To deploy a multi-tier application using Nginx, Nodejs, and Redis, use the samples below (in the order below). These may need to be edited for deployment on OpenShift, Rancher and other Kubernetes based tools.
@@ -158,6 +160,7 @@ Then connect to the public IP address/port for one of the kubernetes nodes, e.g.
 
 After deploying {product-name}, you can run test traffic through the demo applications to generate the whitelist rules, and then move all services to Monitor or Protect mode to see violations and attacks.
 
+[#_generating_network_violations_on_kubernetes]
 === Generating Network Violations on Kubernetes
 
 To generate a violation from a nodejs pod, find a pod:
@@ -181,6 +184,7 @@ Or find the internal IP address of another node pod, like 172.30.2.21 in the exa
 kubectl exec node-pod-name curl 172.30.2.21:8888 -n demo
 ----
 
+[#_generate_a_threat_attack]
 ==== Generate a Threat/Attack
 
 To simulate an attack, log into a container, then try a ping attack:
@@ -199,20 +203,24 @@ ping 172.30.2.21 -s 40000
 
 For all of the above, you can view the security events in the {product-name} console Network Activity map, as well as the Notifications tab.
 
+[#_process_and_file_protection_tests]
 === Process and File Protection Tests
 
 Try various process and file activity by exec'ing into a container and running commands such as apt-get update, ssh, scp or others. Any process activity or file access not allowed will generate alerts in Notifications.
 
+[#_registry_scanning_and_admission_control]
 === Registry Scanning and Admission Control
 
 A popular test is to configure image scanning of a registry in Assets -> Registries. After the scan is complete, configure an Admission Control rule in Policy. Be sure to enable Admission Controls and set a rule to Deny when there are high vulnerabilities in an image. Then pick an image that has high vulnerabilities and try to deploy it in Kubernetes. The deployment will be blocked in Protect mode and you will see an event in Notifications -> Security Risks.
 
 More advanced admission control testing can be done using different criteria in rules, or combining criteria.
 
+[#_deploy_another_app]
 ==== Deploy Another App
 
 The Kubernetes Guestbook demo application can also be deployed on Kubernetes. It is recommended to deploy it into its own namespace so you can see namespace based filtering in the {product-name} console.
 
+[#_docker_native_test_plan]
 == Docker-native Test Plan
 
 After deploying the {product-name} components and the sample application(s) you'll be able to Discover, Monitor and Protect running containers. The test plan below provides suggestions for generating run-time violations of allowed application behavior and scanning containers for vulnerabilities.

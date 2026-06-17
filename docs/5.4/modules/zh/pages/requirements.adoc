@@ -1,0 +1,218 @@
+= 系统要求
+:revdate: 2025-06-02
+:page-revdate: {revdate}
+:page-opendocs-origin: /01.basics/02.requirements/02.requirements.md
+:page-opendocs-slug: /basics/requirements
+
+== 系统要求
+
+[cols="1,1,1,1,4", options="header"]
+|===
+| 组件 | 实例数量 | 推荐 vCPU | 最低内存 | 注意
+
+| 控制器
+| 至少 1 +
+3 个用于高可用性（仅奇数）
+| 1 
+| 1GB
+| vCPU 内核可以共享
+
+| Enforcer
+| 每个节点/虚拟机 1 个
+| 1+
+| 1GB
+| 在保护模式下，为了更高的网络吞吐量，需分配一个或多个专用 vCPU
+
+| 扫描程序
+| 至少 1 +
+2 个或更多用于高可用性/性能
+| 1 
+| 1GB
+| 处理器内核可以共享用于标准工作负载。 +
+为高流量（10k+）图像扫描专用 1 个或更多处理器。 +
+注册表图像扫描由扫描器执行，由控制器管理，图像由扫描器拉取并在内存中展开。 +
+最低内存建议假设待扫描的图像不大于 0.5GB。 +
+当扫描大于 1GB 的图像时，扫描器内存应通过取最大图像大小并加上 0.5GB 来计算。 +
+示例 - 最大图像大小 = 1.3GB，扫描器容器内存应为 1.8GB
+
+| 经理
+| 至少 1 +
+2 个或更多用于高可用性
+| 1 
+| 1GB
+| vCPU 可以共享
+|===
+
+* 对于配置备份/高可用性，需 1Gi 或更多的 RWX PVC。有关更多详细信息，请参见xref:production.adoc#_backups_and_persistent_data[备份和持久数据部分]。
+* 推荐的浏览器：Chrome以获得更好的性能
+
+== 支持的平台
+
+* 官方支持的Linux发行版，包括SUSE Linux、Ubuntu、CentOS/Red Hat (RHEL)、Debian、CoreOS、AWS Bottlerocket和Photon。
+* AMD64和Arm架构
+* CoreOS在2023年11月支持通过RedHat提供的RHEL映射表进行CVE扫描。一旦RedHat为CoreOS发布官方源，将会得到支持。
+* 官方支持的Kubernetes和Docker兼容的容器管理系统。以下平台在每个{product-name}版本中都经过测试：Kubernetes 1.19-1.32、SUSE Rancher (RKE、RKE2、K3s等)、RedHat OpenShift 4.6-4.16（在{product-name} 5.2.x之前支持3.x到4.12）、Google GKE、Amazon EKS、Microsoft Azure AKS、IBM IKS、原生docker、docker swarm。以下Kubernetes和Docker兼容的平台已获得支持，并已验证与{product-name}兼容：VMware Photon和Tanzu、SUSE CaaS、Oracle OKE、Mirantis Kubernetes Engine、Nutanix Kubernetes Engine、Docker UCP/DataCenter、Docker Cloud。
+* Docker运行时版本：1.9.0及以上；Docker API版本：1.21，CE和EE。
+* Containerd和CRI-O运行时（需要更改示例yaml中的卷路径）。请参见Kubernetes部署部分中Containerd所需的更改，以及OpenShift部署部分中CRI-O的更改。
+* {product-name}与大多数商业支持的CNI兼容。官方测试和支持的包括openshift ovs（子网/多租户）、calico、flannel、cilium、antrea和公有云（gke、aks、iks、eks）。在v5.4.0中添加了对Multus的支持。
+* 控制台:推荐使用 Chrome 或 Firefox 浏览器。由于性能问题，不支持 IE 11。
+* Minikube 支持简单的初步评估，但不支持完整的概念验证。请参见下方所需的更改，以便在 Minikube 上运行 Allinone yaml。
+
+AWS Bottlerocket 注意：必须更改专用于 Bottlerocket 的 containerd 套接字路径。有关详细信息，请参见 Kubernetes 部署部分。
+
+== 不支持
+
+* GKE 自动驾驶仪。
+* AWS ECS 不再支持。（注意：在 ECS 部署上，未主动移除任何功能以支持 {product-name}。然而，SUSE 不再对 ECS 进行测试。虽然使用 {product-name} 保护 ECS 工作负载可能会按预期运行，但将不再调查问题。）
+* Mac 上的 Docker
+* Windows 上的 Docker
+* 来自 CoreOS 的 Rkt（容器 Linux）
+* K3S / SLES 环境中的 AppArmor。某些配置可能与 {product-name} 冲突并导致扫描器错误；在部署 {product-name} 时应禁用 AppArmor。
+* 不支持 IPv6
+* VMWare 集成容器（VIC），除非在嵌套模式下
+* CloudFoundry
+* 控制台:由于性能问题，不支持 IE 11。
+* 在容器工具中嵌套的容器主机用于简单测试。例如，使用 'kind' 部署 Kubernetes 集群 https://kind.sigs.k8s.io/docs/user/configuration/.
+
+[NOTE]
+====
+PKS 已经过实地测试，需要为计划/图块启用特权容器，并将 yaml 的 hostPath 更改如下，适用于 Allinone、Controller 和 Enforcer：
+
+[,yaml]
+----
+            hostPath:
+            path: /var/vcap/sys/run/docker/docker.sock
+----
+====
+
+[NOTE]
+====
+{product-name} 支持在 Mac/Windows 上的基于 Linux 的虚拟机中运行，使用 Vagrant、VirtualBox、VMware 或其他虚拟化环境。
+====
+
+
+== Minikube
+
+请对 Allinone 部署的 yaml 进行以下更改。
+
+[,yaml]
+----
+apiVersion: apps/v1 <<-- required for k8s 1.19
+kind: DaemonSet
+metadata:
+ name: neuvector-allinone-pod
+ namespace: neuvector
+spec:
+ selector: <-- Added
+ matchLabels: <-- Added
+ app: neuvector-allinone-pod <-- Added
+ minReadySeconds: 60
+...
+ nodeSelector: <-- DELETE THIS LINE
+ nvallinone: "true" <-- DELETE THIS LINE
+apiVersion: apps/v1 <<-- required for k8s 1.19
+kind: DaemonSet
+metadata:
+ name: neuvector-enforcer-pod
+ namespace: neuvector
+spec:
+ selector: <-- Added
+ matchLabels: <-- Added
+ app: neuvector-enforcer-pod <-- Added
+----
+
+== 性能与扩展
+
+与往常一样，{product-name} 容器的性能规划将取决于几个因素，包括：
+
+* （Controller & Scanner）注册表中待扫描的镜像数量和大小（由 Scanner 初始扫描）
+* （Enforcer）服务模式（发现、监控、保护），其中保护模式作为内联防火墙运行
+* （Enforcer）保护模式下工作负载的网络连接类型
+
+在监控模式下（网络过滤类似于镜像/分流），没有性能影响，Enforcer 以线速处理流量，并根据需要生成警报。在保护模式下（内联防火墙），Enforcer 需要处理器和内存来过滤连接，进行深度数据包检查，并保持连接以确定是否应阻止/丢弃。通常，在 1GB 内存和共享处理器的情况下，Enforcer 应该能够在保护模式下处理大多数环境。
+
+对于对吞吐量或延迟敏感的环境，可以为 {product-name} Enforcer 容器分配额外的内存和/或专用处理器核心。
+
+有关 Controller 和 Scanner 的性能调优以进行注册表扫描，请参见上面的系统要求。
+
+有关性能和规模的更多建议，请参见 xref:production.adoc#_best_practices_tips_qa_for_deploying_and_managing_suse_security[入门/最佳实践部分]。
+
+=== 吞吐量
+
+正如下面的图表所示，基本的吞吐量基准测试显示，在具有 4 个处理器内核的小型公有云实例上，每个节点的最大吞吐量为 1.3 Gbps。例如，10 节点集群将能够为保护模式下的整个集群处理最多 13 Gbps 的吞吐量。
+
+image:throughput.png[吞吐量]
+
+随着为 Enforcer 分配专用处理器，或处理器速度变化，和/或分配额外内存，这个吞吐量预计会增加。再次，扩展将取决于工作负载的网络/应用程序流量类型。
+
+=== 延迟
+
+延迟是另一个性能指标，取决于网络连接的类型。与吞吐量类似，延迟在监控模式下不受影响，仅在保护（内联防火墙）模式下的服务中受影响。小数据包或简单/快速服务将导致延迟增加{product-name}的百分比，而较大数据包或需要复杂处理的服务将显示由{product-name} Enforcer 增加的较低延迟百分比。
+
+下表显示了使用Redis基准工具基准测试的平均延迟为2-10%。Redis基准使用相当小的数据包，因此较大数据包的延迟预计会更低。
+
+|===
+| 测试 | 监控 | 保护 | 延迟
+
+| PING_INLINE
+| 34,904
+| 31,603
+| 9.46%
+
+| SET
+| 38,618
+| 36,157
+| 6.37%
+
+| GET
+| 36,055
+| 35,184
+| 2.42%
+
+| LPUSH
+| 39,853
+| 35,994
+| 9.68%
+
+| RPUSH
+| 37,685
+| 36,010
+| 4.45%
+
+| LPUSH（LRANGE 基准）
+| 37,399
+| 35,220
+| 5.83%
+
+| LRANGE_100
+| 25,539
+| 23,906
+| 6.39%
+
+| LRANGE_300
+| 13,082
+| 12,277
+| 6.15%
+|===
+
+上述基准显示了保护模式与监控模式的平均TPS，以及在基准测试中保护模式增加的延迟。降低保护模式下实际延迟（微秒）的主要方法是在具有更快处理器的系统上运行。您可以在 https://redis.io/topics/benchmarks.找到有关此开源Redis基准工具的更多详细信息。
+
+=== 为大型工作负载环境添加扩展约束
+
+在NeuVector安装期间，如果您的主机操作系统有大量工作负载，则NeuVector Enforcer Pod 在尝试打开大量文件时可能会失败，因为 Pod 主机监控。这也可能导致 RKE2 服务器因打开的文件数量过多而失败。
+
+作为大型工作负载环境的解决方法，您需要在 `/etc/sysctl.d/` 位置创建一个文件，例如 `example-fs-max.conf`，并添加以下配置的扩展约束：
+
+[,shell]
+----
+fs.inotify.max_user_instances=8192
+fs.inotify.max_user_watches=524288
+fs.filemax=5000
+----
+
+然后确保通过以下命令重启应用配置：
+
+[,shell]
+----
+systemctl restart systemd-sysctl
+----

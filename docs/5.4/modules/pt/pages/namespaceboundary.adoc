@@ -1,0 +1,86 @@
+= Imposição de Limite de Namespace
+:revdate: 2026-02-05
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/14.namespaceboundary/14.namespaceboundary.md
+:page-opendocs-slug:  /policy/namespaceboundary
+
+== Política: Imposição de Limite de Namespace
+
+Por padrão, os pods em diferentes namespaces podem se comunicar entre si, mesmo quando usam rótulos diferentes. Para restringir esse comportamento, você deve criar regras de rede adicionais.
+
+A imposição de limite de namespace fornece uma maneira mais simples de limitar a comunicação de pods a um namespace ou a limites naturais de aplicativo.
+
+== Como a imposição de limite de namespace funciona
+
+O rótulo de namespace `NeuvectorNamespaceBoundary` impõe limites de comunicação entre os pods. Quando habilitado, o NeuVector restringe o tráfego para que os pods se comuniquem apenas dentro do mesmo namespace ou dentro de limites de aplicativo definidos.
+
+Essa abordagem reduz a necessidade de grupos personalizados e políticas de rede adicionais.
+
+== Habilitar ou desabilitar a imposição de limite de namespace
+
+Para controlar a imposição de limite de namespace, aplique o rótulo `NeuvectorNamespaceBoundary` a um namespace.
+
+=== Habilitar imposição
+
+[source,bash]
+----
+kubectl label namespace <namespace> NeuvectorNamespaceBoundary=enabled
+----
+
+=== Desabilitar imposição
+
+[source,bash]
+----
+kubectl label namespace <namespace> NeuvectorNamespaceBoundary=disabled
+----
+
+=== Remover o rótulo
+
+Remover o rótulo desabilita a imposição de limite de namespace.
+
+[source,bash]
+----
+kubectl label namespace <namespace> NeuvectorNamespaceBoundary-
+----
+
+== Cenário de exemplo
+
+Este exemplo mostra como a imposição de limite de namespace simplifica o controle de entrada e saída.
+
+=== Ambiente
+
+* Dois namespaces: `ns1` e `ns2`
+* Pods:
+** `ns1`: `pod1` (rótulos: `app=app1`, `label=one`), `pod2` (rótulos: `app=app2`, `label=two`)
+** `ns2`: `pod3` (rótulos: `app=app1`, `label=three`), `pod4` (rótulos: `app=app2`, `label=four`)
+* Grupos:
+** `g1`: `app=app1` (inclui `pod1` e `pod3`)
+** `g2`: `app=app2` (inclui `pod2` e `pod4`)
+
+Uma política de rede permite tráfego de `g1` para `g2` em qualquer aplicativo e porta.
+
+=== Comportamento sem imposição de limite de namespace.
+
+Com apenas a política baseada em grupos:
+
+* `pod1` pode se comunicar com `pod2` e `pod4`
+* `pod3` pode se comunicar com `pod2` e `pod4`
+
+Para restringir a comunicação ao mesmo namespace, você deve criar grupos adicionais e políticas de negação:
+
+* Crie grupos com base em rótulos individuais
+* Adicione regras de negação para bloquear tráfego entre namespaces
+
+Isso aumenta a complexidade da política e o esforço de manutenção.
+
+=== Comportamento com imposição de limite de namespace.
+
+Quando a imposição de limite de namespace está habilitada:
+
+* `pod1` pode se comunicar apenas com `pod2`
+* `pod3` pode se comunicar apenas com `pod4`
+* A comunicação entre namespaces é bloqueada automaticamente
+
+Nenhum grupo adicional ou política de rede é necessário.
+
+A imposição de limite de namespace simplifica a gestão de políticas enquanto impõe um isolamento rigoroso em nível de namespace.

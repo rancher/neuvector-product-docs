@@ -1,0 +1,159 @@
+= Mirantis Kubernetes Engine
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /13.special/02.docker/02.docker.md
+:page-opendocs-slug:  /special/docker
+
+== Déployer sur le cluster Swarm
+
+Pour déployer {product-name} en utilisant un cluster Swarm, commencez par tirer les images {product-name} en utilisant Docker UCP dans le menu Images. Vous devrez peut-être ajouter un numéro de version pour obtenir la dernière version sur Docker Hub.
+
+Actuellement, Swarm/UCP ne prend pas en charge les capacités seccomp (options cap_add) ou le déploiement dans '`privileged mode`', donc les conteneurs {product-name} devront être déployés depuis la ligne de commande en utilisant docker-compose ou run. Voir les fichiers compose d'exemple pour l'All-in-One et l'enforcer ci-dessous.
+
+Le service HRM de Docker UCP utilise le port par défaut 8443 qui entre en conflit avec le port console {product-name}. Si vous utilisez le port HRM par défaut, changez alors le mappage de port {product-name}, par exemple 9443:8443 pour le conteneur All-in-One dans les exemples ci-dessous. Après que l'application {product-name} soit déployée avec succès, connectez-vous à la console sur le port 9443 de l'hôte All-in-One.
+
+== Déployer sur Docker Swarm en utilisant le mode privilégié
+
+Voici un exemple de fichier docker-compose pour déployer le conteneur All-in-One sur le premier nœud. Parce que le conteneur All-in-One a un module enforcer à l'intérieur, les conteneurs d'application sur le même nœud peuvent être sécurisés. Les déploiements greenfield et brownfield sont pris en charge.
+
+Déployer All-in-One en utilisant docker-compose (mode privilégié){nbsp}:
+
+[,yaml]
+----
+allinone:
+    pid: host
+    image: neuvector/allinone:<version>
+    container_name: allinone
+    privileged: true
+    environment:
+        - CLUSTER_JOIN_ADDR=node_ip
+    ports:
+        - 18300:18300
+        - 18301:18301
+        - 18400:18400
+        - 18401:18401
+        - 18301:18301/udp
+        - 9443:8443
+    volumes:
+        - /lib/modules:/lib/modules
+        - /var/neuvector:/var/neuvector
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup:/host/cgroup:ro
+----
+
+La variable d'environnement la plus importante est *CLUSTER_JOIN_ADDR*. C'est l'adresse IP à laquelle d'autres enforcers se connectent. Normalement, elle devrait être définie sur l'adresse IP du nœud où le conteneur All-in-One est en cours d'exécution.
+
+Les ports 18300 et 18301 sont les ports par défaut pour la communication entre clusters. Ils doivent être identiques pour tous les contrôleurs et enforcers du cluster. Veuillez vous référer à la section _"Détails de Docker-compose"_ pour savoir comment changer les ports par défaut.
+
+Ajoutez un conteneur enforcer en utilisant docker-compose (mode privilégié)
+
+Voici un exemple de fichier docker-compose pour intégrer un enforcer dans le cluster. Les déploiements greenfield et brownfield sont pris en charge.
+
+[,yaml]
+----
+enforcer:
+    pid: host
+    image: neuvector/enforcer:<version>
+    container_name: enforcer
+    privileged: true
+    environment:
+        - CLUSTER_JOIN_ADDR=controller_node_ip
+    ports:
+        - 18301:18301
+        - 18401:18401
+        - 18301:18301/udp
+    volumes:
+        - /lib/modules:/lib/modules
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup/:/host/cgroup/:ro
+----
+
+La variable d'environnement la plus importante est *CLUSTER_JOIN_ADDR*. Pour les enforcers, remplacez `<controller_node_ip>` par l'adresse IP du nœud du contrôleur. En général, *CLUSTER_JOIN_ADDR* dans le fichier docker-compose du contrôleur/All-in-One et dans le fichier docker-compose de l'enforcer ont la même valeur.
+
+À partir de {product-name} 4.0+, un conteneur de scanner séparé doit être déployé pour effectuer une analyse de vulnérabilité.
+
+Exemple de docker-compose pour le Scanner{nbsp}:
+
+[,yaml]
+----
+Scanner:
+   image: neuvector/scanner
+   container_name: scanner
+   environment:
+     - SCANNER_DOCKER_URL=tcp://192.168.1.10:2376
+     - CLUSTER_JOIN_ADDR=controller_node_ip
+   ports:
+     - 18402:18402
+   volumes:
+     - /var/run/docker.sock:/var/run/docker.sock:ro
+----
+
+== Déploiement sans utiliser le mode privilégié
+
+Pour certaines configurations de plateforme, il est possible de déployer les conteneurs {product-name} sans qu'ils aient besoin de fonctionner en mode privilégié. La configuration doit prendre en charge la possibilité d'ajouter des capacités et de définir le profil apparmor. Notez que Docker DataCenter/UCP et Swarm ne prennent actuellement pas en charge cela, mais il est toujours possible de déployer {product-name} manuellement en utilisant Compose ou Run.
+
+Déployez All-in-One (SANS mode privilégié) avec docker-compose
+
+[,yaml]
+----
+allinone:
+    pid: host
+    image: neuvector/allinone
+    container_name: neuvector.allinone
+    cap_add:
+        - SYS_ADMIN
+        - NET_ADMIN
+        - SYS_PTRACE
+        - IPC_LOCK
+    security_opt:
+        - apparmor=unconfined
+        - seccomp=unconfined
+        - label=disable
+    environment:
+        - CLUSTER_JOIN_ADDR=[AllInOne Node IP Address]
+    ports:
+        - 18300:18300
+        - 18301:18301
+        - 18400:18400
+        - 18401:18401
+        - 18301:18301/udp
+        - 9443:8443
+    volumes:
+        - /lib/modules:/lib/modules
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup:/host/cgroup:ro
+        - /var/neuvector:/var/neuvector
+----
+
+Déployez enforcer (SANS mode privilégié) avec docker-compose
+
+[,yaml]
+----
+enforcer:
+    pid: host
+    image: neuvector/enforcer
+    container_name: neuvector.enforcer
+    cap_add:
+        - SYS_ADMIN
+        - NET_ADMIN
+        - SYS_PTRACE
+        - IPC_LOCK
+    security_opt:
+        - apparmor=unconfined
+        - seccomp=unconfined
+        - label=disable
+    environment:
+        - CLUSTER_JOIN_ADDR=[AllInOne Node IP Address]
+    ports:
+        - 18301:18301
+        - 18401:18401
+        - 18301:18301/udp
+    volumes:
+        - /lib/modules:/lib/modules
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /proc:/host/proc:ro
+        - /sys/fs/cgroup/:/host/cgroup/:ro
+----

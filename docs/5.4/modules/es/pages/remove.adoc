@@ -1,0 +1,76 @@
+= Eliminando o Restableciendo {product-name}
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/10.remove/10.remove.md
+:page-opendocs-slug: /deploying/remove
+
+== Eliminando {product-name} despliegue / contenedores
+
+Para eliminar el despliegue de {product-name} en Kubernetes, utiliza el mismo archivo yaml para el despliegue en el comando de eliminación.
+
+[,shell]
+----
+kubectl delete -f neuvector.yaml
+----
+
+Esto eliminará los servicios y despliegues de contenedores de {product-name}. También puede que desees eliminar el espacio de nombres neuvector, el volumen persistente y los roles de clúster y los enlaces de roles de clúster creados en los pasos de despliegue.
+
+Si desplegaste {product-name} utilizando un chart de Helm o un operador, deberías eliminar {product-name} usando Helm o el comando del operador correspondiente.
+
+== Restableciendo {product-name} a un Estado Inicial
+
+Además de eliminar como se discutió anteriormente y redeplegar {product-name}, se pueden tomar los siguientes pasos en Kubernetes para restablecer {product-name}, lo que eliminará las reglas aprendidas, grupos y otra configuración, pero dejará intacto el despliegue de {product-name}.
+
+. Escala el despliegue del controlador a 0.
+. (Opcional) si se utiliza un Volumen Persistente, elimina la copia de seguridad del volumen persistente y las carpetas de registro creadas.
+. Escala el despliegue del controlador a 3.
+
+== Restableciendo la Contraseña de Administrador
+
+La contraseña de administrador es la clave para administrar el despliegue de {product-name} y para ver las actividades de la red del clúster.  Es importante cambiar la contraseña al instalar y mantenerla bien guardada.  A veces, la contraseña está demasiado bien guardada y se pierde o el administrador deja la empresa.  Si tienes acceso kubectl al clúster, puedes restablecer la contraseña de administrador a la predeterminada utilizando los siguientes pasos.
+
+Accede a uno de los controladores.
+
+[,shell]
+----
+kubectl exec -it <controller> -n neuvector -- sh
+----
+
+Verifica que la entrada de administrador exista y guarda la salida json en un lugar seguro.
+
+[,shell]
+----
+consul kv get object/config/user/admin
+----
+
+Toma la salida del comando consul kv get anterior y reemplaza la cadena password_hash con la siguiente cadena.
+
+[,shell]
+----
+c7ad44cbad762a5da0a452f9e854fdc1e0e7a52a38015f23f3eab1d80b931dd472634dfac71cd34ebc35d16ab7fb8a90c81f975113d6c7538dc69dd8de9077ec
+----
+
+Restablece la contraseña de la cuenta de administrador a la predeterminada. (REEMPLAZAR <UPDATED_consul_kv_get_output_with_new_password_hash> ANTES DE LA EJECUCIÓN!!!)
+
+[,shell]
+----
+consul kv put object/config/user/admin '<UPDATED_consul_kv_get_output_with_new_password_hash>'
+----
+
+[WARNING]
+.EJEMPLO A CONTINUACIÓN: (NO EJECUTES SIN REEMPLAZAR CON LA SALIDA)
+====
+[,shell]
+----
+consul kv put object/config/user/admin '{"fullname":"admin","username":"admin","password_hash":"c7ad44cbad762a5da0a452f9e854fdc1e0e7a52a38015f23f3eab1d80b931dd472634dfac71cd34ebc35d16ab7fb8a90c81f975113d6c7538dc69dd8de9077ec","pwd_reset_time":"2022-03-24T20:50:15.341074451Z","pwd_hash_history":null,"domain":"","server":"","email":"","role":"admin","role_oride":false,"timeout":300,"locale":"en","role_domains":{},"last_login_at":"2022-03-24T20:49:32.577877044Z","login_count":1,"failed_login_count":0,"block_login_since":"0001-01-01T00:00:00Z"}'
+----
+
+Respuesta:
+
+[,shell]
+----
+Success! Data written to: object/config/user/admin
+----
+
+Inicia sesión con admin/admin y cambia la contraseña.
+====

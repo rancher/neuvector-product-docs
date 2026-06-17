@@ -1,0 +1,72 @@
+= SAML（Azure AD）
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /08.integration/05.msazure/05.msazure.md
+:page-opendocs-slug:  /integration/msazure
+
+== 与 Azure AD SAML 认证集成
+
+. 在 Azure 管理控制台中，选择 Azure Active Directory 中的 "企业应用程序" 菜单项
++
+image:azure1.png[azure_config1]
+
+. 选择 "`New Application`"
++
+image:azure2.png[azure_config2]
+
+. 创建一个非画廊应用程序并为其命名
++
+image:azure3.png[azure_config3]
+
+. 在应用程序的配置页面中，在左侧面板选择 "单点登录" 并选择基于 SAML 的登录
++
+image:azure4.png[azure_config4]
+
+. 下载证书的 base64 格式，并记录应用程序的登录 URL 和 Azure AD 标识符
++
+image:azure5.png[azure_config5]
+
+. 在 {product-name} 管理控制台中，以管理员身份登录。在右上角的管理员下拉菜单中选择 "设置"。点击 SAML 设置
++
+image:azure6.png[azure_config6]
+
+. 按如下方式配置 SAML 服务器：
+* 将应用程序的 "登录 URL" 复制为单点登录 URL。
+* 将 "Azure AD 标识符" 复制为发行者。
+* 打开下载的证书并将文本复制到 X.509 证书框中。
+* 设置默认角色。
+* 输入角色映射的组名。Azure 返回的组声明是通过 "对象 ID" 而不是名称来识别的。组的对象 ID 可以在 menu:Azure Active Directory[组> 组名页面] 中找到。您应该使用此值在 {product-name} 中配置基于组的角色映射。
++
+image:openid5.png[OpenID5]
++
+然后启用 SAML 服务器。
++
+image:azure7.png[azure_config7]
+
+. 复制重定向 URL
++
+image:azure8.png[azure_config8]
+
+. 返回 Azure 管理控制台以设置 "基本 SAML 配置"。将 {product-name} 控制台的重定向 URL 复制到 "标识符" 和 "回复 URL" 框中
++
+image:azure9.png[azure_config9]
+
+. 编辑 "SAML 签名证书"，将签名选项更改为 "签名 SAML 响应"
++
+image:azure10.png[azure_config10]
+
+. 编辑 "用户属性和声明"，以便响应能将登录用户的属性传回 {product-name}。点击 "添加新声明"，分别添加 "用户名" 和 "电子邮件" 声明，使用 "user.userprincipalname" 和 "user.mail"。
++
+image:azure11.png[azure_config11]
+
+. 如果用户被分配到活动目录中的组，则可以将其组成员资格添加到声明中。在 "应用程序注册" 中找到该应用程序并编辑清单。将 "groupMembershipClaims" 的值修改为 "所有"。
++
+image:azure12.png[azure_config12]
+
+. 授权用户和组访问该应用，以便他们可以使用 Azure AD SAML SSO 登录 {product-name} 控制台
++
+image:azure13.png[azure_config13]
+
+=== 将组映射到角色和名称空间
+
+请参阅 xref:users.adoc#_mapping_groups_to_roles_and_namespaces[用户和角色] 部分，了解如何将组映射到预设和自定义角色以及 {product-name} 中的名称空间。

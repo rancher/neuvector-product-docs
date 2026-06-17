@@ -1,0 +1,15 @@
+= Avaliação de Configuração de Recursos do Kubernetes
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/03.admission/02.assessment/02.assessment.md
+:page-opendocs-slug:  /policy/admission/assessment
+
+== Escaneamento de arquivos de implantação de recursos Kubernetes
+
+{product-name} é capaz de escanear arquivos yaml de implantação para avaliações de configuração em relação às regras de Controle de Admissão. Isso é útil para escanear arquivos yaml de implantação no início do pipeline para determinar se a implantação violaria alguma regra antes de tentar a implantação.
+
+Para enviar um arquivo yaml para ser escaneado, vá para a Política -> Controle de Admissão e clique no botão Avaliação de Configuração. Na janela, selecione um arquivo para enviar e, em seguida, clique em Testar.
+
+image:assessment.png[Avaliação]
+
+Você verá então uma análise do arquivo, se a implantação seria permitida e mensagens para as regras que se aplicariam ao arquivo de implantação.

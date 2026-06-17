@@ -2,6 +2,7 @@
 :page-opendocs-origin: /15.ui_extension/03.notifications/03.notifications.md
 :page-opendocs-slug:  /ui_extension/notifications
 
+[#_security_events]
 == Security Events
 
 In the UI Extension on the Rancher portal, the **Security Events** tab works similarly to the NeuVector standalone page. The events can be triggered by several factors:
@@ -44,6 +45,7 @@ The **Reported by** field in the message box is clickable and opens the enforcer
 
 image:enforcer_detail_open.png[Security Events]
 
+[#_functions_not_included_when_comparing_with_the_neuvector_standalone_page]
 == Functions Not Included When Comparing with the NeuVector Standalone Page
 
 * Review / Propose rule.

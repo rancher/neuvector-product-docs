@@ -1,0 +1,35 @@
+= Resumen general del estado de seguridad
+:page-opendocs-origin: /15.ui_extension/01.dashboard/01.dashboard.md
+:page-opendocs-slug:  /ui_extension/dashboard
+
+En la extensión de la interfaz de usuario en el portal de Rancher, el **Panel de control de NeuVector** funciona de manera similar a su página independiente. Proporciona factores de puntuación de riesgo de seguridad para informar a los usuarios sobre el estado de seguridad de sus clústeres. En el panel inferior, proporciona 4 pestañas para que los usuarios cambien los gráficos y monitoricen diferentes categorías.
+
+En la pestaña **Eventos de Seguridad**, el gráfico de líneas muestra un conteo de eventos basado en fechas en una línea de tiempo. El gráfico de barras superior de Eventos de Seguridad muestra los 5 principales puntos finales de origen y destino.
+
+image:dashboard_security_events.png[Panel de control]
+
+En la pestaña **Exposición de Ingress y Egress**, el gráfico de barras apiladas muestra la cantidad de puntos finales expuestos por acciones. En el lado derecho, las tablas de exposición muestran los servicios de puntos finales de egress e ingress con información de escaneo.
+
+image:dashboard_exposure.png[Panel de control]
+
+Hacer clic en una fila de la tabla de egress/ingress muestra conversaciones sobre servicios específicos. El nombre FQDN / dirección IP se muestra con una ubicación geográfica basada en la bandera nacional en el campo **Host Externo**.
+
+image:dashboard_conversations.png[Panel de control]
+
+Hacer clic en el **Host Externo** redirige a whois.com para mostrar la información detallada de la dirección IP.
+
+image:whois.png[Panel de control]
+
+En la pestaña **Modo de Directiva**, los gráficos de pastel muestran la proporción y los números de pods/servicios bajo diferentes modos de política.
+
+image:dashboard_policy_mode.png[Panel de control]
+
+En la pestaña **Activos Más Vulnerables**, los gráficos de barras muestran los 5 principales pods / nodos que contienen vulnerabilidades de alta o media severidad.
+
+image:dashboard_top_vul_assets.png[Panel de control]
+
+== Funciones no incluidas al comparar con la página independiente de NeuVector
+
+* Diálogo de mejora de puntuación.
+* Protocolos de aplicación detectados y protegidos por reglas de red de Capa 7.
+* Informes PDF basados en el espacio de nombres.

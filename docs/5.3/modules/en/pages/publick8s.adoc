@@ -4,6 +4,7 @@
 :page-opendocs-origin: /02.deploying/08.publick8s/08.publick8s.md
 :page-opendocs-slug: /deploying/publick8s
 
+[#_deploy_product_on_a_public_cloud_kubernetes_service]
 == Deploy {product-name} on a Public Cloud Kubernetes Service
 
 Deploy {product-name} on any public cloud K8s service such as AWS EKS, Azure AKS, IBM Cloud K8s, Google Cloud, Alibaba Cloud or Oracle Cloud.
@@ -17,6 +18,7 @@ Some cloud providers have integrated load balancers which are easy to deploy by 
 
 {product-name} also supports Helm-based deployment with a Helm chart at https://github.com/neuvector/neuvector-helm.
 
+[#_network_access]
 === Network Access
 
 Make sure internal and external ingress access is configured properly. For the NodePort service, the random port in the 3xxxx range must be accessible on a public IP of a worker or master node from the outside. You can access the console using the public IP address of any worker node and that port (NodePort), or the public IP of the load balancer and default port 8443. You can view the IP/port using:
@@ -30,10 +32,12 @@ Most K8s services automatically enable/allow all inter-pod / inter-cluster commu
 
 The sample Kubernetes yaml file will deploy one manager and 3 controllers. It will deploy an enforcer on every node as a daemonset. Note: It is not recommended to deploy (scale) more than one manager behind a load balancer due to potential session state issues.
 
+[#_microsoft_azure_aks]
 == Microsoft Azure AKS
 
 When deploying a k8s cluster on Azure, the default for Kubernetes RBACs is off. Please enable RBACs to enable the cluster-admin clusterrole, otherwise you will need to create that manually later to support Helm based deployments.
 
+[#_google_cloud_platform_gke]
 == Google Cloud Platform / GKE
 
 You can use the integrated load balancers which are easy to deploy by using '`Type: LoadBalancer`' instead of NodePort for the {product-name} webui. Configuring persistent storage with type RWM (read write many) may require creating a storage service such as NFS before deploying {product-name}.
@@ -42,6 +46,7 @@ You can use the integrated load balancers which are easy to deploy by using '`Ty
 
 Use the environment variable NV_PLATFORM_INFO with value platform=Kubernetes:GKE to enable {product-name} to perform GKE specific action such as running the GKE Kubernetes CIS Benchmarks.
 
+[#_handling_auto_scaling_nodes_with_a_pod_disruption_budget]
 == Handling Auto-Scaling Nodes with a Pod Disruption Budget
 
 Public cloud providers support the ability to auto-scale nodes, which can dynamically evict pods including the {product-name} controllers. To prevent disruptions to the controllers, a {product-name} pod disruption budget can be created.

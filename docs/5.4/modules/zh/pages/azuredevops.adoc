@@ -1,0 +1,23 @@
+= Azure DevOps
+:revdate: 2025-05-08
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/03.build/04.azuredevops/04.azuredevops.md
+:page-opendocs-slug:  /scanning/build/azuredevops
+
+== 扫描 Azure DevOps 构建管道中的漏洞
+
+可以通过在 Azure DevOps 市场发布的 {product-name} 扩展，从 Azure DevOps 管道触发 {product-name} 扫描器。
+
+image:azure_devops.png[AzureDevOps]
+
+该扩展支持远程和本地扫描，其中 {product-name} 控制器可以在构建期间远程扫描注册表中的镜像，或动态启动本地控制器在 Azure 代理虚拟机上扫描镜像。
+
+此外，请确保已部署并配置 {product-name} 扫描器容器以连接到 Allinone 或控制器。在 4.0 及更高版本中，NeuVector Scanner 容器必须与 Allinone 或控制器分开部署。
+
+* 使用 {product-name} 任务扫描镜像将 {product-name} 漏洞扫描器集成到 Azure DevOps 构建管道中。
+* 在镜像构建后，可通过外部 {product-name} 控制器实例或在管道中以服务容器运行的本地 {product-name} 控制器实例，对容器镜像进行漏洞扫描。
+* 根据不同严重性检测到的漏洞数量定义构建失败的阈值。
+* 提供镜像扫描的详细报告，以便在构建摘要选项卡中进行分析。
+* 外部 {product-name} 控制器实例被定义为服务端点，以将构建管道定义与连接参数和凭据解耦。
+
+可以在 https://marketplace.visualstudio.com/items?itemName=NeuVector.neuvector-vsts. 找到带有示例屏幕的概述。

@@ -1,0 +1,160 @@
+= Netzwerkregeln
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/05.networkrules/05.networkrules.md
+:page-opendocs-slug:  /richtlinie/netzwerkregeln
+
+== Richtlinie: Netzwerkregeln
+
+{product-name} erstellt automatisch Netzwerkregeln aus Ihren laufenden Anwendungen im Entdeckungsmodus. Sie können sie auch manuell in jedem Modus hinzufügen – sei es im Entdeckungs-, Überwachungs- oder Schutzmodus. Regeln können über die CLI oder die REST-API hinzugefügt oder bearbeitet werden.
+
+{product-name} verwendet eine deklarative Richtlinie, die aus Regeln besteht, welche zulässige und unzulässige Verbindungen auf der Anwendungsschicht festlegen. {product-name} analysiert und schützt nicht nur anhand von IP-Adresse und Port, sondern bestimmt das tatsächliche Netzwerkverhalten basierend auf den Anwendungsprotokollen. Dies ermöglicht es {product-name}, automatisch alle neuen Container unabhängig von IP-Adresse und Port zu schützen.
+
+Netzwerkregeln geben das ERLAUBTE oder VERWEIGERTE Verhalten für Ihre Anwendungen an. Diese Regeln bestimmen, welche Verbindungen normales Verhalten für Ihre Dienste sind und welche Verstöße darstellen. Sie können automatisch '`learned`' Regeln löschen sowie neue Regeln zu Ihrer Richtlinie hinzufügen.
+
+[IMPORTANT]
+====
+Netzwerkregeln werden in der Reihenfolge durchgesetzt, in der sie in der Liste erscheinen, von oben nach unten. Um die Regeln neu anzuordnen, wählen Sie die Regel aus, die Sie verschieben möchten, dann erscheint oben ein Feld 'Verschieben nach', und Sie können die ausgewählte Regel vor oder nach einer bestimmten Regel verschieben.
+====
+
+[IMPORTANT]
+====
+Wenn Sie Regeln bearbeiten (hinzufügen, löschen, ändern), werden Ihre Änderungen NICHT angewendet, bis Sie auf die Schaltfläche 'Speichern' oben klicken. Wenn Sie diese Seite verlassen, ohne Ihre Änderungen bereitzustellen, gehen sie verloren.
+====
+
+=== Neue Regeln hinzufügen
+Fügen Sie eine Regel mit '`+`' entweder unter einer anderen Regel in der rechten Spalte oder mit der Schaltfläche unten rechts hinzu.
+
+* *ID*
++
+____
+(Optional) Geben Sie eine Nummer ein. Netzwerkregeln sind anfänglich in aufsteigender Reihenfolge angeordnet, aber die Reihenfolge der Regeln kann durch Ziehen und Ablegen in der Liste geändert werden.
+____
+
+* *Von*
++
+____
+Geben Sie die GRUPPE an, von der die Verbindung ausgehen wird. Beginnen Sie mit der Eingabe, und {product-name} stimmt alle zuvor entdeckten Gruppen sowie alle neu definierten Gruppen ab.
+____
+
+* *Durchgeführte Aktion*
++
+____
+Geben Sie die ZIELGRUPPE an, in der diese Verbindungen erlaubt oder verweigert werden.
+____
+
+* *Anwendungen*
++
+--
+____
+Geben Sie Anwendungen für {product-name} ein, um sie zu erlauben oder zu verweigern. {product-name} versteht das tiefgehende Anwendungsverhalten und analysiert die Nutzlast, um die Anwendungsprotokolle zu bestimmen. Protokolle umfassen HTTP, HTTPS, SSL, SSH, DNS, DNCP, NTP, TFTP, ECHO, RTSP, SIP, MySQL, Redis, Zookeeper, Cassandra, MongoDB, PostgresSQL, Kafka, Couchbase, ActiveMQ, ElasticSearch, RabbitMQ, Radius, VoltDB, Consul, Syslog, Etcd, Spark, Apache, Nginx, Jetty, NodeJS, Oracle, MSSQL, Memcached und gRPC.
+____
+
+[NOTE]
+====
+Um Beliebig/Alle auszuwählen, lassen Sie dieses Feld leer.
+====
+--
+
+* *Ports*
++
+--
+____
+Wenn es spezifische Ports gibt, auf die diese Regel beschränkt werden soll, geben Sie sie hier ein. Für ICMP-Verkehr geben Sie icmp ein.
+____
+
+[NOTE]
+====
+Um Beliebig/Alle auszuwählen, lassen Sie dieses Feld leer.
+====
+--
+
+* *Verweigern/Erlauben*
++
+--
+____
+Geben Sie an, ob diese Regel diese Art von Verbindung erlauben oder verweigern soll.
+____
+
+Wenn Verweigern ausgewählt ist, wird {product-name} dies im Überwachungsmodus als Verstoß protokollieren und im Schutzmodus blockieren. Die Standardaktion besteht darin, eine Verbindung zu verweigern (Verstoß nur protokollieren, wenn im Überwachungsmodus), wenn keine Regel übereinstimmt.
+--
+
+[IMPORTANT]
+====
+Vergessen Sie nicht, Ihre Änderungen bereitzustellen bzw. zu aktualisieren, wenn Sie Änderungen vornehmen!
+====
+
+== Egress-Kontrolle: Erlauben von Verbindungen zu vertrauenswürdigen internen Diensten in anderen Netzwerken
+
+Ein häufiger Anwendungsfall für die Anpassung von Regeln besteht darin, einem Containerdienst zu erlauben, eine Verbindung zu einem Netzwerk außerhalb des {product-name} verwalteten Clusters herzustellen. In vielen Fällen, da {product-name} dieses Netzwerk nicht erkennt, wird es als '`External`' Netzwerk klassifiziert, auch wenn es sich um ein internes Netzwerk handelt.
+
+Um Containern zu erlauben, eine Verbindung zu Diensten in anderen internen Netzwerken herzustellen, erstellen Sie zuerst eine Gruppe und dann eine Regel dafür.
+
+. Erstellen Sie eine Gruppe. Klicken Sie in den Richtlinien -> Gruppen, um eine neue Gruppe hinzuzufügen. Benennen Sie die Gruppe (z. B. intern) und geben Sie dann die Kriterien für die Gruppe an. Geben Sie beispielsweise den DNS-Namen, die IP-Adresse oder den Adressbereich der internen Dienste an. Speichern Sie die neue Gruppe.
+. Erstellen Sie eine Regel. Klicken Sie in den Richtlinien -> Regeln, um eine neue Regel hinzuzufügen. Wählen Sie die Gruppe aus, die den Container repräsentiert, von dem die Verbindungen ausgehen, und anschließend die ZIELGRUPPE (z. B. intern). Sie können die Regel weiter verfeinern, indem Sie spezifische Protokolle oder Ports angeben oder das Feld leer lassen. Stellen Sie sicher, dass der Selektor auf Erlauben (grün) eingestellt ist.
+
+Klicken Sie unbedingt auf Bereitstellen, um die neue Regel zu speichern.
+
+Überprüfen Sie schließlich die Liste der Regeln, um sicherzustellen, dass die neue Regel in der gewünschten Reihenfolge und Priorität ist. Regeln werden von oben nach unten angewendet.
+
+=== Ingress-IP-Richtlinie basierend auf X-FORWARDED-FOR
+
+In einem Kubernetes-Cluster kann eine Anwendung durch NodePort-, LoadBalancer- oder Ingress-Dienste nach außen exponiert werden. Diese Dienste ersetzen typischerweise die Quell-IP, während sie das Source NAT (SNAT) auf den Paketen durchführen. Da die ursprüngliche Quell-IP maskiert wird, verhindert dies, dass {product-name} erkennt, dass die Verbindung tatsächlich von "extern" stammt.
+
+Um die ursprüngliche Quell-IP-Adresse zu erhalten, muss der Benutzer die folgende Zeile zu den exponierten Diensten im Abschnitt 'spec' des externen Load Balancers oder Ingress-Controllers hinzufügen. (Ref: https://kubernetes.io/docs/tutorials/services/source-ip/)
+
+[,json]
+----
+"externalTrafficPolicy":"Local"
+----
+
+Viele Implementierungen von LoadBalancer-Diensten und Ingress-Controllern fügen die Zeile X-FORWARDED-FOR zum HTTP-Anforderungsheader hinzu, um die echte Quell-IP an die Backend-Anwendungen zu kommunizieren. Dieses Produkt kann dieses Set von HTTP-Headern erkennen, die ursprüngliche Quell-IP identifizieren und die Richtlinie entsprechend durchsetzen.
+
+Diese Verbesserung hat in einigen Setups unerwartete Probleme verursacht. Wenn die obige Zeile zu den exponierten Diensten hinzugefügt wurde und {product-name} Netzwerkrichtlinien so erstellt wurden, dass sie erwarten, dass die Netzwerkverbindungen von internen Proxy-/Ingress-Diensten kommen, da wir jetzt erkennen, dass die Verbindungen von "extern" zum Cluster stammen, könnte normaler Anwendungsverkehr Warnungen auslösen oder blockiert werden, wenn die Anwendungen im "Schutz"-Modus sind.
+
+Ein Schalter ist verfügbar, um diese Funktion zu deaktivieren. Das Deaktivieren teilt {product-name} mit, dass die Verbindung nicht als "extern" über die X-FORWARDED-FOR-Header identifiziert werden soll. Standardmäßig ist dies aktiviert, und der X-FORWARDED-FOR-Header wird zur Durchsetzung der Richtlinie verwendet. Um es zu deaktivieren, gehen Sie zu Einstellungen -> Konfiguration und deaktivieren Sie die Einstellung "Richtlinienübereinstimmung basierend auf X-Forwarded-For".
+
+=== Besondere Durchsetzung für Istio ServiceEntry-Ziele
+
+Die Funktionalität zur Durchsetzung von Egress-Netzwerkrichtlinien wurde in Version 5.1.0 für Pods zu ServiceEntry-Zielen, die mit Istio deklariert sind, hinzugefügt. Typischerweise definiert ein ServiceEntry, wie ein externer Dienst, der über den DNS-Namen angesprochen wird, in eine Ziel-IP aufgelöst wird. Vor v5.1 konnte {product-name} keine Regeln für Verbindungen zu einem ServiceEntry erkennen und durchsetzen, sodass alle Verbindungen als extern klassifiziert wurden. Mit 5.1 können Regeln für spezifische ServiceEntry-Ziele durchgesetzt werden. Implizite Verstöße werden für neu sichtbaren Verkehr gemeldet, wenn keine Erlaubnisregeln existieren. Diese Regeln können im Entdeckungsmodus erlernt und automatisch erstellt werden. Um diesen Verkehr zuzulassen, können Sie die Gruppe in den Entdeckungsmodus versetzen oder eine benutzerdefinierte Gruppe mit Zieladressen (oder DNS-Namen) erstellen und eine neue Netzwerkrichtlinie für dieses Ziel hinzufügen, um den Verkehr zuzulassen.
+
+=== Netzwerkrichtlinie basierend auf virtuellen Hosts
+
+Benutzerdefinierte Gruppen können adressenbasierte Gruppen für virtuelle Hosts unterstützen. Dies ermöglicht einen Anwendungsfall, bei dem zwei verschiedene FQDN-Adressen auf die gleiche IP-Adresse aufgelöst werden, aber unterschiedliche Regeln für jeden FQDN durchgesetzt werden sollten. Eine neue benutzerdefinierte Gruppe mit '`address=vh:xxx.yyy`' kann unter Verwendung des '`vh:`' Indikators erstellt werden, um diesen Schutz zu aktivieren. Eine Netzwerkrichtlinie kann dann die benutzerdefinierte Gruppe als '`From`' Quelle basierend auf dem virtuellen Hostnamen (anstatt der aufgelösten IP-Adresse) verwenden, um unterschiedliche Regeln für virtuelle Hosts durchzusetzen.
+
+== Split-Mode-Netzwerkschutz
+
+Containergruppen können Prozess-/Dateiregeln in einem anderen Modus als Netzwerkrichtlinien haben, wie xref:modes.adoc#_network_service_policy_mode[hier] beschrieben.
+
+== Integrierte Netzwerkbedrohungserkennung
+
+{product-name} erkennt automatisch bestimmte Netzwerkangriffe, unabhängig vom Schutzmodus. Im Entdecken- und Überwachungsmodus werden diese Bedrohungen gemeldet und können in den Benachrichtigungen -> Sicherheitsereignisse gefunden werden. Im Schutzmodus werden diese sowohl alarmiert als auch blockiert. Reaktionsregeln können ebenfalls auf Grundlage der Bedrohungserkennung erstellt werden.
+
+Beachten Sie, dass die benutzerdefinierte Netzwerkbedrohungserkennung über den Abschnitt WAF-Regeln konfiguriert werden kann.
+
+{product-name} umfasst die folgenden Erkennungen für Bedrohungen:
+
+* Apache Struts RCE-Angriff
+* Cipher Overflow-Angriff
+* Erkennung von HTTP-negativem Content-Length-Pufferüberlauf
+* Erkennung von MySQL-Zugriffsverweigerung
+* Erkennung von SSH-Version 1, 2 oder 3
+* Erkennung von SSL/TLS v1.0, v1.1 (erfordert Umgebungsvariable zur Aktivierung)
+* DNS-Pufferüberlauf-Angriff
+* DNS-Flut-DDOS-Angriff
+* DNS-Nulltyp-Angriff
+* DNS-Tunneling-Angriff
+* DNS-Zonentransfer-Angriff
+* HTTP Slowloris-DDOS-Angriff
+* HTTP-Smuggling-Angriff
+* ICMP-Flut-Angriff
+* ICMP-Tunneling-Angriff
+* IP-Teardrop-Angriff
+* Kubernetes Man-in-the-Middle-Angriff gemäß CVE-2020-8554
+* PING-of-Death-Angriff
+* SQL-Injection-Angriff
+* SSL Heartbleed-Angriff
+* SYN-Flood-Angriff
+* TCP-Kleinfenster-Angriff
+* TCP-Split-Handschlag-Angriff
+* TCP-Kleiner-MSS-Angriff

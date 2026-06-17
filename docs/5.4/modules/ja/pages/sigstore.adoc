@@ -1,0 +1,50 @@
+= Sigstore Cosign 署名検証者
+:revdate: 2025-05-08
+:page-revdate: {revdate}
+:page-opendocs-origin: /05.policy/03.admission/01.sigstore/01.sigstore.md
+:page-opendocs-slug:  /policy/admission/sigstore
+
+== 画像署名の要求に対する Sigstore/Cosign 検証者の設定
+
+{product-name} は、Sigstore の cosign ツールによって生成された画像署名を統合することで、ユーザーが署名検証ロジックを実行できるようにします。
+
+[NOTE]
+====
+NeuVector は現在、cosign v2 で生成された画像署名のスキャンのみをサポートしています。cosign v3 で作成された署名は、Sigstore の検証をトリガーしません。
+====
+
+以下は、適切なキーまたはアイデンティティによってデプロイメントの画像に署名されることを要求するアドミッションコントロール設定の例です。
+
+まず、信頼のルートを設定します。これは、署名を生成するために使用される Sigstore のデプロイメントに応じて、公開または非公開の信頼のルートのいずれかです。Sigstore のサービスの独自のインスタンスをデプロイしている場合は、非公開の信頼のルートオプションを選択してください。
+
+公開の信頼のルートは、簡単に参照できる名前を付ける以外に追加の設定は必要ありません。
+
+image:1configure-public-root-of-trust.png[sigstore]
+
+非公開の信頼のルートは、Sigstore のサービスのプライベートにデプロイされたインスタンスからのキーおよび/または証明書を必要とします。
+
+image:2configure-private-root-of-trust.png[sigstore]
+
+次に、特定の信頼のルートに対して、アドミッションコントロール中に使用したい各検証者を設定します。検証者には、キーペアとキーレスの2種類があります。キーペア検証者は、ユーザー定義のプライベートキーで署名された画像を検証しようとする際に使用されます。キーレス検証者は、Sigstore のキーレスパターンによって生成された署名を検証する際に使用されます。Sigstore の署名方法に関する詳細情報は、 https://docs.sigstore.dev/quickstart/quickstart-cosign/[Sigstore 署名概要] ドキュメントで参照できます。
+
+キーペア検証者を設定するには、名前とターゲットプライベートキーに対応する公開鍵を提供します。
+
+image:3add-keypair-verifier-for-public-root-of-trust.png[sigstore]
+
+キーレス検証者を設定するには、署名中に使用される OIDC 発行者とアイデンティティを提供します。
+
+image:4add-keyless-verifier-for-public-root-of-trust.png[sigstore]
+
+信頼のルートと検証者の設定後、特定の画像の署名が満たす検証者を特定するために、画像をスキャンする必要があります。
+
+特定の画像が満たす設定された検証者は、Assets->Registriesの特定の画像のスキャン結果の右上セクションで確認できます。画像が検証者によって署名されていない場合、そのスキャン結果には表示されません。
+
+image:6new_show_verifiers.scanresults.png[sigstore]
+
+特定のルートと検証者をアドミッションコントロールルールで参照するには、2つの名前をスラッシュで結合します：`my-root-of-trust/my-verifier`。
+
+image:5new_admission_rule_signature.png[sigstore]
+
+アドミッションコントロールルールで画像が署名されることを要求するには、画像署名基準のTrue/False値を設定します。
+
+image:7image_signed.png[sigstore]

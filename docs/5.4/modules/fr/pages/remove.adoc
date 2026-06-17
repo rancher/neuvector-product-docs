@@ -1,0 +1,76 @@
+= Suppression ou réinitialisation de {product-name}
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /02.deploying/10.remove/10.remove.md
+:page-opendocs-slug: /déployer/supprimer
+
+== Suppression de {product-name} Déploiement / Conteneurs
+
+Pour supprimer le déploiement {product-name} sur Kubernetes, utilisez le même fichier yaml pour le déploiement dans la commande de suppression.
+
+[,shell]
+----
+kubectl delete -f neuvector.yaml
+----
+
+Cela supprimera les services et les déploiements de conteneurs de {product-name}. Vous voudrez peut-être également supprimer l'espace de noms neuvector, le volume persistant et les rôles de cluster ainsi que les liaisons de rôles de cluster créés lors des étapes de déploiement.
+
+Si vous avez déployé {product-name} à l'aide d'un chart Helm ou d'un opérateur, vous devez supprimer {product-name} en utilisant Helm ou la commande appropriée de l'opérateur.
+
+== Réinitialisation de {product-name} à un état initial
+
+En plus de supprimer comme discuté ci-dessus et de redéployer {product-name}, les étapes suivantes peuvent être prises dans Kubernetes pour réinitialiser {product-name}, ce qui supprimera les règles apprises, les groupes et d'autres configurations mais laissera le déploiement {product-name} intact.
+
+. Mettez à l'échelle le déploiement du contrôleur à 0.
+. (Optionnel) si un volume persistant est utilisé, supprimez la sauvegarde du volume persistant ainsi que les dossiers du registre créés.
+. Mettez à l'échelle le déploiement du contrôleur à 3.
+
+== Réinitialisation du mot de passe administrateur
+
+Le mot de passe administrateur est la clé pour administrer le déploiement {product-name} et pour visualiser les activités du réseau du cluster.  Il est important de changer le mot de passe lors de l'installation et de le garder en sécurité.  Parfois, le mot de passe est trop bien gardé et devient perdu ou l'administrateur quitte l'entreprise.  Si vous avez accès à kubectl sur le cluster, vous pouvez réinitialiser le mot de passe administrateur à la valeur par défaut en suivant les étapes suivantes.
+
+Exécutez la commande exec sur l'un des contrôleurs.
+
+[,shell]
+----
+kubectl exec -it <controller> -n neuvector -- sh
+----
+
+Vérifiez que l'entrée administrateur existe et enregistrez la sortie JSON quelque part pour la conserver en sécurité.
+
+[,shell]
+----
+consul kv get object/config/user/admin
+----
+
+Prenez la sortie de la commande consul kv get ci-dessus et remplacez la chaîne password_hash par la chaîne ci-dessous.
+
+[,shell]
+----
+c7ad44cbad762a5da0a452f9e854fdc1e0e7a52a38015f23f3eab1d80b931dd472634dfac71cd34ebc35d16ab7fb8a90c81f975113d6c7538dc69dd8de9077ec
+----
+
+Réinitialisez le mot de passe du compte administrateur à la valeur par défaut. (REMPLACEZ <UPDATED_consul_kv_get_output_with_new_password_hash> AVANT L'EXÉCUTION !!!)
+
+[,shell]
+----
+consul kv put object/config/user/admin '<UPDATED_consul_kv_get_output_with_new_password_hash>'
+----
+
+[WARNING]
+.EXEMPLE CI-DESSOUS{nbsp}: (NE PAS EXÉCUTER SANS REMPLACER PAR LA SORTIE)
+====
+[,shell]
+----
+consul kv put object/config/user/admin '{"fullname":"admin","username":"admin","password_hash":"c7ad44cbad762a5da0a452f9e854fdc1e0e7a52a38015f23f3eab1d80b931dd472634dfac71cd34ebc35d16ab7fb8a90c81f975113d6c7538dc69dd8de9077ec","pwd_reset_time":"2022-03-24T20:50:15.341074451Z","pwd_hash_history":null,"domain":"","server":"","email":"","role":"admin","role_oride":false,"timeout":300,"locale":"en","role_domains":{},"last_login_at":"2022-03-24T20:49:32.577877044Z","login_count":1,"failed_login_count":0,"block_login_since":"0001-01-01T00:00:00Z"}'
+----
+
+Réponse{nbsp}:
+
+[,shell]
+----
+Success! Data written to: object/config/user/admin
+----
+
+Connectez-vous avec admin/admin et changez le mot de passe.
+====

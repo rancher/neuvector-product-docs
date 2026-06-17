@@ -1,0 +1,31 @@
+= Bamboo
+:revdate: 2024-09-27
+:page-revdate: {revdate}
+:page-opendocs-origin: /06.scanning/03.build/02.bamboo/02.bamboo.md
+:page-opendocs-slug:  /scanning/build/bamboo
+
+== Escanea vulnerabilidades durante el pipeline de compilación de Bamboo
+
+El complemento de Bamboo para {product-name} se puede utilizar para escanear vulnerabilidades en el pipeline de Bamboo. El complemento se puede descargar desde el menú de complementos del Administrador -> en Bamboo. Utiliza Buscar nuevas apps para buscar {product-name}. El complemento también se describe en el https://marketplace.atlassian.com/apps/1221199/neuvector[Atlassian Marketplace].
+
+Despliega el contenedor {product-name} Allinone o Controller si aún no lo has hecho en un host accesible por Bamboo. Toma nota de la dirección IP del host donde se está ejecutando el Allinone o Controller.
+
+Además, asegúrate de que haya un contenedor {product-name} escáner desplegado y configurado para conectarse al Allinone o Controller. En 4.0 y versiones posteriores, el contenedor neuvector/scanner debe desplegarse por separado del Allinone o Controller.
+
+=== Configurar ajustes globales
+
+Configurar ajustes para el {product-name} Controller/Allinone, incluyendo la autenticación {product-name} así como la autenticación del registro.
+
+image:bamboo_nv_global_config.png[global-image]
+
+=== Configurar el repositorio y la política de construcción
+
+Crea una tarea e introduce el repositorio y la etiqueta a escanear, así como la política de construcción para fallar la construcción si se detectan vulnerabilidades. Habilita el escaneo por capas si los resultados deben contener un análisis de vulnerabilidades para cada capa en la imagen.
+
+image:bamboo_nv_local_config_2.png[local-image]
+
+=== Revisar resultados
+
+Revisa los resultados en los registros de escaneo, incluyendo el resumen del escaneo, la razón del fallo si es apropiado, y los detalles de cada CVE detectado.
+
+image:bamboo_set_criteria_to_fail_3.png[fail-image]

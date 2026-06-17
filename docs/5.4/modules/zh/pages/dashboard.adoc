@@ -1,0 +1,35 @@
+= 安全状态监控概览
+:page-opendocs-origin: /15.ui_extension/01.dashboard/01.dashboard.md
+:page-opendocs-slug:  /ui_extension/dashboard
+
+在Rancher门户的UI扩展中，**NeuVector仪表板**的工作方式类似于其独立页面。它提供安全风险评分因素，让用户了解其集群的安全状态。在底部面板中，它提供4个选项卡，让用户切换图表以监控不同类别。
+
+在**安全事件**选项卡中，折线图显示基于日期的事件计数时间线。顶部的安全事件柱状图显示前5个源和目标端点。
+
+image:dashboard_security_events.png[仪表板]
+
+在**入口和出口暴露**选项卡中，堆叠柱状图显示按操作暴露的端点数量。在右侧，暴露表显示带有扫描信息的出口和入口端点服务。
+
+image:dashboard_exposure.png[仪表板]
+
+点击出口/入口表的一行显示特定服务的对话。在**外部主机**字段中，FQDN名称/IP地址显示带有地理位置国家旗帜。
+
+image:dashboard_conversations.png[仪表板]
+
+点击**外部主机**会重定向到whois.com以显示IP地址的详细信息。
+
+image:whois.png[仪表板]
+
+在**策略模式**选项卡中，饼图显示不同策略模式下的pod/服务的比例和数量。
+
+image:dashboard_policy_mode.png[仪表板]
+
+在**最易受攻击资产**选项卡中，柱状图显示包含高或中等严重性漏洞的前5个pod/节点。
+
+image:dashboard_top_vul_assets.png[仪表板]
+
+== 与NeuVector独立页面比较时不包含的功能
+
+* 评分改进对话框。
+* 通过第7层网络规则检测和保护的应用程序协议。
+* 基于名称空间的PDF报告。
