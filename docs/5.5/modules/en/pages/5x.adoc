@@ -12,6 +12,14 @@
 To receive email notifications of new releases, please subscribe to this SUSE mailing list: https://lists.suse.com/mailman/listinfo/neuvector-updates
 ====
 
+
+[#_553_june_2026]
+== 5.5.3 June 2026
+This release rebuilds the container images to patch CVEs in underlying operating system, application and library dependencies. It contains no new functional features or breaking changes, ensuring complete backwards compatibility.
+
+=== Bugs fixed	
+* https://github.com/neuvector/neuvector/issues/2227[#2227]: UBI controller images don't work in newer OpenShift environment
+
 [#_552_may_2026]
 == 5.5.2 May 2026
 This release rebuilds the container images to patch CVEs in underlying operating system, application and library dependencies. It contains no new functional features or breaking changes, ensuring complete backwards compatibility.
