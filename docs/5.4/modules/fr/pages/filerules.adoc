@@ -1,4 +1,5 @@
 = Règles d'accès aux fichiers
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/07.filerules/07.filerules.md

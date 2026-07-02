@@ -1,4 +1,5 @@
 = Azure DevOps
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-05-08
 :page-revdate: {revdate}
 :page-opendocs-origin: /06.scanning/03.build/04.azuredevops/04.azuredevops.md

@@ -1,4 +1,5 @@
 = Avaliação e Teste {product-name}
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-05-08
 :page-revdate: {revdate}
 :page-opendocs-origin: /09.testing/01.testing/01.testing.md

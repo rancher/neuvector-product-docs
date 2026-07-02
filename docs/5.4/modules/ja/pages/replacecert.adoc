@@ -1,4 +1,5 @@
 = 自己署名証明書の置き換え
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /03.configuration/01.console/01.replacecert/01.replacecert.md

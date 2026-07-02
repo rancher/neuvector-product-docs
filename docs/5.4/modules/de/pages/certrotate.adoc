@@ -1,4 +1,5 @@
 = Rotierendes internes selbstsigniertes Zertifikat
+:page-languages: [en, de, es, fr, ja, pt, zh]
 
 Dieses Feature ermöglicht es Benutzern, die internen Zertifikate von NeuVector automatisch zu aktualisieren/rotieren.
 

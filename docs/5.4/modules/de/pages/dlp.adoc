@@ -1,4 +1,5 @@
 = DLP- und WAF-Sensoren
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-05-05
 :page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/09.dlp/09.dlp.md

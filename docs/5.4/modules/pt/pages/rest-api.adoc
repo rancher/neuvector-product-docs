@@ -1,4 +1,5 @@
 = Conectar ao Gerenciador, servidor REST API
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-05-08
 :page-revdate: {revdate}
 :page-opendocs-origin: /03.configuration/01.console/01.console.md

@@ -1,4 +1,5 @@
 = Rotating Internal self signed certificate
+:page-languages: [en, de, es, fr, ja, pt, zh]
 
 This feature allows users to automatically update/rotate NeuVector internal certificates.
 

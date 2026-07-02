@@ -1,4 +1,5 @@
 = Reglas del Perfil de Proceso
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-03-31
 :page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/06.processrules/06.processrules.md

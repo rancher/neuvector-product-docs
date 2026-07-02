@@ -1,4 +1,5 @@
 = Bereitstellungsvorbereitung
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2026-02-05
 :page-revdate: {revdate}
 :page-opendocs-origin: /01.basics/03.installation/01.native/01.native.md

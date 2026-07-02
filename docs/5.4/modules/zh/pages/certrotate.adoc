@@ -1,4 +1,5 @@
 = 轮换内部自签名证书
+:page-languages: [en, de, es, fr, ja, pt, zh]
 
 此功能允许用户自动更新/轮换NeuVector内部证书。
 

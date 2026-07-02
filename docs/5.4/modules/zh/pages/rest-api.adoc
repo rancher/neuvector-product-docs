@@ -1,4 +1,5 @@
 = 连接到管理器，REST API 服务器
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-05-08
 :page-revdate: {revdate}
 :page-opendocs-origin: /03.configuration/01.console/01.console.md

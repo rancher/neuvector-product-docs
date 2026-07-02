@@ -1,4 +1,5 @@
 = 检测由 Pod/组使用的高带宽（DDoS）
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2026-02-05
 :page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/15.detectbandwidthddos/15.detectbandwidthddos.md

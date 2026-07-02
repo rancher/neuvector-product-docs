@@ -1,4 +1,5 @@
 = Detect High Bandwidth Used by a Pod/Group (DDoS)
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2026-02-05
 :page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/15.detectbandwidthddos/15.detectbandwidthddos.md

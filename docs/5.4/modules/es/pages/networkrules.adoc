@@ -1,4 +1,5 @@
 = Reglas de red
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/05.networkrules/05.networkrules.md

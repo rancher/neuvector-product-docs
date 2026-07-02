@@ -1,4 +1,5 @@
 = 5.x Versionshinweise
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2026-02-13
 :page-revdate: {revdate}
 :page-opendocs-origin: /14.releasenotes/01.5x/01.5x.md

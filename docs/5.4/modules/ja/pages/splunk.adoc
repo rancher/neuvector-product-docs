@@ -1,4 +1,5 @@
 = Splunk
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-05-08
 :page-revdate: {revdate}
 :page-opendocs-origin: /08.integration/11.splunk/11.splunk.md

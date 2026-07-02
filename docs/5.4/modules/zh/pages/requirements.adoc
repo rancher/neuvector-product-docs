@@ -1,4 +1,5 @@
 = 系统要求
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-06-02
 :page-revdate: {revdate}
 :page-opendocs-origin: /01.basics/02.requirements/02.requirements.md

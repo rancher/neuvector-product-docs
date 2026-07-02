@@ -1,4 +1,5 @@
 = Navegando no Console
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /04.navigation/01.navigation/01.navigation.md
