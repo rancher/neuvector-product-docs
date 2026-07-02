@@ -1,4 +1,5 @@
 = 与Rancher RBAC的集成
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2026-02-05
 :page-revdate: {revdate}
 :page-opendocs-origin: /08.integration/12.rancher_sso_rbac.md

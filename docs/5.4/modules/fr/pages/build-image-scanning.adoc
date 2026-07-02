@@ -1,4 +1,5 @@
 = Analyse des images lors de la phase de build
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-01-10
 :page-revdate: {revdate}
 :page-opendocs-origin: /06.scanning/03.build/03.build.md

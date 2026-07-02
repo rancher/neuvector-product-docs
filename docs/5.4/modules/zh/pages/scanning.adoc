@@ -1,4 +1,5 @@
 = 扫描和合规性
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-01-16
 :page-revdate: {revdate}
 :page-opendocs-origin: /06.scanning/01.scanning/01.scanning.md

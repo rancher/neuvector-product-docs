@@ -1,5 +1,6 @@
 [#_rest_api]
 = REST API und Automatisierung
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-05-08
 :page-revdate: {revdate}
 :page-opendocs-origin: /11.automation/02.automation/02.automation.md

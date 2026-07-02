@@ -1,4 +1,5 @@
 = Aperçu de l'état de sécurité
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :page-opendocs-origin: /15.ui_extension/01.dashboard/01.dashboard.md
 :page-opendocs-slug:  /ui_extension/dashboard
 

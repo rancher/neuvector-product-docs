@@ -1,4 +1,5 @@
 = Integrações e Outros Componentes
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /14.releasenotes/02.other/02.other.md

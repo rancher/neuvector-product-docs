@@ -1,4 +1,5 @@
 = 提高安全风险评分
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /04.navigation/03.improve_score/03.improve_score.md

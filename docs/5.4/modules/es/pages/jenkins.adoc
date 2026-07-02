@@ -1,4 +1,5 @@
 = Detalles de Jenkins
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-05-05
 :page-revdate: {revdate}
 :page-opendocs-origin: /06.scanning/03.build/01.jenkins/01.jenkins.md

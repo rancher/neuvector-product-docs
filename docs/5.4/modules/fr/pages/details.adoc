@@ -1,4 +1,5 @@
 = Détails des variables d'environnement
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-12-03
 :page-revdate: {revdate}
 :page-opendocs-origin: /02.deploying/01.production/03.details/03.details.md

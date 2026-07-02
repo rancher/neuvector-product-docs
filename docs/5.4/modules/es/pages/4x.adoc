@@ -1,4 +1,5 @@
 = Notas de la versión 4.x
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-02-19
 :page-revdate: {revdate}
 :page-opendocs-origin: /14.releasenotes/03.4x/03.4x.md

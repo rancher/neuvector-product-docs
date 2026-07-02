@@ -1,4 +1,5 @@
 = GitHub
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /06.scanning/03.build/06.github/06.github.md

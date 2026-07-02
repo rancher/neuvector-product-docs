@@ -1,4 +1,5 @@
 = Assinaturas de Ameaças de Rede
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /05.política/10.ameaças/10.ameaças.md

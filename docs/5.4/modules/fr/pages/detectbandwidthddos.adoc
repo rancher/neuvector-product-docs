@@ -1,4 +1,5 @@
 = Détecter l'utilisation de bande passante élevée par un pod/groupe (DDoS)
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2026-02-05
 :page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/15.detectbandwidthddos/15.detectbandwidthddos.md

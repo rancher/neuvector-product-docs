@@ -1,4 +1,5 @@
 = Certificado interno rotativo autofirmado
+:page-languages: [en, de, es, fr, ja, pt, zh]
 
 Esta función permite a los usuarios actualizar/rotar automáticamente los certificados internos de NeuVector.
 

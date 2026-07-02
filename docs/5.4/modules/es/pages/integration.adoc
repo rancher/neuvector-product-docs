@@ -1,4 +1,5 @@
 = Integración empresarial
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 18-12-2025
 :page-revdate: {revdate}
 :page-opendocs-origin: /08.integration/01.integration/01.integration.md

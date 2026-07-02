@@ -1,4 +1,5 @@
 = Rapport d'événements
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :page-opendocs-origin: /15.ui_extension/03.notifications/03.notifications.md
 :page-opendocs-slug:  /ui_extension/notifications
 

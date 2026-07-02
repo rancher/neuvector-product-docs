@@ -1,4 +1,5 @@
 = Configuração de Escaneamento de Registro
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-06-25
 :page-revdate: {revdate}
 :page-opendocs-origin: /06.scanning/02.registry/02.registry.md

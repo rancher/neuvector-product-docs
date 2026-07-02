@@ -1,4 +1,5 @@
 = Modos: Descubrir, Monitor y Proteger
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/02.modes/02.modes.md

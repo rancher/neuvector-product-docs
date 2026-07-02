@@ -1,4 +1,5 @@
 = Gestion multi-cluster d'entreprise
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /04.navigation/02.multicluster/02.multicluster.md

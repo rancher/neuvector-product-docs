@@ -1,5 +1,6 @@
 [#_users]
 = Usuarios y funciones
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-01-10
 :page-revdate: {revdate}
 :page-opendocs-origin: /03.configuration/02.users/02.users.md

@@ -1,4 +1,5 @@
 = Chrome証明書アップロード - MacOS
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /03.configuration/01.console/02.chrome/02.chrome.md

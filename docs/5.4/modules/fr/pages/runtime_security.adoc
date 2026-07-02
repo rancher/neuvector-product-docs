@@ -1,4 +1,5 @@
 = Résultat de l'analyse de sécurité des actifs
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :page-opendocs-origin: /15.ui_extension/02.runtime_security/02.runtime_security.md
 :page-opendocs-slug:  /ui_extension/runtime_security
 

@@ -1,4 +1,5 @@
 = Durchsetzung der Namespace-Grenze
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2026-02-05
 :page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/14.namespaceboundary/14.namespaceboundary.md

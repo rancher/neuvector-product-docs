@@ -1,4 +1,5 @@
 = Docker e Mirantis Kubernetes Engine
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-01-10
 :page-revdate: {revdate}
 :page-opendocs-origin: /02.deploying/05.docker/05.docker.md

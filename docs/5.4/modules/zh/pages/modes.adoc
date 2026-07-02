@@ -1,4 +1,5 @@
 = 方式：发现、监控、保护
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/02.modes/02.modes.md

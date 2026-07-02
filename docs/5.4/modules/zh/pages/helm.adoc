@@ -1,4 +1,5 @@
 = 使用 Helm 部署
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2026-03-24
 :page-revdate: {revdate}
 :chart-version: 108.0.2+up2.8.11

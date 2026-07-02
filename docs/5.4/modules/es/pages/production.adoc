@@ -1,4 +1,5 @@
 = Distribuyendo {product-name}
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /02.deploying/01.production/01.production.md

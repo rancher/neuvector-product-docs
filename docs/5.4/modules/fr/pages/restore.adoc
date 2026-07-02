@@ -1,4 +1,5 @@
 = Restauration de la {product-name} configuration
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-12-08
 :page-revdate: {revdate}
 :page-opendocs-origin: /02.deploying/11.restore/11.restore.md
