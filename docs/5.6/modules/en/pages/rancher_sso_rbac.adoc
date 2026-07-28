@@ -73,7 +73,7 @@ This integration supports roles at the Global, Cluster, Project, and Namespace l
 [#_definitions_and_expectations_with_global_cluster_and_project_namespace_roles]
 == Definitions and expectations with Global, Cluster, and Project/Namespace roles
 
-* Cluster resource with `*` verb on a Rancher Global role:
+* Cluster resource with `*` verb on a Rancher Cluster role:
 ** Mapped to the {product-name} `fedAdmin` role on the {product-name} federation master cluster  
   (Users cannot map a Rancher Global role to a {product-name} `admin` role when {product-name} is deployed on a federation master cluster.)
 ** Mapped to the {product-name} `admin` role on {product-name} federation-managed clusters
@@ -133,7 +133,7 @@ inheritedClusterRoles:
 
 * Create a FedAdmin user. Always log in as a FedAdmin through the federation master cluster. If the environment is not federated, roles are downgraded to Reader or Admin.
 
-** Create a Global role:
+** Create a cluster role with the following parameters. By using a global role it is also accessible by the other downstream clusters:
 +
 [source,yaml]
 ----
@@ -158,7 +158,8 @@ API: neuvector.com
 
 [NOTE]
 ====
-To switch between FedAdmin and FedReader, change the verb from `*` to `get`. The `get` verb provides read-only access.
+To switch between FedAdmin and FedReader, just change the verbs from * to `get`. `get` is just the read permission, i.e., FedReader in this use case.
+You should use the Cluster role to divide access scenarios based on the RBAC verbs and resources allowed by {product-name}. The Global role should be used strictly if you want to propagate to more clusters. Users must create Cluster roles to propagate the Global role to all downstream clusters.
 ====
 
 [#_use_case_3]

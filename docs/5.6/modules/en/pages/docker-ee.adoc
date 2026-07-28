@@ -9,6 +9,11 @@
 This page is deprecated and will be removed in a future release.
 ====
 
+[IMPORTANT]
+====
+`Allinone` native Docker support is deprecated from v5.5.0.
+====
+
 [#_deploy_to_swarm_cluster]
 == Deploy to Swarm Cluster
 
