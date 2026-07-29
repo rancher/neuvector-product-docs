@@ -28,9 +28,13 @@ Other features of {product-name} include the ability to quarantine containers an
 [#_security_containers]
 == Security Containers
 
-The {product-name} run-time container security solution contains four types of security containers: *Controllers*, *Enforcers*, *Managers*, and *Scanners*. A special container called the *Allinone* is also provided to combine the Controller, Enforcer, and Manager functions all in one container, primarily for docker native deployments.
-
+The {product-name} run-time container security solution contains four types of security containers: **Controllers**, **Enforcers**, **Managers**, and **Scanners**.
 {product-name} can be deployed on virtual machines or on bare metal systems with a single os.
+
+[NOTE]
+====
+Docker support is deprecated from v5.5.0.
+====
 
 image:1Overview.png[Deployment]
 
@@ -55,11 +59,6 @@ For Docker native (non Kubernetes) deployments the Enforcer container and the Co
 
 The Manager is a stateless container that provides a web-UI (HTTPS only) console for users to manage the {product-name} security solution. More than one Manager container can be deployed as necessary.
 
-[#_all_in_one]
-=== All-in-One
-
-The All-in-One container includes a Controller, an Enforcer and a Manager in one package. It's useful for easy installation in single-node or small-scale deployments.
-
 [#_scanner]
 === Scanner
 
@@ -82,20 +81,10 @@ image:architecture.png[Architecture]
 
 For common deployment patterns and best practices see the xref:production.adoc#_best_practices_tips_qa_for_deploying_and_managing_product[Onboarding/Best Practices section].
 
-[#_all_in_one_and_enforcers]
-=== All-in-One and Enforcers
-
-This deployment is ideal for single-node or small-scale environments, for example for evaluation, testing, and small deployments. An All-in-One container is deployed on one node, which can also be a node with running application containers. An Enforcer can be deployed on all other nodes, with one Enforcer required on each node you wish to protect with {product-name}. This is also useful for native Docker deployments where a controller and enforcer cannot run on the same host.
-
 [#_controller_manager_and_enforcer_containers]
 === Controller, Manager and Enforcer Containers
 
 This is a more generic deployment use case which consists one or more Controllers, one Manager and a set of Enforcers. The Controller and Manager can be deployed on the same node or on different nodes than the Enforcer.
-
-[#_all_in_one_only]
-=== All-in-One Only
-
-You can deploy just the allinone container for registry scanning, using the Jenkins plug-in, or simple one node testing of {product-name}.
 
 [#_controller_only]
 === Controller Only
