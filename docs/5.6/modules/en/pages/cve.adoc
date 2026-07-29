@@ -4,6 +4,11 @@
 
 NeuVector is committed to informing the community about security issues. The following table lists published security advisories and CVEs (Common Vulnerabilities and Exposures) for resolved issues.
 
+[NOTE]
+====
+Currently there are no new known security advisories or CVEs for {product-name}. This page will be updated as new advisories are published.
+====
+
 [#_questions_and_support]
 == Questions and Support
 
