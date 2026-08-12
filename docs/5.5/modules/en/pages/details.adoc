@@ -109,7 +109,7 @@ ____
 * MANAGER_SSL
 +
 ____
-(Optional) Manager by default uses and HTTPS/SSL connection. Set the value to "`off`" to use HTTP.
+(Optional) Manager by default uses and HTTPS/SSL connection. Set the value to `off` to use HTTP.
 ____
 +
 [IMPORTANT]
@@ -129,19 +129,19 @@ ____
 * ENF_NO_SECRET_SCANS
 +
 ____
-(Optional) Set the value to "`1`" to disable scanning for secrets in files (improves performance).
+(Optional) Set the value to `1` to disable scanning for secrets in files (improves performance).
 ____
 
 * ENF_NO_AUTO_BENCHMARK
 +
 ____
-(Optional) Set the value to "`1`" to disable CIS benchmarks on host and containers (improves performance).
+(Optional) Set the value to `1` to disable CIS benchmarks on host and containers (improves performance).
 ____
 
 * ENF_NO_SYSTEM_PROFILES
 +
 ____
-(Optional) Set the value to "1" to disable the process and file monitors. No learning processes, no profile modes, no process/file (package) incidents, and no file activity monitor will be performed. This will reduce CPU/memory resource usage and file operations.
+(Optional) Set the value to `1` to disable the process and file monitors. No learning processes, no profile modes, no process/file (package) incidents, and no file activity monitor will be performed. This will reduce CPU/memory resource usage and file operations.
 ____
 
 * ENF_NETPOLICY_PULL_INTERVAL
@@ -153,13 +153,13 @@ ____
 * THRT_SSL_TLS_1DOT0
 +
 ____
-(Optional) Set the value to "`1`" to enable the detection for TLS Version 1.0 (Deprecated).
+(Optional) Set the value to `1` to enable the detection for TLS Version 1.0 (Deprecated).
 ____
 
 * THRT_SSL_TLS_1DOT1
 +
 ____
-(Optional) Set the value to "`1`" to enable the detection for TLS Version 1.1 (Deprecated).
+(Optional) Set the value to `1` to enable the detection for TLS Version 1.1 (Deprecated).
 ____
 
 * NV_SYSTEM_GROUPS
