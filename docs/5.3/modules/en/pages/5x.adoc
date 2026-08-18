@@ -258,6 +258,7 @@ HTTP Strict Transport Security max-age=15724800, 2) add CSP header (e.g. set a '
 * Remove requirement for controller/enforcer to mount "/host/cgroup".
 * Add Get Support menu with links to slack, documentation, and other resources
 * Fill message field to /v1/log/activity logs
+* The federation of scan results to remote/managed clusters is now configurable. Please note that the default setting is `OFF`. In previous versions, this behavior was enabled by default. For more information, refer to xref:multicluster.adoc#_federating_results_from_ci_cd_scanners_optional[Federating Results from CI/CD Scanners (Optional)].
 
 ==== Bug Fixes
 
