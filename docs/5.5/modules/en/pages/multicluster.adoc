@@ -122,6 +122,11 @@ Federated registries can only be configured by a federated admin on the primary 
 [#_federating_results_from_ci_cd_scanners_optional]
 === Federating Results from CI/CD Scanners (Optional)
 
+[NOTE]
+====
+The federation of scan results to managed clusters is now an optional setting. By default, this setting is turned `OFF`.
+====
+
 Federated registry scan results are always sync'd to managed clusters, as described above. The primary cluster can also receive scan results xref:scanners.adoc#_standalone_scanner_for_local_scanning[from stand alone scanner scans] or scanner plug-ins invoked from a build CI/CD pipeline. To enable build phase (CI/CD) repository scanning results to also sync to managed clusters, first enable it by editing the primary (master) cluster settings as shown below.
 
 image:fed_primary_config.png[master_settings]
