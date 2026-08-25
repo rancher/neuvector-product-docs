@@ -24,7 +24,10 @@ After deployment of the adapter, it is necessary to configure this in Harbor.
 
 image:5_2_adapter_configuration.png[Harbor]
 
-The adapter endpoint must be entered, and the adapter connects to the controller, which is typically exposed as a service externally so the adapter can connect to it. In addition, authentication credentials for a valid {product-name} user must be entered.
+The adapter endpoint must be entered, and the adapter connects to the controller, which is typically exposed as a service externally so the adapter can connect to it. In addition, authentication credentials set through cve.adapter.harbor.secretName could be entered.
+If you set cve.adapter.harbor.secretName in your Helm values:
+It sets the HARBOR_BASIC_AUTH_USERNAME and HARBOR_BASIC_AUTH_PASSWORD environment variables inside the adapter pod.
+The adapter will now act as a gatekeeper. When Harbor sends a request, the adapter will check the credentials against this secret first.
 
 [#_scanning_images_from_a_harbor_registry]
 === Scanning Images from a Harbor Registry
