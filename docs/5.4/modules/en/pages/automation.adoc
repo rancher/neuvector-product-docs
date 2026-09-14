@@ -1,4 +1,5 @@
 = REST API and Automation
+:description: Use the REST API to automate security functions in SUSE® Security and manage tasks like scanning, policy enforcement, and event response
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-05-08
 :page-revdate: {revdate}

@@ -1,4 +1,5 @@
 = Evaluating and Testing {product-name}
+:description: Evaluate and test SUSE® Security by deploying sample applications and running Kubernetes-based security tests
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-05-08
 :page-revdate: {revdate}

@@ -1,4 +1,5 @@
 = OpenID Connect Azure/Okta
+:description: Configure OpenID Connect for Azure and Okta by entering the issuer URL, client ID, client secret, and redirect URIs, then set permissions and group claim
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}

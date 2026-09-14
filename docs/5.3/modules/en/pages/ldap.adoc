@@ -1,4 +1,5 @@
 = LDAP
+:description: Configure LDAP server settings including port, user name, base DN, default role, admin and reader role map, and test the connection
 :revdate: 2024-09-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /08.integration/02.ldap/02.ldap.md

@@ -1,4 +1,5 @@
 = Mirantis Kubernetes Engine
+:description: Deploy Mirantis Kubernetes Engine using Docker Compose to set up clusters, configure containers, and manage workloads using specific environment variables
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}

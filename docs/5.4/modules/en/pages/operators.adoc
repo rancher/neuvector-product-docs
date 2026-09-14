@@ -1,4 +1,5 @@
 = Deploy Using Operators
+:description: Deploy SUSE® Security using Operators on OpenShift by installing, configuring, and verifying the SUSE® Security Operator instance
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-06-02
 :page-revdate: {revdate}

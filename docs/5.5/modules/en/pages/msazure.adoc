@@ -1,4 +1,5 @@
 = SAML (Azure AD)
+:description: Configure SAML integration between Azure AD and SUSE® Security by setting up an enterprise application and configuring SAML with the Login URL
 :revdate: 2024-09-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /08.integration/05.msazure/05.msazure.md

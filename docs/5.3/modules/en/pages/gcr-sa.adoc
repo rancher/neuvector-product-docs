@@ -1,4 +1,5 @@
 = GCR Scanning using Service Accounts
+:description: Set up a GCP service account to enable GCR scanning in SUSE® Security and trigger repository scans
 :revdate: 2024-09-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /06.scanning/02.registry/03.gcr-sa/03.gcr-sa.md

@@ -1,4 +1,5 @@
 = Integrations & Other Components
+:description: Find updates and release notes for integrations and components such as Helm charts, plugins, Splunk app, GitHub Actions, and Jenkins plugins
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}

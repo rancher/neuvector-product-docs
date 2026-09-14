@@ -1,4 +1,5 @@
 = Compliance & CIS Benchmarks
+:description: Manage compliance and CIS benchmarks using SUSE Security to view results and generate reports for industry standards
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-01-16
 :page-revdate: {revdate}

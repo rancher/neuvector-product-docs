@@ -1,4 +1,5 @@
 = Amazon ECS
+:description: Deploy SUSE Security on Amazon ECS by creating task definitions, setting up security groups, and configuring services
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}

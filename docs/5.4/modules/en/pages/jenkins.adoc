@@ -1,4 +1,5 @@
 = Jenkins Details
+:description: Configure the Jenkins plugin to scan images using Controller and Scanner or standalone scanner mode for vulnerability detection
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-05-05
 :page-revdate: {revdate}

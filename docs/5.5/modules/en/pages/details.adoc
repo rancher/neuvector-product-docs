@@ -1,4 +1,5 @@
 = Environment Variables Details
+:description: Find details about environment variables for Controller, Enforcer, Manager, and open ports in the SUSE® Security containers
 :revdate: 2024-12-03
 :page-revdate: {revdate}
 :page-opendocs-origin: /02.deploying/01.production/03.details/03.details.md

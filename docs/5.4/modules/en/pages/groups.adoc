@@ -1,4 +1,5 @@
 = Groups
+:description: Manage security groups to view and customize rules, switch between Discover, Monitor, and Protect modes, and apply policies to containers and hosts
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}

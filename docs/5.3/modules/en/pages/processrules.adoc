@@ -1,4 +1,5 @@
 = Process Profile Rules
+:description: Configure process profile rules for groups to set protection modes and manage allowed processes and files
 :revdate: 2024-09-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/06.processrules/06.processrules.md

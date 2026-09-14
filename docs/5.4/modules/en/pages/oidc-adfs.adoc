@@ -1,4 +1,5 @@
 = OpenID Connect (OIDC) for ADFS
+:description: Configure OpenID Connect (OIDC) for ADFS by creating application groups, setting redirect URIs, and defining claim rules
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}

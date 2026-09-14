@@ -1,4 +1,5 @@
 = Deployment Preparation
+:description: Prepare to deploy SUSE® Security using Kubernetes, OpenShift, Rancher, Docker, or other platforms by following setup steps and configuring volumes and ports,
 :revdate: 2026-02-05
 :page-revdate: {revdate}
 :page-opendocs-origin: /01.basics/03.installation/01.native/01.native.md

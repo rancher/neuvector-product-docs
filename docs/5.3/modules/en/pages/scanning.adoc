@@ -1,4 +1,5 @@
 = Scanning & Compliance
+:description: Enable full lifecycle scanning and compliance management by performing vulnerability scans, running CIS benchmarks, and custom checks to identify risks
 :revdate: 2024-09-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /06.scanning/01.scanning/01.scanning.md
