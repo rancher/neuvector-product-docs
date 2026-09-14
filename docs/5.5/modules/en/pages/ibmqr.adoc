@@ -1,4 +1,5 @@
 = IBM QRadar
+:description: Configure the integration between SUSE® Security and IBM QRadar to collect and analyze container security events
 :revdate: 2024-09-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /08.integration/10.ibmqr/10.ibmqr.md

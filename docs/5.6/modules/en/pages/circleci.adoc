@@ -1,4 +1,5 @@
 = CircleCI
+:description: Use the SUSE® Security CircleCI ORB to scan images in your pipeline by deploying the Allinone or Controller container and configuring environment variables
 :revdate: 2024-09-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /06.scanning/03.build/03.circleci/03.circleci.md

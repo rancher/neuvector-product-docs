@@ -1,4 +1,5 @@
 = Rancher Deployment
+:description: Deploy SUSE® Security through Rancher Extensions or the Apps & Marketplace to manage security functions, monitor cluster health, and use the SUSE® Security UI
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-12-03
 :page-revdate: {revdate}

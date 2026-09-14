@@ -1,4 +1,5 @@
 = Namespace Boundary Enforcement
+:description: Apply the NeuvectorNamespaceBoundary label to enforce communication boundaries between pods in different namespaces
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2026-02-05
 :page-revdate: {revdate}

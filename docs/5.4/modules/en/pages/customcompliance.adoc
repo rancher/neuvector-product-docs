@@ -1,4 +1,5 @@
 = Custom Compliance Checks
+:description: Create custom compliance checks to run scripts on containers and hosts, validate conditions, and generate compliance reports
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-25
 :page-revdate: {revdate}

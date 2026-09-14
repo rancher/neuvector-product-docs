@@ -1,4 +1,5 @@
 = 5.x Overview
+:description: Learn about the 5.x Overview features and components, including vulnerability scanning, runtime protection, and deployment options for the Full Life-Cycle
 :revdate: 2025-01-10
 :page-revdate: {revdate}
 :page-opendocs-origin: /01.basics/01.overview/01.overview.adoc

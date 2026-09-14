@@ -1,4 +1,5 @@
 = Docker & Mirantis Kubernetes Engine
+:description: Deploy SUSE Security Containers using Docker Native, UCP, or Swarm on Mirantis Kubernetes Engine with Docker Compose
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-01-10
 :page-revdate: {revdate}

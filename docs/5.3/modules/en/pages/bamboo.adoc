@@ -1,4 +1,5 @@
 = Bamboo
+:description: Scan for vulnerabilities during Bamboo builds using the SUSE® Security plug-in, download it from the Admin menu, deploy required containers, and configure global settings
 :revdate: 2024-09-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /06.scanning/03.build/02.bamboo/02.bamboo.md

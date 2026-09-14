@@ -1,4 +1,5 @@
 = ECR Scanning using IAM Roles
+:description: Create an AWS IAM role with ECR Read Access to scan ECR repositories on an EC2 instance without using access keys
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}

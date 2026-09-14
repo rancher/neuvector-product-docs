@@ -1,4 +1,5 @@
 = Security Policy & Rules
+:description: Manage network, process, and file system rules to learn normal application behavior and detect violations
 :revdate: 2024-09-25
 :page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/05.policy.md

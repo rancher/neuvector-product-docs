@@ -1,4 +1,5 @@
 = Rotating Internal self signed certificate
+:description: Enable auto-rotation to update the internal self-signed certificate using Kubernetes Jobs and CronJobs by setting internal.autoRotateCert to true
 :page-languages: [en, de, es, fr, ja, pt, zh]
 
 This feature allows users to automatically update/rotate NeuVector internal certificates.

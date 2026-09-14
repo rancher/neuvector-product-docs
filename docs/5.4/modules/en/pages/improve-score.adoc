@@ -1,4 +1,5 @@
 = Improve Security Risk Score
+:description: Learn how to improve the Security Risk Score by adjusting protection modes, ingress/egress risks, container settings, admission controls, and vulnerabilities
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}

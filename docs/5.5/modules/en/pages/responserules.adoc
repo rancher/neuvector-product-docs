@@ -1,4 +1,5 @@
 = Response Rules
+:description: Create and configure response rules to automate actions like quarantine, webhook, or suppress log based on security events
 :revdate: 2024-09-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/08.responserules/08.responserules.md

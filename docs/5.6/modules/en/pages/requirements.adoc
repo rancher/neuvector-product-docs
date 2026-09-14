@@ -1,4 +1,5 @@
 = System Requirements
+:description: Check the system requirements for the product, including supported platforms, required storage (RWX PVC of 1Gi or more), and recommended browsers (Chrome) here
 :revdate: 2025-06-02
 :page-revdate: {revdate}
 :page-opendocs-origin: /01.basics/02.requirements/02.requirements.md

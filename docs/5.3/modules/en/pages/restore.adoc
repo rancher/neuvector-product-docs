@@ -1,4 +1,5 @@
 = Restoring {product-name} Configuration
+:description: Apply a configuration backup file manually or via the REST API to restore a previous SUSE® Security configuration when persistent storage is available
 :revdate: 2024-12-08
 :page-revdate: {revdate}
 :page-opendocs-origin: /02.deploying/11.restore/11.restore.md

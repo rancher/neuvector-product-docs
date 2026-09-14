@@ -1,4 +1,5 @@
 = SAML (ADFS)
+:description: Configure ADFS and SUSE Security SAML integration by following steps for relying party trust and claim rules to enable single sign-on
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-05-08
 :page-revdate: {revdate}

@@ -1,4 +1,5 @@
 = Replacing Internal Certificates
+:description: Replace default self-signed certificates with custom certificates for Manager, Controller, Enforcer, and Scanner internal communications in SUSE® Security
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-01-27
 :page-revdate: {revdate}

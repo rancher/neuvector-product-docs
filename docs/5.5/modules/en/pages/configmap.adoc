@@ -1,4 +1,5 @@
 = Deploy Using ConfigMap
+:description: Deploy SUSE® Security containers using a Kubernetes ConfigMap to automate configuration with settings, integrations, and reload options to manage updates
 :revdate: 2025-01-10
 :page-revdate: {revdate}
 :page-opendocs-origin: /02.deploying/01.production/01.configmap/01.configmap.md

@@ -1,4 +1,5 @@
 = Admission Controls
+:description: Learn how to use admission controls to manage image and container deployments using SUSE® Security based on user-defined rules
 :revdate: 2025-05-08
 :page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/03.admission/03.admission.md

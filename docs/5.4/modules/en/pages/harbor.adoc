@@ -1,4 +1,5 @@
 = Harbor Pluggable Scanner Module
+:description: Configure the Harbor Pluggable Scanner Module to scan Harbor registries using the registry adapter and controller
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}

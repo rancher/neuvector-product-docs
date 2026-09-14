@@ -1,4 +1,5 @@
 = GitHub
+:description: Scan for vulnerabilities in a GitHub Action pipeline using the SUSE® Security Vulnerability Scan Action from the GitHub Action Marketplace to identify vulnerabilities
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}

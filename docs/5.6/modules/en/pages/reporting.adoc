@@ -1,4 +1,5 @@
 = Reporting & Notifications
+:description: View and download security reports, event logs, and compliance data from the SUSE® Security console
 :revdate: 2025-05-02
 :page-revdate: {revdate}
 :page-opendocs-origin: /07.reporting/01.reporting/01.reporting.md

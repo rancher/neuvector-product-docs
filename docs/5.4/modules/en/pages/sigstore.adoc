@@ -1,4 +1,5 @@
 = Sigstore Cosign Signature Verifiers
+:description: Configure Sigstore Cosign Signature Verifiers to require image signing by setting up root of trust and selecting keypair or keyless verification
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-05-08
 :page-revdate: {revdate}
