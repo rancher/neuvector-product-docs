@@ -1,4 +1,5 @@
 = Integrations & Other Components
+:description: Find updates and release notes for integrations and components such as Helm charts, plugins, Splunk app, GitHub Actions, and Jenkins plugins
 :revdate: 2024-09-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /14.releasenotes/02.other/02.other.md

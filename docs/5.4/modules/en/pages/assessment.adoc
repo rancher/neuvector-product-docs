@@ -1,4 +1,5 @@
 = Configuration Assessment for Kubernetes Resources
+:description: Scan Kubernetes resource deployment files against Admission Control rules to check for compliance before deployment
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}

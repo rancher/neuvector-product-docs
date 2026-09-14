@@ -1,4 +1,5 @@
 = Parallel & Standalone Scanners
+:description: Deploy parallel and standalone scanners to increase performance and scalability by scanning images in registries using Kubernetes, and to scale up or down
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}

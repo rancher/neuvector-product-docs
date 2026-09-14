@@ -1,4 +1,5 @@
 = Microsoft AD
+:description: Configure SUSE® Security to authenticate with Windows Active Directory by setting user names, Base DN, testing connections, and mapping groups to roles
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}

@@ -1,4 +1,5 @@
 = Splunk
+:description: Find and install the SUSE® Security Splunk App to monitor security events and configure syslog settings
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-05-08
 :page-revdate: {revdate}

@@ -1,4 +1,5 @@
 = Response Rules
+:description: Create and configure response rules to automate actions like quarantine, webhook, or suppress log based on security events
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}

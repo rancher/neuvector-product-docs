@@ -1,4 +1,5 @@
 = 4.x Release Notes
+:description: Review 4.x release notes to find security patches for CVEs like CVE-2022-0778 and CVE-2022-28391, Alpine image updates, enhancements, and bug fixes
 :revdate: 2025-02-19
 :page-revdate: {revdate}
 :page-opendocs-origin: /14.releasenotes/03.4x/03.4x.md

@@ -1,4 +1,5 @@
 = Custom Login, Header and Footer
+:description: Customize the login logo, header, and footer by creating and encoding SVG and text files, then setting environment variables in the helm chart
 :revdate: 2024-09-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /03.configuration/03.customui/03.customui.md

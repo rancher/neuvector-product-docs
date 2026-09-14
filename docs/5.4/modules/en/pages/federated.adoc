@@ -1,4 +1,5 @@
 = Federated Policy
+:description: Configure federated policies in the Master cluster to propagate global rules to all clusters as read-only entries
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-25
 :page-revdate: {revdate}

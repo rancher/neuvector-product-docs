@@ -1,4 +1,5 @@
 = Kubernetes
+:description: Deploy SUSE® Security on Kubernetes using manager, controller, and enforcer containers with supported network plugins
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-06-05
 :page-revdate: {revdate}

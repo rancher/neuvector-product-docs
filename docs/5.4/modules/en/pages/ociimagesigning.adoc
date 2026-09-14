@@ -1,4 +1,5 @@
 = Image Signing for OCI Image
+:description: Verify OCI images in the SUSE Rancher Application Collection using Sigstore and Cosign public keys from SUSE® Security
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2026-02-05
 :page-revdate: {revdate}

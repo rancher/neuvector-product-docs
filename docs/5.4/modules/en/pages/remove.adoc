@@ -1,4 +1,5 @@
 = Removing or Resetting {product-name}
+:description: Remove or reset SUSE® Security from Kubernetes to delete deployments, reset configurations, or change the admin password
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}

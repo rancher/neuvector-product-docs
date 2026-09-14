@@ -1,4 +1,5 @@
 = Network Threat Signatures
+:description: Learn to detect network threats using SUSE Security signatures for OWASP attacks such as SQL injection, DDoS, and tunneling
 :revdate: 2024-09-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/10.threats/10.threats.md

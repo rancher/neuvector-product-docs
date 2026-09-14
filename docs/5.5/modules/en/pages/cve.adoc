@@ -1,5 +1,6 @@
 = Security Advisories and CVEs
-:revdate: 2026-09-15
+:description: Find security advisories and CVEs for resolved issues in NeuVector products and how to contact the security team or report problems via GitHub
+:revdate: 2026-09-16
 :page-revdate: {revdate}
 
 NeuVector is committed to informing the community about security issues. The following table lists published security advisories and CVEs (Common Vulnerabilities and Exposures) for resolved issues.

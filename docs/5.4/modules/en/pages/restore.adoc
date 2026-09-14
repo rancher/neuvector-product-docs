@@ -1,4 +1,5 @@
 = Restoring {product-name} Configuration
+:description: Apply a configuration backup file manually or via the REST API to restore a previous SUSE® Security configuration when persistent storage is available
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-12-08
 :page-revdate: {revdate}

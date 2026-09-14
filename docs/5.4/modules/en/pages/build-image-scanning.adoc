@@ -1,4 +1,5 @@
 = Build Phase Image Scanning
+:description: Scan images during the build phase using plugins like Jenkins or REST API, connect to registry or local host, deploy the scanner container, and expose port 10443,
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-01-10
 :page-revdate: {revdate}
