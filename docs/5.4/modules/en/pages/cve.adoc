@@ -1,6 +1,6 @@
 = Security Advisories and CVEs
 :page-languages: [en, de, es, fr, ja, pt, zh]
-:revdate: 2026-09-09
+:revdate: 2026-09-15
 :page-revdate: {revdate}
 
 NeuVector is committed to informing the community about security issues. The following table lists published security advisories and CVEs (Common Vulnerabilities and Exposures) for resolved issues.
@@ -8,6 +8,31 @@ NeuVector is committed to informing the community about security issues. The fol
 [cols="1,4,1,1", options="header"]
 |===
 | ID | Description | Date | Resolution
+
+| https://github.com/neuvector/neuvector/security/advisories/GHSA-vr77-8vmq-qfmj[CVE-2026-78424]
+| Fixed a security vulnerability where improper parameter handling allowed any authenticated users access to inject OS commands in the privileged enforcer container, which could lead to the complete compromise of the worker node.
+| 15 September 2026
+| https://github.com/neuvector/neuvector/releases/tag/v5.4.11[NeuVector v5.4.11]
+
+| https://github.com/neuvector/neuvector/security/advisories/GHSA-wgg5-24xq-px35[CVE-2026-78425]
+| Fixed a security vulnerability regarding improper authentication where starting from version v5.6.2, users can configure the “Audience URI” in the *Settings -> SAML Settings* page. After the “Audience URI” is configured, it is used and checked during SAML SSO so that assertion for other applications won’t be accepted by SUSE Security.
+| 15 September 2026
+| https://github.com/neuvector/neuvector/releases/tag/v5.4.11[NeuVector v5.4.11]
+
+| https://github.com/neuvector/neuvector/security/advisories/GHSA-wcx5-mq6c-c54j[CVE-2026-78426]
+| Fixed a security vulnerability where the SUSE Security JWT verifier accepted non-canonical `Base64URL` encodings of the same RSA signature, so an attacker holding a valid token could continue using a token that is expired or logged out by using its equivalent spelling. Starting from version v5.6.2, the SUSE Security JWT verifier requires the JWT token to be a unique compact serialization.
+| 15 September 2026
+| https://github.com/neuvector/neuvector/releases/tag/v5.4.11[NeuVector v5.4.11]
+
+| https://github.com/neuvector/neuvector/security/advisories/GHSA-78r4-3wfq-r2xm[CVE-2026-78427]
+| Fixed a security vulnerability where the SUSE Security admission webhook silently excluded containers from policy evaluation when their image path matched one of three hard-coded service mesh sidecar images. This could lead malicious users to deploy workloads by evading admission deny rules by naming their image path after one of these sidecar images. Starting from version v5.6.2, the automatic sidecar exemptions are removed entirely.
+| 15 September 2026
+| https://github.com/neuvector/neuvector/releases/tag/v5.4.11[NeuVector v5.4.11]
+
+| https://github.com/neuvector/neuvector/security/advisories/GHSA-c6rx-pmvf-m3jx[CVE-2026-78428]
+| Fixed a security vulnerability for users that authenticated through SAML or OpenID Connect (OIDC). This vulnerability would result in one user receiving another user's authenticated session when multiple SSO login attempts occurred concurrently.
+| 15 September 2026
+| https://github.com/neuvector/neuvector/releases/tag/v5.4.11[NeuVector v5.4.11]
 
 | https://github.com/neuvector/neuvector/security/advisories/GHSA-4jj9-cgqc-x9h5[CVE-2025-66001]
 | In the patched version, new NeuVector deployments enable TLS verification by default. For rolling upgrades, NeuVector does not change this setting automatically to avoid disruption.
