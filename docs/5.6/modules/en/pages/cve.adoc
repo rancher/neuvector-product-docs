@@ -9,6 +9,7 @@ NeuVector is committed to informing the community about security issues. The fol
 
 [cols="1,4,1,1", options="header"]
 |===
+| ID | Description | Date | Resolution
 
 | https://github.com/neuvector/neuvector/security/advisories/GHSA-vr77-8vmq-qfmj[CVE-2026-78424]
 | Fixed a security vulnerability where improper parameter handling allowed any authenticated users access to inject OS commands in the privileged enforcer container, which could lead to the complete compromise of the worker node.
