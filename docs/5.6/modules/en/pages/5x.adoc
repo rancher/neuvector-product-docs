@@ -1,5 +1,5 @@
 = 5.x Release Notes
-:revdate: 2026-04-27
+:revdate: 2026-09-16
 :page-revdate: {revdate}
 :page-opendocs-origin: /14.releasenotes/01.5x/01.5x.md
 :page-opendocs-slug:  /releasenotes/5x
@@ -11,6 +11,39 @@
 ====
 To receive email notifications of new releases, please subscribe to this SUSE mailing list: https://lists.suse.com/mailman/listinfo/neuvector-updates
 ====
+
+[#_562_september_2026]
+== 5.6.2 September 2026
+
+[NOTE]
+====
+.Critical CVE Stats After Upgrades
+When upgrading controllers to version `5.6.2 (or later) from a version that does not support critical-level severity (e.g., `5.5.3`), existing scanner pods must be restarted or redeployed.
+
+Older scanner pods cache the controller's initial capability response. They will not recognize that the upgraded controller supports critical-level severity until they are restarted and re-query the controller on startup.
+====
+
+=== Enhancement
+
+* **Issue-2668**: Add Traefik details into the NV Helm Chart.
+
+=== Bugs fixed
+
+* **NVSHAS-10289**: Group contention resolution Restrict Mode on K3s/RKE2 yields unexpected results.
+* **Issue-2673**: Size the `AF_PACKET` ring blocks from the runtime page size.
+* **Issue-2686**: Duplicate response rules are created when importing (through CRD) same-name response rules with changes.
+* **Issue-2709**: When CRD-defined response rules are triggered, the webhook call (if configured) is not sent.
+* **Issue-2727**: NV doesn't prevent user from importing federated groups/policies through CRD.
+* **Fix**: Support automate module name with parsing cap.
+* **Chore(deps)**: Dependency updates & golang upgrade.
+
+=== References
+
+* https://github.com/neuvector/neuvector/security/advisories/GHSA-78r4-3wfq-r2xm[Admission Control Bypass via Hardcoded Sidecar Image Exemption]
+* https://github.com/neuvector/neuvector/security/advisories/GHSA-wcx5-mq6c-c54j[Logout bypass via alternate JWT spelling]
+* https://github.com/neuvector/neuvector/security/advisories/GHSA-c6rx-pmvf-m3jx[The SAML and OpenID SSO login does not have proper identifier for login users]
+* https://github.com/neuvector/neuvector/security/advisories/GHSA-wgg5-24xq-px35[SAML Audience Confusion Allows Cross-SP Authentication]
+* https://github.com/neuvector/neuvector/security/advisories/GHSA-vr77-8vmq-qfmj[OS Command Injection in Packet-Capture (Sniffer) Filter leading to Remote Code Execution on Kubernetes Nodes]
 
 [#_561_august_2026]
 == 5.6.1 August 2026
