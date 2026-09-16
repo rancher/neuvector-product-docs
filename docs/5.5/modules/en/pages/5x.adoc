@@ -1,5 +1,5 @@
 = 5.x Release Notes
-:revdate: 2026-04-27
+:revdate: 2026-09-16
 :page-revdate: {revdate}
 :page-opendocs-origin: /14.releasenotes/01.5x/01.5x.md
 :page-opendocs-slug:  /releasenotes/5x
@@ -12,6 +12,30 @@
 To receive email notifications of new releases, please subscribe to this SUSE mailing list: https://lists.suse.com/mailman/listinfo/neuvector-updates
 ====
 
+[#_554_september_2026]
+== 5.5.4 September 2026
+
+=== Enhancement
+
+* **Issue-2423**: Prevent the cvedb `is empty` case.
+* **Issue-2602**: Provide vcs information in NeuVector's golang binaries.
+
+=== Bugs Fixed
+
+* **NVSHAS-10289**: Group contention resolution Restrict Mode on K3s/RKE2 yields unexpected results.
+* **Issue-2669**: Suppress log messages Benchmark report not found.
+* **Issue-2686**: Duplicate response rules are created when importing (through CRD) same-name response rules with changes.
+* **Issue-2709**: When CRD-defined response rules are triggered, the webhook call (if configured) is not sent.
+* **Issue-2727**: NV doesn't prevent user from importing federated groups/policies through CRD.
+* **Chore(deps)**: Dependency updates & golang upgrade.
+
+=== References:
+
+* https://github.com/neuvector/neuvector/security/advisories/GHSA-78r4-3wfq-r2xm[Admission Control Bypass via Hardcoded Sidecar Image Exemption]
+* https://github.com/neuvector/neuvector/security/advisories/GHSA-wcx5-mq6c-c54j[Logout bypass via alternate JWT spelling]
+* https://github.com/neuvector/neuvector/security/advisories/GHSA-c6rx-pmvf-m3jx[The SAML and OpenID SSO login does not have proper identifier for login users]
+* https://github.com/neuvector/neuvector/security/advisories/GHSA-wgg5-24xq-px35[SAML Audience Confusion Allows Cross-SP Authentication]
+* https://github.com/neuvector/neuvector/security/advisories/GHSA-vr77-8vmq-qfmj[OS Command Injection in Packet-Capture (Sniffer) Filter leading to Remote Code Execution on Kubernetes Nodes]
 
 [#_553_june_2026]
 == 5.5.3 June 2026
