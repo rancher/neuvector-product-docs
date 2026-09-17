@@ -36,7 +36,6 @@ NeuVector is committed to informing the community about security issues. The fol
 | 15 September 2026
 | https://github.com/neuvector/neuvector/releases/tag/v5.5.4[NeuVector v5.5.4]
 
-| ID | Description | Date | Resolution
 | https://github.com/neuvector/manager/security/advisories/GHSA-hx45-873x-74qv[CVE-2026-25703]
 | The NeuVector manager `/network/graph` API may expose sensitive network topology and metadata due to insufficient access control validation.
 | 18 Mar 2026
