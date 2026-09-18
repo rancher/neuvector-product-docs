@@ -23,6 +23,10 @@ When upgrading controllers to version `5.6.2 (or later) from a version that does
 Older scanner pods cache the controller's initial capability response. They will not recognize that the upgraded controller supports critical-level severity until they are restarted and re-query the controller on startup.
 ====
 
+=== Feature requests
+
+* **NVSHAS-10317**: [Web UI] Once CA is added, TLS CA file should not be editable.
+
 === Enhancement
 
 * **Issue-2668**: Add Traefik details into the NV Helm Chart.
@@ -30,6 +34,8 @@ Older scanner pods cache the controller's initial capability response. They will
 === Bugs fixed
 
 * **NVSHAS-10289**: Group contention resolution Restrict Mode on K3s/RKE2 yields unexpected results.
+* **NVSHAS-10331**: HTTP chunk size exceeds the configured limit of 31457280 bytes when exporting vulnerabilities.
+* **Issue-1272**: "Vulnerabilities" column always shows the wrong number in "Details" section.
 * **Issue-2673**: Size the `AF_PACKET` ring blocks from the runtime page size.
 * **Issue-2686**: Duplicate response rules are created when importing (through CRD) same-name response rules with changes.
 * **Issue-2709**: When CRD-defined response rules are triggered, the webhook call (if configured) is not sent.
