@@ -1,4 +1,5 @@
 = Reporting & Notifications
+:description: View and download security reports, event logs, and compliance data from the SUSE® Security console
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-05-02
 :page-revdate: {revdate}

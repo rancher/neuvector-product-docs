@@ -1,4 +1,5 @@
 = Deploying {product-name}
+:description: Deploy the SUSE® Security containers, including controller, manager, enforcer, scanner, and updater, with proper placement and image versions
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}

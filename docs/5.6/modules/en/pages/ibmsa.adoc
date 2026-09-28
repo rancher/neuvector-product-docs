@@ -1,4 +1,5 @@
 = IBM Security Advisor
+:description: Integrate SUSE® Security with IBM Security Advisor by generating a registration URL and verifying the connection
 :revdate: 2024-09-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /08.integration/09.ibmsa/09.ibmsa.md

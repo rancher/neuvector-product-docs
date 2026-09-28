@@ -1,4 +1,5 @@
 = DLP & WAF Sensors
+:description: Configure DLP and WAF sensors to inspect network traffic using regular expressions and apply the regular expressions to groups for security filtering
 :revdate: 2025-05-05
 :page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/09.dlp/09.dlp.md

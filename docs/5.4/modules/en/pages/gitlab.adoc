@@ -1,4 +1,5 @@
 = Gitlab
+:description: Configure a GitLab plugin and use the SUSE® Security REST API to scan vulnerabilities in build pipelines
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}

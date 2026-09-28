@@ -1,4 +1,5 @@
 = Deploying {product-name}
+:description: Deploy the SUSE® Security containers, including controller, manager, enforcer, scanner, and updater, with proper placement and image versions
 :revdate: 2024-09-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /02.deploying/01.production/01.production.md

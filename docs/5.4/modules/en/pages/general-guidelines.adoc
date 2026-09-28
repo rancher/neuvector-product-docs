@@ -1,4 +1,5 @@
 = General Guidelines
+:description: Prepare your host environment for SUSE® Security deployment by ensuring containers can communicate, labeling nodes, opening required ports
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}

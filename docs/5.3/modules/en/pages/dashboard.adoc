@@ -1,4 +1,5 @@
 = Monitor Overview of Security Status
+:description: Use the NeuVector Dashboard in the Rancher portal to switch tabs and view security events, exposure, policy mode, and vulnerable assets
 :revdate: 2026-02-05
 :page-revdate: {revdate}
 :page-opendocs-origin: /15.ui_extension/01.dashboard/01.dashboard.md

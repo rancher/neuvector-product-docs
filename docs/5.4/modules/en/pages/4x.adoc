@@ -1,4 +1,5 @@
 = 4.x Release Notes
+:description: Find details about security patches, CVE fixes, Helm chart updates, and other changes in the 4.x release notes
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-02-19
 :page-revdate: {revdate}

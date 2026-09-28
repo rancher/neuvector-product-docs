@@ -1,4 +1,5 @@
 = Integration with Rancher RBAC
+:description: Create custom roles in Rancher RBAC for SUSE Security with specific permissions based on user groups
 :revdate: 2026-02-05
 :page-revdate: {revdate}
 :page-opendocs-origin: /08.integration/12.rancher_sso_rbac.md

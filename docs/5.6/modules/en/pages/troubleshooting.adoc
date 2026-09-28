@@ -1,4 +1,5 @@
 = Troubleshooting
+:description: Troubleshoot SUSE® Security container deployments by checking configuration steps, logs, and support tools for issues like registry access and controller
 :revdate: 2024-09-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /12.troubleshooting/01.troubleshooting/01.troubleshooting.md

@@ -1,4 +1,5 @@
 = Navigating the Console
+:description: Access the console using the default admin credentials and navigate menus to view security risk scores, settings, and network activity details
 :revdate: 2024-09-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /04.navigation/01.navigation/01.navigation.md

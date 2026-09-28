@@ -1,4 +1,5 @@
 = Updating {product-name}
+:description: Update SUSE® Security components using Docker and Kubernetes to apply CVE database updates and ensure continuous operation
 :revdate: 2024-09-27
 :page-revdate: {revdate}
 :page-opendocs-origin: /10.updating/01.updating/01.updating.md

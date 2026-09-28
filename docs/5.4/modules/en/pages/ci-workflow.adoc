@@ -1,4 +1,5 @@
 = {product-name} Workflow
+:description: Learn how to integrate SUSE® Security into CI/CD workflows to automate security checks and compliance testing
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2024-09-27
 :page-revdate: {revdate}

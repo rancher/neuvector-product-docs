@@ -1,4 +1,5 @@
 = Connect to Manager, REST API server
+:description: Connect to the manager using HTTPS or REST API through the Controller/Allinone container, allowing users to manage SUSE® Security via the UI or by invoking
 :page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2025-05-08
 :page-revdate: {revdate}
