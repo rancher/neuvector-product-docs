@@ -1,0 +1,14 @@
+= 5.x Release Notes
+:description: Check the 5.x release notes to find new features, bug fixes, and compatibility updates for each version, including changes to image scans and error handling
+:revdate: 2026-09-16
+:page-revdate: {revdate}
+:page-opendocs-origin: /14.releasenotes/01.5x/01.5x.md
+:page-opendocs-slug:  /releasenotes/5x
+
+[#_release_notes_for_5x]
+== Release Notes for 5.x
+
+[NOTE]
+====
+To receive email notifications of new releases, please subscribe to this SUSE mailing list: https://lists.suse.com/mailman/listinfo/neuvector-updates
+====
