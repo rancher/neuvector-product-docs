@@ -1,6 +1,6 @@
 = SAML (Azure AD)
 :description: Configure SAML integration between Azure AD and SUSE® Security by setting up an enterprise application and configuring SAML with the Login URL
-:revdate: 2024-09-27
+:revdate: 2026-10-01
 :page-revdate: {revdate}
 :page-opendocs-origin: /08.integration/05.msazure/05.msazure.md
 :page-opendocs-slug:  /integration/msazure
@@ -8,64 +8,70 @@
 [#_integrate_with_azure_ad_saml_authentication]
 == Integrate with Azure AD SAML authentication
 
-. In the Azure management console, select the `"Enterprise applications" menu item in Azure Active Directory
+. In the Azure management console, select the *Enterprise applications* menu item in Azure Active Directory.
 +
 image:azure1.png[azure_config1]
 
-. Select "`New Application`"
+. Select *New Application*.
 +
 image:azure2.png[azure_config2]
 
-. Create a Non-gallery application and give it a unique name
+. Create a Non-gallery application and give it a unique name.
 +
 image:azure3.png[azure_config3]
 
-. In the application's configuration page, select "Single sign-on" in the left-side panel and choose the SAML-based sign-on
+. In the application's configuration page, select *Single sign-on* in the left-side panel and choose the SAML-based sign-on
 +
 image:azure4.png[azure_config4]
 
-. Download the certificate in the base64 format and note the application's Login URL and Azure AD Identifier
+. Download the certificate in the base64 format and note the application's Login URL and Azure AD Identifier.
 +
 image:azure5.png[azure_config5]
 
-. In the {product-name} management console, login as an administrator. Select "`Settings" in the administrator dropdown menu at the top-right corner. Click SAML settings
+. In the NeuVector management console, login as an administrator and go to *Settings > SAML Settings*.
 +
-image:azure6.png[azure_config6]
+image:nv_saml_settings.png[NeuVector SAML settings]
 
 . Configure the SAML server as follows:
-* Copy application's "Login URL" as the Single Sign-On URL.
-* Copy "Azure AD Identifier" as the Issuer.
-* Open downloaded the certificate and copy the text to X.509 Certificate box.
-* Set a default role.
-* Enter the group name for role mapping. The group claim returned by Azure are identified by the "Object ID" instead of the name. The group's object ID can be located in menu:Azure Active Directory[Groups > Group name Page]. You should use this value to configure group-based role mapping in {product-name}.
+** Copy the application's *Login URL* as the Single Sign-On URL.
+** Copy the *Azure AD Identifier* as the Issuer.
+** Open the downloaded certificate and copy the text to the *X.509 Certificate* box.
+** Set a default role. This is the role assigned to an authenticated user when no group matches the role map.
+** Add the group-based role mapping. Click *Add to Top* and enter the group together with the Global Role and Namespace Roles to assign to its members. The group claim returned by Azure are identified by the *Object ID* instead of the name. The group's object ID can be located in *Azure Active Directory > Groups > Group name Page*. You should use this value to configure group-based role mapping in NeuVector.
 +
 image:openid5.png[OpenID5]
 +
-Then Enable the SAML server.
+Every user needs a role, assigned either by the default role or by group-based role mapping. A user who ends up without a role cannot log in, even with the correct credentials.
 +
-image:azure7.png[azure_config7]
+Then check *Enable* at the bottom left of the page and click *Submit* to enable the SAML server.
 
-. Copy the Redirect URL
+. Copy the SAML Redirect URI shown at the top of the SAML Settings page with the *Copy to Clipboard* button. It has the form `https://<nv-console>:<port>/token_auth_server`, where `<nv-console>` and `<port>` are the address and port of your NeuVector console.
+
+. Return to the Azure management console to setup *Basic SAML Configuration*. Paste the NeuVector SAML Redirect URI into both boxes:
 +
-image:azure8.png[azure_config8]
-
-. Return to the Azure management console to setup "Basic SAML Configuration". Copy {product-name} console's Redirect URL to both "Identifier" and "Reply URL" boxes
+** **Identifier (Entity ID)**: the audience URI of the NeuVector service provider.
+** **Reply URL (Assertion Consumer Service URL)**: the endpoint Azure AD posts the SAML response to.
 +
 image:azure9.png[azure_config9]
++
+[NOTE]
+====
+NeuVector uses its SAML Redirect URI as both the assertion consumer service URL and the audience URI (SP entity ID); it is not configurable in the NeuVector console. Enter that same value in both Azure fields so the audience of the assertion matches what NeuVector expects.
+====
 
-. Edit "SAML Signing Certificate", changing the Signing Option to "Sign SAML response"
+. Edit *SAML Signing Certificate*, changing the Signing Option to *Sign SAML response*.
 +
 image:azure10.png[azure_config10]
 
-. Edit "User Attributes & Claims" so the response can carry the login user's attributes back to {product-name}. Click "Add new claim" to add "Username" and "Email" claims with "user.userprincipalname" and "user.mail" respectively.
+. Edit *User Attributes & Claims* so the response can carry the login user's attributes back to {product-name}. Click *Add new claim* to add `Username` and `Email` claims with `user.userprincipalname` and `user.mail` respectively.
 +
 image:azure11.png[azure_config11]
 
-. If the users are assigned to the groups in the active directory, their group membership can be added to the claim. Find the application in "App registrations" and edit the manifest. Modify the value of "groupMembershipClaims" to "All".
+. If the users are assigned to the groups in the active directory, their group membership can be added to the claim. Find the application in *App registrations* and edit the manifest. Modify the value of `groupMembershipClaims` to `All`.
 +
 image:azure12.png[azure_config12]
 
-. Authorize users and groups to access the application so they can login {product-name} console with Azure AD SAML SSO
+. Authorize users and groups to access the application so they can login {product-name} console with Azure AD SAML SSO.
 +
 image:azure13.png[azure_config13]
 
