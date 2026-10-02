@@ -1,40 +1,114 @@
 = SAML (Okta)
 :description: Configure SAML for Okta in SUSE® Security by configuring identity provider attribute mappings and group-based role assignments
-:page-languages: [en, de, es, fr, ja, pt, zh]
-:revdate: 2024-09-27
+:revdate: 2026-10-01
 :page-revdate: {revdate}
 :page-opendocs-origin: /08.integration/04.saml/04.saml.md
 :page-opendocs-slug:  /integration/saml
 
-[#_saml_idp_configuration]
-== SAML IDP Configuration
+[#_setting_up_okta_integration]
+== Setting Up Okta and {product-name} Integration
 
-To configure {product-name} to use Okta SAML IDP server, first, configure the SAML IDP server on the Okta site.
+This section describes how to configure Okta as a SAML 2.0 identity provider (IDP) for NeuVector. The setup steps are performed in Okta first, then in the NeuVector console.
 
-image:okta.png[Okta]
+[#_prerequisites]
+=== Prerequisites
 
-. Copy "SAML Redirect URI" from {product-name} SAML Setting page, paste it to Okta's single sign on url, recipient url and destination url fields.
-. Assertion encryption: This field must be *unencrypted.*
-. Attribute statements: Enter the email and username attributes.
-. Group attribute statements: Enable this if group-based role mapping is required. The default attribute name that {product-name} looks for is NVRoleGroup. If other attribute name is used for the user's group membership, it can be customized in {product-name}'s SAML Setting page.
+* An Okta Developer or Enterprise account with administrative privileges.
+* Administrator access to the NeuVector console.
+* The NeuVector SAML Redirect URI. Log in to NeuVector as an administrator, go to *Settings > SAML Settings* and copy the *SAML Redirect URI* shown at the top of the page.
+** It has the form `\https://<nv-console>:<port>/token_auth_server`, where `<nv-console>` and `<port>` are the address and port of your NeuVector console.
 
-Configure SAML settings in {product-name} UI console.
+[#_okta_setup]
+=== Okta Setup
 
-image:saml1.png[SAML]
+. Log in to the Okta Admin Console.
 
-Use "View Setup Instructions" button as shown in the following screenshot to locate following information, and copy them into {product-name}'s SAML page.
+. In the left-hand navigation, expand *Applications* and click *Applications*, then click *Create App Integration*.
 
-. Identity Provider Single Sign-On URL
-. Identity Provider Issuer
-. X.509 Certificate
-. Specify group attribute name if non-default value is used.
+. Select *SAML 2.0* as the sign-in method and click *Next*.
++
+image::okta_signin_method.png[Okta sign-in method]
 
-image:setting.png[Setting]
+. On the *General Settings* step, enter a recognizable *App name*, for example `NeuVector SSO`, and click *Next*.
 
-After the user is authenticated, the proper role can be derived with group-based role mapping configuration. To setup group-based role mapping,
+. On the *Configure SAML* step, map the Okta application to your NeuVector instance:
++
+--
+* *Single sign-on URL*: the NeuVector SAML Redirect URI copied in the prerequisites, `\https://<nv-console>:<port>/token_auth_server`. Keep the setting *Use this for Recipient URL and Destination URL* checked.
+* *Audience URI (SP Entity ID)*: the same SAML Redirect URI, `\https://<nv-console>:<port>/token_auth_server`.
+* *Name ID format*: `Unspecified`.
+--
++
+image::okta_saml_config.png[Okta SAML settings]
++
+[NOTE]
+====
+* NeuVector uses its SAML Redirect URI as both the assertion consumer service URL and the audience URI (SP entity ID); it is not configurable in the NeuVector console. Enter that same value in both Okta fields so the audience of the assertion matches what NeuVector expects.
+* Click *Show Advanced Settings* and confirm that *Assertion Encryption* is `Unencrypted`; NeuVector does not accept encrypted assertions. Leave *Response* and *Assertion Signature* set to `Signed`.
+====
 
-. If group-based role mapping is not configured or the matched groups cannot be located, the authenticated user will be assigned with the Default role. If the Default role is set to None, when group-based role mapping fails, the user is not able to login.
-. Specify a list of groups respectively in Admin and Reader role map. The user's group attribute is piggybacked in the response after the user is authenticated. If the matched group is located, the corresponding role will be assigned to the user.
+. On the *Feedback* step, select *This is an internal app that we have created* and click *Finish*.
+
+. Configure the attribute statements so the SAML response carries the user's attributes back to NeuVector. On the application's *Sign On* tab, scroll to *Attribute Statements*, click *Show legacy configuration* and edit the statements below it:
++
+[cols="1,1,1,1",options="header"]
+|===
+| Statement | Name | Name format | Value / Filter
+
+| Attribute Statements | `Email` | Unspecified | `user.email`
+| Attribute Statements | `Username` | Unspecified | `user.firstName`
+| Group Attribute Statements | `NVRoleGroup` | Unspecified | Matches regex `.*`
+|===
++
+The group attribute statement is only required if group-based role mapping is used. `NVRoleGroup` is the attribute name NeuVector looks for by default. If you use a different attribute name for the user's group membership, enter that name in the *Group Claim* field of NeuVector's SAML Settings page.
+
+. Open the *Assignments* tab, click *Assign > Assign to People*, and assign the users who should be able to log in to NeuVector.
+
+. Return to the *Sign On* tab, scroll to the *SAML 2.0* section and open *Metadata details*. Collect the values needed by NeuVector:
++
+--
+* *Sign on URL*: click *Copy* and save it.
+* *Issuer*: click *Copy* and save it.
+* *Signing Certificate*: click *Download* to save the certificate file, or click *Copy*.
+--
+
+[#_application_setup]
+=== {product-name} Setup
+
+. Log in to the NeuVector console as an administrator and go to *Settings > SAML Settings*.
++
+image::nv_saml_settings.png[{product-name} SAML settings]
+
+. Fill in the fields with the information collected from Okta:
++
+--
+* *Identity Provider Single Sign-On URL*: the Okta _Sign on URL_.
+* *Identity Provider Issuer*: the Okta _Issuer_.
+* *X.509 Certificate*: the complete text of the Okta _Signing Certificate_.
+* *Group Claim*: leave it empty to use the default `NVRoleGroup` attribute name, or enter the group attribute name configured in Okta.
+* *Default Role*: the role assigned to an authenticated user when group-based role mapping is not configured or no group matches. Set it to `None` to allow only users whose groups are mapped to a role.
+--
++
+Every user needs a role, assigned either by the Default Role or by group-based role mapping. A user who ends up without a role cannot log in, even with the correct credentials.
+
+. Optionally add group-based role mapping. Click *Add to Top* and enter a group name together with the *Global Role* and *Namespace Roles* to assign to its members.
+
+. Check *Enable* at the bottom left of the page and click *Submit*.
+
+. To test the integration, log out of NeuVector. The login screen shows a *Login with SAML* button that redirects to Okta for authentication.
++
+[NOTE]
+====
+*SAML Single Logout* is optional. Enable it only if your IDP supports SLO, and provide the *Identity Provider Single Logout URL* together with the single logout signing certificate and key.
+====
+
+[#_role_mapping]
+=== Role Mapping
+
+After a user is authenticated, the role is derived from the group-based role mapping configuration:
+
+. If group-based role mapping is not configured or the matched groups cannot be located, the authenticated user is assigned the Default role. If the Default role is set to None, the user is not able to log in when group-based role mapping fails.
+. Specify the groups to map in the role map. The user's group attribute is piggybacked in the response after the user is authenticated. If a matched group is located, the corresponding role is assigned to the user.
 
 [#_mapping_groups_to_roles_and_namespaces]
 === Mapping Groups to Roles and Namespaces

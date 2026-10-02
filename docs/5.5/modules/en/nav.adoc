@@ -89,7 +89,7 @@
 ** Identity and Access
 *** xref:ldap.adoc[LDAP]
 *** xref:msad.adoc[Microsoft AD]
-*** xref:saml.adoc[SAML]
+*** xref:saml.adoc[SAML (Okta)]
 *** xref:msazure.adoc[SAML (Azure AD)]
 *** xref:adfs.adoc[SAML (ADFS)]
 *** xref:openid.adoc[OpenID Connect]
