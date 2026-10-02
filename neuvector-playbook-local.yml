@@ -11,7 +11,7 @@ content:
 
 ui:
   bundle:
-    url: https://github.com/SUSEdoc/dsc-style-bundle/blob/main/default-ui/ui-bundle.zip?raw=true
+    url: ./dsc-style-bundle/default-ui/ui-bundle.zip
     snapshot: true
   supplemental_files: ./dsc-style-bundle/supplemental-files/rancher
 
