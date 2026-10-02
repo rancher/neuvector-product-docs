@@ -1,5 +1,6 @@
 = SAML (Okta)
 :description: Configure SAML for Okta in SUSE® Security by configuring identity provider attribute mappings and group-based role assignments
+:page-languages: [en, de, es, fr, ja, pt, zh]
 :revdate: 2026-10-01
 :page-revdate: {revdate}
 :page-opendocs-origin: /08.integration/04.saml/04.saml.md
