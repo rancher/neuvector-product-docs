@@ -1,6 +1,6 @@
 = Federated Policy
 :description: Configure federated policies in the Master cluster to propagate global rules to all clusters as read-only entries
-:revdate: 2024-09-25
+:revdate: 2026-10-13
 :page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/12.federated/12.federated.md
 :page-opendocs-slug:  /policy/federated
@@ -26,10 +26,15 @@ In the above example, the Federated rule is shown which is different than learne
 
 Other rules such as Admission Control, Response, Process and File will behave in the same way, except that the order of rules is only relevant for the Network rules.
 
-Note that the configuration of Process and File rules requires the selection of a Federated Group, as these must be applied to a target group as defined in the Federated Group tab. After a new Group has been configured in Federated -> Groups, it will show as a selectable option when configuring a group in Process or File rules.
+Note that the configuration of Process and File rules requires the selection of a Federated Group, as these must be applied to a target group as defined in the Federated Group tab. After a new Group has been configured in *Federated Policy > Groups*, it will show as a selectable option when configuring a group in Process or File rules.
+
+[#_notification_configuration]
+=== Notification Configuration
+
+Notifications can be sent via webhooks to an endpoint. Enter the endpoint URL for notifications to be sent. Authenticated webhook notifications can be added or edited in the *Federated Policy > Configuration* tab.
 
 [#_export_import_federation_policy]
-== Export/Import Federation policy
+=== Export/Import Federation policy
 
 Federation policies—including *Groups*, *Admission Control*, *DLP Sensors*, *WAF Sensors*, *Response Rules*, and *Configuration*—can be imported and exported.
 

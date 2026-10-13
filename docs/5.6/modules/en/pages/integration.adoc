@@ -1,6 +1,6 @@
 = Enterprise Integration
 :description: Find integration options for SUSE® Security, including REST API, CLI, Syslog, RBAC, SAML, LDAP, webhooks, ecosystem partners like Sonatype, IBM Cloud
-:revdate: 2025-12-18
+:revdate: 2026-10-13
 :page-revdate: {revdate}
 :page-opendocs-origin: /08.integration/01.integration/01.integration.md
 :page-opendocs-slug:  /integration/integration
@@ -122,9 +122,7 @@ Configure Syslog integration by entering the Syslog server address and selecting
 [#_webhooks]
 === Webhooks
 
-{product-name} can send notifications to an external endpoint by using webhooks. Specify the webhook endpoint URL to receive notifications.
-
-You can configure webhook notifications for custom events under *Policy* → *Response Rules*.
+Notifications can be sent via webhooks to an endpoint. Enter the endpoint URL for notifications to be sent. Webhook notifications for custom events can be configured in *Policy > Response Rules*. Authenticated webhook notifications can be added or edited in the *Settings > Configuration* tab or in the *Federated Policy > Configuration* tab.
 
 [#_directory_and_sso_integration]
 === Directory and SSO Integration
