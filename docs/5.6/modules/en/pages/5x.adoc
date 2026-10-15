@@ -1,6 +1,6 @@
 = 5.x Release Notes
 :description: Check the 5.x release notes to find new features, bug fixes, and compatibility updates for each version, including changes to image scans and error handling
-:revdate: 2026-09-16
+:revdate: 2026-10-15
 :page-revdate: {revdate}
 :page-opendocs-origin: /14.releasenotes/01.5x/01.5x.md
 :page-opendocs-slug:  /releasenotes/5x
@@ -13,13 +13,48 @@
 To receive email notifications of new releases, please subscribe to this SUSE mailing list: https://lists.suse.com/mailman/listinfo/neuvector-updates
 ====
 
+[#_563_october_2026]
+== 5.6.3 October 2026
+
+[NOTE]
+.Critical CVE Stats After Upgrade
+====
+Upgrading to {neuvector-product-name} v5.6.3 or later from any version prior to v5.6.0 requires all existing {neuvector-product-name} scanner pods to be restarted or redeployed to support the CVE critical-level severity.
+
+Older scanner pods cache the controller's initial capability response. They will not recognize that the upgraded controller supports critical-level severity until they are restarted and re-query the controller on startup.
+====
+
+=== Feature requests
+
+* **Issue-2870**: Support authenticated webhook notifications in NeuVector.
+
+=== Enhancement
+
+* **Issue-2833**: UI shows messaging when the mapped role of a server user is empty.
+
+=== Bug fixes
+
+* **Issue-2925**: Check the id instead of name, also enrich the fail log.
+* **Issue-2750**: Process rules not always working.
+* **Issue-2804**: Automated federation join failed with controller HA setup.
+* **Issue-1310**: Newly added registry in "Assets -> Registries" is not displayed until manual page refresh.
+* **Fix**: (nvbench) Correct RKE2 kubelet configuration checks.
+* **Fix**: (crd) Allow dry-run admission requests instead of denying them.
+* **Fix**: (RKE2) Read eventRecordQPS from kubelet configuration.
+* **Fix**: (nvbench) Resolve RKE2 worker paths from process arguments.
+* **Fix**: (RKE2) kubelet client CA check.
+* **Fix**: (nvbench) Check RKE2 client CA ownership by path.
+* **Fix**: Keep IPv6 client addresses intact in auth audit events.
+* **Fix**: Add missing scanrunning caps.
+* **Chore(deps)**: Dependency updates & golang upgrade.
+
 [#_562_september_2026]
 == 5.6.2 September 2026
 
 [NOTE]
+.Critical CVE Stats After Upgrade
 ====
-.Critical CVE Stats After Upgrades
-When upgrading controllers to version `5.6.2 (or later) from a version that does not support critical-level severity (e.g., `5.5.3`), existing scanner pods must be restarted or redeployed.
+Upgrading to {neuvector-product-name} v5.6.2 or later from any version prior to v5.6.0 requires all existing {neuvector-product-name} scanner pods to be restarted or redeployed to support the CVE critical-level severity.
 
 Older scanner pods cache the controller's initial capability response. They will not recognize that the upgraded controller supports critical-level severity until they are restarted and re-query the controller on startup.
 ====
@@ -56,8 +91,9 @@ Older scanner pods cache the controller's initial capability response. They will
 == 5.6.1 August 2026
 
 [NOTE]
+.Critical CVE Stats After Upgrade
 ====
-When upgrading controllers to version `5.6.1-rc1` (or later) from a version that does not support critical-level severity (e.g., `5.5.3`), existing scanner pods must be restarted or redeployed. 
+Upgrading to {neuvector-product-name} v5.6.1 or later from any version prior to v5.6.0 requires all existing {neuvector-product-name} scanner pods to be restarted or redeployed to support the CVE critical-level severity.
 
 Older scanner pods cache the controller's initial capability response. They will not recognize that the upgraded controller supports critical-level severity until they are restarted and re-query the controller on startup.
 ====
@@ -80,8 +116,9 @@ Older scanner pods cache the controller's initial capability response. They will
 == 5.6.0 July 2026
 
 [NOTE]
+.Critical CVE Stats After Upgrade
 ====
-When upgrading controllers to version `5.6.0-rc1` (or later) from a version that does not support critical-level severity (e.g., `5.5.3`), existing scanner pods must be restarted or redeployed. 
+Upgrading to {neuvector-product-name} v5.6.0 or later from prior versions requires all existing {neuvector-product-name} scanner pods to be restarted or redeployed to support the CVE critical-level severity.
 
 Older scanner pods cache the controller's initial capability response. They will not recognize that the upgraded controller supports critical-level severity until they are restarted and re-query the controller on startup.
 ====
