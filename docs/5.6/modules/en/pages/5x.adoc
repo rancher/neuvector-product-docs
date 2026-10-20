@@ -46,6 +46,7 @@ Older scanner pods cache the controller's initial capability response. They will
 * **Fix**: (nvbench) Check RKE2 client CA ownership by path.
 * **Fix**: Keep IPv6 client addresses intact in auth audit events.
 * **Fix**: Add missing scanrunning caps.
+* **Fix**: Fix enforcer fanotify deadlock.
 * **Chore(deps)**: Dependency updates & golang upgrade.
 
 [#_562_september_2026]
