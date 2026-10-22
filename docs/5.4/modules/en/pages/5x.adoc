@@ -1,7 +1,7 @@
 = 5.x Release Notes
 :description: Check the 5.x release notes to find new features, bug fixes, dependency updates, and security patches for relevant versions
 :page-languages: [en, de, es, fr, ja, pt, zh]
-:revdate: 2026-09-16
+:revdate: 2026-10-22
 :page-revdate: {revdate}
 :page-opendocs-origin: /14.releasenotes/01.5x/01.5x.md
 :page-opendocs-slug:  /releasenotes/5x
@@ -13,6 +13,14 @@
 ====
 To receive email notifications of new releases, please subscribe to this SUSE mailing list: https://lists.suse.com/mailman/listinfo/neuvector-updates
 ====
+
+[#_5412_october_2026]
+== 5.4.12 October 2026
+
+=== Bugs Fixed
+
+* **NVSHAS-10342**: NeuVector ConfigMap Watch Loop causing WAN Link Saturation (200 Mbps) & kube-apiserver instability.
+* **Chore(deps)**: Upgrade golang to 1.27.3.
 
 [#_5411_september_2026]
 == 5.4.11 September 2026
