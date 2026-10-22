@@ -24,6 +24,10 @@ Upgrading to {neuvector-product-name} v5.6.4 or later from any version prior to 
 Older scanner pods cache the controller's initial capability response. They will not recognize that the upgraded controller supports critical-level severity until they are restarted and re-query the controller on startup.
 ====
 
+=== Notable changes
+
+To scan the latest PHP-related vulnerabilities, please restart all NeuVector scanner pods in order to use the latest version (CVE DB version 4.308 or newer).
+
 === Bug fixes
 
 * **NVSHAS-10342**: NeuVector ConfigMap Watch Loop causing WAN Link Saturation (200 Mbps) & kube-apiserver instability.
