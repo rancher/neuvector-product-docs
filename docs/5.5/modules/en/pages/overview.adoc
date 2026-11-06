@@ -1,6 +1,6 @@
-= 5.x Overview
-:description: Learn about the 5.x Overview features and components, including vulnerability scanning, runtime protection, and deployment options for the Full Life-Cycle
-:revdate: 2025-01-10
+= v{page-component-version}.x Overview
+:description: Learn about the v{page-component-version}.x Overview features and components, including vulnerability scanning, runtime protection, and deployment options for the Full Life-Cycle
+:revdate: 2026-11-06
 :page-revdate: {revdate}
 :page-opendocs-origin: /01.basics/01.overview/01.overview.adoc
 :page-opendocs-slug: /basics/overview
@@ -10,7 +10,7 @@
 
 [NOTE]
 ====
-These docs describe the 5.x (Open Source) version. The 5.x images are accessible from Docker Hub with the appropriate tag, e.g. `neuvector/controller:(version)`.
+These docs describe the v{page-component-version}.x (Open Source) version. The v{page-component-version}.x images are accessible from Docker Hub with the appropriate tag, e.g. `neuvector/controller:(version)`.
 ====
 
 {product-name} provides a powerful end-to-end container security platform. This includes end-to-end vulnerability scanning and complete run-time protection for containers, pods and hosts, including:
