@@ -1,0 +1,171 @@
+= v5.6.x Release Notes
+:description: Check the 5.6.x release notes to find new features, bug fixes, and compatibility updates for each version, including changes to image scans and error handling
+:revdate: 2026-11-06
+:page-revdate: {revdate}
+:page-opendocs-origin: /14.releasenotes/01.5x/01.5x.md
+:page-opendocs-slug:  /releasenotes/5x
+
+[#_release_notes_for_v5.6.x]
+== Release Notes for v5.6.x
+
+[NOTE]
+====
+To receive email notifications of new releases, please subscribe to this SUSE mailing list: https://lists.suse.com/mailman/listinfo/neuvector-updates
+====
+
+[#_v564_october_2026]
+== v5.6.4 October 2026
+
+[NOTE]
+.Critical CVE Stats After Upgrade
+====
+Upgrading to {neuvector-product-name} v5.6.4 or later from any version prior to v5.6.0 requires all existing {neuvector-product-name} scanner pods to be restarted or redeployed to support the CVE critical-level severity.
+
+Older scanner pods cache the controller's initial capability response. They will not recognize that the upgraded controller supports critical-level severity until they are restarted and re-query the controller on startup.
+====
+
+=== Notable changes
+
+To scan the latest PHP-related vulnerabilities, please restart all NeuVector scanner pods in order to use the latest version (CVE DB version 4.308 or newer).
+
+=== Bug fixes
+
+* **NVSHAS-10342**: NeuVector ConfigMap Watch Loop causing WAN Link Saturation (200 Mbps) & kube-apiserver instability.
+* **issue-1349**: cli command cannot make controller write k8s-related debug logs.
+* **fix**: add php version check.
+* **Chore(deps)**: Update dependencies.
+* **Chore(deps)**: Upgrade golang to 1.27.3.
+
+[#_v563_october_2026]
+== v5.6.3 October 2026
+
+[NOTE]
+.Critical CVE Stats After Upgrade
+====
+Upgrading to {neuvector-product-name} v5.6.3 or later from any version prior to v5.6.0 requires all existing {neuvector-product-name} scanner pods to be restarted or redeployed to support the CVE critical-level severity.
+
+Older scanner pods cache the controller's initial capability response. They will not recognize that the upgraded controller supports critical-level severity until they are restarted and re-query the controller on startup.
+====
+
+=== Feature requests
+
+* **Issue-2870**: Support authenticated webhook notifications in NeuVector.
+
+=== Enhancement
+
+* **Issue-2833**: UI shows messaging when the mapped role of a server user is empty.
+
+=== Bug fixes
+
+* **Issue-2925**: Check the id instead of name, also enrich the fail log.
+* **Issue-2750**: Process rules not always working.
+* **Issue-2804**: Automated federation join failed with controller HA setup.
+* **Issue-1310**: Newly added registry in "Assets -> Registries" is not displayed until manual page refresh.
+* **Fix**: (nvbench) Correct RKE2 kubelet configuration checks.
+* **Fix**: (crd) Allow dry-run admission requests instead of denying them.
+* **Fix**: (RKE2) Read eventRecordQPS from kubelet configuration.
+* **Fix**: (nvbench) Resolve RKE2 worker paths from process arguments.
+* **Fix**: (RKE2) kubelet client CA check.
+* **Fix**: (nvbench) Check RKE2 client CA ownership by path.
+* **Fix**: Keep IPv6 client addresses intact in auth audit events.
+* **Fix**: Add missing scanrunning caps.
+* **Fix**: Fix enforcer fanotify deadlock.
+* **Chore(deps)**: Dependency updates & golang upgrade.
+
+[#_v562_september_2026]
+== v5.6.2 September 2026
+
+[NOTE]
+.Critical CVE Stats After Upgrade
+====
+Upgrading to {neuvector-product-name} v5.6.2 or later from any version prior to v5.6.0 requires all existing {neuvector-product-name} scanner pods to be restarted or redeployed to support the CVE critical-level severity.
+
+Older scanner pods cache the controller's initial capability response. They will not recognize that the upgraded controller supports critical-level severity until they are restarted and re-query the controller on startup.
+====
+
+=== Feature requests
+
+* **NVSHAS-10317**: [Web UI] Once CA is added, TLS CA file should not be editable.
+
+=== Enhancement
+
+* **Issue-2668**: Add Traefik details into the NV Helm Chart.
+
+=== Bugs fixed
+
+* **NVSHAS-10289**: Group contention resolution Restrict Mode on K3s/RKE2 yields unexpected results.
+* **NVSHAS-10331**: HTTP chunk size exceeds the configured limit of 31457280 bytes when exporting vulnerabilities.
+* **Issue-1272**: "Vulnerabilities" column always shows the wrong number in "Details" section.
+* **Issue-2673**: Size the `AF_PACKET` ring blocks from the runtime page size.
+* **Issue-2686**: Duplicate response rules are created when importing (through CRD) same-name response rules with changes.
+* **Issue-2709**: When CRD-defined response rules are triggered, the webhook call (if configured) is not sent.
+* **Issue-2727**: NV doesn't prevent user from importing federated groups/policies through CRD.
+* **Fix**: Support automate module name with parsing cap.
+* **Chore(deps)**: Dependency updates & golang upgrade.
+
+=== References
+
+* https://github.com/neuvector/neuvector/security/advisories/GHSA-78r4-3wfq-r2xm[Admission Control Bypass via Hardcoded Sidecar Image Exemption]
+* https://github.com/neuvector/neuvector/security/advisories/GHSA-wcx5-mq6c-c54j[Logout bypass via alternate JWT spelling]
+* https://github.com/neuvector/neuvector/security/advisories/GHSA-c6rx-pmvf-m3jx[The SAML and OpenID SSO login does not have proper identifier for login users]
+* https://github.com/neuvector/neuvector/security/advisories/GHSA-wgg5-24xq-px35[SAML Audience Confusion Allows Cross-SP Authentication]
+* https://github.com/neuvector/neuvector/security/advisories/GHSA-vr77-8vmq-qfmj[OS Command Injection in Packet-Capture (Sniffer) Filter leading to Remote Code Execution on Kubernetes Nodes]
+
+[#_v561_august_2026]
+== v5.6.1 August 2026
+
+[NOTE]
+.Critical CVE Stats After Upgrade
+====
+Upgrading to {neuvector-product-name} v5.6.1 or later from any version prior to v5.6.0 requires all existing {neuvector-product-name} scanner pods to be restarted or redeployed to support the CVE critical-level severity.
+
+Older scanner pods cache the controller's initial capability response. They will not recognize that the upgraded controller supports critical-level severity until they are restarted and re-query the controller on startup.
+====
+
+=== Feature requests
+
+* *issue-2614*: Revert `zero-drift` for Processes to NOT be the default.
+* *feat*: Better error handling for image scan.
+* *feat*: Provide vcs information in executible files.
+
+=== Bugs fixed
+
+* *issue-2669*: Suppress log messages Benchmark report not found.
+* *fix*: Match Istio proxymesh traffic against parent workload rules.
+* *fix*: Size the netlink dump buffer for kernels with pages over 4K.
+* *fix*: Fix null value shown in dashboard risk panel.
+* *fix*: Resolve code scanning findings & reduce unnecessary info/warn logs.
+
+[#_v560_july_2026]
+== v5.6.0 July 2026
+
+[NOTE]
+.Critical CVE Stats After Upgrade
+====
+Upgrading to {neuvector-product-name} v5.6.0 or later from prior versions requires all existing {neuvector-product-name} scanner pods to be restarted or redeployed to support the CVE critical-level severity.
+
+Older scanner pods cache the controller's initial capability response. They will not recognize that the upgraded controller supports critical-level severity until they are restarted and re-query the controller on startup.
+====
+
+=== Feature requests
+
+* **issue-2235**: add a column containing image digest in generated reports for containers
+* **NVSHAS-8242**: Add Critical CVE Severity to support CVSS v3 scores 9.0-10.0
+* **NVSHAS-10298**: Include CVE DB Version in NeuVector Vulnerability Report
+* **feat**: Move readiness probe from exec to httpget
+* **NVSHAS-10024**: Option to filter vulnerabilities based on based OS image
+* **issue-1195**: Show severity filter in report filter
+* **feat**: Optimize scanner registration flow
+
+=== Bugs fixed
+	
+* **NVSHAS-10283**: Custom groups with image/namespace criteria shows no member
+* **issue-2348**: Hide global permissions from show advance setting's table
+* **issue-2355**: Registry view all scanned images page does not show critical vulnerability
+* **enhance**: Reject load or upload the empty or corrupt cvedb
+* **nvbench**: k3s CIS check OOM-kills the enforcer on nodes with a large journal
+* **fix**: Allow explicit network rules in restrictive group mode
+* **fix(lint)**: Resolve errcheck findings
+* **fix(code-scanning)**: Resolve code scanning findings
+* **issue-2519**: silent error handling in consul kv slot reads in network functions
+* **issue-2485**: scanner cvedb upgrade takes huge memory utilization

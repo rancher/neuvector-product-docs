@@ -1,0 +1,109 @@
+= v5.5.x Release Notes
+:description: Check the 5.5.x release notes to find new features, bug fixes, dependency updates, and security patches for relevant versions
+:revdate: 2026-11-06
+:page-revdate: {revdate}
+:page-opendocs-origin: /14.releasenotes/01.5x/01.5x.md
+:page-opendocs-slug:  /releasenotes/5x
+
+[#_release_notes_for_v5.5.x]
+== Release Notes for v5.5.x
+
+[NOTE]
+====
+To receive email notifications of new releases, please subscribe to this SUSE mailing list: https://lists.suse.com/mailman/listinfo/neuvector-updates
+====
+
+[#_v555_october_2026]
+== v5.5.5 October 2026
+
+=== Notable changes
+
+To scan the latest PHP-related vulnerabilities, please restart all NeuVector scanner pods in order to use the latest version (CVE DB version 4.308 or newer).
+
+=== Bugs Fixed
+
+* **NVSHAS-10342**: NeuVector ConfigMap Watch Loop causing WAN Link Saturation (200 Mbps) & kube-apiserver instability.
+* **issue-1349**: cli command cannot make controller write k8s-related debug logs.
+* **fix**: automated federation join failed with controller ha setup.
+* **fix**: add php version check.
+* **Chore(deps)**: Update dependencies.
+* **Chore(deps)**: Upgrade golang to 1.27.3.
+
+[#_v554_september_2026]
+== v5.5.4 September 2026
+
+=== Enhancement
+
+* **Issue-2423**: Prevent the cvedb `is empty` case.
+* **Issue-2602**: Provide vcs information in NeuVector's golang binaries.
+
+=== Bugs Fixed
+
+* **NVSHAS-10289**: Group contention resolution Restrict Mode on K3s/RKE2 yields unexpected results.
+* **Issue-2669**: Suppress log messages Benchmark report not found.
+* **Issue-2686**: Duplicate response rules are created when importing (through CRD) same-name response rules with changes.
+* **Issue-2709**: When CRD-defined response rules are triggered, the webhook call (if configured) is not sent.
+* **Issue-2727**: NV doesn't prevent user from importing federated groups/policies through CRD.
+* **Chore(deps)**: Dependency updates & golang upgrade.
+
+=== References:
+
+* https://github.com/neuvector/neuvector/security/advisories/GHSA-78r4-3wfq-r2xm[Admission Control Bypass via Hardcoded Sidecar Image Exemption]
+* https://github.com/neuvector/neuvector/security/advisories/GHSA-wcx5-mq6c-c54j[Logout bypass via alternate JWT spelling]
+* https://github.com/neuvector/neuvector/security/advisories/GHSA-c6rx-pmvf-m3jx[The SAML and OpenID SSO login does not have proper identifier for login users]
+* https://github.com/neuvector/neuvector/security/advisories/GHSA-wgg5-24xq-px35[SAML Audience Confusion Allows Cross-SP Authentication]
+* https://github.com/neuvector/neuvector/security/advisories/GHSA-vr77-8vmq-qfmj[OS Command Injection in Packet-Capture (Sniffer) Filter leading to Remote Code Execution on Kubernetes Nodes]
+
+[#_v553_june_2026]
+== v5.5.3 June 2026
+This release rebuilds the container images to patch CVEs in underlying operating system, application and library dependencies. It contains no new functional features or breaking changes, ensuring complete backwards compatibility.
+
+=== Bugs fixed	
+* https://github.com/neuvector/neuvector/issues/2227[#2227]: UBI controller images don't work in newer OpenShift environment
+
+[#_v552_may_2026]
+== v5.5.2 May 2026
+
+This release rebuilds the container images to patch CVEs in underlying operating system, application and library dependencies. It contains no new functional features or breaking changes, ensuring complete backwards compatibility.
+
+
+[#_v551_april_2026]
+== v5.5.1 April 2026
+
+=== Feature requests
+
+* https://github.com/neuvector/neuvector/issues/2248[#2248]: Expose OS scan support status from scanner results
+  
+=== Bugs fixed
+  
+* https://github.com/neuvector/neuvector/issues/1140[#1140]: The **accept vulnerabilities in Node** page can be brought out of the View drop down box like that of the container
+* https://github.com/neuvector/neuvector/issues/1154[#1154]: Report column content shifting with multiple fix versions separated by a comma
+* https://github.com/neuvector/neuvector/issues/2255[#2255]: Unable to scan image registry by API(v1/scan/repository) with proxy enabled through curl
+* https://github.com/neuvector/neuvector/issues/1170[#1170]: Event handling function that is set in the icon element does not work after Angular 20 migration.
+* https://github.com/neuvector/neuvector/issues/1175[#1175]: The federated prefix and the registry name are not properly aligned when attempting to add a federated registry to the primary cluster
+* https://github.com/neuvector/neuvector/issues/1156[#1156]: Auto-scan button malfunctioning
+* https://github.com/neuvector/neuvector/issues/1179[#1179]: Show advance setting button is not displayed when creating user
+* https://github.com/neuvector/neuvector/issues/1183[#1183]: Auto-scan toggle state is not synchronized between **Dashboard** and **Assets -> Nodes** page
+
+[#_v550_march_2026]
+== v5.5.0 March 2026
+
+=== Feature requests
+
+* **NVSHAS-10131**: Improve the Vulnerabilities Report
+* **NVSHAS-10195**: Upgrade UI framework from Angular 14 to Angular 20
+
+=== Bugs fixed
+
+* **NVSHAS-10244**: NeuVector Rancher SSO authentication error when Rancher Helm release name is not `rancher`
+* **NVSHAS-10255**: Add user validation on APIs that do not communicate with the controller
+* **NVSHAS-10264**: Display control is missing on the API key page
+* **NVSHAS-10281**: Suppress log in the response rule is not working
+
+=== Announcement
+
+* **NVSHAS-10246**: Deprecate Docker native support in NeuVector
+
+=== References
+
+* https://github.com/neuvector/manager/security/advisories/GHSA-hx45-873x-74qv[Potential information leakage from manager `/network/graph` API]
