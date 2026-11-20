@@ -1,6 +1,6 @@
 = Network Rules
 :description: Create, edit, and delete network rules to control allowed and denied application connections using CLI or REST API
-:revdate: 2026-10-20
+:revdate: 2026-11-20
 :page-revdate: {revdate}
 :page-opendocs-origin: /05.policy/05.networkrules/05.networkrules.md
 :page-opendocs-slug:  /policy/networkrules
