@@ -46,7 +46,7 @@ To scan the latest PHP-related vulnerabilities, please restart all NeuVector sca
 * **Issue-2727**: NV doesn't prevent user from importing federated groups/policies through CRD.
 * **Chore(deps)**: Dependency updates & golang upgrade.
 
-=== References:
+=== References
 
 * https://github.com/neuvector/neuvector/security/advisories/GHSA-78r4-3wfq-r2xm[Admission Control Bypass via Hardcoded Sidecar Image Exemption]
 * https://github.com/neuvector/neuvector/security/advisories/GHSA-wcx5-mq6c-c54j[Logout bypass via alternate JWT spelling]
