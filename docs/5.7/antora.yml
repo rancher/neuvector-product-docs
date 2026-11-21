@@ -1,7 +1,7 @@
 name: security
 title: SUSE® Security
 version: 5.7
-prerelease: (Unreleased)
+display_version: '5.7'
 start_page: en:overview.adoc
 asciidoc:
   attributes:
